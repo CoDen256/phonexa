@@ -1,0 +1,67 @@
+{
+  "key":   "ru",
+  "label": "Russian",
+  "color": "#f43f5e",
+  "vowels": [
+    {
+      "ipa": "i", "h": 0.02, "b": 0.02, "rounded": false,
+      "desc": "Close front unrounded (и)", "f1": 270, "f2": 2200,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Russian_phonology",
+      "words": [
+        {"text": "м<b>и</b>р (world)", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ru-мир.ogg"},
+        {"text": "л<b>и</b>с (fox)",   "audio": null}
+      ]
+    },
+    {
+      "ipa": "ɨ", "h": 0.03, "b": 0.52, "rounded": false,
+      "desc": "Close central unrounded (ы)", "f1": 320, "f2": 1380,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
+      "words": [
+        {"text": "б<b>ы</b>ть (to be)", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ru-быть.ogg"},
+        {"text": "т<b>ы</b> (you)",     "audio": null}
+      ]
+    },
+    {
+      "ipa": "u", "h": 0.02, "b": 0.97, "rounded": true,
+      "desc": "Close back rounded (у)", "f1": 300, "f2": 680,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Russian_phonology",
+      "words": [
+        {"text": "д<b>у</b>ша (soul)",  "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ru-душа.ogg"},
+        {"text": "р<b>у</b>ка (hand)",  "audio": null}
+      ]
+    },
+    {
+      "ipa": "e", "h": 0.44, "b": 0.04, "rounded": false,
+      "desc": "Close-mid front unrounded (е/э)", "f1": 440, "f2": 1900,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Russian_phonology",
+      "words": [
+        {"text": "<b>э</b>то (this)",     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ru-это.ogg"},
+        {"text": "м<b>е</b>сто (place)",  "audio": null}
+      ]
+    },
+    {
+      "ipa": "o", "h": 0.40, "b": 0.90, "rounded": true,
+      "desc": "Close-mid back rounded (о)", "f1": 500, "f2": 1000,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Russian_phonology",
+      "words": [
+        {"text": "д<b>о</b>м (house)",  "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ru-дом.ogg"},
+        {"text": "н<b>о</b>с (nose)",   "audio": null}
+      ]
+    },
+    {
+      "ipa": "a", "h": 0.97, "b": 0.38, "rounded": false,
+      "desc": "Open central unrounded (а)", "f1": 850, "f2": 1350,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Russian_phonology",
+      "words": [
+        {"text": "м<b>а</b>ть (mother)", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ru-мать.ogg"},
+        {"text": "д<b>а</b> (yes)",      "audio": null}
+      ]
+    }
+  ]
+}

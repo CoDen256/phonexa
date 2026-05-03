@@ -1,0 +1,107 @@
+{
+  "key":   "no",
+  "label": "Norwegian",
+  "color": "#22d3ee",
+  "vowels": [
+    {
+      "ipa": "i", "h": 0.02, "b": 0.02, "rounded": false,
+      "desc": "Close front unrounded", "f1": 240, "f2": 2380,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Norwegian_phonology",
+      "words": [
+        {"text": "f<b>i</b>n (fine)",    "audio": null},
+        {"text": "l<b>i</b>ten (small)", "audio": null}
+      ]
+    },
+    {
+      "ipa": "y", "h": 0.02, "b": 0.08, "rounded": true,
+      "desc": "Close front rounded", "f1": 235, "f2": 1810,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
+      "words": [
+        {"text": "n<b>y</b> (new)",   "audio": null},
+        {"text": "b<b>y</b> (city)",  "audio": null}
+      ]
+    },
+    {
+      "ipa": "ʉ", "h": 0.04, "b": 0.54, "rounded": true,
+      "desc": "Close central rounded (Norwegian u)", "f1": 260, "f2": 1370,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
+      "words": [
+        {"text": "h<b>u</b>s (house)",     "audio": null},
+        {"text": "sk<b>u</b>lle (should)", "audio": null}
+      ]
+    },
+    {
+      "ipa": "e", "h": 0.30, "b": 0.02, "rounded": false,
+      "desc": "Close-mid front unrounded", "f1": 395, "f2": 2080,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
+      "words": [
+        {"text": "s<b>e</b> (see)",      "audio": null},
+        {"text": "br<b>e</b>v (letter)", "audio": null}
+      ]
+    },
+    {
+      "ipa": "ø", "h": 0.30, "b": 0.08, "rounded": true,
+      "desc": "Close-mid front rounded", "f1": 375, "f2": 1590,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_front_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
+      "words": [
+        {"text": "gr<b>ø</b>t (porridge)", "audio": null},
+        {"text": "s<b>ø</b>t (sweet)",     "audio": null}
+      ]
+    },
+    {
+      "ipa": "o", "h": 0.28, "b": 0.97, "rounded": true,
+      "desc": "Close-mid back rounded", "f1": 410, "f2": 880,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
+      "words": [
+        {"text": "g<b>o</b>d (good)", "audio": null},
+        {"text": "b<b>o</b> (live)",  "audio": null}
+      ]
+    },
+    {
+      "ipa": "ɛ", "h": 0.62, "b": 0.03, "rounded": false,
+      "desc": "Open-mid front unrounded", "f1": 575, "f2": 1880,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "words": [
+        {"text": "s<b>e</b>tt (set)",   "audio": null},
+        {"text": "m<b>e</b>d (with)",   "audio": null}
+      ]
+    },
+    {
+      "ipa": "æ", "h": 0.80, "b": 0.03, "rounded": false,
+      "desc": "Near-open front unrounded", "f1": 730, "f2": 1700,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "words": [
+        {"text": "v<b>æ</b>re (to be)",    "audio": null},
+        {"text": "l<b>æ</b>rer (teacher)", "audio": null}
+      ]
+    },
+    {
+      "ipa": "a", "h": 0.97, "b": 0.18, "rounded": false,
+      "desc": "Open front unrounded", "f1": 820, "f2": 1380,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
+      "words": [
+        {"text": "m<b>a</b>t (food)", "audio": null},
+        {"text": "d<b>a</b>g (day)",  "audio": null}
+      ]
+    },
+    {
+      "ipa": "ɔ", "h": 0.64, "b": 0.94, "rounded": true,
+      "desc": "Open-mid back rounded (å)", "f1": 545, "f2": 865,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
+      "words": [
+        {"text": "<b>å</b>tte (eight)", "audio": null},
+        {"text": "b<b>å</b>t (boat)",   "audio": null}
+      ]
+    }
+  ]
+}
