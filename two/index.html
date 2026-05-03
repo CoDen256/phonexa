@@ -295,19 +295,32 @@ const ROWS = [
 // filterType controls which category system is active.
 // activeLangs / activeRoundness track which tabs are toggled on.
 // checkedVowels is derived — call updateFilter() after any state change.
-
 let filterType = 'language';
 const activeLangs = new Set(['cardinal', 'english']);
 const activeRoundness = new Set(['rounded', 'unrounded']);
 const checkedVowels = new Set();
 function compareKey(lk, ipa) { return `${lk}::${ipa}`; }
 
+// Track individual vowel selection per language
+const langVowelSelections = new Map();
+
 function updateFilter() {
   checkedVowels.clear();
+  
   if (filterType === 'language') {
     for (const [lk, lang] of Object.entries(LANGS)) {
       if (!activeLangs.has(lk)) continue;
-      for (const v of lang.vowels) checkedVowels.add(compareKey(lk, v.ipa));
+      
+      // If no specific vowels selected for this language, show all
+      const selectedVowels = langVowelSelections.get(lk);
+      if (!selectedVowels || selectedVowels.size === 0) {
+        for (const v of lang.vowels) checkedVowels.add(compareKey(lk, v.ipa));
+      } else {
+        // Only show explicitly selected vowels
+        for (const v of lang.vowels) {
+          if (selectedVowels.has(v.ipa)) checkedVowels.add(compareKey(lk, v.ipa));
+        }
+      }
     }
   } else { // roundness
     for (const [lk, lang] of Object.entries(LANGS)) {
@@ -492,7 +505,6 @@ function hideTip() { tip.style.display='none'; }
 //   Level 2 — Toggle tabs for each item in the chosen category.
 //             Multiple tabs can be active simultaneously (multi-select).
 //             Active = filled, dim = inactive.
-
 function buildSidebar() {
   const sb = document.getElementById('sidebar');
   sb.innerHTML = '';
@@ -525,14 +537,58 @@ function buildSidebar() {
   if (filterType === 'language') {
     // One toggle tab per language
     for (const [lk, lang] of Object.entries(LANGS)) {
-      tabWrap.appendChild(makeCatTab(
+      const tab = makeCatTab(
         lang.label, lang.color, activeLangs.has(lk),
         () => {
           if (activeLangs.has(lk)) activeLangs.delete(lk);
           else activeLangs.add(lk);
           updateFilter(); buildSidebar(); render(); renderDetail();
         }
-      ));
+      );
+      
+      // Add vowel checkboxes for each language
+      const vowelList = document.createElement('div');
+      vowelList.className = 'sb-vowel-list';
+      
+      if (activeLangs.has(lk)) {
+        for (const v of lang.vowels) {
+          const item = document.createElement('div');
+          item.className = 'sb-vowel-item';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = langVowelSelections.get(lk)?.has(v.ipa) || false;
+          
+          checkbox.addEventListener('change', () => {
+            if (!langVowelSelections.has(lk)) langVowelSelections.set(lk, new Set());
+            const selected = langVowelSelections.get(lk);
+            
+            if (checkbox.checked) {
+              selected.add(v.ipa);
+            } else {
+              selected.delete(v.ipa);
+            }
+            
+            updateFilter(); render(); renderDetail();
+          });
+          
+          const ipaSpan = document.createElement('span');
+          ipaSpan.className = 'sb-ipa';
+          ipaSpan.textContent = v.ipa;
+          
+          const descSpan = document.createElement('span');
+          descSpan.className = 'sb-desc';
+          descSpan.textContent = v.desc;
+          
+          item.appendChild(checkbox);
+          item.appendChild(ipaSpan);
+          item.appendChild(descSpan);
+          vowelList.appendChild(item);
+        }
+      }
+      
+      tab.appendChild(vowelList);
+      tabWrap.appendChild(tab);
     }
   } else {
     // Rounded / Unrounded
