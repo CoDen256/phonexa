@@ -6,131 +6,209 @@
 <title>IPA Vowel Chart</title>
 <style>
   :root {
-    --bg:      #1e2b3c;
-    --surface: #253344;
-    --border:  #344f6a;
-    --muted:   #7a90a8;
-    --card:    #263447;
+    --bg:      #1a2636;
+    --surface: #213040;
+    --border:  #2e4560;
+    --muted:   #6a8298;
+    --card:    #223042;
+    --sidebar: #1e2e40;
   }
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
     font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
-    background:var(--bg); color:#dce8f4;
-    min-height:100vh; padding:24px 16px 48px;
+    background:var(--bg); color:#d8e8f4;
+    min-height:100vh; padding:20px 16px 60px;
     display:flex; flex-direction:column; align-items:center;
   }
-  header { text-align:center; margin-bottom:18px; }
+  header { text-align:center; margin-bottom:16px; }
   header h1 { font-size:1.15rem; color:#7eb8f7; letter-spacing:.04em; margin-bottom:3px; }
-  header p  { font-size:.78rem; color:var(--muted); }
+  header p  { font-size:.76rem; color:var(--muted); }
 
-  .controls { display:flex; gap:7px; flex-wrap:wrap; justify-content:center; margin-bottom:18px; }
-  .lang-btn {
-    padding:5px 15px; border-radius:20px; border:2px solid;
-    background:transparent; cursor:pointer; font-size:.8rem;
-    font-weight:700; transition:background .15s,color .15s; line-height:1.4;
+  /* ── Page layout ─────────────────────────────────────────── */
+  .page-layout {
+    width:100%; max-width:1480px;
+    display:flex; flex-direction:column; align-items:stretch; gap:0;
   }
-  .lang-btn.on { color:#0d1117 !important; }
+
+  .chart-row {
+    display:flex; gap:14px; align-items:flex-start; width:100%;
+  }
+
+  .chart-col { flex:1; min-width:0; }
 
   .chart-wrap {
     background:var(--surface); border:1px solid var(--border);
-    border-radius:16px; padding:10px;
-    /* Wide enough to give letters real space at desktop size */
-    width:100%; max-width:1020px;
+    border-radius:14px; padding:10px;
   }
   svg#chart { display:block; width:100%; height:auto; overflow:visible; }
+
+  /* ── Sidebar ─────────────────────────────────────────────── */
+  .sidebar {
+    width:230px; flex-shrink:0;
+    background:var(--sidebar); border:1px solid var(--border);
+    border-radius:14px; padding:14px 12px;
+    max-height:820px; overflow-y:auto;
+  }
+  .sb-title {
+    font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--muted); margin-bottom:12px; padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
+
+  .sb-lang { margin-bottom:12px; }
+  .sb-lang-head {
+    display:flex; align-items:center; gap:7px; padding:4px 2px;
+    cursor:pointer; border-radius:6px;
+    transition:background .1s;
+    user-select:none;
+  }
+  .sb-lang-head:hover { background:#ffffff0a; }
+  .sb-lang-name {
+    font-size:.82rem; font-weight:700; letter-spacing:.02em;
+    flex:1;
+  }
+  .sb-lang-count {
+    font-size:.65rem; color:var(--muted);
+  }
+
+  /* collapse arrow */
+  .sb-lang-arrow {
+    font-size:.6rem; color:var(--muted);
+    transition:transform .2s;
+  }
+  .sb-lang.collapsed .sb-lang-arrow { transform:rotate(-90deg); }
+  .sb-lang.collapsed .sb-vowel-list { display:none; }
+
+  .sb-vowel-list { padding:2px 0 4px 4px; }
+  .sb-vowel-item {
+    display:flex; align-items:center; gap:7px;
+    padding:3px 4px; border-radius:5px; cursor:pointer;
+    transition:background .1s; user-select:none;
+  }
+  .sb-vowel-item:hover { background:#ffffff0a; }
+  .sb-vowel-item input[type=checkbox] { flex-shrink:0; cursor:pointer; width:13px; height:13px; }
+  .sb-ipa {
+    font-family:Georgia,'Noto Serif',serif; font-size:1rem;
+    font-weight:bold; min-width:26px; line-height:1;
+  }
+  .sb-desc {
+    font-size:.65rem; color:var(--muted); line-height:1.3;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  /* ── Sidebar category type selector ─────────────────────── */
+  .cat-type-row {
+    display:flex; margin:-14px -12px 16px;
+    border-bottom:1px solid var(--border);
+  }
+  .cat-type-btn {
+    flex:1; padding:10px 4px; text-align:center;
+    font-size:.72rem; font-weight:700; letter-spacing:.03em;
+    background:none; border:none; border-bottom:2px solid transparent;
+    cursor:pointer; color:var(--muted);
+    transition:color .15s, border-color .15s;
+  }
+  .cat-type-btn.active { color:#7eb8f7; border-bottom-color:#7eb8f7; }
+  .cat-type-btn:hover:not(.active) { color:#a8c4da; }
+
+  /* ── Sidebar toggle tabs (multi-selectable) ──────────────── */
+  .cat-tabs {
+    display:flex; flex-direction:column; gap:7px;
+  }
+  .cat-tab {
+    display:flex; align-items:center; gap:8px;
+    padding:8px 14px; border-radius:10px;
+    font-size:.82rem; font-weight:700;
+    cursor:pointer; width:100%; text-align:left;
+    border:1.5px solid; transition:background .12s, opacity .12s, border-color .12s;
+    opacity:0.45;
+  }
+  .cat-tab.on { opacity:1; }
+  .cat-tab:hover { opacity:0.75; }
+  .cat-tab.on:hover { opacity:0.88; }
+  .cat-tab-dot {
+    width:8px; height:8px; border-radius:50%; flex-shrink:0;
+  }
+
+  /* ── Legend ──────────────────────────────────────────────── */
+  .legend {
+    margin-top:8px; font-size:.71rem; color:var(--muted);
+    text-align:center; line-height:1.7;
+  }
+  .legend b { color:#b8cee4; font-weight:600; }
 
   /* ── Tooltip ─────────────────────────────────────────────── */
   .tip {
     position:fixed; pointer-events:none; z-index:999; display:none;
-    background:#18253a; border:1px solid #344f6a; border-radius:10px;
-    padding:10px 13px; min-width:175px; max-width:250px;
-    box-shadow:0 6px 30px rgba(0,0,0,.7);
+    background:#14202e; border:1px solid #2e4560; border-radius:10px;
+    padding:10px 13px; min-width:175px; max-width:248px;
+    box-shadow:0 6px 28px rgba(0,0,0,.75);
   }
-  .tip-ipa  { font-size:2.1rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
-  .tip-lang { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin:3px 0 6px; }
-  .tip-desc { font-size:.76rem; color:#8fa8c0; line-height:1.45; }
-  .tip-word { font-size:.8rem; margin-top:6px; color:#ccdae8; }
+  .tip-ipa  { font-size:2rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
+  .tip-lang { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin:3px 0 5px; }
+  .tip-desc { font-size:.75rem; color:#8fa8c0; line-height:1.45; }
+  .tip-word { font-size:.78rem; margin-top:5px; color:#c8d8e8; }
   .tip-word b { text-decoration:underline; font-weight:normal; }
-  .tip-f    { font-size:.68rem; color:#5a80a0; margin-top:4px; font-family:monospace; }
-  .tip-f span { color:#7aa0be; }
-  .tip-hint { font-size:.67rem; color:#4a6888; margin-top:6px; border-top:1px solid #2a3f58; padding-top:5px; }
+  .tip-f    { font-size:.67rem; color:#587898; margin-top:4px; font-family:monospace; }
+  .tip-f span { color:#789ab8; }
 
-  /* ── Info & legend ───────────────────────────────────────── */
-  .info-bar {
-    display:flex; gap:14px; flex-wrap:wrap;
-    justify-content:center; margin-top:10px; font-size:.75rem; color:var(--muted);
+  /* ── Detail section ──────────────────────────────────────── */
+  .detail-section { margin-top:22px; width:100%; }
+  .detail-empty {
+    background:var(--surface); border:1px dashed var(--border);
+    border-radius:12px; padding:24px; text-align:center;
+    color:#3a5878; font-size:.82rem;
   }
-  .info-item { display:flex; align-items:center; gap:6px; }
-  .info-swatch { width:10px; height:10px; border-radius:50%; border:2px solid; flex-shrink:0; }
-  .legend {
-    margin-top:10px; font-size:.73rem; color:var(--muted); text-align:center; line-height:1.7;
-  }
-  .legend b { color:#ccdae8; font-weight:600; }
-
-  /* ── Comparison section ──────────────────────────────────── */
-  .compare-wrap { width:100%; max-width:1020px; margin-top:28px; }
-  .compare-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .compare-title {
-    font-size:.85rem; color:#7eb8f7; font-weight:700;
-    letter-spacing:.04em; text-transform:uppercase;
+  .detail-lang-block { margin-bottom:22px; }
+  .detail-lang-title {
+    font-size:.82rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:10px;
     display:flex; align-items:center; gap:8px;
   }
-  .compare-badge {
-    background:#1e3050; border:1px solid #2d4868; color:#6090b8;
-    font-size:.7rem; padding:1px 8px; border-radius:10px; font-weight:600;
+  .detail-lang-title::after {
+    content:''; flex:1; height:1px; background:currentColor; opacity:.2;
   }
-  .clear-btn {
-    background:transparent; border:1px solid #344f6a; color:#6a8aa8;
-    padding:4px 12px; border-radius:8px; cursor:pointer; font-size:.75rem;
-    transition:border-color .15s,color .15s;
+  .detail-cards-row {
+    display:flex; gap:10px; flex-wrap:wrap;
   }
-  .clear-btn:hover { border-color:#60a5fa; color:#60a5fa; }
-  .compare-empty {
-    background:var(--surface); border:1px dashed #344f6a; border-radius:12px;
-    padding:28px; text-align:center; color:#4a6888; font-size:.82rem; line-height:1.5;
-  }
-  .compare-empty span { display:block; font-size:1.4rem; margin-bottom:8px; opacity:.5; }
-  .compare-grid { display:flex; gap:12px; flex-wrap:wrap; }
 
-  /* ── Comparison card ─────────────────────────────────────── */
-  .ccard {
-    background:var(--card); border:2px solid; border-radius:14px;
-    padding:14px 13px 12px; width:172px; flex-shrink:0;
-    position:relative; display:flex; flex-direction:column; gap:7px;
+  /* ── Detail card ─────────────────────────────────────────── */
+  .dcard {
+    background:var(--card); border:2px solid;
+    border-radius:12px; padding:12px 12px 10px;
+    width:162px; flex-shrink:0;
+    display:flex; flex-direction:column; gap:5px;
   }
-  .ccard-remove {
-    position:absolute; top:8px; right:9px;
-    background:transparent; border:none; color:#4a6888;
-    font-size:1rem; cursor:pointer; line-height:1; padding:0 2px;
-    transition:color .15s;
+  .dcard-ipa  { font-size:1.9rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
+  .dcard-desc { font-size:.71rem; color:#8fa8c0; line-height:1.4; }
+  .dcard-round { font-size:.66rem; }
+  .dcard-word  { font-size:.72rem; color:#c8d8e8; }
+  .dcard-word b { text-decoration:underline; font-weight:normal; }
+  .dcard-formants { font-size:.66rem; color:#587898; font-family:monospace; }
+  .dcard-formants span { color:#789ab8; }
+  .dcard-actions {
+    display:flex; gap:5px; margin-top:auto; padding-top:6px;
+    border-top:1px solid #253548;
   }
-  .ccard-remove:hover { color:#f87171; }
-  .ccard-top { display:flex; align-items:baseline; gap:7px; }
-  .ccard-ipa  { font-size:2.1rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
-  .ccard-lang { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; opacity:.85; }
-  .ccard-desc { font-size:.73rem; color:#8fa8c0; line-height:1.4; }
-  .ccard-round { font-size:.68rem; }
-  .ccard-word  { font-size:.75rem; color:#ccdae8; }
-  .ccard-word b { text-decoration:underline; font-weight:normal; }
-  .ccard-formants { font-size:.68rem; color:#5a80a0; font-family:monospace; }
-  .ccard-formants span { color:#7aa0be; }
-  .ccard-actions {
-    display:flex; gap:6px; margin-top:auto; padding-top:5px;
-    border-top:1px solid #2a3f58;
+  .dcard-play {
+    flex:1; background:#1a2e48; border:1px solid #2a4060;
+    color:#7eb8f7; padding:4px 0; border-radius:5px;
+    cursor:pointer; font-size:.7rem; transition:background .15s;
   }
-  .ccard-play {
-    flex:1; background:#1e3050; border:1px solid #2d4868;
-    color:#7eb8f7; padding:4px 0; border-radius:6px;
-    cursor:pointer; font-size:.72rem; transition:background .15s;
-  }
-  .ccard-play:hover { background:#253f68; }
-  .ccard-wiki {
-    flex:1; background:#1e3050; border:1px solid #2d4868;
-    color:#7eb8f7; padding:4px 0; border-radius:6px;
-    text-align:center; text-decoration:none; font-size:.72rem;
+  .dcard-play:hover { background:#1f3a58; }
+  .dcard-wiki {
+    flex:1; background:#1a2e48; border:1px solid #2a4060;
+    color:#7eb8f7; padding:4px 0; border-radius:5px;
+    text-align:center; text-decoration:none; font-size:.7rem;
     transition:background .15s;
   }
-  .ccard-wiki:hover { background:#253f68; }
+  .dcard-wiki:hover { background:#1f3a58; }
+
+  /* ── Responsive ──────────────────────────────────────────── */
+  @media (max-width: 800px) {
+    .chart-row { flex-direction:column; }
+    .sidebar { width:100%; max-height:280px; }
+  }
 </style>
 </head>
 <body>
@@ -139,37 +217,36 @@
 
 <header>
   <h1>IPA Vowel Chart</h1>
-  <p>Hover for info · Click letter to play &amp; compare</p>
+  <p>Use the checklist → to show vowels · Hover on chart for details</p>
 </header>
 
-<div class="controls" id="controls"></div>
+<div class="page-layout">
+  <div class="chart-row">
 
-<div class="chart-wrap">
-  <!-- viewBox is wide so letters have real space at desktop size -->
-  <svg id="chart" viewBox="0 0 1000 640"></svg>
-</div>
+    <!-- Chart -->
+    <div class="chart-col">
+      <div class="chart-wrap">
+        <svg id="chart" viewBox="0 0 1200 720"></svg>
+      </div>
+      <div class="legend">
+        <b>·</b> exact position &nbsp;|&nbsp;
+        label <b>left</b> of dot = unrounded &nbsp;|&nbsp;
+        label <b>right</b> of dot = rounded
+      </div>
+    </div>
 
-<div class="legend">
-  <b>·</b> exact position &nbsp;|&nbsp;
-  letter <b>left</b> of dot = unrounded &nbsp;|&nbsp;
-  letter <b>right</b> of dot = rounded
-</div>
-<div class="info-bar" id="infoBar"></div>
+    <!-- Sidebar checklist -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-title">Show vowels</div>
+      <!-- populated by JS -->
+    </aside>
 
-<div class="compare-wrap">
-  <div class="compare-head">
-    <span class="compare-title">
-      Comparison
-      <span class="compare-badge" id="compareBadge">0 selected</span>
-    </span>
-    <button class="clear-btn" id="clearBtn">Clear all</button>
-  </div>
-  <div class="compare-empty" id="compareEmpty">
-    <span>⇧</span>
-    Click any vowel letter on the chart to add it here
-  </div>
-  <div class="compare-grid" id="compareGrid"></div>
-</div>
+  </div><!-- .chart-row -->
+
+  <!-- Detail cards (below chart + sidebar) -->
+  <div class="detail-section" id="detailSection"></div>
+
+</div><!-- .page-layout -->
 
 <div id="tip" class="tip"></div>
 
@@ -198,17 +275,11 @@ function playVowel(lk, ipa) {
 }
 
 // ─── Trapezoid ────────────────────────────────────────────────────────────────
-// Right edge is vertical (TR.x === BR.x).
-// Large dimensions so vowel positions are well-separated.
+// Right edge vertical (TR.x === BR.x). Large for readability.
 const TRAP = {
-  TL: {x:155, y:108},   // Close-Front
-  TR: {x:845, y:108},   // Close-Back
-  BL: {x:375, y:518},   // Open-Front
-  BR: {x:845, y:518},   // Open-Back
+  TL:{x:155, y:110},  TR:{x:1115, y:110},  // top span: 960px
+  BL:{x:390, y:618},  BR:{x:1115, y:618},  // bottom span: 725px,  height: 508px
 };
-// Top span: 690px    Bottom span: 470px    Height: 410px
-// Row interval: ~68px — enough room between rows for 22px letters
-
 function trapPos(h, b) {
   const fX = TRAP.TL.x + h*(TRAP.BL.x - TRAP.TL.x);
   return { x: fX + b*(TRAP.TR.x - fX), y: TRAP.TL.y + h*(TRAP.BL.y - TRAP.TL.y) };
@@ -220,10 +291,34 @@ const ROWS = [
   {h:1,   label:'Open'},
 ];
 
-// ─── State ────────────────────────────────────────────────────────────────────
-const active   = { cardinal:true, english:true, german:false, russian:false, norwegian:false };
-const selected = new Map();
+// ─── Filter state ─────────────────────────────────────────────────────────────
+// filterType controls which category system is active.
+// activeLangs / activeRoundness track which tabs are toggled on.
+// checkedVowels is derived — call updateFilter() after any state change.
+
+let filterType = 'language';
+const activeLangs = new Set(['cardinal', 'english']);
+const activeRoundness = new Set(['rounded', 'unrounded']);
+const checkedVowels = new Set();
 function compareKey(lk, ipa) { return `${lk}::${ipa}`; }
+
+function updateFilter() {
+  checkedVowels.clear();
+  if (filterType === 'language') {
+    for (const [lk, lang] of Object.entries(LANGS)) {
+      if (!activeLangs.has(lk)) continue;
+      for (const v of lang.vowels) checkedVowels.add(compareKey(lk, v.ipa));
+    }
+  } else { // roundness
+    for (const [lk, lang] of Object.entries(LANGS)) {
+      for (const v of lang.vowels) {
+        if (activeRoundness.has(v.rounded ? 'rounded' : 'unrounded'))
+          checkedVowels.add(compareKey(lk, v.ipa));
+      }
+    }
+  }
+}
+updateFilter(); // populate on load
 
 // ─── SVG helpers ──────────────────────────────────────────────────────────────
 const NS = 'http://www.w3.org/2000/svg';
@@ -232,200 +327,141 @@ function $s(tag, a={}) {
   for (const [k,v] of Object.entries(a)) el.setAttribute(k, String(v));
   return el;
 }
-function $t(str, a={}) { const el = $s('text', a); el.textContent = str; return el; }
+function $t(str, a={}) { const el=$s('text',a); el.textContent=str; return el; }
 
-// ─── Text-width estimator for pill sizing ─────────────────────────────────────
-// IPA chars are roughly 0.65em wide; length mark is narrower (~0.36em).
 function ipaWidth(ipa, fs) {
-  let w = 0;
-  for (const ch of ipa) w += (ch === 'ː' ? 0.36 : 0.65);
-  return w * fs;
+  let w=0; for(const ch of ipa) w += ch==='ː'?0.36:0.65;
+  return w*fs;
 }
 
-// ─── Vertical text offset ─────────────────────────────────────────────────────
-// SVG text y sets the BASELINE. We want the visual letter to be centred on dot_y.
-// For IPA characters (mostly lowercase height):
-//   cap-height ≈ 0.72*FS above baseline → centre of cap at 0.36*FS above baseline
-//   So: set baseline = dot_y + 0.36*FS  → cap centre aligns with dot_y.
-// We use dy="0.36em" on the text element (simpler than computing absolute y).
-const DY = '0.36em';
-
-// ─── Controls ─────────────────────────────────────────────────────────────────
-for (const [key, lang] of Object.entries(LANGS)) {
-  const btn = document.createElement('button');
-  btn.className = 'lang-btn' + (active[key] ? ' on' : '');
-  btn.textContent = lang.label;
-  btn.style.borderColor = lang.color;
-  btn.style.color = active[key] ? '#0d1117' : lang.color;
-  btn.style.backgroundColor = active[key] ? lang.color : 'transparent';
-  btn.addEventListener('click', () => {
-    active[key] = !active[key];
-    btn.classList.toggle('on', active[key]);
-    btn.style.backgroundColor = active[key] ? lang.color : 'transparent';
-    btn.style.color = active[key] ? '#0d1117' : lang.color;
-    render();
-  });
-  document.getElementById('controls').appendChild(btn);
-}
-
-// ─── Render ───────────────────────────────────────────────────────────────────
+// ─── Chart render ─────────────────────────────────────────────────────────────
 function render() {
   const svg = document.getElementById('chart');
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-  // ── Grid lines ──
+  // Grid lines
   for (const row of ROWS) {
-    const L = trapPos(row.h, 0), R = trapPos(row.h, 1);
-    svg.appendChild($s('line', {x1:L.x,y1:L.y,x2:R.x,y2:R.y,stroke:'#344f6a','stroke-width':1.5}));
+    const L=trapPos(row.h,0), R=trapPos(row.h,1);
+    svg.appendChild($s('line',{x1:L.x,y1:L.y,x2:R.x,y2:R.y,stroke:'#2e4560','stroke-width':1.5}));
   }
-  const cT = trapPos(0, .5), cB = trapPos(1, .5);
-  svg.appendChild($s('line', {x1:cT.x,y1:cT.y,x2:cB.x,y2:cB.y,stroke:'#344f6a','stroke-width':1,'stroke-dasharray':'6 5'}));
+  const cT=trapPos(0,.5), cB=trapPos(1,.5);
+  svg.appendChild($s('line',{x1:cT.x,y1:cT.y,x2:cB.x,y2:cB.y,stroke:'#2e4560','stroke-width':1,'stroke-dasharray':'6 5'}));
 
-  // ── Trapezoid outline ──
-  const {TL,TR,BL,BR} = TRAP;
-  svg.appendChild($s('path', {
+  // Trapezoid
+  const {TL,TR,BL,BR}=TRAP;
+  svg.appendChild($s('path',{
     d:`M${TL.x},${TL.y} L${TR.x},${TR.y} L${BR.x},${BR.y} L${BL.x},${BL.y}Z`,
-    fill:'none', stroke:'#3f5f7e', 'stroke-width':2,
+    fill:'none', stroke:'#385878', 'stroke-width':2,
   }));
 
-  // ── Row / column labels ──
+  // Row labels (left, following front edge) — bigger for readability
   for (const row of ROWS) {
-    const p = trapPos(row.h, 0);
-    svg.appendChild($t(row.label, {
-      x:p.x-16, y:p.y+1,
-      dy: DY,
-      'text-anchor':'end', 'font-size':11, fill:'#7a90a8',
+    const p=trapPos(row.h,0);
+    svg.appendChild($t(row.label,{
+      x:p.x-16, y:p.y, dy:'0.36em',
+      'text-anchor':'end','font-size':13,fill:'#6a8298',
       'font-family':'system-ui,sans-serif',
     }));
   }
-  for (const [label, b] of [['Front',0],['Central',.5],['Back',1]]) {
-    const p = trapPos(0, b);
-    svg.appendChild($t(label, {
-      x:p.x, y:p.y-26,
-      'text-anchor':'middle', 'font-size':11, fill:'#7a90a8',
+  // Column labels
+  for (const [label,b] of [['Front',0],['Central',.5],['Back',1]]) {
+    const p=trapPos(0,b);
+    svg.appendChild($t(label,{
+      x:p.x, y:p.y-28,
+      'text-anchor':'middle','font-size':13,fill:'#6a8298',
       'font-family':'system-ui,sans-serif',
     }));
   }
 
-  // ── Three rendering layers ─────────────────────────────────────────────────
-  // 1. All dots          — purely visual, no pointer events
-  // 2. Language letters  — interactive
-  // 3. Cardinal letters  — interactive, rendered on top so always clickable
+  // Layer order:
+  //   1. langLayer  — language letter groups  (hover tooltip, background)
+  //   2. cardLayer  — cardinal letter groups  (hover tooltip, above language)
+  //   3. dotLayer   — ALL dots, interactive,  TOPMOST so always clickable
   //
-  // This ensures cardinal letters are never blocked by language layers.
+  // Dots are on top of letters so a click near a position always hits the dot
+  // even when multiple language letters overlap at the same spot.
 
-  const dotLayer  = $s('g', {'pointer-events':'none', 'id':'dotLayer'});
-  const langLayer = $s('g', {'id':'langLayer'});
-  const cardLayer = $s('g', {'id':'cardLayer'});
-  svg.appendChild(dotLayer);
+  const langLayer = $s('g');
+  const cardLayer = $s('g');
+  const dotLayer  = $s('g');          // no pointer-events override — it's interactive
   svg.appendChild(langLayer);
   svg.appendChild(cardLayer);
+  svg.appendChild(dotLayer);          // last = topmost
 
-  const activeLangs = Object.entries(LANGS).filter(([k]) => active[k]);
+  const SF = 'drop-shadow(0px 1px 2px rgba(0,0,0,0.45))';
+  const DOT_R_C = 4, DOT_R_L = 5;  // cardinal / language visual dot radius
+  const DOT_HIT = 12;               // transparent hit radius for dots
 
-  // Pass 1 — dots
-  for (const [key, lang] of activeLangs) {
-    const isCard = key === 'cardinal';
-    const dotR   = isCard ? 3 : 4;
-    const fill   = isCard ? '#7595b8' : lang.color + 'cc';
-    for (const v of lang.vowels) {
-      const {x, y} = trapPos(v.h, v.b);
-      dotLayer.appendChild($s('circle', {cx:x, cy:y, r:dotR, fill}));
-    }
-  }
-
-  // Passes 2 & 3 — letter groups
-  for (const [key, lang] of activeLangs) {
-    const isCard = key === 'cardinal';
-    const layer  = isCard ? cardLayer : langLayer;
-
-    const FS   = isCard ? 16 : 24;   // font-size in SVG units
-    const GAP  = 6;                  // gap: dot edge → nearest letter edge
-    const dotR = isCard ? 3  : 4;   // matches dot layer
-    const normalFill = isCard ? '#9fbad4' : lang.color;
-    // Selected: letter turns white (language) / pale-blue (cardinal) + glow
-    const selFill    = isCard ? '#d8eeff' : '#ffffff';
-    const selGlow    = isCard ? '#5a8aaa' : lang.color;
+  for (const [key, lang] of Object.entries(LANGS)) {
+    const isCard  = key === 'cardinal';
+    const lyrLbl  = isCard ? cardLayer : langLayer;
+    const FS      = isCard ? 15 : 22;
+    const GAP = 5, PAD = 4;
+    const dotR    = isCard ? DOT_R_C : DOT_R_L;
+    const fillOp  = isCard ? 0.70 : 0.78;
+    const lblFill = isCard ? '#9ab8d0' : lang.color;
+    const dotFill = isCard ? '#7090b8cc' : lang.color + 'bb';
+    const dotColor = isCard ? '#7090b8' : lang.color;
 
     for (const v of lang.vowels) {
-      const {x: dx, y: dy_} = trapPos(v.h, v.b);
-      const ck    = compareKey(key, v.ipa);
-      const isSel = selected.has(ck);
+      const ck = compareKey(key, v.ipa);
+      if (!checkedVowels.has(ck)) continue;
+      const {x:dx, y:dy_} = trapPos(v.h, v.b);
 
-      // Unrounded: text-anchor=end,   edge at dot − dotR − GAP
-      // Rounded:   text-anchor=start, edge at dot + dotR + GAP
-      const lx     = v.rounded ? dx + dotR + GAP : dx - dotR - GAP;
+      // ── Letter group — always clickable ─────────────────────
+      const lx     = v.rounded ? dx+dotR+GAP : dx-dotR-GAP;
       const anchor = v.rounded ? 'start' : 'end';
+      const tw     = ipaWidth(v.ipa, FS);
+      const hitX   = (v.rounded ? lx : lx-tw) - PAD;
+      const hitY   = dy_ - FS*0.40 - PAD;
 
-      // Estimated letter bounds (for tight hit rect, no extra padding)
-      const tw   = ipaWidth(v.ipa, FS);          // approximate text width
-      const tTop = dy_ - FS * 0.38;              // approximate top of glyphs
-      const tBot = dy_ + FS * 0.40;              // approximate bottom (incl. descenders)
-      const tH   = tBot - tTop;
-
-      // Hit rect: letter bounds + 3px breathing room (tight, not huge)
-      const PAD  = 3;
-      const hitX = (v.rounded ? lx : lx - tw) - PAD;
-      const hitY = tTop - PAD;
-      const hitW = tw + PAD * 2;
-      const hitH = tH  + PAD * 2;
-
-      const g = $s('g', {style:'cursor:pointer'});
-
-      // Tight transparent hit rect
-      g.appendChild($s('rect', {
-        x:hitX, y:hitY, width:hitW, height:hitH,
+      const lg = $s('g', {style:'cursor:pointer'});
+      lg.appendChild($s('rect',{
+        x:hitX, y:hitY, width:tw+PAD*2, height:FS*0.82+PAD*2,
         rx:3, fill:'transparent',
       }));
+      lg.appendChild($t(v.ipa, {
+        x:lx, y:dy_, dy:'0.36em',
+        'text-anchor':anchor, 'font-size':FS,
+        fill:lblFill, opacity:fillOp,
+        'font-family':"Georgia,'Noto Serif',serif",
+        'font-weight':isCard?'normal':'bold',
+        style:`filter:${SF}; user-select:none`,
+      }));
+      lg.addEventListener('mouseenter', e => showTip(e, v, lang));
+      lg.addEventListener('mousemove',  moveTip);
+      lg.addEventListener('mouseleave', hideTip);
+      lg.addEventListener('click', () => { playVowel(key,v.ipa); spawnPulse(dx,dy_,dotColor); });
+      lyrLbl.appendChild(lg);
 
-      // The letter — color and glow change on selection, nothing else
-      const lbl = $t(v.ipa, {
-        x: lx,
-        y: dy_,
-        dy: DY,
-        'text-anchor': anchor,
-        'font-size': FS,
-        fill: isSel ? selFill : normalFill,
-        'font-family': "Georgia,'Noto Serif',serif",
-        'font-weight': isCard ? 'normal' : 'bold',
-        style: 'user-select:none',
-      });
-      if (isSel) lbl.style.filter =
-        `drop-shadow(0 0 3px ${selGlow}) drop-shadow(0 0 8px ${selGlow}88)`;
-      g.appendChild(lbl);
-
-      // Events
-      g.addEventListener('mouseenter', e => showTip(e, v, lang));
-      g.addEventListener('mousemove',  moveTip);
-      g.addEventListener('mouseleave', hideTip);
-      g.addEventListener('click', () => {
-        toggleCompare(key, v, lang);
-        playVowel(key, v.ipa);
-        spawnPulse(svg, dx, dy_, isCard ? '#5a8ab0' : lang.color);
-      });
-      let tm = false;
-      g.addEventListener('touchstart', e => { tm=false; e.preventDefault(); showTip(e.touches[0],v,lang); }, {passive:false});
-      g.addEventListener('touchmove',  e => { tm=true;  e.preventDefault(); moveTip(e.touches[0]); },         {passive:false});
-      g.addEventListener('touchend',   () => { hideTip(); if (!tm) { toggleCompare(key,v,lang); playVowel(key,v.ipa); spawnPulse(svg,dx,dy_,isCard?'#5a8ab0':lang.color); } });
-
-      layer.appendChild(g);
+      // ── Dot group — topmost, ALWAYS wins click priority ──────
+      const dg = $s('g', {style:'cursor:pointer'});
+      dg.appendChild($s('circle',{cx:dx,cy:dy_,r:DOT_HIT,fill:'transparent'}));
+      dg.appendChild($s('circle',{cx:dx,cy:dy_,r:dotR,fill:dotFill}));
+      dg.addEventListener('mouseenter', e => showTip(e, v, lang));
+      dg.addEventListener('mousemove',  moveTip);
+      dg.addEventListener('mouseleave', hideTip);
+      dg.addEventListener('click', () => { playVowel(key,v.ipa); spawnPulse(dx,dy_,dotColor); });
+      let tm=false;
+      dg.addEventListener('touchstart',e=>{tm=false;e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
+      dg.addEventListener('touchmove', e=>{tm=true; moveTip(e.touches[0]);},{passive:false});
+      dg.addEventListener('touchend',  ()=>{hideTip();if(!tm){playVowel(key,v.ipa);spawnPulse(dx,dy_,dotColor);}});
+      dotLayer.appendChild(dg);
     }
   }
-
-  updateInfoBar();
 }
 
-// ─── Pulse animation on click ─────────────────────────────────────────────────
-function spawnPulse(svg, x, y, color) {
-  const ring = $s('circle', {cx:x,cy:y,r:6,fill:'none',stroke:color,'stroke-width':2.5,opacity:.9,style:'pointer-events:none'});
+// ─── Pulse (used by detail card play button) ──────────────────────────────────
+function spawnPulse(x, y, color) {
+  const svg = document.getElementById('chart');
+  const ring = $s('circle',{cx:x,cy:y,r:5,fill:'none',stroke:color,'stroke-width':2,opacity:.9,style:'pointer-events:none'});
   svg.appendChild(ring);
-  let r=6, op=.9;
-  const step = () => {
-    if (!ring.parentNode) return;
-    r += 2; op -= .045;
-    ring.setAttribute('r', r);
-    ring.setAttribute('opacity', Math.max(0,op).toFixed(3));
-    if (op > 0) requestAnimationFrame(step);
+  let r=5, op=.9;
+  const step=()=>{
+    if(!ring.parentNode) return;
+    r+=2; op-=.045;
+    ring.setAttribute('r',r); ring.setAttribute('opacity',Math.max(0,op).toFixed(3));
+    if(op>0) requestAnimationFrame(step);
     else ring.parentNode?.removeChild(ring);
   };
   requestAnimationFrame(step);
@@ -440,77 +476,175 @@ function showTip(e, v, lang) {
     <div class="tip-desc">${v.desc}</div>
     ${v.word ? `<div class="tip-word">e.g. ${v.word}</div>` : ''}
     ${v.f1   ? `<div class="tip-f">F1 <span>${v.f1} Hz</span> &nbsp;·&nbsp; F2 <span>${v.f2} Hz</span></div>` : ''}
-    <div class="tip-hint">▶ Click to play &amp; add to comparison</div>
   `;
-  tip.style.display = 'block';
-  moveTip(e);
+  tip.style.display='block'; moveTip(e);
 }
 function moveTip(e) {
   const x=e.clientX+18, y=e.clientY-12, r=tip.getBoundingClientRect();
-  tip.style.left = Math.min(x, window.innerWidth  - r.width  - 8) + 'px';
-  tip.style.top  = Math.max(4, Math.min(y, window.innerHeight - r.height - 8)) + 'px';
+  tip.style.left=Math.min(x,window.innerWidth-r.width-8)+'px';
+  tip.style.top=Math.max(4,Math.min(y,window.innerHeight-r.height-8))+'px';
 }
 function hideTip() { tip.style.display='none'; }
 
-// ─── Info bar ─────────────────────────────────────────────────────────────────
-function updateInfoBar() {
-  const bar = document.getElementById('infoBar');
-  bar.innerHTML = '';
-  for (const [key, lang] of Object.entries(LANGS)) {
-    if (!active[key]) continue;
-    const item = document.createElement('div'); item.className='info-item';
-    const sw   = document.createElement('div'); sw.className='info-swatch';
-    sw.style.borderColor = lang.color; sw.style.backgroundColor = lang.color+'30';
-    const lbl  = document.createElement('span'); lbl.textContent=`${lang.label}: ${lang.vowels.length} vowels`;
-    item.appendChild(sw); item.appendChild(lbl); bar.appendChild(item);
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+// Two-level design:
+//   Level 1 — "Category type" selector:  Language | Roundness
+//   Level 2 — Toggle tabs for each item in the chosen category.
+//             Multiple tabs can be active simultaneously (multi-select).
+//             Active = filled, dim = inactive.
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+
+  // ── Level 1: Category type buttons ───────────────────────────
+  const typeRow = document.createElement('div');
+  typeRow.className = 'cat-type-row';
+
+  const TYPES = [
+    {id:'language',  label:'Language'},
+    {id:'roundness', label:'Roundness'},
+  ];
+  for (const t of TYPES) {
+    const btn = document.createElement('button');
+    btn.className = 'cat-type-btn' + (filterType===t.id ? ' active' : '');
+    btn.textContent = t.label; btn.type = 'button';
+    btn.addEventListener('click', () => {
+      if (filterType === t.id) return;
+      filterType = t.id;
+      updateFilter(); buildSidebar(); render(); renderDetail();
+    });
+    typeRow.appendChild(btn);
   }
+  sb.appendChild(typeRow);
+
+  // ── Level 2: Toggle tabs ──────────────────────────────────────
+  const tabWrap = document.createElement('div');
+  tabWrap.className = 'cat-tabs';
+
+  if (filterType === 'language') {
+    // One toggle tab per language
+    for (const [lk, lang] of Object.entries(LANGS)) {
+      tabWrap.appendChild(makeCatTab(
+        lang.label, lang.color, activeLangs.has(lk),
+        () => {
+          if (activeLangs.has(lk)) activeLangs.delete(lk);
+          else activeLangs.add(lk);
+          updateFilter(); buildSidebar(); render(); renderDetail();
+        }
+      ));
+    }
+  } else {
+    // Rounded / Unrounded
+    const ROUND_OPTS = [
+      {id:'unrounded', label:'Unrounded', color:'#7eb8f7'},
+      {id:'rounded',   label:'Rounded',   color:'#c084fc'},
+    ];
+    for (const opt of ROUND_OPTS) {
+      tabWrap.appendChild(makeCatTab(
+        opt.label, opt.color, activeRoundness.has(opt.id),
+        () => {
+          if (activeRoundness.has(opt.id)) activeRoundness.delete(opt.id);
+          else activeRoundness.add(opt.id);
+          updateFilter(); buildSidebar(); render(); renderDetail();
+        }
+      ));
+    }
+  }
+  sb.appendChild(tabWrap);
 }
 
-// ─── Comparison ───────────────────────────────────────────────────────────────
-function toggleCompare(lk, vowel, lang) {
-  const ck = compareKey(lk, vowel.ipa);
-  if (selected.has(ck)) selected.delete(ck);
-  else selected.set(ck, {vowel, lang, langKey:lk});
-  render(); renderCompare();
+// Build a single toggleable category tab
+function makeCatTab(label, color, isOn, onClick) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'cat-tab' + (isOn ? ' on' : '');
+
+  // Color dot
+  const dot = document.createElement('span');
+  dot.className = 'cat-tab-dot';
+  dot.style.backgroundColor = color;
+  btn.appendChild(dot);
+  btn.appendChild(document.createTextNode(label));
+
+  // Style
+  btn.style.setProperty('--tc', color);
+  if (isOn) {
+    btn.style.borderColor = color;
+    btn.style.color = color;
+    btn.style.backgroundColor = color + '22';
+  } else {
+    btn.style.borderColor = '#2e4560';
+    btn.style.color = '#5a7898';
+    btn.style.backgroundColor = 'transparent';
+  }
+  btn.addEventListener('click', onClick);
+  return btn;
 }
-function removeFromCompare(ck) { selected.delete(ck); render(); renderCompare(); }
 
-function renderCompare() {
-  const grid  = document.getElementById('compareGrid');
-  const empty = document.getElementById('compareEmpty');
-  document.getElementById('compareBadge').textContent = `${selected.size} selected`;
-  grid.innerHTML = '';
-  empty.style.display = selected.size === 0 ? 'block' : 'none';
+// ─── Detail cards (sorted by chart position, no language grouping) ────────────
+function renderDetail() {
+  const section = document.getElementById('detailSection');
+  section.innerHTML = '';
 
-  for (const [ck, {vowel:v, lang, langKey}] of selected) {
+  // Collect all checked vowels across all languages
+  const all = [];
+  for (const [langKey, lang] of Object.entries(LANGS)) {
+    for (const v of lang.vowels) {
+      if (checkedVowels.has(compareKey(langKey, v.ipa))) {
+        all.push({langKey, lang, v});
+      }
+    }
+  }
+
+  if (all.length === 0) {
+    section.innerHTML = `<div class="detail-empty">
+      Select vowels from the checklist → to see them here and on the chart
+    </div>`;
+    return;
+  }
+
+  // Sort by chart position: h (close first) then b (front first)
+  all.sort((a, b) => {
+    const dh = a.v.h - b.v.h;
+    if (Math.abs(dh) > 0.001) return dh;
+    return a.v.b - b.v.b;
+  });
+
+  const grid = document.createElement('div');
+  grid.className = 'detail-cards-row';
+
+  for (const {langKey, lang, v} of all) {
     const c = lang.color;
     const wikiUrl = resolveWikiUrl(v.ipa);
+    const {x:dx, y:dy_} = trapPos(v.h, v.b);
+
     const card = document.createElement('div');
-    card.className = 'ccard'; card.style.borderColor = c;
+    card.className = 'dcard'; card.style.borderColor = c;
     card.innerHTML = `
-      <button class="ccard-remove" title="Remove">×</button>
-      <div class="ccard-top">
-        <span class="ccard-ipa" style="color:${c}">${v.ipa}</span>
-        <span class="ccard-lang" style="color:${c}">${lang.label}</span>
-      </div>
-      <div class="ccard-desc">${v.desc}</div>
-      <div class="ccard-round" style="color:${c}99">${v.rounded ? '⊙ Rounded' : '○ Unrounded'}</div>
-      ${v.word ? `<div class="ccard-word">e.g. ${v.word}</div>` : ''}
-      ${v.f1 ? `<div class="ccard-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>` : ''}
-      <div class="ccard-actions">
-        <button class="ccard-play">▶ Play</button>
-        ${wikiUrl ? `<a class="ccard-wiki" href="${wikiUrl}" target="_blank" rel="noopener">Wiki ↗</a>` : ''}
+      <div class="dcard-ipa" style="color:${c}">${v.ipa}</div>
+      <div class="dcard-desc" style="color:${c}bb;font-size:.65rem;font-weight:700;margin:-2px 0 1px">${lang.label}</div>
+      <div class="dcard-desc">${v.desc}</div>
+      <div class="dcard-round" style="color:${c}88">${v.rounded?'⊙ Rounded':'○ Unrounded'}</div>
+      ${v.word ? `<div class="dcard-word">e.g. ${v.word}</div>` : ''}
+      ${v.f1   ? `<div class="dcard-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>` : ''}
+      <div class="dcard-actions">
+        <button class="dcard-play">▶ Play</button>
+        ${wikiUrl ? `<a class="dcard-wiki" href="${wikiUrl}" target="_blank" rel="noopener">Wiki ↗</a>` : ''}
       </div>
     `;
-    card.querySelector('.ccard-remove').addEventListener('click', () => removeFromCompare(ck));
-    card.querySelector('.ccard-play').addEventListener('click',   () => playVowel(langKey, v.ipa));
+    card.querySelector('.dcard-play').addEventListener('click', () => {
+      playVowel(langKey, v.ipa); spawnPulse(dx, dy_, c);
+    });
     grid.appendChild(card);
   }
+  section.appendChild(grid);
 }
 
-document.getElementById('clearBtn').addEventListener('click', () => { selected.clear(); render(); renderCompare(); });
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+buildSidebar();
 render();
-renderCompare();
+renderDetail();
 </script>
 </body>
 </html>
