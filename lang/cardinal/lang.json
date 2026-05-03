@@ -184,6 +184,30 @@
       "words": []
     },
     {
+      "ipa": "e̞",
+      "h": 0.50,
+      "b": 0.0,
+      "rounded": false,
+      "desc": "Mid front unrounded ɛ̝",
+      "f1": 390,
+      "f2": 1480,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid_front_unrounded_vowel.ogg",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Mid_front_unrounded_vowel",
+      "words": []
+    },
+    {
+      "ipa": "ø̞",
+      "h": 0.50,
+      "b": 0.0,
+      "rounded": true,
+      "desc": "Mid front rounded œ̝",
+      "f1": 390,
+      "f2": 1480,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid_front_rounded_vowel.ogg",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Mid_front_rounded_vowel",
+      "words": []
+    },
+    {
       "ipa": "ə",
       "h": 0.5,
       "b": 0.50,
@@ -193,6 +217,30 @@
       "f2": 1490,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid-central_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
+      "words": []
+    },
+        {
+      "ipa": "ɤ̞",
+      "h": 0.50,
+      "b": 1.0,
+      "rounded": false,
+      "desc": "Mid back unrounded ʌ̝",
+      "f1": 390,
+      "f2": 1480,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid_back_unrounded_vowel.ogg",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_unrounded_vowel",
+      "words": []
+    },
+    {
+      "ipa": "o̞",
+      "h": 0.50,
+      "b": 1.0,
+      "rounded": true,
+      "desc": "Mid front rounded ɔ̝",
+      "f1": 390,
+      "f2": 1480,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid_back_rounded_vowel.ogg",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
       "words": []
     },
     {
@@ -229,6 +277,18 @@
       "f2": 1490,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_central_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_unrounded_vowel",
+      "words": []
+    },
+    {
+      "ipa": "ɞ",
+      "h": 0.6667,
+      "b": 0.50,
+      "rounded": true,
+      "desc": "Open-mid central rounded",
+      "f1": 500,
+      "f2": 1490,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_central_rounded_vowel.ogg",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_rounded_vowel",
       "words": []
     },
     {
@@ -301,6 +361,18 @@
       "f2": 1320,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_front_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_rounded_vowel",
+      "words": []
+    },
+    {
+      "ipa": "ä",
+      "h": 1,
+      "b": 0.50,
+      "rounded": false,
+      "desc": "Open central unrounded",
+      "f1": 820,
+      "f2": 1320,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_central_unrounded_vowel.ogg",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open_central_unrounded_vowel",
       "words": []
     },
     {
