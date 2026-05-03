@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPA Vowel Chart</title>
+  <style>
+    :root {
+      --font-sans: system-ui, sans-serif;
+      --font-mono: 'Courier New', monospace;
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f5f5f4;
+      --color-border-tertiary: #e0ddd8;
+      --color-border-secondary: #c9c5be;
+      --color-text-primary: #1a1916;
+      --color-text-secondary: #6b6860;
+      --color-text-tertiary: #a09d96;
+      --border-radius-lg: 12px;
+      --border-radius-md: 8px;
+    }
+    body { background: var(--color-background-primary); padding: 24px; max-width: 860px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <style>
+.lang-btn { padding: 5px 13px; border-radius: 20px; cursor: pointer; font-size: 12px; font-family: var(--font-mono); transition: all 0.12s; background: transparent; }
+.lang-btn:hover { opacity: 0.85; }
+.vowel-dot { cursor: pointer; }
+.info-panel { width: 210px; flex-shrink: 0; background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 16px; min-height: 190px; box-sizing: border-box; }
+.ipa-big { font-size: 3.2rem; font-family: var(--font-mono); line-height: 1; margin-bottom: 10px; }
+.lang-label { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.06em; font-weight: 500; margin-bottom: 8px; }
+.desc-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 12px; }
+.example-box { font-size: 13px; color: var(--color-text-primary); background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 7px 10px; font-style: italic; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+</style>
+
+<h2 class="sr-only">Interactive IPA vowel chart comparing English, German, Norwegian, and Russian</h2>
+
+<div id="app" style="font-family: var(--font-sans); padding: 4px 0;"></div>
+
+<script>
+const SVG_W = 590, SVG_H = 420;
+const TL=[125,45], TR=[545,45], BR=[545,385], BL=[255,385];
+
+function vToSVG(vx, vy) {
+  const lx = TL[0] + vy * (BL[0]-TL[0]);
+  const x = lx + vx * (TR[0]-lx);
+  const y = TL[1] + vy * (BL[1]-TL[1]);
+  return [x, y];
+}
+
+const HEIGHTS = [
+  {y:0, label:'Close'},
+  {y:0.29, label:'Close-mid'},
+  {y:0.43, label:'Mid'},
+  {y:0.57, label:'Open-mid'},
+  {y:0.75, label:'Near-open'},
+  {y:1.0, label:'Open'},
+];
+
+const LANGUAGES = [
+  { id:'cardinal', name:'Reference (IPA)', color:'#888780', on:true, vowels:[
+    {ipa:'i', vx:0.0, vy:0.0, desc:'Close front unrounded', eg:'French "si"'},
+    {ipa:'y', vx:0.06, vy:0.0, desc:'Close front rounded', eg:'French "lune"'},
+    {ipa:'e', vx:0.0, vy:0.29, desc:'Close-mid front unrounded', eg:'French "été"'},
+    {ipa:'ø', vx:0.06, vy:0.29, desc:'Close-mid front rounded', eg:'French "feu"'},
+    {ipa:'ɛ', vx:0.0, vy:0.57, desc:'Open-mid front unrounded', eg:'French "fête"'},
+    {ipa:'a', vx:0.0, vy:1.0, desc:'Open front unrounded', eg:'French "patte"'},
+    {ipa:'ɑ', vx:1.0, vy:1.0, desc:'Open back unrounded', eg:'French "pâte"'},
+    {ipa:'ɔ', vx:1.0, vy:0.57, desc:'Open-mid back rounded', eg:'Latin "sol"'},
+    {ipa:'o', vx:1.0, vy:0.29, desc:'Close-mid back rounded', eg:'French "eau"'},
+    {ipa:'u', vx:1.0, vy:0.0, desc:'Close back rounded', eg:'French "ou"'},
+    {ipa:'ə', vx:0.5, vy:0.43, desc:'Mid central — schwa', eg:'English "comma"'},
+    {ipa:'ɨ', vx:0.5, vy:0.0, desc:'Close central unrounded', eg:'Romanian "înainte"'},
+  ]},
+  { id:'english', name:'English (RP)', color:'#378ADD', on:true, vowels:[
+    {ipa:'iː', vx:0.02, vy:0.01, desc:'Close front unrounded, long', eg:'fleece'},
+    {ipa:'ɪ', vx:0.22, vy:0.19, desc:'Near-close near-front', eg:'kit'},
+    {ipa:'ɛ', vx:0.07, vy:0.57, desc:'Open-mid front unrounded', eg:'dress'},
+    {ipa:'æ', vx:0.1, vy:0.79, desc:'Near-open front — no German equivalent!', eg:'trap'},
+    {ipa:'ɑː', vx:0.93, vy:1.0, desc:'Open back unrounded, long', eg:'start'},
+    {ipa:'ɒ', vx:0.87, vy:0.93, desc:'Open back rounded', eg:'lot'},
+    {ipa:'ɔː', vx:0.97, vy:0.57, desc:'Open-mid back rounded, long', eg:'thought'},
+    {ipa:'ʊ', vx:0.8, vy:0.19, desc:'Near-close near-back', eg:'foot'},
+    {ipa:'uː', vx:0.89, vy:0.02, desc:'Close back rounded, long', eg:'goose'},
+    {ipa:'ʌ', vx:0.65, vy:0.57, desc:'Open-mid back unrounded', eg:'strut'},
+    {ipa:'ə', vx:0.52, vy:0.43, desc:'Mid central — schwa', eg:'comma'},
+    {ipa:'ɜː', vx:0.43, vy:0.57, desc:'Open-mid central unrounded, long', eg:'nurse'},
+  ]},
+  { id:'german', name:'German', color:'#D85A30', on:true, vowels:[
+    {ipa:'iː', vx:0.01, vy:0.01, desc:'Close front unrounded, long', eg:'viel (much)'},
+    {ipa:'ɪ', vx:0.2, vy:0.19, desc:'Near-close near-front', eg:'mit (with)'},
+    {ipa:'eː', vx:0.02, vy:0.29, desc:'Close-mid front unrounded, long', eg:'See (lake)'},
+    {ipa:'ɛ', vx:0.06, vy:0.57, desc:'Open-mid front unrounded', eg:'Bär (bear)'},
+    {ipa:'aː', vx:0.22, vy:1.0, desc:'Open central unrounded, long', eg:'Vater (father)'},
+    {ipa:'a', vx:0.29, vy:1.0, desc:'Open central unrounded, short', eg:'Mann (man)'},
+    {ipa:'ɔ', vx:0.97, vy:0.57, desc:'Open-mid back rounded', eg:'Gott (God)'},
+    {ipa:'oː', vx:0.97, vy:0.29, desc:'Close-mid back rounded, long', eg:'Sohn (son)'},
+    {ipa:'ʊ', vx:0.82, vy:0.19, desc:'Near-close near-back', eg:'Mutter (mother)'},
+    {ipa:'uː', vx:0.97, vy:0.01, desc:'Close back rounded, long', eg:'Schuh (shoe)'},
+    {ipa:'yː', vx:0.06, vy:0.0, desc:'Close front rounded, long — ü', eg:'fühlen (feel)'},
+    {ipa:'ʏ', vx:0.27, vy:0.19, desc:'Near-close near-front rounded — short ü', eg:'hübsch (pretty)'},
+    {ipa:'øː', vx:0.09, vy:0.29, desc:'Close-mid front rounded, long — ö', eg:'schön (beautiful)'},
+    {ipa:'œ', vx:0.13, vy:0.57, desc:'Open-mid front rounded — short ö', eg:'zwölf (twelve)'},
+    {ipa:'ə', vx:0.5, vy:0.43, desc:'Mid central — schwa', eg:'bitte (please)'},
+  ]},
+  { id:'norwegian', name:'Norwegian', color:'#1D9E75', on:false, vowels:[
+    {ipa:'iː', vx:0.01, vy:0.01, desc:'Close front unrounded, long', eg:'vi (we)'},
+    {ipa:'eː', vx:0.02, vy:0.29, desc:'Close-mid front unrounded, long', eg:'lese (read)'},
+    {ipa:'ɛː', vx:0.08, vy:0.57, desc:'Open-mid front unrounded, long', eg:'vær (weather)'},
+    {ipa:'aː', vx:0.22, vy:1.0, desc:'Open front unrounded, long', eg:'ha (have)'},
+    {ipa:'ɔː', vx:0.94, vy:0.57, desc:'Open-mid back rounded, long', eg:'hå (how)'},
+    {ipa:'oː', vx:0.96, vy:0.29, desc:'Close-mid back rounded, long', eg:'gro (grow)'},
+    {ipa:'ʉː', vx:0.5, vy:0.01, desc:'Close central rounded — unique to Norwegian!', eg:'hus (house)'},
+    {ipa:'yː', vx:0.04, vy:0.01, desc:'Close front rounded, long', eg:'ny (new)'},
+    {ipa:'øː', vx:0.08, vy:0.29, desc:'Close-mid front rounded, long', eg:'grønn (green)'},
+  ]},
+  { id:'russian', name:'Russian', color:'#EF9F27', on:false, vowels:[
+    {ipa:'i', vx:0.02, vy:0.01, desc:'Close front unrounded', eg:'рис /ris/ (rice)'},
+    {ipa:'ɨ', vx:0.48, vy:0.01, desc:'Close central unrounded — no Eng/Ger equivalent!', eg:'ты /tɨ/ (you)'},
+    {ipa:'e', vx:0.06, vy:0.35, desc:'Close-mid to mid front unrounded', eg:'нет /net/ (no)'},
+    {ipa:'a', vx:0.3, vy:1.0, desc:'Open central unrounded', eg:'да /da/ (yes)'},
+    {ipa:'o', vx:0.95, vy:0.29, desc:'Close-mid back rounded', eg:'нос /nos/ (nose)'},
+    {ipa:'u', vx:0.95, vy:0.01, desc:'Close back rounded', eg:'рука /ruka/ (hand)'},
+  ]},
+];
+
+let state = {
+  langs: Object.fromEntries(LANGUAGES.map(l => [l.id, l.on])),
+  hover: null,
+  sel: null,
+};
+
+function render() {
+  const { langs, hover, sel } = state;
+  const active = sel || hover;
+  const aLang = active ? LANGUAGES.find(l => l.id === active.lid) : null;
+  const aVowel = aLang ? aLang.vowels[active.vi] : null;
+
+  const trapPoints = `${TL[0]},${TL[1]} ${TR[0]},${TR[1]} ${BR[0]},${BR[1]} ${BL[0]},${BL[1]}`;
+
+  let gridLines = HEIGHTS.map(({ y, label }) => {
+    const [lx, ly] = vToSVG(0, y);
+    const [rx] = vToSVG(1, y);
+    return `<line x1="${lx}" y1="${ly}" x2="${rx}" y2="${ly}" stroke="var(--color-border-tertiary)" stroke-width="0.8" stroke-dasharray="3,4"/>
+    <text x="${lx-8}" y="${ly+4}" text-anchor="end" fill="var(--color-text-tertiary)" font-size="11" font-family="var(--font-mono)">${label}</text>`;
+  }).join('');
+
+  let colLabels = [['Front',0],['Central',0.5],['Back',1]].map(([label, vx]) => {
+    const [x] = vToSVG(vx, 0);
+    return `<text x="${x}" y="28" text-anchor="middle" fill="var(--color-text-tertiary)" font-size="11" font-family="var(--font-mono)" letter-spacing="1">${label.toUpperCase()}</text>`;
+  }).join('');
+
+  let dots = LANGUAGES.map(lang => {
+    if (!langs[lang.id]) return '';
+    return lang.vowels.map((v, vi) => {
+      const [x, y] = vToSVG(v.vx, v.vy);
+      const lit = (hover?.lid === lang.id && hover?.vi === vi) || (sel?.lid === lang.id && sel?.vi === vi);
+      const r = lit ? 14 : 11;
+      const fs = lit ? 11 : 9.5;
+      return `<g class="vowel-dot" data-lid="${lang.id}" data-vi="${vi}" data-hover="0">
+        <circle cx="${x}" cy="${y}" r="${r}" fill="${lang.color}" fill-opacity="${lit ? 1 : 0.78}"/>
+        <text x="${x}" y="${y+4}" text-anchor="middle" fill="white" font-size="${fs}" font-family="var(--font-mono)" font-weight="500" pointer-events="none">${v.ipa}</text>
+      </g>`;
+    }).join('');
+  }).join('');
+
+  const infoHTML = aVowel ? `
+    <div class="ipa-big" style="color:${aLang.color}">${aVowel.ipa}</div>
+    <div class="lang-label" style="color:${aLang.color}">${aLang.name.toUpperCase()}</div>
+    <div class="desc-text">${aVowel.desc}</div>
+    <div class="example-box">"${aVowel.eg}"</div>
+  ` : `<div style="font-size:13px;color:var(--color-text-tertiary);padding-top:4px;">Hover or click a vowel to see details</div>`;
+
+  const btns = LANGUAGES.map(l => {
+    const on = langs[l.id];
+    return `<button class="lang-btn" data-id="${l.id}" style="border: 1.5px solid ${on ? l.color : 'var(--color-border-tertiary)'}; color: ${on ? l.color : 'var(--color-text-tertiary)'}; background: ${on ? l.color+'18' : 'transparent'};">${l.name}</button>`;
+  }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">${btns}</div>
+    <div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="flex:1;min-width:0;">
+        <svg viewBox="0 0 ${SVG_W} ${SVG_H}" style="width:100%;" id="ipa-svg">
+          ${gridLines}
+          ${colLabels}
+          <polygon points="${trapPoints}" fill="none" stroke="var(--color-border-secondary)" stroke-width="1.5"/>
+          ${dots}
+        </svg>
+      </div>
+      <div class="info-panel">${infoHTML}</div>
+    </div>
+    <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:8px;font-family:var(--font-mono);">
+      Toggle languages above · hover or click vowels to compare · overlapping dots = shared sounds
+    </div>
+  `;
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.onclick = () => {
+      state.langs[btn.dataset.id] = !state.langs[btn.dataset.id];
+      state.sel = null; state.hover = null;
+      render();
+    };
+  });
+
+  document.querySelectorAll('.vowel-dot').forEach(g => {
+    const lid = g.dataset.lid, vi = +g.dataset.vi;
+    g.onmouseenter = () => { state.hover = { lid, vi }; render(); };
+    g.onmouseleave = () => { state.hover = null; render(); };
+    g.onclick = () => {
+      if (state.sel?.lid === lid && state.sel?.vi === vi) state.sel = null;
+      else state.sel = { lid, vi };
+      render();
+    };
+  });
+}
+
+render();
+</script>
+</body>
+</html>
