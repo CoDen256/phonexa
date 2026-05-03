@@ -49,69 +49,80 @@
 
   /* ── Sidebar ─────────────────────────────────────────────── */
   .sidebar {
-    width:240px; flex-shrink:0;
+    width:256px; flex-shrink:0;
     background:var(--sidebar); border:1px solid var(--border);
-    border-radius:14px; max-height:860px; overflow-y:auto;
+    border-radius:14px; display:flex; flex-direction:column;
+    max-height:860px;
   }
-  .cat-type-row {
-    display:flex; border-bottom:1px solid var(--border);
-    position:sticky; top:0; background:var(--sidebar);
-    z-index:10; border-radius:14px 14px 0 0;
+
+  /* Sidebar header */
+  .sb-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px 0; flex-shrink:0;
   }
-  .cat-type-btn {
-    flex:1; padding:11px 4px; text-align:center;
-    font-size:.72rem; font-weight:700; letter-spacing:.03em;
-    background:none; border:none; border-bottom:2px solid transparent;
-    cursor:pointer; color:var(--muted); transition:color .15s,border-color .15s;
+  .sb-header-title { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); }
+  .sb-clear-btn {
+    font-size:.68rem; color:#4a6888; background:none; border:1px solid #2e4560;
+    padding:2px 9px; border-radius:6px; cursor:pointer; transition:color .12s,border-color .12s;
   }
-  .cat-type-btn.active { color:#7eb8f7; border-bottom-color:#7eb8f7; }
-  .cat-type-btn:hover:not(.active) { color:#a8c4da; }
-  .cat-body { padding:10px 10px 12px; }
-  .cat-section { margin-bottom:6px; }
-  .cat-tab-head {
-    display:flex; align-items:center;
-    border-radius:10px; border:1.5px solid #2e4560; overflow:hidden;
-    cursor:default; transition:border-color .12s;
+  .sb-clear-btn:hover { color:#7eb8f7; border-color:#7eb8f7; }
+
+  /* Result count */
+  .sb-count {
+    font-size:.7rem; color:#4a7090; padding:5px 14px 0;
+    flex-shrink:0;
   }
-  .cat-tab-head.on { border-color:var(--tc,#7eb8f7); }
-  .cat-tab-toggle {
-    flex:1; display:flex; align-items:center; gap:8px;
-    padding:8px 10px; font-size:.8rem; font-weight:700;
-    cursor:pointer; opacity:.45; transition:background .12s,opacity .12s;
+  .sb-count b { color:#7eb8f7; }
+
+  /* Divider */
+  .sb-divider { height:1px; background:var(--border); margin:10px 0 0; flex-shrink:0; }
+
+  /* Scrollable filter body */
+  .sb-body { overflow-y:auto; padding:12px 12px 14px; flex:1; }
+
+  /* ── Filter section ──────────────────────────────────────── */
+  .filter-section { margin-bottom:14px; }
+  .filter-label {
+    font-size:.65rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.09em; color:#4a6888; margin-bottom:6px;
+    display:flex; align-items:center; justify-content:space-between;
   }
-  .cat-tab-head.on .cat-tab-toggle { opacity:1; }
-  .cat-tab-toggle:hover { background:#ffffff0a; }
-  .cat-tab-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .cat-tab-arrow {
-    padding:8px 10px; border-left:1px solid #2e4560;
-    font-size:.65rem; color:var(--muted); cursor:pointer;
-    transition:transform .18s,background .12s; flex-shrink:0;
+  .filter-clear-link {
+    font-size:.62rem; font-weight:400; color:#3a5878; cursor:pointer;
+    text-transform:none; letter-spacing:0;
+    background:none; border:none; padding:0;
+    transition:color .12s;
   }
-  .cat-tab-arrow:hover { background:#ffffff0a; }
-  .cat-section.expanded .cat-tab-arrow { transform:rotate(90deg); }
-  .cat-vowel-list {
-    display:none; padding:4px 4px 4px 10px;
-    background:#192738; border:1.5px solid var(--tc,#2e4560);
-    border-top:none; border-radius:0 0 10px 10px; margin-top:-2px;
+  .filter-clear-link:hover { color:#7eb8f7; }
+
+  /* Chip grid */
+  .chip-grid { display:flex; flex-wrap:wrap; gap:5px; }
+
+  /* Individual chip */
+  .chip {
+    padding:4px 10px; border-radius:20px; border:1.5px solid #2e4560;
+    font-size:.75rem; cursor:pointer; background:transparent;
+    color:#5a7898; transition:background .1s,color .1s,border-color .1s;
+    user-select:none; line-height:1.4;
   }
-  .cat-section.expanded .cat-vowel-list { display:block; }
-  .sb-vowel-item {
-    display:flex; align-items:center; gap:6px;
-    padding:3px 4px; border-radius:5px; cursor:pointer;
-    transition:background .1s; user-select:none;
+  .chip:hover { border-color:#4a7098; color:#8ab8d8; }
+  .chip.on {
+    border-color:var(--chip-color,#7eb8f7) !important;
+    background:color-mix(in srgb, var(--chip-color,#7eb8f7) 18%, transparent);
+    color:var(--chip-color,#7eb8f7) !important;
   }
-  .sb-vowel-item:hover { background:#ffffff0a; }
-  .sb-vowel-item input[type=checkbox] { flex-shrink:0; cursor:pointer; width:13px; height:13px; }
-  .sb-ipa { font-family:Georgia,'Noto Serif',serif; font-size:1rem; font-weight:bold; min-width:24px; line-height:1; }
-  .sb-desc { font-size:.63rem; color:var(--muted); line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* IPA chips are a bit larger and use serif font */
+  .chip.ipa {
+    font-family:Georgia,'Noto Serif',serif;
+    font-size:.9rem; font-weight:bold; padding:3px 8px;
+  }
 
   /* ── Disambiguation picker ───────────────────────────────── */
   #vowelPicker {
     position:fixed; display:none; z-index:9999;
     background:#14202e; border:1px solid #3a5878;
     border-radius:12px; padding:8px;
-    box-shadow:0 8px 32px rgba(0,0,0,.8);
-    min-width:160px;
+    box-shadow:0 8px 32px rgba(0,0,0,.8); min-width:165px;
   }
   .picker-title {
     font-size:.62rem; text-transform:uppercase; letter-spacing:.08em;
@@ -140,8 +151,6 @@
   .tip-ipa  { font-size:2rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
   .tip-lang { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin:3px 0 5px; }
   .tip-desc { font-size:.75rem; color:#8fa8c0; line-height:1.45; }
-  .tip-word { font-size:.78rem; margin-top:5px; color:#c8d8e8; }
-  .tip-word b { text-decoration:underline; font-weight:normal; }
   .tip-f    { font-size:.67rem; color:#587898; margin-top:4px; font-family:monospace; }
   .tip-f span { color:#789ab8; }
 
@@ -149,34 +158,58 @@
   .detail-section { margin-top:22px; width:100%; }
   .detail-empty {
     background:var(--surface); border:1px dashed var(--border);
-    border-radius:12px; padding:24px; text-align:center; color:#3a5878; font-size:.82rem;
+    border-radius:12px; padding:24px; text-align:center;
+    color:#3a5878; font-size:.82rem;
   }
   .detail-cards-row { display:flex; gap:10px; flex-wrap:wrap; }
+
+  /* ── Detail card ─────────────────────────────────────────── */
   .dcard {
     background:var(--card); border:2px solid; border-radius:12px;
-    padding:12px 12px 10px; width:168px; flex-shrink:0;
+    padding:12px 12px 10px; width:175px; flex-shrink:0;
     display:flex; flex-direction:column; gap:5px;
   }
   .dcard-ipa     { font-size:1.9rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
   .dcard-sublang { font-size:.65rem; font-weight:700; letter-spacing:.03em; }
   .dcard-desc    { font-size:.71rem; color:#8fa8c0; line-height:1.4; }
   .dcard-round   { font-size:.66rem; }
-  .dcard-word    { font-size:.72rem; color:#c8d8e8; }
-  .dcard-word b  { text-decoration:underline; font-weight:normal; }
   .dcard-formants { font-size:.66rem; color:#587898; font-family:monospace; }
   .dcard-formants span { color:#789ab8; }
+
+  /* Words section in card */
+  .dcard-words-label {
+    font-size:.6rem; text-transform:uppercase; letter-spacing:.07em;
+    color:#3a5878; margin-top:2px;
+  }
+  .dcard-words { display:flex; flex-wrap:wrap; gap:4px; }
+  /* Word button — looks like styled text, not a button */
+  .word-btn {
+    font-size:.78rem; padding:2px 7px; border-radius:6px;
+    border:1px solid transparent; cursor:pointer;
+    background:transparent; color:#c8d8e8; line-height:1.5;
+    transition:background .1s, border-color .1s;
+  }
+  .word-btn.has-audio {
+    border-color:#2a4060; cursor:pointer;
+  }
+  .word-btn.has-audio:hover { background:#1a3050; border-color:#3a6090; }
+  .word-btn.no-audio { cursor:default; color:#7a98b0; }
+  .word-btn b { text-decoration:underline; font-weight:normal; }
+  .word-btn .play-icon { font-size:.6rem; opacity:.6; margin-right:2px; }
+
+  /* Card actions */
   .dcard-actions {
-    display:flex; gap:5px; flex-wrap:wrap; margin-top:auto; padding-top:6px;
+    display:flex; gap:5px; margin-top:auto; padding-top:6px;
     border-top:1px solid #253548;
   }
   .dcard-btn {
-    flex:1; min-width:0; background:#1a2e48; border:1px solid #2a4060;
+    flex:1; background:#1a2e48; border:1px solid #2a4060;
     color:#7eb8f7; padding:4px 0; border-radius:5px;
     cursor:pointer; font-size:.68rem; text-align:center;
-    text-decoration:none; display:block; transition:background .15s;
+    text-decoration:none; display:block;
+    transition:background .15s;
   }
   .dcard-btn:hover { background:#1f3a58; }
-  .dcard-btn:disabled { opacity:.35; cursor:default; }
 
   @media (max-width:800px) {
     .chart-row { flex-direction:column; }
@@ -190,7 +223,7 @@
 
 <header>
   <h1>IPA Vowel Chart</h1>
-  <p>Select vowels → · Hover for details · Click dot or letter to play</p>
+  <p>Use filters → · Hover for details · Click dot or letter to play</p>
 </header>
 
 <div class="page-layout">
@@ -205,10 +238,7 @@
           <svg class="chart-svg" id="chartIpa" viewBox="0 0 1200 720"></svg>
         </div>
         <div class="legend">
-          <b>·</b> exact position &nbsp;|&nbsp;
-          label <b>left</b> = unrounded &nbsp;|&nbsp;
-          label <b>right</b> = rounded &nbsp;|&nbsp;
-          shared dot = click to pick vowel
+          <b>·</b> exact position &nbsp;|&nbsp; left = unrounded &nbsp;|&nbsp; right = rounded &nbsp;|&nbsp; shared dot → click to pick
         </div>
       </div>
       <div class="chart-panel" id="panelFormant">
@@ -216,124 +246,147 @@
           <svg class="chart-svg" id="chartFormant" viewBox="0 0 1200 720"></svg>
         </div>
         <div class="legend">
-          X: <b>F2 (Hz)</b> high→left (front) &nbsp;|&nbsp;
-          Y: <b>F1 (Hz)</b> high→bottom (open) &nbsp;|&nbsp;
-          shared dot = click to pick
+          X: <b>F2 (Hz)</b> high→left (front) &nbsp;|&nbsp; Y: <b>F1 (Hz)</b> high→bottom (open)
         </div>
       </div>
     </div>
-    <aside class="sidebar" id="sidebar"></aside>
+
+    <!-- ── Sidebar ──────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sb-header">
+        <span class="sb-header-title">Filters</span>
+        <button class="sb-clear-btn" id="clearAllFilters">Clear all</button>
+      </div>
+      <div class="sb-count" id="sbCount"></div>
+      <div class="sb-divider"></div>
+      <div class="sb-body" id="sidebarBody"></div>
+    </aside>
   </div>
+
   <div class="detail-section" id="detailSection"></div>
 </div>
 
-<!-- Disambiguation picker (outside SVG, position:fixed) -->
 <div id="vowelPicker">
   <div class="picker-title">Choose vowel</div>
   <div id="pickerItems"></div>
 </div>
-
 <div id="tip" class="tip"></div>
 
 <script>
 if (typeof LANGS === 'undefined') {
-  document.body.innerHTML = `<div style="padding:40px;color:#f87171;text-align:center">
-    <h2>Could not load vowels.js</h2>
-    <p style="margin-top:10px;color:#8fa0b8">Run: <code>npx serve .</code> or <code>python3 -m http.server</code></p>
-  </div>`;
+  document.body.innerHTML = '<div style="padding:40px;color:#f87171;text-align:center"><h2>Could not load vowels.js</h2><p style="margin-top:10px;color:#8fa0b8">Run: <code>npx serve .</code> or <code>python3 -m http.server</code></p></div>';
 }
 
 // ─── Audio ────────────────────────────────────────────────────────────────────
-const WM_BASE = 'https://commons.wikimedia.org/wiki/Special:Redirect/file/';
-let curAudio = null;
-function resolveBase(ipa) { return DIPHTHONG_MAP[ipa] ?? ipa.replace('ː',''); }
-function resolveIpaAudio(lk, ipa) {
-  if (USE_LOCAL_AUDIO) return `${LOCAL_AUDIO_BASE}${lk}/${encodeURIComponent(ipa)}.ogg`;
-  const f = WM_AUDIO[resolveBase(ipa)]; return f ? WM_BASE+f : null;
+const WM_BASE='https://commons.wikimedia.org/wiki/Special:Redirect/file/';
+let curAudio=null;
+function resolveBase(ipa){return DIPHTHONG_MAP[ipa]??ipa.replace('ː','');}
+function ipaAudioUrl(lk,ipa){
+  if(USE_LOCAL_AUDIO)return`${LOCAL_AUDIO_BASE}${lk}/${encodeURIComponent(ipa)}.ogg`;
+  const f=WM_AUDIO[resolveBase(ipa)];return f?WM_BASE+f:null;
 }
-function resolveWiki(ipa) { return WIKI_ARTICLE[resolveBase(ipa)] ?? null; }
-function playUrl(url) {
-  if (!url) return;
-  if (curAudio) { curAudio.pause(); curAudio.currentTime=0; }
-  curAudio = new Audio(url);
-  curAudio.play().catch(e => console.warn('Audio:', e.message));
+function resolveWiki(ipa){return WIKI_ARTICLE[resolveBase(ipa)]??null;}
+function playUrl(url){
+  if(!url)return;
+  if(curAudio){curAudio.pause();curAudio.currentTime=0;}
+  curAudio=new Audio(url);
+  curAudio.play().catch(e=>console.warn('Audio:',e.message));
 }
-function playIpa(lk, ipa)  { playUrl(resolveIpaAudio(lk, ipa)); }
-function playWord(url)     { playUrl(url); }
 
 // ─── IPA trapezoid ────────────────────────────────────────────────────────────
-const TRAP = { TL:{x:155,y:110}, TR:{x:1115,y:110}, BL:{x:390,y:618}, BR:{x:1115,y:618} };
-function trapPos(h,b) {
-  const fX = TRAP.TL.x + h*(TRAP.BL.x-TRAP.TL.x);
-  return { x: fX + b*(TRAP.TR.x-fX), y: TRAP.TL.y + h*(TRAP.BL.y-TRAP.TL.y) };
+const TRAP={TL:{x:155,y:110},TR:{x:1115,y:110},BL:{x:390,y:618},BR:{x:1115,y:618}};
+function trapPos(h,b){
+  const fX=TRAP.TL.x+h*(TRAP.BL.x-TRAP.TL.x);
+  return{x:fX+b*(TRAP.TR.x-fX),y:TRAP.TL.y+h*(TRAP.BL.y-TRAP.TL.y)};
 }
-const ROWS = [
-  {h:0,  label:'Close'},{h:1/6,label:'Near-close'},{h:2/6,label:'Close-mid'},
+const ROWS=[
+  {h:0,label:'Close'},{h:1/6,label:'Near-close'},{h:2/6,label:'Close-mid'},
   {h:3/6,label:'Mid'},{h:4/6,label:'Open-mid'},{h:5/6,label:'Near-open'},{h:1,label:'Open'},
 ];
 
 // ─── Formant plot ─────────────────────────────────────────────────────────────
-const FP = {x0:90,x1:1150,y0:60,y1:660};
-const F2_MIN=400, F2_MAX=2800, F1_MIN=150, F1_MAX=920;
-function formantPos(f1,f2) {
-  const xf=(f2-F2_MIN)/(F2_MAX-F2_MIN), yf=(f1-F1_MIN)/(F1_MAX-F1_MIN);
-  return { x:FP.x1 - xf*(FP.x1-FP.x0), y:FP.y0 + yf*(FP.y1-FP.y0) };
+const FP={x0:90,x1:1150,y0:60,y1:660};
+const F2MIN=400,F2MAX=2800,F1MIN=150,F1MAX=920;
+function formantPos(f1,f2){
+  const xf=(f2-F2MIN)/(F2MAX-F2MIN),yf=(f1-F1MIN)/(F1MAX-F1MIN);
+  return{x:FP.x1-xf*(FP.x1-FP.x0),y:FP.y0+yf*(FP.y1-FP.y0)};
 }
+
+// ─── Vowel property helpers ───────────────────────────────────────────────────
+function getLength(ipa){
+  if(ipa in DIPHTHONG_MAP)return'diphthong';
+  if(ipa.includes('ː'))return'long';
+  return'short';
+}
+// IPA base chips — ordered by articulatory height for display
+const IPA_BASE_ORDER=[
+  'i','y','ɨ','ʉ','ɯ','u','ɪ','ʏ','ʊ',  // close / near-close
+  'e','ø','ɘ','ɤ','o',                     // close-mid
+  'ə',                                      // mid
+  'ɛ','œ','ɜ','ʌ','ɔ',                     // open-mid
+  'æ','ɐ',                                  // near-open
+  'a','ɶ','ɑ','ɒ',                          // open
+];
 
 // ─── Filter state ─────────────────────────────────────────────────────────────
-let filterType = 'language';
-const langChecked  = {};
-const expandedCats = new Set();
-const activeRoundness = new Set(['rounded','unrounded']);
+// Each Set: empty = no restriction. Non-empty = must match at least one.
+// All sections combine with AND.
+const filters={
+  languages :new Set(),   // langKey strings
+  roundness :new Set(),   // 'rounded' | 'unrounded'
+  length    :new Set(),   // 'long' | 'short' | 'diphthong'
+  ipaBase   :new Set(),   // base IPA symbol strings
+};
 
-for (const [lk, lang] of Object.entries(LANGS)) {
-  langChecked[lk] = new Set();
-  if (lk==='cardinal'||lk==='english') lang.vowels.forEach(v=>langChecked[lk].add(v.ipa));
+function passesFilters(lk,v){
+  if(filters.languages.size>0 && !filters.languages.has(lk)) return false;
+  if(filters.roundness.size>0 && !filters.roundness.has(v.rounded?'rounded':'unrounded')) return false;
+  if(filters.length.size>0   && !filters.length.has(getLength(v.ipa))) return false;
+  if(filters.ipaBase.size>0  && !filters.ipaBase.has(resolveBase(v.ipa))) return false;
+  return true;
 }
 
-function isShown(lk, v) {
-  if (filterType==='language') return langChecked[lk]?.has(v.ipa) ?? false;
-  return activeRoundness.has(v.rounded?'rounded':'unrounded');
+function countShown(){
+  let n=0;
+  for(const[lk,lang]of Object.entries(LANGS))
+    for(const v of lang.vowels) if(passesFilters(lk,v)) n++;
+  return n;
 }
 
-// ─── SVG helpers ──────────────────────────────────────────────────────────────
+// ─── SVG helpers ─────────────────────────────────────────────────────────────
 const NS='http://www.w3.org/2000/svg';
-function $s(tag,a={}) {
+function $s(tag,a={}){
   const el=document.createElementNS(NS,tag);
-  for(const[k,vv]of Object.entries(a)) el.setAttribute(k,String(vv));
+  for(const[k,vv]of Object.entries(a))el.setAttribute(k,String(vv));
   return el;
 }
-function $t(str,a={}) { const el=$s('text',a); el.textContent=str; return el; }
-function ipaW(ipa,fs) { let w=0; for(const c of ipa) w+=c==='ː'?0.36:0.65; return w*fs; }
+function $t(str,a={}){const el=$s('text',a);el.textContent=str;return el;}
+function ipaW(ipa,fs){let w=0;for(const c of ipa)w+=c==='ː'?0.36:0.65;return w*fs;}
 
 // ─── Pulse ────────────────────────────────────────────────────────────────────
-function pulse(svgId,x,y,color) {
-  const svg=document.getElementById(svgId); if(!svg) return;
-  const ring=$s('circle',{cx:x,cy:y,r:6,fill:'none',stroke:color,'stroke-width':2,opacity:.9,style:'pointer-events:none'});
-  svg.appendChild(ring);
+function pulse(svgId,x,y,color){
+  const svg=document.getElementById(svgId);if(!svg)return;
+  const r_=$s('circle',{cx:x,cy:y,r:6,fill:'none',stroke:color,'stroke-width':2,opacity:.9,style:'pointer-events:none'});
+  svg.appendChild(r_);
   let r=6,op=.9;
   const step=()=>{
-    if(!ring.parentNode)return;
-    r+=2;op-=.045;
-    ring.setAttribute('r',r);ring.setAttribute('opacity',Math.max(0,op).toFixed(3));
-    if(op>0)requestAnimationFrame(step);else ring.parentNode?.removeChild(ring);
-  };
-  requestAnimationFrame(step);
+    if(!r_.parentNode)return;r+=2;op-=.045;
+    r_.setAttribute('r',r);r_.setAttribute('opacity',Math.max(0,op).toFixed(3));
+    if(op>0)requestAnimationFrame(step);else r_.parentNode?.removeChild(r_);
+  };requestAnimationFrame(step);
 }
 
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
 const tip=document.getElementById('tip');
-function showTip(e,v,lang) {
+function showTip(e,v,lang){
   tip.innerHTML=`
     <div class="tip-ipa" style="color:${lang.color}">${v.ipa}</div>
     <div class="tip-lang" style="color:${lang.color}">${lang.label}</div>
     <div class="tip-desc">${v.desc}</div>
-    ${v.word?`<div class="tip-word">e.g. ${v.word}</div>`:''}
     ${v.f1?`<div class="tip-f">F1 <span>${v.f1} Hz</span> · F2 <span>${v.f2} Hz</span></div>`:''}
-  `;
-  tip.style.display='block'; moveTip(e);
+  `;tip.style.display='block';moveTip(e);
 }
-function moveTip(e) {
+function moveTip(e){
   const x=e.clientX+18,y=e.clientY-12,r=tip.getBoundingClientRect();
   tip.style.left=Math.min(x,window.innerWidth-r.width-8)+'px';
   tip.style.top=Math.max(4,Math.min(y,window.innerHeight-r.height-8))+'px';
@@ -342,152 +395,97 @@ function hideTip(){tip.style.display='none';}
 
 // ─── Disambiguation picker ────────────────────────────────────────────────────
 const picker=document.getElementById('vowelPicker');
-const pickerItems=document.getElementById('pickerItems');
-let pickerSvgId='', pickerDotX=0, pickerDotY=0;
-
-function showPicker(clientX, clientY, group, svgId, dotX, dotY) {
+function showPicker(cx,cy,group,svgId,dx,dy){
   hideTip();
-  pickerSvgId=svgId; pickerDotX=dotX; pickerDotY=dotY;
-  pickerItems.innerHTML='';
-  for (const {lk,lang,v} of group) {
+  document.getElementById('pickerItems').innerHTML='';
+  for(const{lk,lang,v}of group){
     const btn=document.createElement('button');
     btn.className='picker-btn';
-    btn.innerHTML=`
-      <span class="picker-ipa" style="color:${lang.color}">${v.ipa}</span>
-      <span class="picker-info">
-        <span class="picker-lang" style="color:${lang.color}">${lang.label}</span>
-        <span class="picker-desc">${v.desc}</span>
-      </span>`;
+    btn.innerHTML=`<span class="picker-ipa" style="color:${lang.color}">${v.ipa}</span><span class="picker-info"><span class="picker-lang" style="color:${lang.color}">${lang.label}</span><span class="picker-desc">${v.desc}</span></span>`;
     btn.addEventListener('click',()=>{
-      hidePicker();
-      playIpa(lk,v.ipa);
-      pulse(svgId,dotX,dotY,lang.color);
+      hidePicker();playUrl(ipaAudioUrl(lk,v.ipa));pulse(svgId,dx,dy,lang.color);
     });
-    pickerItems.appendChild(btn);
+    document.getElementById('pickerItems').appendChild(btn);
   }
   picker.style.display='block';
-  // Position near click, stay in viewport
-  const pw=Math.max(picker.offsetWidth,180);
-  const ph=picker.scrollHeight||120;
-  let px=clientX+10, py=clientY-10;
-  if(px+pw>window.innerWidth-8) px=clientX-pw-10;
-  if(py+ph>window.innerHeight-8) py=window.innerHeight-ph-8;
-  picker.style.left=Math.max(4,px)+'px';
-  picker.style.top=Math.max(4,py)+'px';
+  const pw=Math.max(picker.offsetWidth,170),ph=picker.scrollHeight||120;
+  let px=cx+10,py=cy-10;
+  if(px+pw>window.innerWidth-8)px=cx-pw-10;
+  if(py+ph>window.innerHeight-8)py=window.innerHeight-ph-8;
+  picker.style.left=Math.max(4,px)+'px';picker.style.top=Math.max(4,py)+'px';
 }
 function hidePicker(){picker.style.display='none';}
+document.addEventListener('click',e=>{if(!picker.contains(e.target))hidePicker();},true);
 
-// Close picker when clicking elsewhere
-document.addEventListener('click', e => {
-  if (!picker.contains(e.target)) hidePicker();
-}, true);
-
-// ─── Core chart builder ───────────────────────────────────────────────────────
-// Shared by both renderers. Takes svg element, pos function, svgId string.
-function buildChartVowels(svg, getPos, svgId) {
-  const langLayer=$s('g'), cardLayer=$s('g'), dotLayer=$s('g');
-  svg.appendChild(langLayer); svg.appendChild(cardLayer); svg.appendChild(dotLayer);
-
+// ─── Chart renderer (shared) ──────────────────────────────────────────────────
+function buildVowels(svg,getPos,svgId){
+  const langL=$s('g'),cardL=$s('g'),dotL=$s('g');
+  svg.appendChild(langL);svg.appendChild(cardL);svg.appendChild(dotL);
   const SF='drop-shadow(0px 1px 2px rgba(0,0,0,0.45))';
-  const DOT_R_C=4, DOT_R_L=5, DOT_HIT=12;
+  const DR_C=4,DR_L=5,DH=12;
+  const posGroups=new Map();
 
-  // ── Collect visible vowels and group by dot position ─────
-  // Position key snapped to ~3px grid to catch exact float matches
-  const posGroups = new Map();
-
-  for (const [lk,lang] of Object.entries(LANGS)) {
-    for (const v of lang.vowels) {
-      if (!isShown(lk,v)) continue;
-      const pos = getPos(v); if (!pos) continue;
-      const {x:dx,y:dy} = pos;
-      const pk = `${Math.round(dx/3)},${Math.round(dy/3)}`;
-      if (!posGroups.has(pk)) posGroups.set(pk,[]);
+  for(const[lk,lang]of Object.entries(LANGS)){
+    for(const v of lang.vowels){
+      if(!passesFilters(lk,v))continue;
+      const pos=getPos(v);if(!pos)continue;
+      const{x:dx,y:dy}=pos;
+      const pk=`${Math.round(dx/3)},${Math.round(dy/3)}`;
+      if(!posGroups.has(pk))posGroups.set(pk,[]);
       posGroups.get(pk).push({lk,lang,v,dx,dy});
     }
   }
-
-  // ── Letters (per vowel, left/right of dot) ────────────────
-  for (const group of posGroups.values()) {
-    for (const {lk,lang,v,dx,dy} of group) {
-      const isCard=lk==='cardinal';
-      const lyr=isCard?cardLayer:langLayer;
-      const FS=isCard?15:22, GAP=5, PAD=4;
-      const dotR=isCard?DOT_R_C:DOT_R_L;
+  // Letters
+  for(const group of posGroups.values()){
+    for(const{lk,lang,v,dx,dy}of group){
+      const ic=lk==='cardinal',lyr=ic?cardL:langL;
+      const FS=ic?15:22,GAP=5,PAD=4,dotR=ic?DR_C:DR_L;
       const lx=v.rounded?dx+dotR+GAP:dx-dotR-GAP;
-      const anch=v.rounded?'start':'end';
-      const tw=ipaW(v.ipa,FS);
-      const hitX=(v.rounded?lx:lx-tw)-PAD, hitY=dy-FS*0.40-PAD;
-
+      const anch=v.rounded?'start':'end',tw=ipaW(v.ipa,FS);
+      const hx=(v.rounded?lx:lx-tw)-PAD,hy=dy-FS*0.40-PAD;
       const lg=$s('g',{style:'cursor:pointer'});
-      lg.appendChild($s('rect',{x:hitX,y:hitY,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
-      lg.appendChild($t(v.ipa,{
-        x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
-        fill:isCard?'#9ab8d0':lang.color,
-        opacity:isCard?0.70:0.78,
-        'font-family':"Georgia,'Noto Serif',serif",
-        'font-weight':isCard?'normal':'bold',
-        style:`filter:${SF};user-select:none`,
-      }));
+      lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
+      lg.appendChild($t(v.ipa,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
+        fill:ic?'#9ab8d0':lang.color,opacity:ic?0.70:0.78,
+        'font-family':"Georgia,'Noto Serif',serif",'font-weight':ic?'normal':'bold',
+        style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
-      lg.addEventListener('mousemove',moveTip);
-      lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{playIpa(lk,v.ipa);pulse(svgId,dx,dy,isCard?'#7090b8':lang.color);});
+      lg.addEventListener('mousemove',moveTip);lg.addEventListener('mouseleave',hideTip);
+      lg.addEventListener('click',()=>{playUrl(ipaAudioUrl(lk,v.ipa));pulse(svgId,dx,dy,ic?'#7090b8':lang.color);});
       lyr.appendChild(lg);
     }
   }
-
-  // ── One dot per unique position ───────────────────────────
-  for (const group of posGroups.values()) {
-    const {dx,dy}=group[0];
-    const multi=group.length>1;
-    const isCard=group.every(g=>g.lk==='cardinal');
-    const dotR=isCard?DOT_R_C:DOT_R_L;
-
-    // Dot color: use language color for single, neutral steel for multi
-    const dotColor = multi ? '#8090a8'
-      : (group[0].lk==='cardinal' ? '#7090b8' : group[0].lang.color);
-    const dotFill  = multi ? '#8090a8cc'
-      : (group[0].lk==='cardinal' ? '#7090b8cc' : group[0].lang.color+'bb');
-
+  // Dots (one per position)
+  for(const group of posGroups.values()){
+    const{dx,dy}=group[0],multi=group.length>1;
+    const ic=group.every(g=>g.lk==='cardinal'),dotR=ic?DR_C:DR_L;
+    const dc=multi?'#8090a8':(group[0].lk==='cardinal'?'#7090b8':group[0].lang.color);
+    const df=multi?'#8090a8cc':(group[0].lk==='cardinal'?'#7090b8cc':group[0].lang.color+'bb');
     const dg=$s('g',{style:'cursor:pointer'});
-    dg.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_HIT,fill:'transparent'}));
-    // Outer ring for shared dots so they look slightly different
-    if (multi) {
-      dg.appendChild($s('circle',{cx:dx,cy:dy,r:dotR+2.5,fill:'none',stroke:'#8090a840','stroke-width':1.5}));
-    }
-    dg.appendChild($s('circle',{cx:dx,cy:dy,r:dotR,fill:dotFill}));
-
-    if (!multi) {
-      const {lk,lang,v}=group[0];
+    dg.appendChild($s('circle',{cx:dx,cy:dy,r:DH,fill:'transparent'}));
+    if(multi)dg.appendChild($s('circle',{cx:dx,cy:dy,r:dotR+2.5,fill:'none',stroke:'#8090a840','stroke-width':1.5}));
+    dg.appendChild($s('circle',{cx:dx,cy:dy,r:dotR,fill:df}));
+    if(!multi){
+      const{lk,lang,v}=group[0];
       dg.addEventListener('mouseenter',e=>showTip(e,v,lang));
-      dg.addEventListener('mousemove',moveTip);
-      dg.addEventListener('mouseleave',hideTip);
-      dg.addEventListener('click',()=>{playIpa(lk,v.ipa);pulse(svgId,dx,dy,dotColor);});
+      dg.addEventListener('mousemove',moveTip);dg.addEventListener('mouseleave',hideTip);
+      dg.addEventListener('click',()=>{playUrl(ipaAudioUrl(lk,v.ipa));pulse(svgId,dx,dy,dc);});
       let tm=false;
       dg.addEventListener('touchstart',e=>{tm=false;e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
       dg.addEventListener('touchmove',e=>{tm=true;moveTip(e.touches[0]);},{passive:false});
-      dg.addEventListener('touchend',()=>{hideTip();if(!tm){playIpa(lk,v.ipa);pulse(svgId,dx,dy,dotColor);}});
-    } else {
-      // Multi: show picker on click
-      dg.addEventListener('click',e=>{
-        e.stopPropagation();
-        showPicker(e.clientX,e.clientY,group,svgId,dx,dy);
-      });
-      dg.addEventListener('touchend',e=>{
-        e.preventDefault();
-        const t=e.changedTouches[0];
-        showPicker(t.clientX,t.clientY,group,svgId,dx,dy);
-      },{passive:false});
+      dg.addEventListener('touchend',()=>{hideTip();if(!tm){playUrl(ipaAudioUrl(lk,v.ipa));pulse(svgId,dx,dy,dc);}});
+    }else{
+      dg.addEventListener('click',e=>{e.stopPropagation();showPicker(e.clientX,e.clientY,group,svgId,dx,dy);});
+      dg.addEventListener('touchend',e=>{e.preventDefault();const t=e.changedTouches[0];showPicker(t.clientX,t.clientY,group,svgId,dx,dy);},{passive:false});
     }
-    dotLayer.appendChild(dg);
+    dotL.appendChild(dg);
   }
 }
 
-// ─── IPA chart ────────────────────────────────────────────────────────────────
-function renderIpa() {
+// ─── IPA Chart ────────────────────────────────────────────────────────────────
+function renderIpa(){
   const svg=document.getElementById('chartIpa');
   while(svg.firstChild)svg.removeChild(svg.firstChild);
-  // Grid
   for(const r of ROWS){
     const L=trapPos(r.h,0),R=trapPos(r.h,1);
     svg.appendChild($s('line',{x1:L.x,y1:L.y,x2:R.x,y2:R.y,stroke:'#2e4560','stroke-width':1.5}));
@@ -496,46 +494,39 @@ function renderIpa() {
   svg.appendChild($s('line',{x1:cT.x,y1:cT.y,x2:cB.x,y2:cB.y,stroke:'#2e4560','stroke-width':1,'stroke-dasharray':'6 5'}));
   const{TL,TR,BL,BR}=TRAP;
   svg.appendChild($s('path',{d:`M${TL.x},${TL.y} L${TR.x},${TR.y} L${BR.x},${BR.y} L${BL.x},${BL.y}Z`,fill:'none',stroke:'#385878','stroke-width':2}));
-  // Labels
-  for(const r of ROWS){
-    const p=trapPos(r.h,0);
-    svg.appendChild($t(r.label,{x:p.x-16,y:p.y,dy:'0.36em','text-anchor':'end','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
-  }
+  for(const r of ROWS){const p=trapPos(r.h,0);svg.appendChild($t(r.label,{x:p.x-16,y:p.y,dy:'0.36em','text-anchor':'end','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));}
   for(const[l,b]of[['Front',0],['Central',.5],['Back',1]]){
-    const p=trapPos(0,b);
-    svg.appendChild($t(l,{x:p.x,y:p.y-28,'text-anchor':'middle','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
+    const p=trapPos(0,b);svg.appendChild($t(l,{x:p.x,y:p.y-28,'text-anchor':'middle','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
   }
-  buildChartVowels(svg, v=>trapPos(v.h,v.b), 'chartIpa');
+  buildVowels(svg,v=>trapPos(v.h,v.b),'chartIpa');
 }
 
-// ─── Formant plot ─────────────────────────────────────────────────────────────
-function renderFormant() {
+// ─── Formant Plot ─────────────────────────────────────────────────────────────
+function renderFormant(){
   const svg=document.getElementById('chartFormant');
   while(svg.firstChild)svg.removeChild(svg.firstChild);
   svg.appendChild($s('rect',{x:FP.x0,y:FP.y0,width:FP.x1-FP.x0,height:FP.y1-FP.y0,fill:'#192838',rx:6}));
-  // F2 grid (vertical)
-  for(const f2 of [500,700,900,1100,1400,1700,2000,2400,2800]){
-    const{x}=formantPos(F1_MIN,f2);
+  for(const f2 of[500,700,900,1100,1400,1700,2000,2400,2800]){
+    const{x}=formantPos(F1MIN,f2);
     svg.appendChild($s('line',{x1:x,y1:FP.y0,x2:x,y2:FP.y1,stroke:'#2a3e58','stroke-width':1,'stroke-dasharray':'4 4'}));
     svg.appendChild($t(f2,{x,y:FP.y1+18,'text-anchor':'middle','font-size':11,fill:'#4a6888','font-family':'system-ui,sans-serif'}));
   }
-  // F1 grid (horizontal)
-  for(const f1 of [200,300,400,500,600,700,800,900]){
-    const{y}=formantPos(f1,F2_MIN);
+  for(const f1 of[200,300,400,500,600,700,800,900]){
+    const{y}=formantPos(f1,F2MIN);
     svg.appendChild($s('line',{x1:FP.x0,y1:y,x2:FP.x1,y2:y,stroke:'#2a3e58','stroke-width':1,'stroke-dasharray':'4 4'}));
     svg.appendChild($t(f1,{x:FP.x0-8,y,'text-anchor':'end','font-size':11,dy:'0.35em',fill:'#4a6888','font-family':'system-ui,sans-serif'}));
   }
-  svg.appendChild($t('← F2 (Hz)  front',{x:(FP.x0+FP.x1)/2,y:FP.y1+38,'text-anchor':'middle','font-size':12,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
-  const f1el=$t('F1 (Hz) ↓ open',{x:18,y:(FP.y0+FP.y1)/2,'text-anchor':'middle','font-size':12,fill:'#6a8298','font-family':'system-ui,sans-serif'});
+  svg.appendChild($t('← F2 (Hz)',{x:(FP.x0+FP.x1)/2,y:FP.y1+38,'text-anchor':'middle','font-size':12,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
+  const f1el=$t('F1 (Hz) ↓',{x:18,y:(FP.y0+FP.y1)/2,'text-anchor':'middle','font-size':12,fill:'#6a8298','font-family':'system-ui,sans-serif'});
   f1el.setAttribute('transform',`rotate(-90,18,${(FP.y0+FP.y1)/2})`);
   svg.appendChild(f1el);
   svg.appendChild($s('rect',{x:FP.x0,y:FP.y0,width:FP.x1-FP.x0,height:FP.y1-FP.y0,fill:'none',stroke:'#385878','stroke-width':1.5,rx:6}));
-  buildChartVowels(svg, v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null), 'chartFormant');
+  buildVowels(svg,v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null),'chartFormant');
 }
 
-function renderAll(){renderIpa();renderFormant();renderDetail();}
+function renderAll(){renderIpa();renderFormant();renderDetail();updateCount();}
 
-// ─── View tab switching ───────────────────────────────────────────────────────
+// ─── View tabs ────────────────────────────────────────────────────────────────
 document.getElementById('tabIpa').addEventListener('click',()=>{
   document.getElementById('tabIpa').classList.add('active');
   document.getElementById('tabFormant').classList.remove('active');
@@ -550,172 +541,148 @@ document.getElementById('tabFormant').addEventListener('click',()=>{
 });
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-function buildSidebar() {
-  const sb=document.getElementById('sidebar');
-  sb.innerHTML='';
-  const tr=document.createElement('div'); tr.className='cat-type-row';
-  for(const{id,label}of[{id:'language',label:'Language'},{id:'roundness',label:'Roundness'}]){
-    const btn=document.createElement('button'); btn.type='button';
-    btn.className='cat-type-btn'+(filterType===id?' active':'');
+function updateCount(){
+  const n=countShown(),total=Object.values(LANGS).reduce((s,l)=>s+l.vowels.length,0);
+  document.getElementById('sbCount').innerHTML=`<b>${n}</b> of ${total} vowels shown`;
+}
+
+function buildSidebar(){
+  const body=document.getElementById('sidebarBody');
+  body.innerHTML='';
+
+  // Helper: make a chip
+  function chip(label,filterSet,value,color){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='chip'+(filterSet.has(value)?' on':'');
+    if(color)btn.style.setProperty('--chip-color',color);
     btn.textContent=label;
-    btn.addEventListener('click',()=>{if(filterType===id)return;filterType=id;buildSidebar();renderAll();});
-    tr.appendChild(btn);
-  }
-  sb.appendChild(tr);
-  const body=document.createElement('div'); body.className='cat-body';
-  if(filterType==='language'){
-    for(const[lk,lang]of Object.entries(LANGS)) body.appendChild(makeLangSection(lk,lang));
-  } else {
-    for(const opt of [{id:'unrounded',label:'Unrounded',color:'#7eb8f7'},{id:'rounded',label:'Rounded',color:'#c084fc'}])
-      body.appendChild(makeRoundSection(opt));
-  }
-  sb.appendChild(body);
-}
-
-function makeLangSection(lk,lang) {
-  const checked=langChecked[lk]??new Set();
-  const isOn=lang.vowels.some(v=>checked.has(v.ipa));
-  const allOn=lang.vowels.every(v=>checked.has(v.ipa));
-  const isExpanded=expandedCats.has(lk);
-  const sec=document.createElement('div');
-  sec.className='cat-section'+(isExpanded?' expanded':'');
-  const head=document.createElement('div');
-  head.className='cat-tab-head'+(isOn?' on':'');
-  head.style.setProperty('--tc',lang.color);
-  const tog=document.createElement('div'); tog.className='cat-tab-toggle';
-  const dot=document.createElement('span'); dot.className='cat-tab-dot'; dot.style.backgroundColor=lang.color;
-  const allCb=document.createElement('input'); allCb.type='checkbox';
-  allCb.checked=allOn; allCb.indeterminate=isOn&&!allOn;
-  allCb.style.accentColor=lang.color; allCb.style.marginRight='2px';
-  allCb.addEventListener('change',e=>{
-    e.stopPropagation();
-    lang.vowels.forEach(v=>{if(allCb.checked)checked.add(v.ipa);else checked.delete(v.ipa);});
-    langChecked[lk]=checked; buildSidebar(); renderAll();
-  });
-  const nm=document.createElement('span');
-  nm.style.color=lang.color; nm.style.flex='1'; nm.textContent=lang.label;
-  tog.appendChild(dot); tog.appendChild(allCb); tog.appendChild(nm);
-  tog.addEventListener('click',e=>{
-    if(e.target===allCb)return;
-    const nowOn=lang.vowels.some(v=>checked.has(v.ipa));
-    if(nowOn)lang.vowels.forEach(v=>checked.delete(v.ipa));
-    else lang.vowels.forEach(v=>checked.add(v.ipa));
-    langChecked[lk]=checked; buildSidebar(); renderAll();
-  });
-  const arr=document.createElement('div'); arr.className='cat-tab-arrow'; arr.textContent='›';
-  arr.addEventListener('click',e=>{
-    e.stopPropagation();
-    if(expandedCats.has(lk))expandedCats.delete(lk);else expandedCats.add(lk);
-    buildSidebar();
-  });
-  head.appendChild(tog); head.appendChild(arr); sec.appendChild(head);
-  const list=document.createElement('div'); list.className='cat-vowel-list';
-  list.style.setProperty('--tc',lang.color);
-  for(const v of lang.vowels){
-    const item=document.createElement('label'); item.className='sb-vowel-item';
-    const cb=document.createElement('input'); cb.type='checkbox';
-    cb.checked=checked.has(v.ipa); cb.style.accentColor=lang.color;
-    cb.addEventListener('change',()=>{
-      if(cb.checked)checked.add(v.ipa);else checked.delete(v.ipa);
-      langChecked[lk]=checked; buildSidebar(); renderAll();
+    btn.addEventListener('click',()=>{
+      if(filterSet.has(value))filterSet.delete(value);
+      else filterSet.add(value);
+      buildSidebar();renderAll();
     });
-    const ipa=document.createElement('span'); ipa.className='sb-ipa'; ipa.style.color=lang.color; ipa.textContent=v.ipa;
-    const desc=document.createElement('span'); desc.className='sb-desc';
-    desc.textContent=v.desc.replace(' unrounded','').replace(' rounded','').replace('Close-mid','Cl-mid').replace('Open-mid','Op-mid').replace('Near-close','Nr-cl').replace('Near-open','Nr-op').replace(' (long)','').replace(' (diphthong)','');
-    item.appendChild(cb); item.appendChild(ipa); item.appendChild(desc); list.appendChild(item);
+    return btn;
   }
-  sec.appendChild(list);
-  return sec;
+  function ipaChip(base,filterSet){
+    const btn=chip(base,filterSet,base);
+    btn.classList.add('ipa');
+    return btn;
+  }
+  function section(title,filterSet,buildFn){
+    const sec=document.createElement('div');sec.className='filter-section';
+    const lbl=document.createElement('div');lbl.className='filter-label';
+    const span=document.createElement('span');span.textContent=title;
+    const clr=document.createElement('button');clr.className='filter-clear-link';clr.textContent='clear';clr.type='button';
+    clr.addEventListener('click',()=>{filterSet.clear();buildSidebar();renderAll();});
+    lbl.appendChild(span);lbl.appendChild(clr);
+    const grid=document.createElement('div');grid.className='chip-grid';
+    buildFn(grid);
+    sec.appendChild(lbl);sec.appendChild(grid);
+    return sec;
+  }
+
+  // ── 1. Language ──────────────────────────────────────────
+  body.appendChild(section('Language',filters.languages,grid=>{
+    for(const[lk,lang]of Object.entries(LANGS))
+      grid.appendChild(chip(lang.label,filters.languages,lk,lang.color));
+  }));
+
+  // ── 2. Roundness ─────────────────────────────────────────
+  body.appendChild(section('Roundness',filters.roundness,grid=>{
+    grid.appendChild(chip('Rounded',   filters.roundness,'rounded',  '#c084fc'));
+    grid.appendChild(chip('Unrounded', filters.roundness,'unrounded','#7eb8f7'));
+  }));
+
+  // ── 3. Length ────────────────────────────────────────────
+  body.appendChild(section('Length',filters.length,grid=>{
+    grid.appendChild(chip('Long ː',   filters.length,'long',      '#34d399'));
+    grid.appendChild(chip('Short',    filters.length,'short',     '#fbbf24'));
+    grid.appendChild(chip('Diphthong',filters.length,'diphthong', '#f87171'));
+  }));
+
+  // ── 4. IPA Base symbol ───────────────────────────────────
+  // Collect which bases actually exist across all languages
+  const existingBases=new Set();
+  for(const lang of Object.values(LANGS))
+    for(const v of lang.vowels) existingBases.add(resolveBase(v.ipa));
+
+  body.appendChild(section('IPA Base',filters.ipaBase,grid=>{
+    for(const base of IPA_BASE_ORDER){
+      if(existingBases.has(base)) grid.appendChild(ipaChip(base,filters.ipaBase));
+    }
+    // Add any bases not in the predefined order
+    for(const base of existingBases){
+      if(!IPA_BASE_ORDER.includes(base)) grid.appendChild(ipaChip(base,filters.ipaBase));
+    }
+  }));
+
+  updateCount();
 }
 
-function makeRoundSection(opt) {
-  const isOn=activeRoundness.has(opt.id);
-  const isExpanded=expandedCats.has('r_'+opt.id);
-  const sec=document.createElement('div');
-  sec.className='cat-section'+(isExpanded?' expanded':'');
-  const head=document.createElement('div');
-  head.className='cat-tab-head'+(isOn?' on':'');
-  head.style.setProperty('--tc',opt.color);
-  const tog=document.createElement('div'); tog.className='cat-tab-toggle';
-  const dot=document.createElement('span'); dot.className='cat-tab-dot'; dot.style.backgroundColor=opt.color;
-  const nm=document.createElement('span'); nm.style.color=opt.color; nm.style.flex='1'; nm.textContent=opt.label;
-  tog.appendChild(dot); tog.appendChild(nm);
-  tog.addEventListener('click',()=>{
-    if(activeRoundness.has(opt.id))activeRoundness.delete(opt.id);else activeRoundness.add(opt.id);
-    buildSidebar(); renderAll();
-  });
-  const arr=document.createElement('div'); arr.className='cat-tab-arrow'; arr.textContent='›';
-  arr.addEventListener('click',e=>{
-    e.stopPropagation();
-    const k='r_'+opt.id;
-    if(expandedCats.has(k))expandedCats.delete(k);else expandedCats.add(k);
-    buildSidebar();
-  });
-  head.appendChild(tog); head.appendChild(arr); sec.appendChild(head);
-  const list=document.createElement('div'); list.className='cat-vowel-list';
-  list.style.setProperty('--tc',opt.color);
-  for(const[lk,lang]of Object.entries(LANGS)){
-    const matching=lang.vowels.filter(v=>v.rounded===(opt.id==='rounded'));
-    if(!matching.length)continue;
-    const lbl=document.createElement('div');
-    lbl.style.cssText=`font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:${lang.color};padding:5px 4px 2px;`;
-    lbl.textContent=lang.label; list.appendChild(lbl);
-    for(const v of matching){
-      const item=document.createElement('label'); item.className='sb-vowel-item';
-      const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=isOn;
-      cb.style.accentColor=lang.color; cb.style.pointerEvents='none'; cb.tabIndex=-1;
-      const ipa=document.createElement('span'); ipa.className='sb-ipa'; ipa.style.color=lang.color; ipa.textContent=v.ipa;
-      const desc=document.createElement('span'); desc.className='sb-desc';
-      desc.textContent=v.desc.replace(' unrounded','').replace(' rounded','').replace('Close-mid','Cl-mid').replace('Open-mid','Op-mid').replace('Near-close','Nr-cl').replace('Near-open','Nr-op').replace(' (long)','').replace(' (diphthong)','');
-      item.appendChild(cb); item.appendChild(ipa); item.appendChild(desc); list.appendChild(item);
-    }
-  }
-  sec.appendChild(list);
-  return sec;
-}
+// Clear all filters
+document.getElementById('clearAllFilters').addEventListener('click',()=>{
+  filters.languages.clear();filters.roundness.clear();
+  filters.length.clear();filters.ipaBase.clear();
+  buildSidebar();renderAll();
+});
 
 // ─── Detail cards ─────────────────────────────────────────────────────────────
-function renderDetail() {
+function renderDetail(){
   const sec=document.getElementById('detailSection');
   sec.innerHTML='';
   const all=[];
   for(const[lk,lang]of Object.entries(LANGS))
     for(const v of lang.vowels)
-      if(isShown(lk,v)) all.push({lk,lang,v});
+      if(passesFilters(lk,v)) all.push({lk,lang,v});
   if(!all.length){
-    sec.innerHTML='<div class="detail-empty">Select vowels from the sidebar to see them here</div>';
+    sec.innerHTML='<div class="detail-empty">No vowels match the current filters · Use the sidebar to select</div>';
     return;
   }
-  all.sort((a,b)=>{ const dh=a.v.h-b.v.h; return Math.abs(dh)>0.001?dh:a.v.b-b.v.b; });
-  const grid=document.createElement('div'); grid.className='detail-cards-row';
+  all.sort((a,b)=>{const dh=a.v.h-b.v.h;return Math.abs(dh)>.001?dh:a.v.b-b.v.b;});
+  const grid=document.createElement('div');grid.className='detail-cards-row';
+
   for(const{lk,lang,v}of all){
-    const c=lang.color;
-    const wikiUrl=resolveWiki(v.ipa);
+    const c=lang.color,wiki=resolveWiki(v.ipa);
     const tPos=trapPos(v.h,v.b);
     const fPos=v.f1&&v.f2?formantPos(v.f1,v.f2):null;
     const card=document.createElement('div');
-    card.className='dcard'; card.style.borderColor=c;
+    card.className='dcard';card.style.borderColor=c;
+
+    // Words block
+    let wordsHtml='';
+    const ws=v.words||[];
+    if(ws.length>0){
+      wordsHtml='<div class="dcard-words-label">Examples (click to hear)</div><div class="dcard-words">';
+      for(const w of ws){
+        const hasAudio=!!w.audio;
+        wordsHtml+=`<button class="word-btn ${hasAudio?'has-audio':'no-audio'}" data-audio="${w.audio||''}">${hasAudio?'<span class="play-icon">▶</span>':''}${w.text}</button>`;
+      }
+      wordsHtml+='</div>';
+    }
+
     card.innerHTML=`
       <div class="dcard-ipa" style="color:${c}">${v.ipa}</div>
       <div class="dcard-sublang" style="color:${c}bb">${lang.label}</div>
       <div class="dcard-desc">${v.desc}</div>
-      <div class="dcard-round" style="color:${c}88">${v.rounded?'⊙ Rounded':'○ Unrounded'}</div>
-      ${v.word?`<div class="dcard-word">e.g. ${v.word}</div>`:''}
+      <div class="dcard-round" style="color:${c}88">${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v.ipa)}</div>
       ${v.f1?`<div class="dcard-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>`:''}
+      ${wordsHtml}
       <div class="dcard-actions">
-        <button class="dcard-btn dcard-play" title="Play IPA sound">▶ Sound</button>
-        <button class="dcard-btn dcard-word-btn" title="Play example word"${!v.exampleAudio?' disabled':''}>▶ Word</button>
-        ${wikiUrl?`<a class="dcard-btn" href="${wikiUrl}" target="_blank" rel="noopener">Wiki ↗</a>`:''}
+        <button class="dcard-btn dcard-play">▶ Sound</button>
+        ${wiki?`<a class="dcard-btn" href="${wiki}" target="_blank" rel="noopener">Wiki ↗</a>`:''}
       </div>`;
-    card.querySelector('.dcard-play').addEventListener('click',()=>{
-      playIpa(lk,v.ipa);
-      pulse('chartIpa',tPos.x,tPos.y,c);
-      if(fPos) pulse('chartFormant',fPos.x,fPos.y,c);
+
+    // Wire word buttons
+    card.querySelectorAll('.word-btn.has-audio').forEach(btn=>{
+      btn.addEventListener('click',()=>playUrl(btn.dataset.audio));
     });
-    const wb=card.querySelector('.dcard-word-btn');
-    if(v.exampleAudio){
-      wb.addEventListener('click',()=>playWord(v.exampleAudio));
-    }
+    // Wire sound button
+    card.querySelector('.dcard-play').addEventListener('click',()=>{
+      playUrl(ipaAudioUrl(lk,v.ipa));
+      pulse('chartIpa',tPos.x,tPos.y,c);
+      if(fPos)pulse('chartFormant',fPos.x,fPos.y,c);
+    });
     grid.appendChild(card);
   }
   sec.appendChild(grid);
