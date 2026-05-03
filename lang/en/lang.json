@@ -1,0 +1,137 @@
+{
+  "key":   "english",
+  "label": "English",
+  "color": "#60a5fa",
+  "vowels": [
+    {
+      "ipa": "iː", "h": 0.03, "b": 0.04, "rounded": false,
+      "desc": "Close front unrounded (long)", "f1": 270, "f2": 2290,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+      "words": [
+        {"text": "f<b>ee</b>t", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-feet.ogg"},
+        {"text": "s<b>ee</b>n", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-seen.ogg"}
+      ]
+    },
+    {
+      "ipa": "ɪ", "h": 0.20, "b": 0.20, "rounded": false,
+      "desc": "Near-close near-front unrounded", "f1": 400, "f2": 1920,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
+      "words": [
+        {"text": "k<b>i</b>t", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-kit.ogg"},
+        {"text": "b<b>i</b>t", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bit.ogg"}
+      ]
+    },
+    {
+      "ipa": "eɪ", "h": 0.30, "b": 0.04, "rounded": false,
+      "desc": "Close-mid front unrounded (diphthong)", "f1": 430, "f2": 2090,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
+      "words": [
+        {"text": "f<b>a</b>ce", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-face.ogg"},
+        {"text": "b<b>a</b>ke", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bake.ogg"}
+      ]
+    },
+    {
+      "ipa": "ɛ", "h": 0.63, "b": 0.04, "rounded": false,
+      "desc": "Open-mid front unrounded", "f1": 580, "f2": 1990,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "words": [
+        {"text": "dr<b>e</b>ss", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-dress.ogg"},
+        {"text": "b<b>e</b>d",   "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bed.ogg"}
+      ]
+    },
+    {
+      "ipa": "æ", "h": 0.80, "b": 0.04, "rounded": false,
+      "desc": "Near-open front unrounded", "f1": 750, "f2": 1660,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "words": [
+        {"text": "tr<b>a</b>p", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-trap.ogg"},
+        {"text": "c<b>a</b>t",  "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-cat.ogg"}
+      ]
+    },
+    {
+      "ipa": "ɑː", "h": 0.97, "b": 0.97, "rounded": false,
+      "desc": "Open back unrounded (long)", "f1": 800, "f2": 1100,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "words": [
+        {"text": "f<b>a</b>ther", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-father.ogg"},
+        {"text": "p<b>a</b>lm",   "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-palm.ogg"}
+      ]
+    },
+    {
+      "ipa": "ɔː", "h": 0.65, "b": 0.97, "rounded": true,
+      "desc": "Open-mid back rounded (long)", "f1": 590, "f2": 920,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
+      "words": [
+        {"text": "th<b>ough</b>t", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-thought.ogg"},
+        {"text": "cl<b>aw</b>",    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-claw.ogg"}
+      ]
+    },
+    {
+      "ipa": "oʊ", "h": 0.27, "b": 0.93, "rounded": true,
+      "desc": "Close-mid back rounded (diphthong)", "f1": 449, "f2": 1020,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
+      "words": [
+        {"text": "g<b>oa</b>t", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-goat.ogg"},
+        {"text": "n<b>o</b>",   "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-no.ogg"}
+      ]
+    },
+    {
+      "ipa": "ʊ", "h": 0.20, "b": 0.78, "rounded": true,
+      "desc": "Near-close near-back rounded", "f1": 374, "f2": 1005,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
+      "words": [
+        {"text": "f<b>oo</b>t", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-foot.ogg"},
+        {"text": "p<b>u</b>t",  "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-put.ogg"}
+      ]
+    },
+    {
+      "ipa": "uː", "h": 0.04, "b": 0.84, "rounded": true,
+      "desc": "Close back rounded (long)", "f1": 300, "f2": 870,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_back_rounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
+      "words": [
+        {"text": "g<b>oo</b>se", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-goose.ogg"},
+        {"text": "f<b>oo</b>d",  "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-food.ogg"}
+      ]
+    },
+    {
+      "ipa": "ʌ", "h": 0.67, "b": 0.62, "rounded": false,
+      "desc": "Open-mid back unrounded", "f1": 760, "f2": 1260,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open-mid_back_unrounded_vowel",
+      "words": [
+        {"text": "str<b>u</b>t", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-strut.ogg"},
+        {"text": "b<b>u</b>s",   "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bus.ogg"}
+      ]
+    },
+    {
+      "ipa": "ə", "h": 0.48, "b": 0.50, "rounded": false,
+      "desc": "Mid central (schwa)", "f1": 500, "f2": 1500,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid-central_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Mid-central_vowel",
+      "words": [
+        {"text": "<b>a</b>bout", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-about.ogg"},
+        {"text": "comm<b>a</b>", "audio": null}
+      ]
+    },
+    {
+      "ipa": "ɜː", "h": 0.63, "b": 0.44, "rounded": false,
+      "desc": "Open-mid central unrounded (long)", "f1": 500, "f2": 1490,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_central_unrounded_vowel.ogg",
+      "wikiUrl":  "https://en.wikipedia.org/wiki/Open-mid_central_unrounded_vowel",
+      "words": [
+        {"text": "n<b>ur</b>se", "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-nurse.ogg"},
+        {"text": "b<b>ir</b>d",  "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bird.ogg"}
+      ]
+    }
+  ]
+}

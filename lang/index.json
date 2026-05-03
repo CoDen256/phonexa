@@ -1,0 +1,10 @@
+{
+  "_comment": "Add a language folder name to the list below. That's all you need to do.",
+  "languages": [
+    "cardinal",
+    "en",
+    "de",
+    "ru",
+    "no"
+  ]
+}
