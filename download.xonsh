@@ -1,13 +1,13 @@
 #!/usr/bin/env xonsh
 
 # Base URL
-base_url = "https://www.hf.ntnu.no/now/audio/extras/chap1/bokstaver"
+base_url = "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound"
 
 # Letters list
-letters = list("abcdefghijklmnopqrstuvwxyz") + ["ae", "oe", "aa"]
+letters = list(range(1, 34))
 
 # Output directory
-outdir = "alphabet_audio"
+outdir = "two/audio/russian"
 
 # Create directory if it doesn't exist
 import os
@@ -15,7 +15,7 @@ os.makedirs(outdir, exist_ok=True)
 
 # Download files
 for letter in letters:
-    url = f"{base_url}/{letter}.mp3"
+    url = f"{base_url}{letter}.mp3"
     output_file = os.path.join(outdir, f"{letter}.mp3")
     
     print(f"Downloading {url} -> {output_file}")

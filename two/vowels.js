@@ -92,7 +92,7 @@ const LANGS = {
     label: 'Cardinal', color: '#607a96',
     vowels: [
       { ipa:'i',  h:0,    b:0.00, rounded:false, desc:'Close front unrounded',        f1:240, f2:2400 },
-      { ipa:'y',  h:0,    b:0.02, rounded:true,  desc:'Close front rounded',          f1:235, f2:1870 },
+      { ipa:'y',  h:0,    b:0.05, rounded:true,  desc:'Close front rounded',          f1:235, f2:1870 },
       { ipa:'ɨ',  h:0,    b:0.50, rounded:false, desc:'Close central unrounded',      f1:250, f2:1450 },
       { ipa:'ʉ',  h:0,    b:0.55, rounded:true,  desc:'Close central rounded',        f1:250, f2:1380 },
       { ipa:'ɯ',  h:0,    b:0.95, rounded:false, desc:'Close back unrounded',         f1:250, f2: 800 },
