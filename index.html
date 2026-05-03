@@ -196,6 +196,18 @@
   }
   .dcard-btn:hover { background:#1f3a58; }
 
+  /* ── Reload button ───────────────────────────────────────── */
+  .reload-btn {
+    display:inline-flex; align-items:center; gap:5px;
+    margin-top:6px; padding:3px 11px 3px 8px;
+    font-size:.7rem; color:#4a7090; cursor:pointer;
+    background:none; border:1px solid #2e4560; border-radius:20px;
+    transition:color .15s, border-color .15s, transform .15s;
+  }
+  .reload-btn:hover { color:#7eb8f7; border-color:#7eb8f7; }
+  .reload-btn.spinning .reload-icon { animation:spin .7s linear infinite; }
+  .reload-icon { font-size:.75rem; display:inline-block; }
+
   @media (max-width:800px) {
     .chart-row { flex-direction:column; }
     .sidebar { width:100%; max-height:300px; }
@@ -207,6 +219,9 @@
 <header>
   <h1>IPA Vowel Chart</h1>
   <p>Use filters → · Hover for details · Click dot or letter to play</p>
+  <button class="reload-btn" id="reloadBtn" type="button">
+    <span class="reload-icon">↺</span> Reload languages
+  </button>
 </header>
 
 <div id="loading">
@@ -456,19 +471,19 @@ function buildVowels(svg, getPos, svgId) {
   for (const group of posGroups.values()) {
     for (const {lk,lang,v,dx,dy} of group) {
       const ic=lk==='cardinal', lyr=ic?cardL:langL;
-      const FS=ic?15:22, GAP=5, PAD=4, dotR=ic?DR_C:DR_L;
+      const FS=22, GAP=5, PAD=4, dotR=ic?DR_C:DR_L;
       const lx=v.rounded?dx+dotR+GAP:dx-dotR-GAP;
       const anch=v.rounded?'start':'end', tw=ipaW(v.ipa,FS);
       const hx=(v.rounded?lx:lx-tw)-PAD, hy=dy-FS*0.40-PAD;
       const lg=$s('g',{style:'cursor:pointer'});
       lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
       lg.appendChild($t(v.ipa,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
-        fill:ic?'#9ab8d0':lang.color, opacity:ic?0.70:0.78,
-        'font-family':"Georgia,'Noto Serif',serif", 'font-weight':ic?'normal':'bold',
+        fill:lang.color, opacity:ic?0.98:0.78,
+        'font-family':"Georgia,'Noto Serif',serif", 'font-weight':ic?"normal": 'bold',
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{ playUrl(v.ipaAudio); pulse(svgId,dx,dy,ic?'#7090b8':lang.color); });
+      lg.addEventListener('click',()=>{ playUrl(v.ipaAudio); pulse(svgId,dx,dy,lang.color); });
       lyr.appendChild(lg);
     }
   }
@@ -477,8 +492,8 @@ function buildVowels(svg, getPos, svgId) {
   for (const group of posGroups.values()) {
     const {dx,dy}=group[0], multi=group.length>1;
     const ic=group.every(g=>g.lk==='cardinal'), dotR=ic?DR_C:DR_L;
-    const dc=multi?'#8090a8':(ic?'#7090b8':group[0].lang.color);
-    const df=multi?'#8090a8cc':(ic?'#7090b8cc':group[0].lang.color+'bb');
+    const dc=multi?'#8090a8':(ic?'#90b4d0':group[0].lang.color);
+    const df=multi?'#8090a8cc':(ic?'#90b4d0dd':group[0].lang.color+'bb');
     const dg=$s('g',{style:'cursor:pointer'});
     dg.appendChild($s('circle',{cx:dx,cy:dy,r:DH,fill:'transparent'}));
     if(multi) dg.appendChild($s('circle',{cx:dx,cy:dy,r:dotR+2.5,fill:'none',stroke:'#8090a840','stroke-width':1.5}));
@@ -514,7 +529,7 @@ function renderIpa() {
   svg.appendChild($s('path',{d:`M${TL.x},${TL.y} L${TR.x},${TR.y} L${BR.x},${BR.y} L${BL.x},${BL.y}Z`,fill:'none',stroke:'#385878','stroke-width':2}));
   for(const r of ROWS){
     const p=trapPos(r.h,0);
-    svg.appendChild($t(r.label,{x:p.x-16,y:p.y,dy:'0.36em','text-anchor':'end','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
+    svg.appendChild($t(r.label,{x:p.x-56,y:p.y,dy:'0.36em','text-anchor':'end','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
   }
   for(const[l,b]of[['Front',0],['Central',.5],['Back',1]]){
     const p=trapPos(0,b);
@@ -689,17 +704,47 @@ function renderDetail() {
 
 // ─── Init (called after all lang.js files have loaded) ───────────────────────
 function init() {
-  // Default: show Cardinal + English (if loaded)
   if (!Object.keys(LANGS).length) {
-    console.warn('No languages loaded — check lang/index.js and lang/*/lang.js');
+    console.warn('No languages loaded — check lang/index.json and lang/*/lang.json');
   }
-
-  // Hide loading screen, show app
   document.getElementById('loading').style.display = 'none';
-
   buildSidebar();
   renderAll();
 }
+
+// ─── Reload button ────────────────────────────────────────────────────────────
+document.getElementById('reloadBtn').addEventListener('click', async () => {
+  const btn  = document.getElementById('reloadBtn');
+  const icon = btn.querySelector('.reload-icon');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+
+  // Clear existing language data
+  for (const key of Object.keys(LANGS)) delete LANGS[key];
+
+  try {
+    // Add cache-busting param so browsers re-fetch even if cached
+    const ts  = Date.now();
+    const idx = await fetch(`lang/index.json?t=${ts}`).then(r => r.json());
+    const names = (idx.languages || []).filter(n => !n.startsWith('_'));
+
+    await Promise.all(
+      names.map(name =>
+        fetch(`lang/${name}/lang.json?t=${ts}`)
+          .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(data => { if (data && data.key) LANGS[data.key] = data; })
+          .catch(e => console.warn(`Skipped lang/${name}:`, e.message))
+      )
+    );
+  } catch (e) {
+    console.error('Reload failed:', e);
+  }
+
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+  buildSidebar();
+  renderAll();
+});
 </script>
 
 </body>
