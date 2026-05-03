@@ -14,13 +14,11 @@
     font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
     background:var(--bg); color:#d8e8f4;
     min-height:100vh; padding:20px 16px 60px;
-    display:flex; flex-direction:column; align-items:center;
   }
   header { text-align:center; margin-bottom:16px; }
   header h1 { font-size:1.15rem; color:#7eb8f7; letter-spacing:.04em; margin-bottom:3px; }
   header p  { font-size:.76rem; color:var(--muted); }
 
-  /* Loading screen */
   #loading { padding:60px 20px; text-align:center; color:var(--muted); font-size:.9rem; }
   #loading .spinner {
     width:32px; height:32px; border:3px solid #2e4560;
@@ -28,10 +26,13 @@
     animation:spin .8s linear infinite; margin:0 auto 16px;
   }
   @keyframes spin { to { transform:rotate(360deg); } }
-  #app { display:none; }
+  #app { }
 
   /* ── Layout ──────────────────────────────────────────────── */
-  .page-layout { width:100%; max-width:1480px; display:flex; flex-direction:column; }
+  .page-layout {
+    width:100%; max-width:1480px; margin:0 auto;
+    display:flex; flex-direction:column;
+  }
   .chart-row   { display:flex; gap:14px; align-items:flex-start; }
   .chart-col   { flex:1; min-width:0; }
 
@@ -694,8 +695,7 @@ function init() {
   }
 
   // Hide loading screen, show app
-  document.getElementById('loading').style.display='none';
-  document.getElementById('app').style.display='block';
+  document.getElementById('loading').style.display = 'none';
 
   buildSidebar();
   renderAll();
