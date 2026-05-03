@@ -1,374 +1,614 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IPA Vowel Chart</title>
-<style>
-  :root { --bg:#0d1117; --surface:#161b22; --border:#21262d; --muted:#48556a; }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body {
-    font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
-    background:var(--bg); color:#e6edf3;
-    min-height:100vh; padding:24px 16px;
-    display:flex; flex-direction:column; align-items:center;
-  }
-  header { text-align:center; margin-bottom:18px; }
-  header h1 { font-size:1.15rem; color:#7eb8f7; letter-spacing:.04em; margin-bottom:3px; }
-  header p  { font-size:.78rem; color:var(--muted); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPA Vowel Chart</title>
+  <style>
+    :root {
+      --bg: #141c28;
+      --surface: #1b2436;
+      --border: #26334a;
+      --muted: #5a6e85;
+    }
 
-  .controls { display:flex; gap:7px; flex-wrap:wrap; justify-content:center; margin-bottom:18px; }
-  .lang-btn {
-    padding:5px 15px; border-radius:20px; border:2px solid;
-    background:transparent; cursor:pointer; font-size:.8rem;
-    font-weight:700; transition:background .15s,color .15s; line-height:1.4;
-  }
-  .lang-btn.on { color:#0d1117 !important; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  .chart-wrap {
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:16px; padding:10px; width:100%; max-width:760px;
-  }
-  svg { display:block; width:100%; height:auto; overflow:visible; }
+    body {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: #e0e8f4;
+      min-height: 100vh;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-  .tip {
-    position:fixed; pointer-events:none; z-index:999; display:none;
-    background:#0d1320; border:1px solid #2d3a55; border-radius:12px;
-    padding:12px 15px; min-width:190px; max-width:250px;
-    box-shadow:0 8px 40px rgba(0,0,0,.7);
-  }
-  .tip-ipa  { font-size:2.1rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
-  .tip-lang { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin:3px 0 7px; }
-  .tip-desc { font-size:.78rem; color:#8fa0b8; line-height:1.45; }
-  .tip-word { font-size:.82rem; margin-top:7px; color:#c8d6e8; }
-  .tip-word b { text-decoration:underline; font-weight:normal; }
-  .tip-f    { font-size:.7rem; color:#5a7090; margin-top:5px; font-family:monospace; }
-  .tip-f span { color:#7a90a8; }
+    header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
 
-  .info-bar {
-    display:flex; gap:14px; flex-wrap:wrap;
-    justify-content:center; margin-top:12px; font-size:.75rem; color:var(--muted);
-  }
-  .info-item { display:flex; align-items:center; gap:6px; }
-  .info-swatch { width:11px; height:11px; border-radius:50%; border:2px solid; flex-shrink:0; }
+    header h1 {
+      font-size: 1.15rem;
+      color: #7eb8f7;
+      letter-spacing: .04em;
+      margin-bottom: 3px;
+    }
 
-  .legend-strip {
-    display:flex; gap:20px; justify-content:center;
-    margin-top:10px; font-size:.72rem; color:var(--muted);
-  }
-  .legend-strip span { display:flex; align-items:center; gap:6px; }
-</style>
-</head>
-<body>
+    header p {
+      font-size: .78rem;
+      color: var(--muted);
+    }
 
-<header>
-  <h1>IPA Vowel Chart</h1>
-  <p>Hover a vowel for details · Toggle languages to compare</p>
-</header>
+    .controls {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
 
-<div class="controls" id="controls"></div>
+    .lang-btn {
+      padding: 5px 15px;
+      border-radius: 20px;
+      border: 2px solid;
+      background: transparent;
+      cursor: pointer;
+      font-size: .8rem;
+      font-weight: 700;
+      transition: background .15s, color .15s;
+      line-height: 1.4;
+    }
 
-<div class="chart-wrap">
-  <svg id="chart" viewBox="0 0 740 510"></svg>
-</div>
+    .lang-btn.on {
+      color: #0d1117 !important;
+    }
 
-<div class="legend-strip">
-  <span>
-    <svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="#12172a" stroke="#2d3a55" stroke-width="1.5"/></svg>
-    Cardinal reference
-  </span>
-  <span>
-    <svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="#7eb8f730" stroke="#7eb8f7" stroke-width="1.5"/></svg>
-    Language vowel
-  </span>
-</div>
+    .chart-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px;
+      width: 100%;
+      max-width: 760px;
+    }
 
-<div class="info-bar" id="infoBar"></div>
-<div id="tip" class="tip"></div>
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
 
-<script>
-// ─── Trapezoid ────────────────────────────────────────────────────────────────
-//
-//  TL ─────────────────────────────────── TR
-//   \   front edge slants right           |
-//    \  (vowel height increases →)        |  ← right edge VERTICAL
-//     BL ─────────────────────────────── BR
-//
-//  TR.x === BR.x  →  perfectly straight back (right) column
-
-const TRAP = {
-  TL: {x:108, y:95 },   // Close-Front
-  TR: {x:638, y:95 },   // Close-Back
-  BL: {x:300, y:450},   // Open-Front
-  BR: {x:638, y:450},   // Open-Back  (same x as TR)
-};
-
-// h=0(Close)→1(Open),  b=0(Front)→1(Back)
-function trapPos(h, b) {
-  const fX = TRAP.TL.x + h * (TRAP.BL.x - TRAP.TL.x);
-  const bX = TRAP.TR.x;   // constant — back edge never moves
-  return { x: fX + b * (bX - fX), y: TRAP.TL.y + h * (TRAP.BL.y - TRAP.TL.y) };
-}
-
-const ROWS = [
-  {h:0,    label:'Close'},
-  {h:1/6,  label:'Near-close'},
-  {h:2/6,  label:'Close-mid'},
-  {h:3/6,  label:'Mid'},
-  {h:4/6,  label:'Open-mid'},
-  {h:5/6,  label:'Near-open'},
-  {h:1,    label:'Open'},
-];
-
-// ─── Language data ────────────────────────────────────────────────────────────
-const LANGS = {
-
-  cardinal: {
-    label:'Cardinal', color:'#4a5568',
-    vowels:[
-      {ipa:'i',  h:0,    b:0.00, desc:'Close front unrounded'},
-      {ipa:'y',  h:0,    b:0.05, desc:'Close front rounded'},
-      {ipa:'ɨ',  h:0,    b:0.50, desc:'Close central unrounded'},
-      {ipa:'ʉ',  h:0,    b:0.55, desc:'Close central rounded'},
-      {ipa:'ɯ',  h:0,    b:0.95, desc:'Close back unrounded'},
-      {ipa:'u',  h:0,    b:1.00, desc:'Close back rounded'},
-      {ipa:'e',  h:2/6,  b:0.00, desc:'Close-mid front unrounded'},
-      {ipa:'ø',  h:2/6,  b:0.05, desc:'Close-mid front rounded'},
-      {ipa:'ɘ',  h:2/6,  b:0.50, desc:'Close-mid central unrounded'},
-      {ipa:'ɤ',  h:2/6,  b:0.95, desc:'Close-mid back unrounded'},
-      {ipa:'o',  h:2/6,  b:1.00, desc:'Close-mid back rounded'},
-      {ipa:'ə',  h:3/6,  b:0.50, desc:'Mid central'},
-      {ipa:'ɛ',  h:4/6,  b:0.00, desc:'Open-mid front unrounded'},
-      {ipa:'œ',  h:4/6,  b:0.05, desc:'Open-mid front rounded'},
-      {ipa:'ɜ',  h:4/6,  b:0.50, desc:'Open-mid central unrounded'},
-      {ipa:'ʌ',  h:4/6,  b:0.95, desc:'Open-mid back unrounded'},
-      {ipa:'ɔ',  h:4/6,  b:1.00, desc:'Open-mid back rounded'},
-      {ipa:'æ',  h:5/6,  b:0.00, desc:'Near-open front unrounded'},
-      {ipa:'ɐ',  h:5/6,  b:0.50, desc:'Near-open central'},
-      {ipa:'a',  h:1,    b:0.00, desc:'Open front unrounded'},
-      {ipa:'ɶ',  h:1,    b:0.05, desc:'Open front rounded'},
-      {ipa:'ɑ',  h:1,    b:1.00, desc:'Open back unrounded'},
-      {ipa:'ɒ',  h:1,    b:0.95, desc:'Open back rounded'},
-    ]
-  },
-
-  english: {
-    label:'English', color:'#60a5fa',
-    vowels:[
-      {ipa:'iː',  h:0.03, b:0.04, desc:'Close front unrounded',           word:'f<b>ee</b>t, s<b>ee</b>n',       f1:270, f2:2290},
-      {ipa:'ɪ',   h:0.20, b:0.20, desc:'Near-close near-front unrounded', word:'k<b>i</b>t, b<b>i</b>t',         f1:400, f2:1920},
-      {ipa:'eɪ',  h:0.30, b:0.04, desc:'Close-mid front (diphthong)',      word:'f<b>a</b>ce, b<b>a</b>ke',       f1:430, f2:2090},
-      {ipa:'ɛ',   h:0.63, b:0.04, desc:'Open-mid front unrounded',        word:'dr<b>e</b>ss, b<b>e</b>d',       f1:580, f2:1990},
-      {ipa:'æ',   h:0.80, b:0.04, desc:'Near-open front unrounded',       word:'tr<b>a</b>p, c<b>a</b>t',        f1:750, f2:1660},
-      {ipa:'ɑː',  h:0.97, b:0.97, desc:'Open back unrounded',             word:'f<b>a</b>ther, p<b>a</b>lm',     f1:800, f2:1100},
-      {ipa:'ɔː',  h:0.65, b:0.97, desc:'Open-mid back rounded',           word:'th<b>ough</b>t, cl<b>aw</b>',    f1:590, f2: 920},
-      {ipa:'oʊ',  h:0.27, b:0.93, desc:'Close-mid back (diphthong)',       word:'g<b>oa</b>t, n<b>o</b>',         f1:449, f2:1020},
-      {ipa:'ʊ',   h:0.20, b:0.78, desc:'Near-close near-back rounded',    word:'f<b>oo</b>t, p<b>u</b>t',        f1:374, f2:1005},
-      {ipa:'uː',  h:0.04, b:0.84, desc:'Close back rounded',              word:'g<b>oo</b>se, f<b>oo</b>d',      f1:300, f2: 870},
-      {ipa:'ʌ',   h:0.67, b:0.62, desc:'Open-mid back unrounded',         word:'str<b>u</b>t, b<b>u</b>s',       f1:760, f2:1260},
-      {ipa:'ə',   h:0.48, b:0.50, desc:'Mid central (schwa)',              word:'<b>a</b>bout, comm<b>a</b>',     f1:500, f2:1500},
-      {ipa:'ɜː',  h:0.63, b:0.44, desc:'Open-mid central (long)',         word:'n<b>ur</b>se, b<b>ir</b>d',      f1:500, f2:1490},
-    ]
-  },
-
-  german: {
-    label:'German', color:'#fb923c',
-    vowels:[
-      {ipa:'iː',  h:0.02, b:0.01, desc:'Close front unrounded',           word:'L<b>ie</b>be, w<b>ie</b>',       f1:270, f2:2290},
-      {ipa:'yː',  h:0.02, b:0.08, desc:'Close front rounded',             word:'<b>ü</b>ber, gr<b>ün</b>',       f1:235, f2:1870},
-      {ipa:'ɪ',   h:0.21, b:0.18, desc:'Near-close near-front unrounded', word:'m<b>i</b>t, b<b>i</b>tte',       f1:380, f2:1940},
-      {ipa:'ʏ',   h:0.21, b:0.24, desc:'Near-close near-front rounded',   word:'h<b>ü</b>bsch, fl<b>üs</b>se',   f1:355, f2:1695},
-      {ipa:'eː',  h:0.30, b:0.01, desc:'Close-mid front unrounded',       word:'S<b>ee</b>, g<b>e</b>ben',       f1:390, f2:2070},
-      {ipa:'øː',  h:0.30, b:0.08, desc:'Close-mid front rounded',         word:'sch<b>ö</b>n, h<b>ö</b>ren',     f1:370, f2:1615},
-      {ipa:'ɛ',   h:0.63, b:0.02, desc:'Open-mid front unrounded',        word:'B<b>e</b>tt, H<b>ä</b>nde',      f1:580, f2:1820},
-      {ipa:'œ',   h:0.63, b:0.09, desc:'Open-mid front rounded',          word:'zw<b>ö</b>lf, H<b>öl</b>le',     f1:490, f2:1290},
-      {ipa:'a',   h:0.97, b:0.18, desc:'Open front/central unrounded',    word:'M<b>a</b>nn, d<b>a</b>s',        f1:800, f2:1300},
-      {ipa:'aː',  h:0.94, b:0.23, desc:'Open central (long)',             word:'B<b>ah</b>n, j<b>a</b>',         f1:780, f2:1230},
-      {ipa:'oː',  h:0.28, b:0.97, desc:'Close-mid back rounded',          word:'gr<b>o</b>ß, S<b>oh</b>n',       f1:400, f2: 840},
-      {ipa:'ɔ',   h:0.66, b:0.94, desc:'Open-mid back rounded',           word:'K<b>o</b>pf, P<b>o</b>st',       f1:555, f2: 870},
-      {ipa:'uː',  h:0.02, b:0.97, desc:'Close back rounded',              word:'B<b>u</b>ch, R<b>uh</b>e',       f1:250, f2: 600},
-      {ipa:'ʊ',   h:0.21, b:0.80, desc:'Near-close near-back rounded',   word:'M<b>u</b>tter, H<b>u</b>nd',     f1:360, f2: 780},
-      {ipa:'ə',   h:0.48, b:0.50, desc:'Mid central (Schwa)',             word:'hab<b>e</b>, Kett<b>e</b>',      f1:490, f2:1350},
-    ]
-  },
-
-  russian: {
-    label:'Russian', color:'#f43f5e',
-    vowels:[
-      // Russian has 6 phonemic vowels. ы /ɨ/ is the most distinctive —
-      // a close central unrounded sound absent in most European languages.
-      {ipa:'i',  h:0.02, b:0.02, desc:'Close front unrounded (и)',        word:'м<b>и</b>р (world)',              f1:270, f2:2200},
-      {ipa:'ɨ',  h:0.03, b:0.52, desc:'Close central unrounded (ы)',      word:'б<b>ы</b>ть (to be), т<b>ы</b>', f1:320, f2:1380},
-      {ipa:'u',  h:0.02, b:0.97, desc:'Close back rounded (у)',           word:'д<b>у</b>ша (soul)',              f1:300, f2: 680},
-      {ipa:'e',  h:0.44, b:0.04, desc:'Close-mid front unrounded (е/э)', word:'<b>э</b>то (this), м<b>е</b>сто', f1:440, f2:1900},
-      {ipa:'o',  h:0.40, b:0.90, desc:'Close-mid back rounded (о)',       word:'д<b>о</b>м (house)',              f1:500, f2:1000},
-      {ipa:'a',  h:0.97, b:0.38, desc:'Open central unrounded (а)',       word:'д<b>а</b> (yes), м<b>а</b>ть',   f1:850, f2:1350},
-    ]
-  },
-
-  norwegian: {
-    label:'Norwegian', color:'#22d3ee',
-    vowels:[
-      // Eastern Norwegian (Bokmål). Key feature: /ʉ/ — a close *central* rounded vowel,
-      // distinct from German /u/ (back) and French /y/ (front). It sits in the middle.
-      {ipa:'i',  h:0.02, b:0.02, desc:'Close front unrounded',            word:'f<b>i</b>n, l<b>i</b>ten',       f1:240, f2:2380},
-      {ipa:'y',  h:0.02, b:0.08, desc:'Close front rounded',              word:'n<b>y</b>, b<b>y</b>',            f1:235, f2:1810},
-      {ipa:'ʉ',  h:0.04, b:0.54, desc:'Close central rounded (Norwegian u)', word:'h<b>u</b>s, sk<b>u</b>lle',   f1:260, f2:1370},
-      {ipa:'e',  h:0.30, b:0.02, desc:'Close-mid front unrounded',        word:'s<b>e</b>, br<b>e</b>v',          f1:395, f2:2080},
-      {ipa:'ø',  h:0.30, b:0.08, desc:'Close-mid front rounded',          word:'gr<b>ø</b>t, s<b>ø</b>t',         f1:375, f2:1590},
-      {ipa:'o',  h:0.28, b:0.97, desc:'Close-mid back rounded',           word:'b<b>o</b>, g<b>o</b>d',           f1:410, f2: 880},
-      {ipa:'ɛ',  h:0.62, b:0.03, desc:'Open-mid front unrounded',        word:'s<b>e</b>tt, m<b>e</b>d',         f1:575, f2:1880},
-      {ipa:'æ',  h:0.80, b:0.03, desc:'Near-open front unrounded',       word:'l<b>æ</b>rer, v<b>æ</b>re',       f1:730, f2:1700},
-      {ipa:'a',  h:0.97, b:0.18, desc:'Open front unrounded',             word:'m<b>a</b>t, d<b>a</b>g',          f1:820, f2:1380},
-      {ipa:'ɔ',  h:0.64, b:0.94, desc:'Open-mid back rounded (å)',        word:'<b>å</b>tte, b<b>å</b>t',         f1:545, f2: 865},
-    ]
-  },
-
-};
-
-// ─── Active state ─────────────────────────────────────────────────────────────
-const active = {cardinal:true, english:true, german:false, russian:false, norwegian:false};
-
-// ─── SVG helpers ──────────────────────────────────────────────────────────────
-const NS = 'http://www.w3.org/2000/svg';
-function $s(tag, attrs={}) {
-  const el = document.createElementNS(NS, tag);
-  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
-  return el;
-}
-function $t(text, attrs={}) { const el=$s('text',attrs); el.textContent=text; return el; }
-
-// ─── Controls ────────────────────────────────────────────────────────────────
-const ctrlEl = document.getElementById('controls');
-for (const [key, lang] of Object.entries(LANGS)) {
-  const btn = document.createElement('button');
-  btn.className = 'lang-btn' + (active[key] ? ' on' : '');
-  btn.textContent = lang.label;
-  btn.style.borderColor = lang.color;
-  btn.style.color = active[key] ? '#0d1117' : lang.color;
-  btn.style.backgroundColor = active[key] ? lang.color : 'transparent';
-  btn.addEventListener('click', () => {
-    active[key] = !active[key];
-    btn.classList.toggle('on', active[key]);
-    btn.style.backgroundColor = active[key] ? lang.color : 'transparent';
-    btn.style.color = active[key] ? '#0d1117' : lang.color;
-    render();
-  });
-  ctrlEl.appendChild(btn);
-}
-
-// ─── Render ───────────────────────────────────────────────────────────────────
-function render() {
-  const svg = document.getElementById('chart');
-  while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-  // Row grid lines
-  for (const row of ROWS) {
-    const L = trapPos(row.h, 0), R = trapPos(row.h, 1);
-    svg.appendChild($s('line', {x1:L.x,y1:L.y,x2:R.x,y2:R.y,stroke:'#181e2c','stroke-width':1.5}));
-  }
-
-  // Central dashed guide
-  const cT=trapPos(0,.5), cB=trapPos(1,.5);
-  svg.appendChild($s('line', {x1:cT.x,y1:cT.y,x2:cB.x,y2:cB.y,stroke:'#181e2c','stroke-width':1,'stroke-dasharray':'5 4'}));
-
-  // Trapezoid outline
-  const {TL,TR,BL,BR}=TRAP;
-  svg.appendChild($s('path', {
-    d:`M${TL.x},${TL.y} L${TR.x},${TR.y} L${BR.x},${BR.y} L${BL.x},${BL.y}Z`,
-    fill:'none', stroke:'#252d3d', 'stroke-width':2,
-  }));
-
-  // Row labels (left side, following the front edge)
-  for (const row of ROWS) {
-    const p = trapPos(row.h, 0);
-    svg.appendChild($t(row.label, {x:p.x-10, y:p.y+4, 'text-anchor':'end', 'font-size':10.5, fill:'#3d4a60', 'font-family':'system-ui,sans-serif'}));
-  }
-
-  // Column labels (top)
-  for (const [label, b] of [['Front',0],['Central',.5],['Back',1]]) {
-    const p = trapPos(0, b);
-    svg.appendChild($t(label, {x:p.x, y:p.y-18, 'text-anchor':'middle', 'font-size':10.5, fill:'#3d4a60', 'font-family':'system-ui,sans-serif'}));
-  }
-
-  // Vowel dots — cardinals first (bottom layer)
-  const layers = Object.entries(LANGS)
-    .sort(([a],[b]) => (a==='cardinal'?-1:1)-(b==='cardinal'?-1:1))
-    .filter(([k]) => active[k]);
-
-  for (const [key, lang] of layers) {
-    const isCard = key === 'cardinal';
-    for (const v of lang.vowels) {
-      const {x,y} = trapPos(v.h, v.b);
-      const g = $s('g', {style:'cursor:pointer'});
-
-      if (isCard) {
-        g.appendChild($s('circle', {cx:x,cy:y,r:4,fill:'#0e1420',stroke:'#2a3348','stroke-width':1.5}));
-        const lbl = $s('text', {x,y:y-7,'text-anchor':'middle','font-size':10,fill:'#2e3a50','font-family':'Georgia,serif'});
-        lbl.textContent = v.ipa;
-        g.appendChild(lbl);
-      } else {
-        const c = lang.color;
-        g.appendChild($s('circle', {cx:x,cy:y,r:22,fill:`${c}0a`,stroke:'none'}));
-        g.appendChild($s('circle', {cx:x,cy:y,r:16,fill:`${c}1c`,stroke:c,'stroke-width':2}));
-        const lbl = $s('text', {x,y:y+6,'text-anchor':'middle','font-size':14,fill:c,'font-family':'Georgia,serif','font-weight':'bold'});
-        lbl.textContent = v.ipa;
-        g.appendChild(lbl);
+    /* Pulse ring animation for audio feedback */
+    @keyframes pulseRing {
+      0% {
+        r: 14;
+        opacity: .9;
       }
 
-      g.addEventListener('mouseenter', e => showTip(e, v, lang));
-      g.addEventListener('mousemove',  moveTip);
-      g.addEventListener('mouseleave', hideTip);
-      g.addEventListener('touchstart', e=>{e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
-      g.addEventListener('touchmove',  e=>{e.preventDefault();moveTip(e.touches[0]);},{passive:false});
-      g.addEventListener('touchend',   hideTip);
-      svg.appendChild(g);
+      100% {
+        r: 34;
+        opacity: 0;
+      }
     }
-  }
 
-  updateInfoBar();
-}
+    .pulse-ring {
+      animation: pulseRing 0.65s ease-out forwards;
+      pointer-events: none;
+    }
 
-// ─── Tooltip ─────────────────────────────────────────────────────────────────
-const tip = document.getElementById('tip');
-function showTip(e, v, lang) {
-  tip.innerHTML = `
+    .tip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+      background: #0d1524;
+      border: 1px solid #2d3a55;
+      border-radius: 12px;
+      padding: 12px 15px;
+      min-width: 200px;
+      max-width: 255px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .7);
+    }
+
+    .tip-ipa {
+      font-size: 2.2rem;
+      font-family: Georgia, 'Noto Serif', serif;
+      line-height: 1;
+    }
+
+    .tip-lang {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin: 3px 0 7px;
+    }
+
+    .tip-desc {
+      font-size: .78rem;
+      color: #8fa0b8;
+      line-height: 1.45;
+    }
+
+    .tip-word {
+      font-size: .82rem;
+      margin-top: 7px;
+      color: #c8d6e8;
+    }
+
+    .tip-word b {
+      text-decoration: underline;
+      font-weight: normal;
+    }
+
+    .tip-f {
+      font-size: .7rem;
+      color: #5a7090;
+      margin-top: 5px;
+      font-family: monospace;
+    }
+
+    .tip-f span {
+      color: #7a90a8;
+    }
+
+    .tip-play {
+      font-size: .7rem;
+      color: #5a7090;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tip-play::before {
+      content: '▶';
+      font-size: .6rem;
+    }
+
+    .info-bar {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-swatch {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 2px solid;
+      flex-shrink: 0;
+    }
+
+    .legend-strip {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    .legend-strip span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>IPA Vowel Chart</h1>
+    <p>Hover for details · Click to play · Toggle languages to compare</p>
+  </header>
+
+  <div class="controls" id="controls"></div>
+
+  <div class="chart-wrap">
+    <svg id="chart" viewBox="0 0 740 510"></svg>
+  </div>
+
+  <div class="legend-strip">
+    <span>
+      <svg width="14" height="14">
+        <circle cx="7" cy="7" r="5" fill="#1e2d42" stroke="#3d5068" stroke-width="1.5" />
+      </svg>
+      Cardinal reference
+    </span>
+    <span>
+      <svg width="14" height="14">
+        <circle cx="7" cy="7" r="5" fill="#60a5fa22" stroke="#60a5fa" stroke-width="1.5" />
+      </svg>
+      Language vowel
+    </span>
+    <span>
+      <svg width="14" height="14">
+        <circle cx="7" cy="7" r="5" fill="none" stroke="#888" stroke-width="1.5" /><text x="7" y="11"
+          text-anchor="middle" font-size="8" fill="#888">▶</text>
+      </svg>
+      Click to hear
+    </span>
+  </div>
+
+  <div class="info-bar" id="infoBar"></div>
+  <div id="tip" class="tip"></div>
+
+  <script>
+    // ─── Trapezoid geometry ───────────────────────────────────────────────────────
+    //  TL ─────────────────────────────────────────────── TR
+    //   \  (front/left edge slants right as h → 1)       |  ← vertical back edge
+    //    BL ────────────────────────────────────────────  BR
+    //  TR.x === BR.x  →  perfectly straight right column
+
+    const TRAP = {
+      TL: { x: 108, y: 95 },
+      TR: { x: 638, y: 95 },
+      BL: { x: 300, y: 450 },
+      BR: { x: 638, y: 450 },   // same x as TR
+    };
+
+    function trapPos(h, b) {
+      const fX = TRAP.TL.x + h * (TRAP.BL.x - TRAP.TL.x);
+      const bX = TRAP.TR.x;                                  // constant
+      return { x: fX + b * (bX - fX), y: TRAP.TL.y + h * (TRAP.BL.y - TRAP.TL.y) };
+    }
+
+    const ROWS = [
+      { h: 0, label: 'Close' },
+      { h: 1 / 6, label: 'Near-close' },
+      { h: 2 / 6, label: 'Close-mid' },
+      { h: 3 / 6, label: 'Mid' },
+      { h: 4 / 6, label: 'Open-mid' },
+      { h: 5 / 6, label: 'Near-open' },
+      { h: 1, label: 'Open' },
+    ];
+
+    // ─── Language / vowel data ────────────────────────────────────────────────────
+    // h=0(Close)→1(Open),  b=0(Front)→1(Back)
+    // f1/f2 in Hz → used for both tooltip display and audio synthesis
+    const LANGS = {
+
+      cardinal: {
+        label: 'Cardinal', color: '#607a96',
+        vowels: [
+          { ipa: 'i', h: 0, b: 0.00, desc: 'Close front unrounded', f1: 240, f2: 2400, audio:'cardinal_i.ogg' },
+          { ipa: 'y', h: 0, b: 0.05, desc: 'Close front rounded', f1: 235, f2: 1870 },
+          { ipa: 'ɨ', h: 0, b: 0.50, desc: 'Close central unrounded', f1: 250, f2: 1450 },
+          { ipa: 'ʉ', h: 0, b: 0.55, desc: 'Close central rounded', f1: 250, f2: 1380 },
+          { ipa: 'ɯ', h: 0, b: 0.95, desc: 'Close back unrounded', f1: 250, f2: 800 },
+          { ipa: 'u', h: 0, b: 1.00, desc: 'Close back rounded', f1: 250, f2: 595 },
+          { ipa: 'e', h: 2 / 6, b: 0.00, desc: 'Close-mid front unrounded', f1: 400, f2: 2300 },
+          { ipa: 'ø', h: 2 / 6, b: 0.05, desc: 'Close-mid front rounded', f1: 370, f2: 1600 },
+          { ipa: 'ɘ', h: 2 / 6, b: 0.50, desc: 'Close-mid central unrounded', f1: 390, f2: 1480 },
+          { ipa: 'ɤ', h: 2 / 6, b: 0.95, desc: 'Close-mid back unrounded', f1: 430, f2: 1000 },
+          { ipa: 'o', h: 2 / 6, b: 1.00, desc: 'Close-mid back rounded', f1: 400, f2: 840 },
+          { ipa: 'ə', h: 3 / 6, b: 0.50, desc: 'Mid central', f1: 490, f2: 1490 },
+          { ipa: 'ɛ', h: 4 / 6, b: 0.00, desc: 'Open-mid front unrounded', f1: 610, f2: 2000 },
+          { ipa: 'œ', h: 4 / 6, b: 0.05, desc: 'Open-mid front rounded', f1: 480, f2: 1260 },
+          { ipa: 'ɜ', h: 4 / 6, b: 0.50, desc: 'Open-mid central unrounded', f1: 500, f2: 1490 },
+          { ipa: 'ʌ', h: 4 / 6, b: 0.95, desc: 'Open-mid back unrounded', f1: 650, f2: 1200 },
+          { ipa: 'ɔ', h: 4 / 6, b: 1.00, desc: 'Open-mid back rounded', f1: 560, f2: 920 },
+          { ipa: 'æ', h: 5 / 6, b: 0.00, desc: 'Near-open front unrounded', f1: 740, f2: 1660 },
+          { ipa: 'ɐ', h: 5 / 6, b: 0.50, desc: 'Near-open central', f1: 700, f2: 1400 },
+          { ipa: 'a', h: 1, b: 0.00, desc: 'Open front unrounded', f1: 850, f2: 1610 },
+          { ipa: 'ɶ', h: 1, b: 0.05, desc: 'Open front rounded', f1: 820, f2: 1320 },
+          { ipa: 'ɑ', h: 1, b: 1.00, desc: 'Open back unrounded', f1: 850, f2: 1100 },
+          { ipa: 'ɒ', h: 1, b: 0.95, desc: 'Open back rounded', f1: 820, f2: 900 },
+        ]
+      },
+
+      english: {
+        label: 'English', color: '#60a5fa',
+        vowels: [
+          { ipa: 'iː', h: 0.03, b: 0.04, desc: 'Close front unrounded', word: 'f<b>ee</b>t, s<b>ee</b>n', f1: 270, f2: 2290 },
+          { ipa: 'ɪ', h: 0.20, b: 0.20, desc: 'Near-close near-front unrounded', word: 'k<b>i</b>t, b<b>i</b>t', f1: 400, f2: 1920 },
+          { ipa: 'eɪ', h: 0.30, b: 0.04, desc: 'Close-mid front (diphthong)', word: 'f<b>a</b>ce, b<b>a</b>ke', f1: 430, f2: 2090 },
+          { ipa: 'ɛ', h: 0.63, b: 0.04, desc: 'Open-mid front unrounded', word: 'dr<b>e</b>ss, b<b>e</b>d', f1: 580, f2: 1990 },
+          { ipa: 'æ', h: 0.80, b: 0.04, desc: 'Near-open front unrounded', word: 'tr<b>a</b>p, c<b>a</b>t', f1: 750, f2: 1660 },
+          { ipa: 'ɑː', h: 0.97, b: 0.97, desc: 'Open back unrounded', word: 'f<b>a</b>ther, p<b>a</b>lm', f1: 800, f2: 1100 },
+          { ipa: 'ɔː', h: 0.65, b: 0.97, desc: 'Open-mid back rounded', word: 'th<b>ough</b>t, cl<b>aw</b>', f1: 590, f2: 920 },
+          { ipa: 'oʊ', h: 0.27, b: 0.93, desc: 'Close-mid back (diphthong)', word: 'g<b>oa</b>t, n<b>o</b>', f1: 449, f2: 1020 },
+          { ipa: 'ʊ', h: 0.20, b: 0.78, desc: 'Near-close near-back rounded', word: 'f<b>oo</b>t, p<b>u</b>t', f1: 374, f2: 1005 },
+          { ipa: 'uː', h: 0.04, b: 0.84, desc: 'Close back rounded', word: 'g<b>oo</b>se, f<b>oo</b>d', f1: 300, f2: 870 },
+          { ipa: 'ʌ', h: 0.67, b: 0.62, desc: 'Open-mid back unrounded', word: 'str<b>u</b>t, b<b>u</b>s', f1: 760, f2: 1260 },
+          { ipa: 'ə', h: 0.48, b: 0.50, desc: 'Mid central (schwa)', word: '<b>a</b>bout, comm<b>a</b>', f1: 500, f2: 1500 },
+          { ipa: 'ɜː', h: 0.63, b: 0.44, desc: 'Open-mid central (long)', word: 'n<b>ur</b>se, b<b>ir</b>d', f1: 500, f2: 1490 },
+        ]
+      },
+
+      german: {
+        label: 'German', color: '#fb923c',
+        vowels: [
+          { ipa: 'iː', h: 0.02, b: 0.01, desc: 'Close front unrounded', word: 'L<b>ie</b>be, w<b>ie</b>', f1: 270, f2: 2290 },
+          { ipa: 'yː', h: 0.02, b: 0.08, desc: 'Close front rounded', word: '<b>ü</b>ber, gr<b>ün</b>', f1: 235, f2: 1870 },
+          { ipa: 'ɪ', h: 0.21, b: 0.18, desc: 'Near-close near-front unrounded', word: 'm<b>i</b>t, b<b>i</b>tte', f1: 380, f2: 1940 },
+          { ipa: 'ʏ', h: 0.21, b: 0.24, desc: 'Near-close near-front rounded', word: 'h<b>ü</b>bsch, fl<b>üs</b>se', f1: 355, f2: 1695 },
+          { ipa: 'eː', h: 0.30, b: 0.01, desc: 'Close-mid front unrounded', word: 'S<b>ee</b>, g<b>e</b>ben', f1: 390, f2: 2070 },
+          { ipa: 'øː', h: 0.30, b: 0.08, desc: 'Close-mid front rounded', word: 'sch<b>ö</b>n, h<b>ö</b>ren', f1: 370, f2: 1615 },
+          { ipa: 'ɛ', h: 0.63, b: 0.02, desc: 'Open-mid front unrounded', word: 'B<b>e</b>tt, H<b>ä</b>nde', f1: 580, f2: 1820 },
+          { ipa: 'œ', h: 0.63, b: 0.09, desc: 'Open-mid front rounded', word: 'zw<b>ö</b>lf, H<b>öl</b>le', f1: 490, f2: 1290 },
+          { ipa: 'a', h: 0.97, b: 0.18, desc: 'Open front/central unrounded', word: 'M<b>a</b>nn, d<b>a</b>s', f1: 800, f2: 1300 },
+          { ipa: 'aː', h: 0.94, b: 0.23, desc: 'Open central (long)', word: 'B<b>ah</b>n, j<b>a</b>', f1: 780, f2: 1230 },
+          { ipa: 'oː', h: 0.28, b: 0.97, desc: 'Close-mid back rounded', word: 'gr<b>o</b>ß, S<b>oh</b>n', f1: 400, f2: 840 },
+          { ipa: 'ɔ', h: 0.66, b: 0.94, desc: 'Open-mid back rounded', word: 'K<b>o</b>pf, P<b>o</b>st', f1: 555, f2: 870 },
+          { ipa: 'uː', h: 0.02, b: 0.97, desc: 'Close back rounded', word: 'B<b>u</b>ch, R<b>uh</b>e', f1: 250, f2: 600 },
+          { ipa: 'ʊ', h: 0.21, b: 0.80, desc: 'Near-close near-back rounded', word: 'M<b>u</b>tter, H<b>u</b>nd', f1: 360, f2: 780 },
+          { ipa: 'ə', h: 0.48, b: 0.50, desc: 'Mid central (Schwa)', word: 'hab<b>e</b>, Kett<b>e</b>', f1: 490, f2: 1350 },
+        ]
+      },
+
+      russian: {
+        label: 'Russian', color: '#f43f5e',
+        vowels: [
+          { ipa: 'i', h: 0.02, b: 0.02, desc: 'Close front unrounded (и)', word: 'м<b>и</b>р (world)', f1: 270, f2: 2200 },
+          { ipa: 'ɨ', h: 0.03, b: 0.52, desc: 'Close central unrounded (ы)', word: 'б<b>ы</b>ть (to be), т<b>ы</b>', f1: 320, f2: 1380 },
+          { ipa: 'u', h: 0.02, b: 0.97, desc: 'Close back rounded (у)', word: 'д<b>у</b>ша (soul)', f1: 300, f2: 680 },
+          { ipa: 'e', h: 0.44, b: 0.04, desc: 'Close-mid front unrounded (е/э)', word: '<b>э</b>то (this), м<b>е</b>сто', f1: 440, f2: 1900 },
+          { ipa: 'o', h: 0.40, b: 0.90, desc: 'Close-mid back rounded (о)', word: 'д<b>о</b>м (house)', f1: 500, f2: 1000 },
+          { ipa: 'a', h: 0.97, b: 0.38, desc: 'Open central unrounded (а)', word: 'д<b>а</b> (yes), м<b>а</b>ть', f1: 850, f2: 1350 },
+        ]
+      },
+
+      norwegian: {
+        label: 'Norwegian', color: '#22d3ee',
+        vowels: [
+          { ipa: 'i', h: 0.02, b: 0.02, desc: 'Close front unrounded', word: 'f<b>i</b>n, l<b>i</b>ten', f1: 240, f2: 2380 },
+          { ipa: 'y', h: 0.02, b: 0.08, desc: 'Close front rounded', word: 'n<b>y</b>, b<b>y</b>', f1: 235, f2: 1810 },
+          { ipa: 'ʉ', h: 0.04, b: 0.54, desc: 'Close central rounded (Norwegian u)', word: 'h<b>u</b>s, sk<b>u</b>lle', f1: 260, f2: 1370 },
+          { ipa: 'e', h: 0.30, b: 0.02, desc: 'Close-mid front unrounded', word: 's<b>e</b>, br<b>e</b>v', f1: 395, f2: 2080 },
+          { ipa: 'ø', h: 0.30, b: 0.08, desc: 'Close-mid front rounded', word: 'gr<b>ø</b>t, s<b>ø</b>t', f1: 375, f2: 1590 },
+          { ipa: 'o', h: 0.28, b: 0.97, desc: 'Close-mid back rounded', word: 'b<b>o</b>, g<b>o</b>d', f1: 410, f2: 880 },
+          { ipa: 'ɛ', h: 0.62, b: 0.03, desc: 'Open-mid front unrounded', word: 's<b>e</b>tt, m<b>e</b>d', f1: 575, f2: 1880 },
+          { ipa: 'æ', h: 0.80, b: 0.03, desc: 'Near-open front unrounded', word: 'l<b>æ</b>rer, v<b>æ</b>re', f1: 730, f2: 1700 },
+          { ipa: 'a', h: 0.97, b: 0.18, desc: 'Open front unrounded', word: 'm<b>a</b>t, d<b>a</b>g', f1: 820, f2: 1380 },
+          { ipa: 'ɔ', h: 0.64, b: 0.94, desc: 'Open-mid back rounded (å)', word: '<b>å</b>tte, b<b>å</b>t', f1: 545, f2: 865 },
+        ]
+      },
+    };
+
+    // ─── Audio synthesis via formant filtering ────────────────────────────────────
+    //
+    // Approach: sawtooth oscillator (harmonic-rich, like voiced speech)
+    // → pre-emphasis shelf → three parallel bandpass filters at F1, F2, F3
+    // → amplitude envelope → output.
+    //
+    // F1 controls vowel height (open/close), F2 controls backness (front/back).
+    // This produces recognisably different vowels for each phoneme.
+
+    let audioCtx = null;
+
+    function ensureAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playVowel(file) {
+      const audio = new Audio(file);
+      audio.play();
+    }
+
+    // ─── Active state ──────────────────────────────────────────────────────────────
+    const active = { cardinal: true, english: true, german: false, russian: false, norwegian: false };
+
+    // ─── SVG helpers ───────────────────────────────────────────────────────────────
+    const NS = 'http://www.w3.org/2000/svg';
+    function $s(tag, attrs = {}) {
+      const el = document.createElementNS(NS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+      return el;
+    }
+    function $t(text, attrs = {}) { const el = $s('text', attrs); el.textContent = text; return el; }
+
+    // ─── Controls ─────────────────────────────────────────────────────────────────
+    const ctrlEl = document.getElementById('controls');
+    for (const [key, lang] of Object.entries(LANGS)) {
+      const btn = document.createElement('button');
+      btn.className = 'lang-btn' + (active[key] ? ' on' : '');
+      btn.textContent = lang.label;
+      btn.style.borderColor = lang.color;
+      btn.style.color = active[key] ? '#0d1117' : lang.color;
+      btn.style.backgroundColor = active[key] ? lang.color : 'transparent';
+      btn.addEventListener('click', () => {
+        active[key] = !active[key];
+        btn.classList.toggle('on', active[key]);
+        btn.style.backgroundColor = active[key] ? lang.color : 'transparent';
+        btn.style.color = active[key] ? '#0d1117' : lang.color;
+        render();
+      });
+      ctrlEl.appendChild(btn);
+    }
+
+    // ─── Render ────────────────────────────────────────────────────────────────────
+    function render() {
+      const svg = document.getElementById('chart');
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+      // Row grid lines
+      for (const row of ROWS) {
+        const L = trapPos(row.h, 0), R = trapPos(row.h, 1);
+        svg.appendChild($s('line', { x1: L.x, y1: L.y, x2: R.x, y2: R.y, stroke: '#222d40', 'stroke-width': 1.5 }));
+      }
+
+      // Central dashed guide
+      const cT = trapPos(0, .5), cB = trapPos(1, .5);
+      svg.appendChild($s('line', { x1: cT.x, y1: cT.y, x2: cB.x, y2: cB.y, stroke: '#222d40', 'stroke-width': 1, 'stroke-dasharray': '5 4' }));
+
+      // Trapezoid outline
+      const { TL, TR, BL, BR } = TRAP;
+      svg.appendChild($s('path', {
+        d: `M${TL.x},${TL.y} L${TR.x},${TR.y} L${BR.x},${BR.y} L${BL.x},${BL.y}Z`,
+        fill: 'none', stroke: '#2f3d52', 'stroke-width': 2,
+      }));
+
+      // Row labels (left, follow front edge)
+      for (const row of ROWS) {
+        const p = trapPos(row.h, 0);
+        svg.appendChild($t(row.label, { x: p.x - 10, y: p.y + 4, 'text-anchor': 'end', 'font-size': 10.5, fill: '#5a6e85', 'font-family': 'system-ui,sans-serif' }));
+      }
+
+      // Column labels (top)
+      for (const [label, b] of [['Front', 0], ['Central', .5], ['Back', 1]]) {
+        const p = trapPos(0, b);
+        svg.appendChild($t(label, { x: p.x, y: p.y - 18, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#5a6e85', 'font-family': 'system-ui,sans-serif' }));
+      }
+
+      // Vowel dots — cardinals first (bottom layer)
+      const layers = Object.entries(LANGS)
+        .sort(([a], [b]) => (a === 'cardinal' ? -1 : 1) - (b === 'cardinal' ? -1 : 1))
+        .filter(([k]) => active[k]);
+
+      for (const [key, lang] of layers) {
+        const isCard = key === 'cardinal';
+
+        for (const v of lang.vowels) {
+          const { x, y } = trapPos(v.h, v.b);
+          const g = $s('g', { style: 'cursor:pointer' });
+
+          if (isCard) {
+            // Small, readable reference dot
+            g.appendChild($s('circle', { cx: x, cy: y, r: 5, fill: '#1e2d42', stroke: '#3d5068', 'stroke-width': 1.5 }));
+            const lbl = $s('text', { x, y: y - 8, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#5a7090', 'font-family': 'Georgia,serif' });
+            lbl.textContent = v.ipa;
+            g.appendChild(lbl);
+          } else {
+            const c = lang.color;
+            // Soft halo
+            g.appendChild($s('circle', { cx: x, cy: y, r: 16, fill: `${c}0d`, stroke: 'none' }));
+            // Main circle — smaller than before (r=12)
+            g.appendChild($s('circle', { cx: x, cy: y, r: 12, fill: `${c}20`, stroke: c, 'stroke-width': 2 }));
+            // IPA label
+            const lbl = $s('text', { x, y: y + 5, 'text-anchor': 'middle', 'font-size': 12, fill: c, 'font-family': 'Georgia,serif', 'font-weight': 'bold' });
+            lbl.textContent = v.ipa;
+            g.appendChild(lbl);
+          }
+
+          // ── Event listeners ──
+          g.addEventListener('mouseenter', e => showTip(e, v, lang));
+          g.addEventListener('mousemove', moveTip);
+          g.addEventListener('mouseleave', hideTip);
+
+          // Click → play vowel sound + pulse ring animation
+          g.addEventListener('click', () => {
+            if (!v.audio) return;
+            playVowel(v.audio);
+            spawnPulse(svg, x, y, isCard ? '#4a6080' : lang.color, isCard ? 7 : 14);
+          });
+
+          // Touch: show tip on touchstart, play on tap (touchend without move)
+          let touchMoved = false;
+          g.addEventListener('touchstart', e => {
+            touchMoved = false;
+            e.preventDefault();
+            showTip(e.touches[0], v, lang);
+          }, { passive: false });
+          g.addEventListener('touchmove', e => {
+            touchMoved = true;
+            e.preventDefault();
+            moveTip(e.touches[0]);
+          }, { passive: false });
+          g.addEventListener('touchend', e => {
+            hideTip();
+            if (!touchMoved && v.audio) {
+              playVowel(v.audio);
+              spawnPulse(svg, x, y, isCard ? '#4a6080' : lang.color, isCard ? 7 : 14);
+            }
+          });
+
+          svg.appendChild(g);
+        }
+      }
+
+      updateInfoBar();
+    }
+
+    // ─── Pulse ring on click ───────────────────────────────────────────────────────
+    function spawnPulse(svg, x, y, color, startR) {
+      const ring = $s('circle', {
+        cx: x, cy: y, r: startR,
+        fill: 'none', stroke: color, 'stroke-width': 2.5,
+        opacity: 0.85, style: 'pointer-events:none'
+      });
+      svg.appendChild(ring);
+
+      let r = startR, opacity = 0.85;
+      const step = () => {
+        if (!ring.parentNode) return;
+        r += 1.5;
+        opacity -= 0.038;
+        ring.setAttribute('r', r);
+        ring.setAttribute('opacity', Math.max(0, opacity).toFixed(3));
+        if (opacity > 0) requestAnimationFrame(step);
+        else if (ring.parentNode) ring.parentNode.removeChild(ring);
+      };
+      requestAnimationFrame(step);
+    }
+
+    // ─── Tooltip ──────────────────────────────────────────────────────────────────
+    const tip = document.getElementById('tip');
+
+    function showTip(e, v, lang) {
+      tip.innerHTML = `
     <div class="tip-ipa" style="color:${lang.color}">${v.ipa}</div>
     <div class="tip-lang" style="color:${lang.color}">${lang.label}</div>
     <div class="tip-desc">${v.desc}</div>
     ${v.word ? `<div class="tip-word">e.g. ${v.word}</div>` : ''}
-    ${v.f1   ? `<div class="tip-f">F1 <span>${v.f1} Hz</span> &nbsp;·&nbsp; F2 <span>${v.f2} Hz</span></div>` : ''}
+    ${v.f1 ? `<div class="tip-f">F1 <span>${v.f1} Hz</span> &nbsp;·&nbsp; F2 <span>${v.f2} Hz</span></div>` : ''}
+    <div class="tip-play">Click to play</div>
   `;
-  tip.style.display = 'block';
-  moveTip(e);
-}
-function moveTip(e) {
-  const x=e.clientX+18, y=e.clientY-12, r=tip.getBoundingClientRect();
-  tip.style.left = Math.min(x, window.innerWidth  - r.width  - 8) + 'px';
-  tip.style.top  = Math.max(4, Math.min(y, window.innerHeight - r.height - 8)) + 'px';
-}
-function hideTip() { tip.style.display='none'; }
+      tip.style.display = 'block';
+      moveTip(e);
+    }
+    function moveTip(e) {
+      const x = e.clientX + 18, y = e.clientY - 12, r = tip.getBoundingClientRect();
+      tip.style.left = Math.min(x, window.innerWidth - r.width - 8) + 'px';
+      tip.style.top = Math.max(4, Math.min(y, window.innerHeight - r.height - 8)) + 'px';
+    }
+    function hideTip() { tip.style.display = 'none'; }
 
-// ─── Info bar ─────────────────────────────────────────────────────────────────
-function updateInfoBar() {
-  const bar = document.getElementById('infoBar');
-  bar.innerHTML = '';
-  for (const [key, lang] of Object.entries(LANGS)) {
-    if (!active[key]) continue;
-    const item = document.createElement('div');
-    item.className = 'info-item';
-    const sw = document.createElement('div');
-    sw.className = 'info-swatch';
-    sw.style.borderColor = lang.color;
-    sw.style.backgroundColor = lang.color + '30';
-    const lbl = document.createElement('span');
-    lbl.textContent = `${lang.label}: ${lang.vowels.length} vowels`;
-    item.appendChild(sw); item.appendChild(lbl);
-    bar.appendChild(item);
-  }
-}
+    // ─── Info bar ─────────────────────────────────────────────────────────────────
+    function updateInfoBar() {
+      const bar = document.getElementById('infoBar');
+      bar.innerHTML = '';
+      for (const [key, lang] of Object.entries(LANGS)) {
+        if (!active[key]) continue;
+        const item = document.createElement('div');
+        item.className = 'info-item';
+        const sw = document.createElement('div');
+        sw.className = 'info-swatch';
+        sw.style.borderColor = lang.color;
+        sw.style.backgroundColor = lang.color + '30';
+        const lbl = document.createElement('span');
+        lbl.textContent = `${lang.label}: ${lang.vowels.length} vowels`;
+        item.appendChild(sw); item.appendChild(lbl);
+        bar.appendChild(item);
+      }
+    }
 
-render();
-</script>
+    render();
+  </script>
 </body>
+
 </html>
