@@ -67,7 +67,7 @@
   .lang-item-key { font-size:.62rem; color:var(--muted); flex-shrink:0; }
 
   /* ── Main panel ──────────────────────────────────────────── */
-  .main-panel { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+  .main-panel { flex:1; overflow-y:auto; }
   .placeholder {
     flex:1; display:flex; align-items:center; justify-content:center;
     color:var(--muted); font-size:.85rem;
@@ -108,27 +108,31 @@
   .btn-danger:hover { background:#f8717115; }
   .btn-sm { padding:4px 10px; font-size:.72rem; }
 
-  /* ── Vowel section split layout ─────────────────────────── */
-  .vowel-section { padding:12px 18px; flex:1; display:flex; flex-direction:column; min-height:0; }
-  .vowel-split { display:flex; gap:14px; flex:1; min-height:0; }
-
-  .lang-chart-col {
-    flex:1; display:flex; flex-direction:column; min-width:0;
-  }
+  /* ── Vowel section ───────────────────────────────────────── */
+  .vowel-section { padding:12px 18px; overflow-y:auto; }
   .lang-chart-wrap {
     background:#192535; border:1px solid var(--border);
-    border-radius:10px; overflow:hidden; flex:1;
+    border-radius:10px;
   }
-  .lang-chart-svg { display:block; width:100%; aspect-ratio:5/3; cursor:default; overflow:visible; }
+  .lang-chart-svg { display:block; width:100%; height:auto; overflow:visible; }
+  .vowel-cards { display:flex; flex-wrap:wrap; gap:8px; }
 
-  .vowel-list-col {
-    width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:6px;
-    overflow-y:auto;
+  /* ── Styled scrollbars ───────────────────────────────────── */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2e4a68 transparent;
   }
-  .vowel-cards { display:flex; flex-direction:column; gap:6px; }
+  *::-webkit-scrollbar { width:6px; height:6px; }
+  *::-webkit-scrollbar-track { background:transparent; }
+  *::-webkit-scrollbar-thumb {
+    background:#2a4560; border-radius:10px;
+    border:1px solid transparent; background-clip:padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover { background:#3a6080; }
+  *::-webkit-scrollbar-corner { background:transparent; }
   .vowel-card {
     background:var(--card); border:1.5px solid var(--border);
-    border-radius:8px; padding:6px 10px;
+    border-radius:8px; padding:6px 10px; width:130px;
     display:flex; flex-direction:column; gap:2px;
     transition:border-color .12s; cursor:pointer;
   }
@@ -465,7 +469,7 @@ function renderMain() {
   });
   document.getElementById('saveLangBtn').addEventListener('click', saveLang);
 
-  // Vowel section — split: chart left, card list right
+  // Vowel section — chart full width, cards as a row below
   const vs=document.createElement('div');
   vs.className='vowel-section';
   vs.innerHTML=`
@@ -473,19 +477,13 @@ function renderMain() {
       <span class="section-title">Vowels (${(state.langDraft.vowels||[]).length})</span>
       <button class="btn btn-secondary btn-sm" id="addVowelBtn" type="button">+ Add Vowel</button>
     </div>
-    <div class="vowel-split">
-      <div class="lang-chart-col">
-        <div class="lang-chart-wrap">
-          <svg class="lang-chart-svg" id="langChartSvg" viewBox="0 0 700 420"></svg>
-        </div>
-        <p style="font-size:.62rem;color:var(--muted);margin-top:5px;text-align:center">
-          Click a vowel on the chart to edit it · Highlighted = currently editing
-        </p>
-      </div>
-      <div class="vowel-list-col">
-        <div class="vowel-cards" id="vowelCards"></div>
-      </div>
-    </div>`;
+    <div class="lang-chart-wrap">
+      <svg class="lang-chart-svg" id="langChartSvg" viewBox="0 0 700 420"></svg>
+    </div>
+    <p style="font-size:.62rem;color:var(--muted);margin-top:5px;margin-bottom:10px;text-align:center">
+      Click a vowel on the chart to edit it · Highlighted = currently editing
+    </p>
+    <div class="vowel-cards" id="vowelCards"></div>`;
   panel.appendChild(vs);
   document.getElementById('addVowelBtn').addEventListener('click', ()=>openVowelEditor(-1));
   renderVowelCards();
