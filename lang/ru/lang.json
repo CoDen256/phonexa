@@ -22,7 +22,7 @@
     },
     {
       "ipa": "ɪ",
-      "h": 0.23,
+      "h": 0.22,
       "b": 0.2,
       "rounded": false,
       "desc": "Near-close near-front unrounded",
@@ -49,7 +49,7 @@
       "desc": "Near-close near-back rounded",
       "f1": 386,
       "f2": 953,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-back_rounded_vowel.ogg",
+      "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound21.mp3#у",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
         {
@@ -59,6 +59,10 @@
         {
           "text": "т<b>у</b>пая",
           "audio": null
+        },
+        {
+          "text": "сраз<b>у<b>",
+          "audio": "https://easypronunciation.com/audio/russian/6b983a7350d3e4597de5b354412bb2ce.mp3"
         }
       ]
     },
@@ -93,6 +97,10 @@
         {
           "text": "сво<b>ю</b>",
           "audio": "https://easypronunciation.com/audio/russian/b47bae2f834078515d4be57e982393b1.mp3"
+        },
+        {
+          "text": "<b>ю</b>",
+          "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound32.mp3#ю"
         }
       ]
     },
@@ -127,19 +135,37 @@
       "f2": 2300,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "м<b>е</b>сте",
+          "audio": " https://easypronunciation.com/audio/russian/0192fa147bdbb9900586660ef9b7cec0.mp3"
+        },
+        {
+          "text": "<b>e</b>",
+          "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound6.mp3#е"
+        }
+      ]
     },
     {
-      "ipa": "ɘ",
+      "ipa": "ɵ",
       "h": 0.3333,
       "b": 0.5,
-      "rounded": false,
-      "desc": "Close-mid central unrounded",
+      "rounded": true,
+      "desc": "Close-mid central rounded",
       "f1": 390,
       "f2": 1480,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_central_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "мо<b>ё</b>",
+          "audio": "https://easypronunciation.com/audio/russian/0192fa147bdbb9900586660ef9b7cec0.mp3"
+        },
+        {
+          "text": "<b>ё</b>",
+          "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound7.mp3#ё"
+        }
+      ]
     },
     {
       "ipa": "o",
@@ -154,20 +180,8 @@
       "words": []
     },
     {
-      "ipa": "e̞",
-      "h": 0.5,
-      "b": 0,
-      "rounded": false,
-      "desc": "Mid front unrounded ɛ̝",
-      "f1": 390,
-      "f2": 1480,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid_front_unrounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Mid_front_unrounded_vowel",
-      "words": []
-    },
-    {
       "ipa": "ə",
-      "h": 0.5,
+      "h": 0.59,
       "b": 0.5,
       "rounded": false,
       "desc": "Mid central",
@@ -175,7 +189,20 @@
       "f2": 1490,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid-central_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "эт<b>о</b>му",
+          "audio": " https://easypronunciation.com/audio/russian/1dcc80d8f49de6b7d6d65b4fa3d780f7.mp3"
+        },
+        {
+          "text": "мир<b>а</b>",
+          "audio": " https://easypronunciation.com/audio/russian/887140d238569d6d8bcec5636497ecd5.mp3"
+        },
+        {
+          "text": "одновременно",
+          "audio": "https://easypronunciation.com/audio/russian/260aeb7d78c8d05c04765fc5a49d89a4.mp3"
+        }
+      ]
     },
     {
       "ipa": "o̞",
@@ -191,15 +218,20 @@
     },
     {
       "ipa": "ɛ",
-      "h": 0.6667,
+      "h": 0.57,
       "b": 0,
       "rounded": false,
       "desc": "Open-mid front unrounded",
       "f1": 610,
       "f2": 2000,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_unrounded_vowel.ogg",
+      "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound31.mp3#э",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "<b>э<b>тот",
+          "audio": "https://easypronunciation.com/audio/russian/410c89ba5da960c01b587cbfdf879a1d.mp3"
+        }
+      ]
     },
     {
       "ipa": "ɜ",
