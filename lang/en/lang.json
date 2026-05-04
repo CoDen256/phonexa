@@ -46,27 +46,6 @@
       ]
     },
     {
-      "ipa": "eɪ",
-      "h": 0.3,
-      "b": 0.04,
-      "rounded": false,
-      "desc": "Close-mid front unrounded (diphthong)",
-      "f1": 430,
-      "f2": 2090,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_front_unrounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "f<b>a</b>ce",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-face.ogg"
-        },
-        {
-          "text": "b<b>a</b>ke",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bake.ogg"
-        }
-      ]
-    },
-    {
       "ipa": "ɛ",
       "h": 0.63,
       "b": 0.04,
@@ -147,27 +126,6 @@
         {
           "text": "cl<b>aw</b>",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-claw.ogg"
-        }
-      ]
-    },
-    {
-      "ipa": "oʊ",
-      "h": 0.27,
-      "b": 0.93,
-      "rounded": true,
-      "desc": "Close-mid back rounded (diphthong)",
-      "f1": 449,
-      "f2": 1020,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_back_rounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
-      "words": [
-        {
-          "text": "g<b>oa</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-goat.ogg"
-        },
-        {
-          "text": "n<b>o</b>",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-no.ogg"
         }
       ]
     },
