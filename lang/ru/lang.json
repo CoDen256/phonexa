@@ -1,12 +1,12 @@
 {
-  "key":   "ru",
+  "key": "ru",
   "label": "Russian",
   "color": "#f43f5e",
   "vowels": [
     {
       "ipa": "i",
-      "h": 0.10,
-      "b": 0.00,
+      "h": 0.1,
+      "b": 0,
       "rounded": false,
       "desc": "Close front unrounded",
       "f1": 240,
@@ -18,7 +18,7 @@
     {
       "ipa": "ɪ",
       "h": 0.165,
-      "b": 0.20,
+      "b": 0.2,
       "rounded": false,
       "desc": "Near-close near-front unrounded",
       "f1": 235,
@@ -42,7 +42,7 @@
     {
       "ipa": "ɨ",
       "h": 0,
-      "b": 0.50,
+      "b": 0.5,
       "rounded": false,
       "desc": "Close central unrounded",
       "f1": 250,
@@ -54,7 +54,7 @@
     {
       "ipa": "ʉ",
       "h": 0,
-      "b": 0.50,
+      "b": 0.5,
       "rounded": true,
       "desc": "Close central rounded",
       "f1": 250,
@@ -66,7 +66,7 @@
     {
       "ipa": "ɯ",
       "h": 0,
-      "b": 1.00,
+      "b": 1,
       "rounded": false,
       "desc": "Close back unrounded",
       "f1": 250,
@@ -78,7 +78,7 @@
     {
       "ipa": "u",
       "h": 0,
-      "b": 1.00,
+      "b": 1,
       "rounded": true,
       "desc": "Close back rounded",
       "f1": 250,
@@ -90,7 +90,7 @@
     {
       "ipa": "e",
       "h": 0.3333,
-      "b": 0.00,
+      "b": 0,
       "rounded": false,
       "desc": "Close-mid front unrounded",
       "f1": 400,
@@ -102,7 +102,7 @@
     {
       "ipa": "ɘ",
       "h": 0.3333,
-      "b": 0.50,
+      "b": 0.5,
       "rounded": false,
       "desc": "Close-mid central unrounded",
       "f1": 390,
@@ -114,7 +114,7 @@
     {
       "ipa": "o",
       "h": 0.3333,
-      "b": 1.00,
+      "b": 1,
       "rounded": true,
       "desc": "Close-mid back rounded",
       "f1": 400,
@@ -125,8 +125,8 @@
     },
     {
       "ipa": "e̞",
-      "h": 0.50,
-      "b": 0.0,
+      "h": 0.5,
+      "b": 0,
       "rounded": false,
       "desc": "Mid front unrounded ɛ̝",
       "f1": 390,
@@ -138,7 +138,7 @@
     {
       "ipa": "ə",
       "h": 0.5,
-      "b": 0.50,
+      "b": 0.5,
       "rounded": false,
       "desc": "Mid central",
       "f1": 490,
@@ -147,22 +147,10 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": []
     },
-        {
-      "ipa": "ɤ̞",
-      "h": 0.50,
-      "b": 1.0,
-      "rounded": false,
-      "desc": "Mid back unrounded ʌ̝",
-      "f1": 390,
-      "f2": 1480,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid_back_unrounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_unrounded_vowel",
-      "words": []
-    },
     {
       "ipa": "o̞",
-      "h": 0.50,
-      "b": 1.0,
+      "h": 0.5,
+      "b": 1,
       "rounded": true,
       "desc": "Mid front rounded ɔ̝",
       "f1": 390,
@@ -174,7 +162,7 @@
     {
       "ipa": "ɛ",
       "h": 0.6667,
-      "b": 0.00,
+      "b": 0,
       "rounded": false,
       "desc": "Open-mid front unrounded",
       "f1": 610,
@@ -186,7 +174,7 @@
     {
       "ipa": "ɜ",
       "h": 0.6667,
-      "b": 0.50,
+      "b": 0.5,
       "rounded": false,
       "desc": "Open-mid central unrounded",
       "f1": 500,
@@ -198,7 +186,7 @@
     {
       "ipa": "ɞ",
       "h": 0.6667,
-      "b": 0.50,
+      "b": 0.5,
       "rounded": true,
       "desc": "Open-mid central rounded",
       "f1": 500,
@@ -210,7 +198,7 @@
     {
       "ipa": "ʌ",
       "h": 0.6667,
-      "b": 1.00,
+      "b": 1,
       "rounded": false,
       "desc": "Open-mid back unrounded",
       "f1": 650,
@@ -222,7 +210,7 @@
     {
       "ipa": "ɔ",
       "h": 0.6667,
-      "b": 1.00,
+      "b": 1,
       "rounded": true,
       "desc": "Open-mid back rounded",
       "f1": 560,
@@ -234,7 +222,7 @@
     {
       "ipa": "ɐ",
       "h": 0.8333,
-      "b": 0.50,
+      "b": 0.5,
       "rounded": false,
       "desc": "Near-open central",
       "f1": 700,
