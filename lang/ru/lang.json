@@ -11,49 +11,77 @@
       "desc": "Close front unrounded",
       "f1": 240,
       "f2": 2400,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_unrounded_vowel.ogg",
+      "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound10.mp3#и",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "м<b>и</b>р",
+          "audio": "https://easypronunciation.com/audio/russian/6c9bc76057b6568ce770aea88bec2aa2.mp3"
+        }
+      ]
     },
     {
       "ipa": "ɪ",
-      "h": 0.165,
+      "h": 0.23,
       "b": 0.2,
       "rounded": false,
       "desc": "Near-close near-front unrounded",
-      "f1": 235,
-      "f2": 1870,
+      "f1": 309,
+      "f2": 2126,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "<b>е</b>го",
+          "audio": " https://easypronunciation.com/audio/russian/550f204f44e7c595d94e5b65f9e5b52b.mp3"
+        },
+        {
+          "text": "п<b>е</b>реход",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "ʊ",
-      "h": 0.165,
+      "h": 0.23,
       "b": 0.875,
       "rounded": true,
       "desc": "Near-close near-back rounded",
-      "f1": 235,
-      "f2": 1870,
+      "f1": 386,
+      "f2": 953,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-back_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "<b>у<b>же",
+          "audio": "https://easypronunciation.com/audio/russian/3ec8f6f5904cbbe8f808d2ba6aac02fb.mp3"
+        },
+        {
+          "text": "т<b>у</b>пая",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "ɨ",
       "h": 0,
-      "b": 0.5,
+      "b": 0.7,
       "rounded": false,
       "desc": "Close central unrounded",
       "f1": 250,
       "f2": 1450,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_unrounded_vowel.ogg",
+      "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound29.mp3#ы",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "б<b>ы</b>л",
+          "audio": " https://easypronunciation.com/audio/russian/1d08a37912d7a0135f4f9ce201011aca.mp3"
+        }
+      ]
     },
     {
       "ipa": "ʉ",
-      "h": 0,
+      "h": 0.1,
       "b": 0.5,
       "rounded": true,
       "desc": "Close central rounded",
@@ -61,23 +89,16 @@
       "f2": 1380,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
-      "words": []
-    },
-    {
-      "ipa": "ɯ",
-      "h": 0,
-      "b": 1,
-      "rounded": false,
-      "desc": "Close back unrounded",
-      "f1": 250,
-      "f2": 800,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_back_unrounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "сво<b>ю</b>",
+          "audio": "https://easypronunciation.com/audio/russian/b47bae2f834078515d4be57e982393b1.mp3"
+        }
+      ]
     },
     {
       "ipa": "u",
-      "h": 0,
+      "h": 0.09,
       "b": 1,
       "rounded": true,
       "desc": "Close back rounded",
@@ -85,7 +106,16 @@
       "f2": 595,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_back_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "ем<b>у</b>",
+          "audio": " https://easypronunciation.com/audio/russian/771cccbe83bcbc57e07af61befef8a60.mp3"
+        },
+        {
+          "text": "т<b>у</b>п",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "e",
