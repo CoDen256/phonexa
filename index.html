@@ -208,6 +208,17 @@
   .reload-btn.spinning .reload-icon { animation:spin .7s linear infinite; }
   .reload-icon { font-size:.75rem; display:inline-block; }
 
+  
+  .editor-link {
+    display:inline-flex; align-items:center; gap:5px;
+    margin-top:6px; margin-left:8px;
+    padding:3px 11px; font-size:.7rem; color:#4a7090;
+    background:none; border:1px solid #2e4560; border-radius:20px;
+    text-decoration:none; transition:color .15s, border-color .15s;
+  }
+  .editor-link:hover { color:#7eb8f7; border-color:#7eb8f7; }
+  
+
   @media (max-width:800px) {
     .chart-row { flex-direction:column; }
     .sidebar { width:100%; max-height:300px; }
@@ -222,6 +233,7 @@
   <button class="reload-btn" id="reloadBtn" type="button">
     <span class="reload-icon">↺</span> Reload languages
   </button>
+  <a href="editor.html" class="editor-link">✎ Edit languages</a>
 </header>
 
 <div id="loading">
