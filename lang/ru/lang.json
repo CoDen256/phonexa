@@ -164,20 +164,12 @@
         {
           "text": "<b>ё</b>",
           "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound7.mp3#ё"
+        },
+        {
+          "text": "жив<b>ё</b>т",
+          "audio": "https://easypronunciation.com/audio/russian/8f6fc58eabc94d3c884e180d6a7a45bd.mp3"
         }
       ]
-    },
-    {
-      "ipa": "o",
-      "h": 0.3333,
-      "b": 1,
-      "rounded": true,
-      "desc": "Close-mid back rounded",
-      "f1": 400,
-      "f2": 840,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_back_rounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
-      "words": []
     },
     {
       "ipa": "ə",
@@ -205,16 +197,21 @@
       ]
     },
     {
-      "ipa": "o̞",
-      "h": 0.5,
+      "ipa": "o",
+      "h": 0.61,
       "b": 1,
       "rounded": true,
-      "desc": "Mid front rounded ɔ̝",
-      "f1": 390,
-      "f2": 1480,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid_back_rounded_vowel.ogg",
+      "desc": "Mid front rounded ɔ̝/o̞",
+      "f1": 492,
+      "f2": 760,
+      "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound16.mp3#о",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "т<b>о</b>т",
+          "audio": "https://easypronunciation.com/audio/russian/d35f48510ac4cfe28d07b72e78d8fbb6.mp3"
+        }
+      ]
     },
     {
       "ipa": "ɛ",
@@ -234,64 +231,33 @@
       ]
     },
     {
-      "ipa": "ɜ",
-      "h": 0.6667,
-      "b": 0.5,
-      "rounded": false,
-      "desc": "Open-mid central unrounded",
-      "f1": 500,
-      "f2": 1490,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_central_unrounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_unrounded_vowel",
-      "words": []
-    },
-    {
-      "ipa": "ɞ",
-      "h": 0.6667,
-      "b": 0.5,
-      "rounded": true,
-      "desc": "Open-mid central rounded",
-      "f1": 500,
-      "f2": 1490,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_central_rounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_rounded_vowel",
-      "words": []
-    },
-    {
-      "ipa": "ʌ",
-      "h": 0.6667,
-      "b": 1,
-      "rounded": false,
-      "desc": "Open-mid back unrounded",
-      "f1": 650,
-      "f2": 1200,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_unrounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_unrounded_vowel",
-      "words": []
-    },
-    {
-      "ipa": "ɔ",
-      "h": 0.6667,
-      "b": 1,
-      "rounded": true,
-      "desc": "Open-mid back rounded",
-      "f1": 560,
-      "f2": 920,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_rounded_vowel.ogg",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
-      "words": []
-    },
-    {
       "ipa": "ɐ",
-      "h": 0.8333,
-      "b": 0.5,
+      "h": 0.6666,
+      "b": 0.5908,
       "rounded": false,
-      "desc": "Near-open central",
+      "desc": "Near-open central ʌ",
       "f1": 700,
       "f2": 1400,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_central_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "х<b>о</b>тел",
+          "audio": "https://easypronunciation.com/audio/russian/d35f48510ac4cfe28d07b72e78d8fbb6.mp3"
+        },
+        {
+          "text": "ст<b>о</b>яла",
+          "audio": "https://easypronunciation.com/audio/russian/e1284a100169b27d6c6f2b2a93cf8ab2.mp3"
+        },
+        {
+          "text": "гол<b>о</b>ва",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/da/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg.mp3"
+        },
+        {
+          "text": "<b>о</b>л<b>о</b>вянный",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "a",
@@ -303,7 +269,16 @@
       "f2": 1610,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "нами",
+          "audio": "https://easypronunciation.com/audio/russian/4e1f6788944f2b3de9407c6fc65f96e6.mp3"
+        },
+        {
+          "text": "а",
+          "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound1.mp3#а"
+        }
+      ]
     },
     {
       "ipa": "ɑ",
@@ -315,7 +290,37 @@
       "f2": 1100,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "п<b>а</b>лка ",
+          "audio": "https://ru.wiktionary.org/wiki/%D0%A4%D0%B0%D0%B9%D0%BB:Ru-%D0%BF%D0%B0%D0%BB%D0%BA%D0%B0.ogg"
+        }
+      ]
+    },
+    {
+      "ipa": "æ",
+      "h": 0.836,
+      "b": 0,
+      "rounded": false,
+      "desc": "Near open front unrounded",
+      "f1": 696,
+      "f2": 1889,
+      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowe",
+      "words": [
+        {
+          "text": "<b>я</b>",
+          "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound33.mp3#я"
+        },
+        {
+          "text": "ч<b>а</b>сти",
+          "audio": "https://easypronunciation.com/audio/russian/be7b2de05a612fb4c33ccaef4af012fe.mp3"
+        },
+        {
+          "text": "п<b>я</b>ть",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg.mp3"
+        }
+      ]
     }
   ]
 }
