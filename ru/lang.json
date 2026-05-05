@@ -9,8 +9,8 @@
       "b": 0,
       "rounded": false,
       "desc": "Close front unrounded",
-      "f1": 313,
-      "f2": 2121,
+      "f1": 240,
+      "f2": 2400,
       "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound10.mp3#и",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
@@ -26,8 +26,8 @@
       "b": 0.2,
       "rounded": false,
       "desc": "Near-close near-front unrounded",
-      "f1": 0,
-      "f2": 0,
+      "f1": 309,
+      "f2": 2126,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
@@ -47,8 +47,8 @@
       "b": 0.875,
       "rounded": true,
       "desc": "Near-close near-back rounded",
-      "f1": 0,
-      "f2": 0,
+      "f1": 386,
+      "f2": 953,
       "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound21.mp3#у",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
@@ -72,8 +72,8 @@
       "b": 0.7,
       "rounded": false,
       "desc": "Close central unrounded",
-      "f1": 352,
-      "f2": 2094,
+      "f1": 250,
+      "f2": 1450,
       "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound29.mp3#ы",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
       "words": [
@@ -89,8 +89,8 @@
       "b": 0.5,
       "rounded": true,
       "desc": "Close central rounded",
-      "f1": 309,
-      "f2": 1662,
+      "f1": 250,
+      "f2": 1380,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
       "words": [
@@ -110,15 +110,11 @@
       "b": 1,
       "rounded": true,
       "desc": "Close back rounded",
-      "f1": 401,
-      "f2": 555,
+      "f1": 250,
+      "f2": 595,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_back_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
-        {
-          "text": "<b>у</b>",
-          "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound21.mp3#у"
-        },
         {
           "text": "ем<b>у</b>",
           "audio": " https://easypronunciation.com/audio/russian/771cccbe83bcbc57e07af61befef8a60.mp3"
@@ -135,8 +131,8 @@
       "b": 0,
       "rounded": false,
       "desc": "Close-mid front unrounded",
-      "f1": 417,
-      "f2": 2307,
+      "f1": 400,
+      "f2": 2300,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
       "words": [
@@ -156,8 +152,8 @@
       "b": 0.5,
       "rounded": true,
       "desc": "Close-mid central rounded",
-      "f1": 482,
-      "f2": 1474,
+      "f1": 390,
+      "f2": 1480,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close-mid_central_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
       "words": [
@@ -181,8 +177,8 @@
       "b": 0.5,
       "rounded": false,
       "desc": "Mid central",
-      "f1": 0,
-      "f2": 0,
+      "f1": 490,
+      "f2": 1490,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid-central_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
@@ -195,7 +191,7 @@
           "audio": " https://easypronunciation.com/audio/russian/887140d238569d6d8bcec5636497ecd5.mp3"
         },
         {
-          "text": "одновременн<b>о</b>",
+          "text": "одновременно",
           "audio": "https://easypronunciation.com/audio/russian/260aeb7d78c8d05c04765fc5a49d89a4.mp3"
         }
       ]
@@ -206,8 +202,8 @@
       "b": 1,
       "rounded": true,
       "desc": "Mid front rounded ɔ̝/o̞",
-      "f1": 595,
-      "f2": 809,
+      "f1": 492,
+      "f2": 760,
       "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound16.mp3#о",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
       "words": [
@@ -223,8 +219,8 @@
       "b": 0,
       "rounded": false,
       "desc": "Open-mid front unrounded",
-      "f1": 702,
-      "f2": 1770,
+      "f1": 610,
+      "f2": 2000,
       "ipaAudio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound31.mp3#э",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
@@ -240,8 +236,8 @@
       "b": 0.5908,
       "rounded": false,
       "desc": "Near-open central ʌ",
-      "f1": 0,
-      "f2": 0,
+      "f1": 700,
+      "f2": 1400,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_central_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
       "words": [
@@ -275,11 +271,11 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
       "words": [
         {
-          "text": "н<b>а</b>ми",
+          "text": "нами",
           "audio": "https://easypronunciation.com/audio/russian/4e1f6788944f2b3de9407c6fc65f96e6.mp3"
         },
         {
-          "text": "<b>а</b>",
+          "text": "а",
           "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound1.mp3#а"
         }
       ]
@@ -290,8 +286,8 @@
       "b": 0.75,
       "rounded": false,
       "desc": "Open back unrounded",
-      "f1": 0,
-      "f2": 0,
+      "f1": 850,
+      "f2": 1100,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": [
@@ -307,8 +303,8 @@
       "b": 0,
       "rounded": false,
       "desc": "Near open front unrounded",
-      "f1": 912,
-      "f2": 1768,
+      "f1": 696,
+      "f2": 1889,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowe",
       "words": [
