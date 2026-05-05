@@ -350,12 +350,13 @@ function getBase(ipa) {
 
 // IPA base display order (Close → Open, Front → Back)
 const IPA_BASE_ORDER = [
-  'i','y','ɨ','ʉ','ɯ','u','ɪ','ʏ','ʊ',
-  'e','ø','ɘ','ɤ','o',
+  'i','y','ɨ','ʉ','ɯ','u',
+  'ɪ','ʏ','ʊ',
+  'e','ø','ɘ','ɵ','ɤ','o',
   'ə',
-  'ɛ','œ','ɜ','ʌ','ɔ',
+  'ɛ','œ','ɜ','ɞ','ʌ','ɔ',
   'æ','ɐ',
-  'a','ɶ','ɑ','ɒ',
+  'a','ɶ','ä','ɑ','ɒ',
 ];
 
 // ─── IPA trapezoid ────────────────────────────────────────────────────────────
@@ -475,7 +476,7 @@ function buildVowels(svg, getPos, svgId) {
   svg.appendChild(langL); svg.appendChild(cardL); svg.appendChild(dotL);
 
   const SF='drop-shadow(0px 1px 2px rgba(0,0,0,0.45))';
-  const DR_C=7, DR_L=9, DH=16;
+  const DR_C=5, DR_L=7, DH=14;
   const posGroups=new Map();
 
   for (const [lk,lang] of Object.entries(LANGS)) {
@@ -493,19 +494,19 @@ function buildVowels(svg, getPos, svgId) {
   for (const group of posGroups.values()) {
     for (const {lk,lang,v,dx,dy} of group) {
       const ic=lk==='cardinal', lyr=ic?cardL:langL;
-      const FS=ic?15:22, GAP=5, PAD=4, dotR=ic?DR_C:DR_L;
+      const FS=22, GAP=5, PAD=4, dotR=ic?DR_C:DR_L;
       const lx=v.rounded?dx+dotR+GAP:dx-dotR-GAP;
       const anch=v.rounded?'start':'end', tw=ipaW(v.ipa,FS);
       const hx=(v.rounded?lx:lx-tw)-PAD, hy=dy-FS*0.40-PAD;
       const lg=$s('g',{style:'cursor:pointer'});
       lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
       lg.appendChild($t(v.ipa,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
-        fill:ic?'#d0e6f8':lang.color, opacity:ic?0.92:0.78,
+        fill:lang.color, opacity:ic?0.92:0.78,
         'font-family':"Georgia,'Noto Serif',serif", 'font-weight':ic?'normal':'bold',
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{ playUrl(v.ipaAudio); pulse(svgId,dx,dy,ic?'#7090b8':lang.color); });
+      lg.addEventListener('click',()=>{ playUrl(v.ipaAudio); pulse(svgId,dx,dy,lang.color); });
       lyr.appendChild(lg);
     }
   }

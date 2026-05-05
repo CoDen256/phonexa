@@ -93,9 +93,9 @@
   .btn-sm { padding:4px 10px; font-size:.72rem; }
 
   /* ── Chart section ───────────────────────────────────────── */
-  .chart-section { padding:12px 18px 0; }
-  .chart-top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .chart-tabs { display:flex; gap:2px; }
+  .chart-section { padding:12px 18px 0; max-width:680px; }
+  .chart-wrap { background:#192535; border:1px solid var(--border); border-radius:0 8px 8px 8px; max-height:320px; overflow:hidden; }
+  .chart-svg { display:block; width:100%; height:auto; overflow:visible; max-height:320px; }
   .chart-tab {
     padding:5px 14px; border-radius:6px 6px 0 0; font-size:.74rem; font-weight:700;
     cursor:pointer; background:var(--card); color:var(--muted);
@@ -105,8 +105,6 @@
   .chart-tab.active { background:var(--surface2); color:var(--accent); }
   .chart-tab-panel { display:none; }
   .chart-tab-panel.active { display:block; }
-  .chart-wrap { background:#192535; border:1px solid var(--border); border-radius:0 8px 8px 8px; }
-  .chart-svg { display:block; width:100%; height:auto; overflow:visible; }
   .chart-hint { font-size:.62rem; color:var(--muted); text-align:center; margin-top:4px; margin-bottom:4px; }
 
   /* ── Inline vowel editor ─────────────────────────────────── */
@@ -680,7 +678,7 @@ function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, isDraft){
   groups.forEach(grp=>{
     const{x,y}=grp[0];
     const isAct=grp.some(g=>g.i===activeIdx);
-    const dotR=isAct?9:7;
+    const dotR=isAct?7:5;
     if(grp.length>1)dotLayer.appendChild($s('circle',{cx:x,cy:y,r:dotR+4,fill:'none',stroke:c+'55','stroke-width':1.5,'stroke-dasharray':'3 2'}));
     dotLayer.appendChild($s('circle',{cx:x,cy:y,r:dotR,fill:isAct?c:c+'99'}));
   });
@@ -692,7 +690,7 @@ function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, isDraft){
     const{x,y}=pos;
     const isAct=i===activeIdx;
     const FS=isAct?17:13;
-    const dotR=isAct?9:7;
+    const dotR=isAct?7:5;
     const GAP=5;
     const lx=v.rounded?x+dotR+GAP:x-dotR-GAP;
     const anchor=v.rounded?'start':'end';
