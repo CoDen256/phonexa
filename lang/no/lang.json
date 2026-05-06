@@ -15,16 +15,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
         {
-          "text": "L<b>ie</b>be",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Liebe.ogg"
-        },
-        {
-          "text": "w<b>ie</b>",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-wie.ogg"
-        },
-        {
-          "text": "M<b>ie</b>ter",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f8/De-Mieter.ogg/De-Mieter.ogg.mp3"
+          "text": "f<b>i</b>ll",
+          "audio": null
         }
       ]
     },
@@ -33,23 +25,15 @@
       "h": 0.02,
       "b": 0.12,
       "rounded": true,
-      "desc": "Close front rounded (long)",
+      "desc": "Close front rounded (protruded,long)",
       "f1": 231,
       "f2": 2091,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
       "words": [
         {
-          "text": "<b>ü</b>ber",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-über.ogg"
-        },
-        {
-          "text": "gr<b>ün</b>",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-grün.ogg"
-        },
-        {
-          "text": "M<b>ü</b>hler",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/De-M%C3%BChle.ogg/De-M%C3%BChle.ogg.mp3"
+          "text": "s<b>y</b>",
+          "audio": null
         }
       ]
     },
@@ -65,16 +49,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
         {
-          "text": "m<b>i</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-mit.ogg"
-        },
-        {
-          "text": "b<b>i</b>tte",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bitte.ogg"
-        },
-        {
-          "text": "M<b>i</b>tte",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/De-Mitte.ogg/De-Mitte.ogg.mp3"
+          "text": "v<b>i</b>ll",
+          "audio": null
         }
       ]
     },
@@ -83,23 +59,15 @@
       "h": 0.02,
       "b": 0.2,
       "rounded": true,
-      "desc": "Near-close near-front rounded",
+      "desc": "Near-close near-front rounded (protruded)",
       "f1": 270,
       "f2": 1810,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
       "words": [
         {
-          "text": "h<b>ü</b>bsch",
+          "text": "n<b>y</b>tt",
           "audio": null
-        },
-        {
-          "text": "fl<b>ü</b>sse",
-          "audio": null
-        },
-        {
-          "text": "M<b>ü</b>ller",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/De-M%C3%BCller.ogg/De-M%C3%BCller.ogg.mp3"
         }
       ]
     },
@@ -115,12 +83,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
       "words": [
         {
-          "text": "S<b>ee</b>",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-See.ogg"
-        },
-        {
-          "text": "g<b>e</b>ben",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-geben.ogg"
+          "text": "s<b>e</b>",
+          "audio": null
         }
       ]
     },
@@ -136,12 +100,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
         {
-          "text": "B<b>e</b>tt",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bett.ogg"
-        },
-        {
-          "text": "St<b>e</b>lle",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/De-Stelle.ogg/De-Stelle.ogg.mp3"
+          "text": "s<b>e</b>tt",
+          "audio": null
         }
       ]
     },
@@ -157,16 +117,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
       "words": [
         {
-          "text": "sch<b>ö</b>n",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-schön.ogg"
-        },
-        {
-          "text": "h<b>ö</b>ren",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-hören.ogg"
-        },
-        {
-          "text": "H<b>ö</b>hle",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/De-H%C3%B6hle.ogg/De-H%C3%B6hle.ogg.mp3"
+          "text": "gr<b>ø</b>nn",
+          "audio": null
         }
       ]
     },
@@ -182,12 +134,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
       "words": [
         {
-          "text": "zw<b>ö</b>lf",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-zwölf.ogg"
-        },
-        {
-          "text": "H<b>öl</b>le",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hölle.ogg"
+          "text": "s<b>ø</b>nn",
+          "audio": null
         }
       ]
     },
@@ -203,16 +151,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
       "words": [
         {
-          "text": "gr<b>o</b>ß",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-groß.ogg"
-        },
-        {
-          "text": "S<b>oh</b>n",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Sohn.ogg"
-        },
-        {
-          "text": "<b>O</b>fen",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0f/DE-Ofen.ogg/DE-Ofen.ogg.mp3"
+          "text": "st<b>o</b>r",
+          "audio": null
         }
       ]
     },
@@ -228,16 +168,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
       "words": [
         {
-          "text": "K<b>o</b>pf",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kopf.ogg"
-        },
-        {
-          "text": "P<b>o</b>st",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Post.ogg"
-        },
-        {
-          "text": "<b>o</b>ffen",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d7/De-offen.ogg/De-offen.ogg.mp3"
+          "text": "st<b>o</b>pp",
+          "audio": null
         }
       ]
     },
@@ -253,16 +185,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
         {
-          "text": "B<b>u</b>ch",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Buch.ogg"
-        },
-        {
-          "text": "R<b>uh</b>e",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Ruhe.ogg"
-        },
-        {
-          "text": "M<b>u</b>t",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5d/De-Mut2.oga/De-Mut2.oga.mp3"
+          "text": "b<b>o</b>",
+          "audio": null
         }
       ]
     },
@@ -278,12 +202,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
         {
-          "text": "M<b>u</b>tter",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mutter.ogg"
-        },
-        {
-          "text": "H<b>u</b>nd",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hund.ogg"
+          "text": "b<b>o</b>rd",
+          "audio": null
         }
       ]
     },
@@ -299,16 +219,8 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
-          "text": "hab<b>e</b>",
+          "text": "het<b>e</b>",
           "audio": null
-        },
-        {
-          "text": "Kett<b>e</b>",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kette.ogg"
-        },
-        {
-          "text": "bitt<b>e</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f4/De-bitte-2.ogg/De-bitte-2.ogg.mp3"
         }
       ]
     },
@@ -322,7 +234,12 @@
       "f2": 1000,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
-      "words": []
+      "words": [
+       {
+          "text": "f<b>a</b>tt",
+          "audio": null
+       }
+      ]
     },
     {
       "ipa": "ɑː",
@@ -334,7 +251,12 @@
       "f2": 924,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "f<b>a</b>r",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "ʉ",
@@ -346,7 +268,12 @@
       "f2": 1337,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "b<b>u</b>kk",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "ʉː",
@@ -358,7 +285,12 @@
       "f2": 1509,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "h<b>u</b>s",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "æ",
@@ -370,7 +302,12 @@
       "f2": 1353,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "d<b>e</b>rr",
+          "audio": null
+        }
+      ]
     },
     {
       "ipa": "æː",
@@ -382,7 +319,12 @@
       "f2": 1360,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "d<b>e</b>r",
+          "audio": null
+        }
+      ]
     }
   ]
 }
