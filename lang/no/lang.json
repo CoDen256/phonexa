@@ -1,12 +1,12 @@
 {
-  "key":   "no",
+  "key": "no",
   "label": "Norwegian",
   "color": "#22d3ee",
   "vowels": [
     {
       "ipa": "iː",
       "h": 0.02,
-      "b": 0.015,
+      "b": 0.045,
       "rounded": false,
       "desc": "Close front unrounded (long)",
       "f1": 274,
@@ -30,8 +30,8 @@
     },
     {
       "ipa": "yː",
-      "h": 0.01,
-      "b": 0.25,
+      "h": 0.02,
+      "b": 0.12,
       "rounded": true,
       "desc": "Close front rounded (long)",
       "f1": 231,
@@ -55,8 +55,8 @@
     },
     {
       "ipa": "ɪ",
-      "h": 0.29,
-      "b": 0.2,
+      "h": 0.02,
+      "b": 0.045,
       "rounded": false,
       "desc": "Near-close near-front unrounded",
       "f1": 272,
@@ -80,8 +80,8 @@
     },
     {
       "ipa": "ʏ",
-      "h": 0.29,
-      "b": 0.25,
+      "h": 0.02,
+      "b": 0.2,
       "rounded": true,
       "desc": "Near-close near-front rounded",
       "f1": 270,
@@ -105,8 +105,8 @@
     },
     {
       "ipa": "eː",
-      "h": 0.28,
-      "b": 0.01,
+      "h": 0.34,
+      "b": 0.05,
       "rounded": false,
       "desc": "Close-mid front unrounded (long)",
       "f1": 376,
@@ -126,8 +126,8 @@
     },
     {
       "ipa": "ɛ ",
-      "h": 0.61,
-      "b": 0.01,
+      "h": 0.5,
+      "b": 0,
       "rounded": false,
       "desc": "Open-mid front unrounded",
       "f1": 465,
@@ -145,10 +145,10 @@
         }
       ]
     },
-        {
+    {
       "ipa": "øː",
-      "h": 0.28,
-      "b": 0.35,
+      "h": 0.34,
+      "b": 0.5,
       "rounded": true,
       "desc": "Close-mid front rounded (long)",
       "f1": 337,
@@ -172,8 +172,8 @@
     },
     {
       "ipa": "œ",
-      "h": 0.59,
-      "b": 0.25,
+      "h": 0.41,
+      "b": 0.5,
       "rounded": true,
       "desc": "Open-mid front rounded",
       "f1": 400,
@@ -193,8 +193,8 @@
     },
     {
       "ipa": "oː",
-      "h": 0.28,
-      "b": 0.99,
+      "h": 0.349,
+      "b": 0.98,
       "rounded": true,
       "desc": "Close-mid back rounded (long)",
       "f1": 341,
@@ -218,7 +218,7 @@
     },
     {
       "ipa": "ɔ",
-      "h": 0.63,
+      "h": 0.38,
       "b": 0.96,
       "rounded": true,
       "desc": "Open-mid back rounded",
@@ -268,8 +268,8 @@
     },
     {
       "ipa": "ʊ",
-      "h": 0.3,
-      "b": 0.79,
+      "h": 0.02,
+      "b": 0.98,
       "rounded": true,
       "desc": "Near-close near-back rounded",
       "f1": 287,
@@ -289,7 +289,7 @@
     },
     {
       "ipa": "ə",
-      "h": 0.48,
+      "h": 0.5,
       "b": 0.5,
       "rounded": false,
       "desc": "Mid central (Schwa)",
@@ -312,10 +312,10 @@
         }
       ]
     },
-      {
+    {
       "ipa": "ɑ",
-      "h": 1,
-      "b": 1.00,
+      "h": 0.98,
+      "b": 0.94,
       "rounded": false,
       "desc": "Open back unrounded",
       "f1": 602,
@@ -326,8 +326,8 @@
     },
     {
       "ipa": "ɑː",
-      "h": 1,
-      "b": 1.00,
+      "h": 0.98,
+      "b": 0.99,
       "rounded": false,
       "desc": "Open back unrounded (long)",
       "f1": 620,
@@ -336,10 +336,10 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": []
     },
-        {
+    {
       "ipa": "ʉ",
-      "h": 0,
-      "b": 0.50,
+      "h": 0.02,
+      "b": 0.5,
       "rounded": true,
       "desc": "Close central rounded",
       "f1": 266,
@@ -350,8 +350,8 @@
     },
     {
       "ipa": "ʉː",
-      "h": 0,
-      "b": 0.50,
+      "h": 0.02,
+      "b": 0.34,
       "rounded": true,
       "desc": "Close central rounded (long)",
       "f1": 239,
@@ -362,8 +362,8 @@
     },
     {
       "ipa": "æ",
-      "h": 0.8333,
-      "b": 0.00,
+      "h": 0.98,
+      "b": 0.25,
       "rounded": false,
       "desc": "Near-open front unrounded",
       "f1": 695,
@@ -374,12 +374,12 @@
     },
     {
       "ipa": "æː",
-      "h": 0.8333,
-      "b": 0.00,
+      "h": 0.98,
+      "b": 0.02,
       "rounded": false,
       "desc": "Near-open front unrounded (long)",
-      "f1": 778 ,
-      "f2": 1360 ,
+      "f1": 778,
+      "f2": 1360,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": []
