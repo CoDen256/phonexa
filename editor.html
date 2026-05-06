@@ -511,9 +511,21 @@ function buildInlineForm(){
 
   // Description + rounded
   const metaRow=document.createElement('div'); metaRow.className='ve-meta';
-  metaRow.innerHTML=`<div class="field"><label>Description</label><input type="text" class="wide" id="fDesc" value="${v.desc||''}" placeholder="Close front unrounded"></div><div class="field" style="flex:0"><label>Rounded</label><div class="rounded-row"><input type="checkbox" id="fRounded" ${v.rounded?'checked':''}><span style="font-size:.8rem">Lip rounded</span></div></div>`;
+  metaRow.innerHTML=`
+    <div class="field"><label>Description</label><input type="text" class="wide" id="fDesc" value="${v.desc||''}" placeholder="Close front unrounded"></div>
+    <div class="field" style="flex:0;min-width:120px">
+      <label>Type</label>
+      <select id="fType" style="background:var(--input);border:1px solid var(--border);border-radius:6px;color:#d8e8f4;padding:6px 8px;font-size:.82rem;outline:none;cursor:pointer">
+        <option value="short"      ${(v.type||'short')==='short'      ?'selected':''}>Short</option>
+        <option value="long"       ${(v.type||'short')==='long'       ?'selected':''}>Long</option>
+        <option value="diphthong"  ${(v.type||'short')==='diphthong'  ?'selected':''}>Diphthong</option>
+        <option value="variable"   ${(v.type||'short')==='variable'   ?'selected':''}>Variable (long/short)</option>
+      </select>
+    </div>
+    <div class="field" style="flex:0"><label>Rounded</label><div class="rounded-row"><input type="checkbox" id="fRounded" ${v.rounded?'checked':''}><span style="font-size:.8rem">Lip rounded</span></div></div>`;
   sec.appendChild(metaRow);
   metaRow.querySelector('#fDesc').addEventListener('input',e=>{v.desc=e.target.value;renderVowelCards();});
+  metaRow.querySelector('#fType').addEventListener('change',e=>{v.type=e.target.value;renderVowelCards();});
   metaRow.querySelector('#fRounded').addEventListener('change',e=>{v.rounded=e.target.checked;refreshCharts();renderVowelCards();});
 
   // Coordinate inputs (sync with chart clicks)
@@ -769,7 +781,7 @@ function renderVowelCards(){
     card.innerHTML=`
       <div class="vc-ipa" style="color:${c}">${v.ipa||'?'}</div>
       <div class="vc-desc">${v.desc||''}</div>
-      <div class="vc-round" style="color:${c}70">${v.rounded?'⊙ Rounded':'○ Unrounded'}</div>
+      <div class="vc-round" style="color:${c}70">${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${v.type||'short'}</div>
       ${v.f1?`<div class="vc-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>`:''}
       ${wordsHtml}
       <div class="vc-actions">
