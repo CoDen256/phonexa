@@ -40,6 +40,7 @@
       "h":        0.02,
       "b":        0.02,
       "rounded":  false,
+      "type": "short",
       "desc":     "Close front unrounded",
       "f1":       270,
       "f2":       2200,

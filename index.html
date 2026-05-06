@@ -147,6 +147,7 @@
   .tip-ipa  { font-size:2rem; font-family:Georgia,'Noto Serif',serif; line-height:1; }
   .tip-lang { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin:3px 0 5px; }
   .tip-desc { font-size:.75rem; color:#8fa8c0; line-height:1.45; }
+  .tip-meta { font-size:.65rem; color:#4a7090; margin-top:2px; }
   .tip-f    { font-size:.67rem; color:#587898; margin-top:4px; font-family:monospace; }
   .tip-f span { color:#789ab8; }
   .ctip-row { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid #1e3048; }
@@ -441,10 +442,12 @@ function showTip(e,v,lang) {
   const wordsHtml=ws.length
     ? `<div class="tip-words">${ws.map(w=>`<span class="tip-word-chip">${w.text||''}</span>`).join('')}</div>`
     : '';
+  const roundType=`${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}`;
   tip.innerHTML=`
     <div class="tip-ipa" style="color:${lang.color}">${v.ipa}</div>
     <div class="tip-lang" style="color:${lang.color}">${lang.label}</div>
     <div class="tip-desc">${v.desc}</div>
+    <div class="tip-meta">${roundType}</div>
     ${v.f1?`<div class="tip-f">F1 <span>${v.f1} Hz</span> · F2 <span>${v.f2} Hz</span></div>`:''}
     ${wordsHtml}
   `;
@@ -454,11 +457,13 @@ function showClusterTip(e, members) {
   const rows = members.map(({lang,v}) => {
     const ws = (v.words||[]).map(w=>`<span class="tip-word-chip">${w.text||''}</span>`).join('');
     const freq = v.f1 ? `<span class="tip-f" style="margin-top:2px">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</span>` : '';
+    const roundType=`${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}`;
     return `<div class="ctip-row">
       <span class="tip-ipa" style="color:${lang.color};font-size:1.3rem;line-height:1">${v.ipa}</span>
       <span class="ctip-info">
         <span class="tip-lang" style="color:${lang.color};display:block">${lang.label}</span>
         <span class="tip-desc">${v.desc}</span>
+        <span class="tip-meta">${roundType}</span>
         ${freq}
         ${ws ? `<span class="tip-words" style="margin-top:3px;padding-top:3px">${ws}</span>` : ''}
       </span>
