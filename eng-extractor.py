@@ -28,21 +28,15 @@ from pydub.silence import detect_nonsilent
 # Add your entries here:
 #   "url"   – direct link to the MP3 file
 #   "sound" – label used in the output filenames (e.g. the vowel name)
-ENTRIES = [
-{"sound": "foot", "url": "https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-11-2/sound-11-2/assets/media/2-2.mp3"},
-{"sound":"trap", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-5/sound%205/assets/media/2-6.mp3"},
-{"sound":"lot", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-14/sound%2014/assets/media/2-4.mp3"},
-{"sound":"thought", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-13/sound-13/assets/media/3-4.mp3"},
-{"sound":"dress", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-3/sound-3/assets/media/2-3.mp3"},
-{"sound":"nurse", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-8/sound-8/assets/media/3-3.mp3"},
-{"sound":"air", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-4/sound-4/assets/media/3-5.mp3"},
-{"sound":"kit", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/class21120/CLASS21120/assets/media/2-1.mp3"},
-{"sound":"fleece", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-1/sound-1/assets/media/3-1.mp3"},
-{"sound":"palm", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-10/sound-10/assets/media/3-6.mp3"},
-{"sound":"strut", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-9/sound-9/assets/media/2-5.mp"},
-{"sound":"goose", "url":"https://thesoundofenglish.org/wp-content/uploads/in5-archives/sound-6/sound-6/assets/media/3-2.mp3"},
-{"sound": "schwa", "url": "https://thesoundofenglish.org/wp-content/uploads/in5-archives/class-1-new/CLASS%201%20NEW/assets/media/1-1.mp3"}
-]
+
+
+base = "https://bilingueanglaismedia.s3.amazonaws.com/blog/infographics/api/mp3"
+
+sounds = ["green", "pink", "blue", "wood", "dust", "purple", "mauve", "coffee", "sand", "red"]
+
+ENTRIES = list(
+    (f"{base}/PHONEME-{i.upper()}.mp3", f"{base}/NORMAL-{i.upper()}.mp3", i) for i in sounds
+)
 
 
 
@@ -116,21 +110,19 @@ def save_segment(segment: AudioSegment, path: str) -> None:
 LABELS = ["sound", "word1", "word2"]   # names for the 3 output slots
 
 
-def process_entry(entry: dict, output_dir: str) -> None:
-    url   = entry["url"]
-    sound = entry["sound"]
+def process_entry(url, sound, output_dir: str) -> None:
 
     print(f"\n{'─'*55}")
     print(f"Processing sound: '{sound}'")
 
     # 1. Download
-    raw_path = os.path.join(output_dir, f"{sound}_raw.mp3")
+    raw_path = os.path.join(output_dir, f"{sound}.mp3")
     download_mp3(url, raw_path)
 
     # 2. Load audio
     audio = AudioSegment.from_mp3(raw_path)
     print(f"  Loaded {len(audio)/1000:.1f}s of audio")
-
+    return
     # 3. Detect the first 3 non-silent chunks
     try:
         segments = extract_segments(audio)
@@ -154,11 +146,12 @@ def main() -> None:
         print("No entries defined. Edit the ENTRIES list at the top of the script.")
         sys.exit(1)
 
-    for entry in ENTRIES:
+    for (vowel, word, sound) in ENTRIES:
         try:
-            process_entry(entry, OUTPUT_DIR)
+            process_entry(vowel, sound, OUTPUT_DIR)
+            process_entry(word, sound+"_word", OUTPUT_DIR)
         except Exception as exc:
-            print(f"  ✗ Error processing {entry.get('sound', '?')}: {exc}")
+            print(f"  ✗ Error processing {(vowel, word, sound)}: {exc}")
 
     print(f"\n✓ Done. Clips saved to '{OUTPUT_DIR}/'")
 
