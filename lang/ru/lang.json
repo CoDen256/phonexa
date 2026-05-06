@@ -269,8 +269,8 @@
       "b": 0.25,
       "rounded": false,
       "desc": "Open front unrounded",
-      "f1": 941,
-      "f2": 1346,
+      "f1": 932,
+      "f2": 1538,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_front_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
       "words": [
@@ -290,8 +290,8 @@
       "b": 0.75,
       "rounded": false,
       "desc": "Open back unrounded",
-      "f1": 0,
-      "f2": 0,
+      "f1": 941,
+      "f2": 1346,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": [
