@@ -354,7 +354,7 @@ const IPA_BASE_ORDER = [
   'ɪ','ʏ','ʊ',
   'e','ø','ɘ','ɵ','ɤ','o',
   'ə',
-  'ɛ','œ','ɜ', 'ɝ', 'ɞ','ʌ','ɔ',
+  'ɛ','œ','ɜ','ɞ','ʌ','ɔ',
   'æ','ɐ',
   'a','ɶ','ä','ɑ','ɒ',
 ];
@@ -476,63 +476,82 @@ function buildVowels(svg, getPos, svgId) {
   svg.appendChild(langL); svg.appendChild(cardL); svg.appendChild(dotL);
 
   const SF='drop-shadow(0px 1px 2px rgba(0,0,0,0.45))';
-  const DR_C=5, DR_L=5, DH=14;
-  const posGroups=new Map();
+  const DOT_R=3;   // same small dot for all vowels
+  const DH=14;     // transparent hit radius on dots
+  const PROX=22;   // proximity threshold for clustering / picker
 
+  // ── Step 1: collect visible vowels ──────────────────────────────────────────
+  const items=[];
   for (const [lk,lang] of Object.entries(LANGS)) {
     for (const v of lang.vowels) {
       if (!passesFilters(lk,v)) continue;
       const pos=getPos(v); if(!pos) continue;
-      const {x:dx,y:dy}=pos;
-      const pk=`${Math.round(dx/3)},${Math.round(dy/3)}`;
-      if (!posGroups.has(pk)) posGroups.set(pk,[]);
-      posGroups.get(pk).push({lk,lang,v,dx,dy});
+      items.push({lk,lang,v,dx:pos.x,dy:pos.y});
     }
   }
 
-  // Letters
-  for (const group of posGroups.values()) {
-    for (const {lk,lang,v,dx,dy} of group) {
+  // ── Step 2: greedy proximity clustering ─────────────────────────────────────
+  const clusters=[];
+  for (const item of items) {
+    let found=null, best=Infinity;
+    for (const cl of clusters) {
+      const d=Math.hypot(item.dx-cl.cx,item.dy-cl.cy);
+      if (d<PROX&&d<best){best=d;found=cl;}
+    }
+    if (found){
+      found.members.push(item);
+      found.cx=found.members.reduce((s,m)=>s+m.dx,0)/found.members.length;
+      found.cy=found.members.reduce((s,m)=>s+m.dy,0)/found.members.length;
+    } else {
+      clusters.push({cx:item.dx,cy:item.dy,members:[item]});
+    }
+  }
+
+  // ── Step 3: render ───────────────────────────────────────────────────────────
+  for (const cl of clusters) {
+    const {members,cx,cy}=cl;
+    const multi=members.length>1;
+
+    // Labels — one per vowel, left (unrounded) or right (rounded) of its own dot
+    for (const {lk,lang,v,dx,dy} of members) {
       const ic=lk==='cardinal', lyr=ic?cardL:langL;
-      const FS=22, GAP=5, PAD=4, dotR=ic?DR_C:DR_L;
-      const lx=v.rounded?dx+dotR+GAP:dx-dotR-GAP;
+      const FS=22, GAP=5, PAD=4;
+      const lx=v.rounded?dx+DOT_R+GAP:dx-DOT_R-GAP;
       const anch=v.rounded?'start':'end', tw=ipaW(v.ipa,FS);
       const hx=(v.rounded?lx:lx-tw)-PAD, hy=dy-FS*0.40-PAD;
       const lg=$s('g',{style:'cursor:pointer'});
       lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
       lg.appendChild($t(v.ipa,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
-        fill:lang.color, opacity:ic?0.92:0.78,
-        'font-family':"Georgia,'Noto Serif',serif", 'font-weight':ic?'normal':'bold',
+        fill:lang.color,opacity:ic?0.98:0.78,
+        'font-family':"Georgia,'Noto Serif',serif",'font-weight':ic?'normal':'normal',
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{ playUrl(v.ipaAudio); pulse(svgId,dx,dy,lang.color); });
+      lg.addEventListener('click',()=>{playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
-    }
-  }
 
-  // One dot per unique position
-  for (const group of posGroups.values()) {
-    const {dx,dy}=group[0], multi=group.length>1;
-    const ic=group.every(g=>g.lk==='cardinal'), dotR=ic?DR_C:DR_L;
-    const dc=multi?'#8090a8':(ic?'#90b4d0':group[0].lang.color);
-    const df=multi?'#8090a8cc':(ic?'#90b4d0dd':group[0].lang.color+'bb');
+      // Individual dot at exact position
+      dotL.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
+    }
+
+    // Transparent hit area — covers the cluster centroid, triggers picker if multi
     const dg=$s('g',{style:'cursor:pointer'});
-    dg.appendChild($s('circle',{cx:dx,cy:dy,r:DH,fill:'transparent'}));
-    if(multi) dg.appendChild($s('circle',{cx:dx,cy:dy,r:dotR+2.5,fill:'none',stroke:'#8090a840','stroke-width':1.5}));
-    dg.appendChild($s('circle',{cx:dx,cy:dy,r:dotR,fill:df}));
-    if (!multi) {
-      const {lk,lang,v}=group[0];
+    dg.appendChild($s('circle',{cx,cy,r:DH,fill:'transparent'}));
+    if (multi) {
+      // Faint dashed indicator that multiple dots are here
+      dg.appendChild($s('circle',{cx,cy,r:DOT_R+4,fill:'none',stroke:'#8090a8',
+        'stroke-width':1,'stroke-dasharray':'3 2',opacity:0.5}));
+      dg.addEventListener('click',e=>{e.stopPropagation();showPicker(e.clientX,e.clientY,members,svgId,cx,cy);});
+      dg.addEventListener('touchend',e=>{e.preventDefault();const t=e.changedTouches[0];showPicker(t.clientX,t.clientY,members,svgId,cx,cy);},{passive:false});
+    } else {
+      const {lk,lang,v,dx,dy}=members[0];
       dg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       dg.addEventListener('mousemove',moveTip); dg.addEventListener('mouseleave',hideTip);
-      dg.addEventListener('click',()=>{ playUrl(v.ipaAudio); pulse(svgId,dx,dy,dc); });
+      dg.addEventListener('click',()=>{playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);});
       let tm=false;
       dg.addEventListener('touchstart',e=>{tm=false;e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
       dg.addEventListener('touchmove', e=>{tm=true;moveTip(e.touches[0]);},{passive:false});
-      dg.addEventListener('touchend',  ()=>{hideTip();if(!tm){playUrl(v.ipaAudio);pulse(svgId,dx,dy,dc);}});
-    } else {
-      dg.addEventListener('click',e=>{e.stopPropagation();showPicker(e.clientX,e.clientY,group,svgId,dx,dy);});
-      dg.addEventListener('touchend',e=>{e.preventDefault();const t=e.changedTouches[0];showPicker(t.clientX,t.clientY,group,svgId,dx,dy);},{passive:false});
+      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);}});
     }
     dotL.appendChild(dg);
   }
