@@ -18,6 +18,10 @@
         {
           "text": "f<b>i</b>ll",
           "audio": null
+        },
+        {
+          "text": "skr<b>i</b>ve",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/36/LL-Q9043_%28nor%29-Telaneo-skive.wav/LL-Q9043_%28nor%29-Telaneo-skive.wav.mp3"
         }
       ]
     },
@@ -54,6 +58,10 @@
         {
           "text": "v<b>i</b>ll",
           "audio": null
+        },
+        {
+          "text": "sk<b>i</b>lle",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/LL-Q9043_%28nor%29-Telaneo-skille.wav/LL-Q9043_%28nor%29-Telaneo-skille.wav.mp3"
         }
       ]
     },
@@ -90,6 +98,10 @@
         {
           "text": "s<b>e</b>",
           "audio": null
+        },
+        {
+          "text": "skj<b>e</b>",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/LL-Q9043_%28nor%29-Telaneo-skje.wav/LL-Q9043_%28nor%29-Telaneo-skje.wav.mp3"
         }
       ]
     },
@@ -108,6 +120,10 @@
         {
           "text": "s<b>e</b>tt",
           "audio": null
+        },
+        {
+          "text": "skj<b>e</b>ll",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/LL-Q9043_%28nor%29-Telaneo-skjell.wav/LL-Q9043_%28nor%29-Telaneo-skjell.wav.mp3"
         }
       ]
     },
@@ -252,6 +268,14 @@
         {
           "text": "f<b>a</b>tt",
           "audio": null
+        },
+        {
+          "text": "h<b>a</b>gle",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/38/LL-Q9043_%28nor%29-Telaneo-hagle.wav/LL-Q9043_%28nor%29-Telaneo-hagle.wav.mp3"
+        },
+        {
+          "text": "p<b>e</b>nsjonist",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav.mp3"
         }
       ]
     },
@@ -270,6 +294,10 @@
         {
           "text": "f<b>a</b>r",
           "audio": null
+        },
+        {
+          "text": "h<b>a</b>le",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/LL-Q9043_%28nor%29-Telaneo-hale.wav/LL-Q9043_%28nor%29-Telaneo-hale.wav.mp3"
         }
       ]
     },
@@ -322,8 +350,12 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": [
         {
-          "text": "d<b>e</b>rr",
-          "audio": null
+          "text": "kj<b>e</b>rring",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/LL-Q9043_%28nor%29-Telaneo-kjerring.wav/LL-Q9043_%28nor%29-Telaneo-kjerring.wav.mp3"
+        },
+        {
+          "text": "kr<b>a</b>sj",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Telaneo-krasj.wav/LL-Q9043_%28nor%29-Telaneo-krasj.wav.mp3"
         }
       ]
     },
@@ -342,6 +374,14 @@
         {
           "text": "d<b>e</b>r",
           "audio": null
+        },
+        {
+          "text": "kj<b>erning</b>",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Nb-kjerning.ogg/Nb-kjerning.ogg.mp3"
+        },
+        {
+          "text": "<b>æ</b>rlig",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav.mp3"
         }
       ]
     }

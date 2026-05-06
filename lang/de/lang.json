@@ -304,7 +304,7 @@
       "h": 0.63,
       "b": 0.96,
       "rounded": true,
-      "type": "long",
+      "type": "short",
       "desc": "Open-mid back rounded",
       "f1": 537,
       "f2": 1074,
