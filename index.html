@@ -149,6 +149,11 @@
   .tip-desc { font-size:.75rem; color:#8fa8c0; line-height:1.45; }
   .tip-f    { font-size:.67rem; color:#587898; margin-top:4px; font-family:monospace; }
   .tip-f span { color:#789ab8; }
+  .ctip-row { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid #1e3048; }
+  .ctip-row:first-child { padding-top:0; }
+  .ctip-row:last-of-type { border-bottom:none; }
+  .ctip-info { display:flex; flex-direction:column; gap:1px; }
+  .ctip-hint { font-size:.65rem; color:#4a6888; margin-top:6px; text-align:center; }
   .tip-words { display:flex; flex-wrap:wrap; gap:3px; margin-top:6px; padding-top:6px; border-top:1px solid #1e3048; }
   .tip-word-chip {
     font-size:.73rem; color:#c8d8e8; padding:1px 6px;
@@ -335,12 +340,8 @@ function playUrl(url) {
   curAudio.play().catch(e => console.warn('Audio:', e.message));
 }
 
-function getLength(ipa) {
-  if (ipa.includes('ː')) return 'long';
-  // diphthong: multiple letters, none being ː, and longer than 1 char
-  const base = ipa.replace('ː', '');
-  if (base.length > 1) return 'diphthong';
-  return 'short';
+function getLength(v) {
+  return v.type || 'short';  // 'short' | 'long' | 'diphthong'
 }
 
 function getBase(ipa) {
@@ -388,7 +389,14 @@ const filters = {
 function passesFilters(lk, v) {
   if (filters.languages.size > 0 && !filters.languages.has(lk))                      return false;
   if (filters.roundness.size > 0 && !filters.roundness.has(v.rounded?'rounded':'unrounded')) return false;
-  if (filters.length.size    > 0 && !filters.length.has(getLength(v.ipa)))            return false;
+  if (filters.length.size > 0) {
+    const t = getLength(v);
+    // 'variable' chip matches variable, short, and long
+    const passes = filters.length.has(t)
+      || (t === 'variable')                                    // variable always shown when any length filter active
+      || (filters.length.has('variable') && (t === 'short' || t === 'long')); // variable chip covers short+long
+    if (!passes) return false;
+  }
   if (filters.ipaBase.size   > 0 && !filters.ipaBase.has(getBase(v.ipa)))             return false;
   return true;
 }
@@ -441,6 +449,26 @@ function showTip(e,v,lang) {
     ${wordsHtml}
   `;
   tip.style.display='block'; moveTip(e);
+}
+function showClusterTip(e, members) {
+  const rows = members.map(({lang,v}) => {
+    const ws = (v.words||[]).map(w=>`<span class="tip-word-chip">${w.text||''}</span>`).join('');
+    const freq = v.f1 ? `<span class="tip-f" style="margin-top:2px">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</span>` : '';
+    return `<div class="ctip-row">
+      <span class="tip-ipa" style="color:${lang.color};font-size:1.3rem;line-height:1">${v.ipa}</span>
+      <span class="ctip-info">
+        <span class="tip-lang" style="color:${lang.color};display:block">${lang.label}</span>
+        <span class="tip-desc">${v.desc}</span>
+        ${freq}
+        ${ws ? `<span class="tip-words" style="margin-top:3px;padding-top:3px">${ws}</span>` : ''}
+      </span>
+    </div>`;
+  }).join('');
+  tip.innerHTML = `
+    ${rows}
+    <div class="ctip-hint">Click to choose which sound to play</div>`;
+  tip.style.display = 'block';
+  moveTip(e);
 }
 function moveTip(e) {
   const x=e.clientX+18, y=e.clientY-12, r=tip.getBoundingClientRect();
@@ -523,7 +551,7 @@ function buildVowels(svg, getPos, svgId) {
       lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
       lg.appendChild($t(v.ipa,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
         fill:lang.color,opacity:ic?0.98:0.78,
-        'font-family':"Georgia,'Noto Serif',serif",'font-weight':ic?'normal':'normal',
+        'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
@@ -541,7 +569,11 @@ function buildVowels(svg, getPos, svgId) {
       // Faint dashed indicator that multiple dots are here
       dg.appendChild($s('circle',{cx,cy,r:DOT_R+4,fill:'none',stroke:'#8090a8',
         'stroke-width':1,'stroke-dasharray':'3 2',opacity:0.5}));
-      dg.addEventListener('click',e=>{e.stopPropagation();showPicker(e.clientX,e.clientY,members,svgId,cx,cy);});
+      // Hover: show all vowels in the cluster + click hint
+      dg.addEventListener('mouseenter',e=>showClusterTip(e,members));
+      dg.addEventListener('mousemove',moveTip);
+      dg.addEventListener('mouseleave',hideTip);
+      dg.addEventListener('click',e=>{e.stopPropagation();hideTip();showPicker(e.clientX,e.clientY,members,svgId,cx,cy);});
       dg.addEventListener('touchend',e=>{e.preventDefault();const t=e.changedTouches[0];showPicker(t.clientX,t.clientY,members,svgId,cx,cy);},{passive:false});
     } else {
       const {lk,lang,v,dx,dy}=members[0];
@@ -667,6 +699,7 @@ function buildSidebar() {
     grid.appendChild(chip('Long ː',    filters.length,'long',      '#34d399'));
     grid.appendChild(chip('Short',     filters.length,'short',     '#fbbf24'));
     grid.appendChild(chip('Diphthong', filters.length,'diphthong', '#f87171'));
+    grid.appendChild(chip('Variable',  filters.length,'variable',  '#c084fc'));
   }));
 
   // Collect which base symbols actually exist in current loaded languages
@@ -723,7 +756,7 @@ function renderDetail() {
       <div class="dcard-ipa" style="color:${c}">${v.ipa}</div>
       <div class="dcard-sublang" style="color:${c}bb">${lang.label}</div>
       <div class="dcard-desc">${v.desc}</div>
-      <div class="dcard-round" style="color:${c}88">${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v.ipa)}</div>
+      <div class="dcard-round" style="color:${c}88">${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}</div>
       ${v.f1?`<div class="dcard-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>`:''}
       ${wordsHtml}
       <div class="dcard-actions">
