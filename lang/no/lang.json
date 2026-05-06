@@ -244,8 +244,12 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
-          "text": "het<b>e</b>",
-          "audio": null
+          "text": "kryss<b>e</b>",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/LL-Q9043_%28nor%29-Telaneo-krysse.wav/LL-Q9043_%28nor%29-Telaneo-krysse.wav.mp3"
+        },
+        {
+          "text": "b<b>e</b>rik<b>e</b>",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/LL-Q9043_%28nor%29-Telaneo-berike.wav/LL-Q9043_%28nor%29-Telaneo-berike.wav.mp3"
         }
       ]
     },
