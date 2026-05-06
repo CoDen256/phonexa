@@ -32,7 +32,7 @@ from pydub.silence import detect_nonsilent
 
 base = "https://bilingueanglaismedia.s3.amazonaws.com/blog/infographics/api/mp3"
 
-sounds = ["green", "pink", "blue", "wood", "dust", "purple", "mauve", "coffee", "sand", "red"]
+sounds = ["jade", "gold"]
 
 ENTRIES = list(
     (f"{base}/PHONEME-{i.upper()}.mp3", f"{base}/NORMAL-{i.upper()}.mp3", i) for i in sounds
@@ -71,7 +71,7 @@ def extract_segments(audio: AudioSegment,
                      min_silence_len: int = MIN_SILENCE_LEN,
                      silence_thresh: int  = SILENCE_THRESH,
                      padding_ms: int      = PADDING_MS,
-                     n: int = 3) -> list[AudioSegment]:
+                     n: int = 15) -> list[AudioSegment]:
     """
     Detect non-silent chunks in *audio* and return the first *n* of them,
     each padded by *padding_ms* milliseconds on both sides.
@@ -101,7 +101,21 @@ def save_segment(segment: AudioSegment, path: str) -> None:
     segment.export(path, format="mp3")
     duration_s = len(segment) / 1000
     print(f"  → saved {path}  ({duration_s:.2f}s)")
-
+vowels = [
+"FACE",
+"DRESS",
+"TRAP",
+"COMMA",
+"STRUT",
+"LOT",
+"GOOSE",
+"FOOT",
+"GOAT",
+"THOUGHT",
+"PRICE",
+"MOUTH",
+"CHOICE"
+]
 
 # ──────────────────────────────────────────────
 # MAIN
@@ -110,19 +124,12 @@ def save_segment(segment: AudioSegment, path: str) -> None:
 LABELS = ["sound", "word1", "word2"]   # names for the 3 output slots
 
 
-def process_entry(url, sound, output_dir: str) -> None:
-
-    print(f"\n{'─'*55}")
-    print(f"Processing sound: '{sound}'")
-
-    # 1. Download
-    raw_path = os.path.join(output_dir, f"{sound}.mp3")
-    download_mp3(url, raw_path)
+def process_entry(raw_path, sound, output_dir: str) -> None:
 
     # 2. Load audio
     audio = AudioSegment.from_mp3(raw_path)
     print(f"  Loaded {len(audio)/1000:.1f}s of audio")
-    return
+    
     # 3. Detect the first 3 non-silent chunks
     try:
         segments = extract_segments(audio)
@@ -131,14 +138,17 @@ def process_entry(url, sound, output_dir: str) -> None:
         return
 
     # 4. Save each chunk
-    for label, segment in zip(LABELS, segments):
+    for label, segment in enumerate(segments):
+        label = str(label) if label >= 10 else "0" + str(label)
         out_path = os.path.join(output_dir, f"{sound}_{label}.mp3")
         save_segment(segment, out_path)
 
     # 5. Optionally remove the raw download to save space
-    os.remove(raw_path)
-
-
+    # os.remove(raw_path)
+process_entry("/home/coden/dev/phonapp/phonemes.mp3", "us", "us")
+#au = AudioSegment.from_mp3("/home/coden/dev/phonapp/us/us_0.mp3")
+#save_segment(au[:850], "./ee.mp3")
+#save_segment(au[850:], "./i.mp3")
 def main() -> None:
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -157,4 +167,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    pass

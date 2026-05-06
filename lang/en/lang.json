@@ -12,7 +12,7 @@
       "desc": "Close front unrounded",
       "f1": 343,
       "f2": 2322,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/green.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
         {
@@ -34,7 +34,7 @@
       "desc": "Near-close near-front unrounded",
       "f1": 429,
       "f2": 2033,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/pink.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
         {
@@ -56,7 +56,7 @@
       "desc": "Open-mid front unrounded",
       "f1": 588,
       "f2": 1802,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/red.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
         {
@@ -78,7 +78,7 @@
       "desc": "Near-open front unrounded",
       "f1": 591,
       "f2": 1930,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/sand.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": [
         {
@@ -100,7 +100,7 @@
       "desc": "Open back unrounded",
       "f1": 756,
       "f2": 1308,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/coffee.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": [
         {
@@ -122,7 +122,7 @@
       "desc": "Open-mid back rounded",
       "f1": 656,
       "f2": 1023,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_rounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/mauve.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
       "words": [
         {
@@ -144,7 +144,7 @@
       "desc": "Near-close near-back rounded",
       "f1": 469,
       "f2": 1122,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-back_rounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/wood.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
         {
@@ -166,7 +166,7 @@
       "desc": "Close back rounded",
       "f1": 380,
       "f2": 992,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_back_rounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/blue.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
         {
@@ -188,9 +188,17 @@
       "desc": "Open-mid back unrounded",
       "f1": 621,
       "f2": 1181,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/sa/strut.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_unrounded_vowel",
       "words": [
+        {
+          "text": "c<b>u</b>t",
+          "audio": "lang/en/audio/sa/cut.mp3"
+        },
+        {
+          "text": "h<b>u</b>d",
+          "audio": "lang/en/audio/h95/hud.wav"
+        },
         {
           "text": "str<b>u</b>t",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-strut.ogg"
@@ -210,16 +218,16 @@
       "desc": "Mid central (schwa)",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid-central_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/dust.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
-          "text": "<b>a</b>bout",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-about.ogg"
+          "text": "d<b>u</b>st",
+          "audio": "lang/en/audio/ipa/dust_word.mp3"
         },
         {
-          "text": "comm<b>a</b>",
-          "audio": null
+          "text": "<b>a</b>bout",
+          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-about.ogg"
         }
       ]
     },
@@ -232,9 +240,17 @@
       "desc": "Open-mid central unrounded ɛː",
       "f1": 475,
       "f2": 1379,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_central_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/purple.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_unrounded_vowel",
       "words": [
+        {
+          "text": "p<b>ur</b>ple",
+          "audio": "lang/en/audio/ipa/purple_word.mp3"
+        },
+        {
+          "text": "h<b>ea</b>rd",
+          "audio": "lang/en/audio/h95/heard.wav"
+        },
         {
           "text": "n<b>ur</b>se",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-nurse.ogg"
@@ -251,12 +267,21 @@
       "b": 0.02,
       "rounded": false,
       "type": "variable",
-      "desc": "Close-mid front unrounded",
+      "desc": "Close-mid front unrounded (allophone of eɪ)",
       "f1": 476,
       "f2": 2089,
-      "ipaAudio": "https://en.wikipedia.org/wiki/File:Close-mid_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/jade.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "j<b>a</b>de",
+          "audio": "lang/en/audio/ipa/jade_word.mp3"
+        },
+        {
+          "text": "h<b>aye</b>d",
+          "audio": "lang/en/audio/h95/hayed.wav"
+        }
+      ]
     },
     {
       "ipa": "o",
@@ -264,12 +289,21 @@
       "b": 0.9,
       "rounded": true,
       "type": "variable",
-      "desc": "Close-mid back rounded",
+      "desc": "Close-mid back rounded (allophone of oʊ)",
       "f1": 498,
       "f2": 910,
-      "ipaAudio": "https://en.wikipedia.org/wiki/File:Close-mid_back_rounded_vowel.ogg",
+      "ipaAudio": "lang/en/audio/ipa/gold.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
-      "words": []
+      "words": [
+        {
+          "text": "g<b>o</b>ld",
+          "audio": "lang/en/audio/ipa/gold_word.mp3"
+        },
+        {
+          "text": "h<b>oe</b>d",
+          "audio": "lang/en/audio/h95/hoed.wav"
+        }
+      ]
     }
   ]
 }
