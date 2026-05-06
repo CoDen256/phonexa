@@ -1,7 +1,10 @@
 F1/F2:
 https://books.google.de/books?id=-VFNWqXxRoMC&pg=PA28&redir_esc=y#v=onepage&q&f=false
+![alt text](formants-plot.png)
+![alt text](formant-values.png)
 
 Vowel chart:
+![alt text](chart.jpg)
 https://books.google.de/books?id=Txw9AAAAIAAJ&redir_esc=y
 
 https://en.wikipedia.org/wiki/Help:IPA/Russian
