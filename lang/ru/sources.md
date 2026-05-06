@@ -1,3 +1,12 @@
+F1/F2:
+https://books.google.de/books?id=-VFNWqXxRoMC&pg=PA28&redir_esc=y#v=onepage&q&f=false
+
+Vowel chart:
+https://books.google.de/books?id=Txw9AAAAIAAJ&redir_esc=y
+
+https://en.wikipedia.org/wiki/Help:IPA/Russian
+
+Alphabet:
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound1.mp3#а
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound2.mp3#б
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound3.mp3#в
@@ -31,5 +40,3 @@ https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound30.m
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound31.mp3#э
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound32.mp3#ю
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound33.mp3#я
-
-https://en.wikipedia.org/wiki/Help:IPA/Russian
