@@ -1,3 +1,17 @@
+# Vowel chart
+https://en.wikipedia.org/wiki/Norwegian_phonology
+![alt text](vowel-long.png)
+![alt text](vowel-short.png)
+
+# F1/F2 formants
+https://en.wikipedia.org/wiki/Norwegian_phonology
+![alt text](formants.png)
+Kristoffersen, Gjert (2000), The Phonology of Norwegian, Oxford University Press
+[document.pdf](document.pdf)
+![alt text](formants-book.png)
+
+
+# Alphabet
 https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_GA1Y4BUUFHZ2ZKTK.mp3#A
 https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_4QR8IUMN2LKBWKAB.mp3#B
 https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_BG9Y9TNHXYXOMPAL.mp3#C
