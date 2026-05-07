@@ -64,9 +64,13 @@
       "desc": "Near-close near-front unrounded",
       "f1": 369,
       "f2": 1902,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/in.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
+        {
+          "text": "i",
+          "audio": "lang/de/audio/in.mp3"
+        },
         {
           "text": "m<b>i</b>t",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-mit.ogg"
@@ -90,9 +94,13 @@
       "desc": "Near-close near-front rounded",
       "f1": 373,
       "f2": 1543,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_rounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/duenn.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
       "words": [ 
+        {
+          "text": "d<b>ü</b>nn",
+          "audio": "lang/de/audio/duenn.mp3"
+        },
         {
           "text": "M<b>ü</b>ller",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/De-M%C3%BCller.ogg/De-M%C3%BCller.ogg.mp3"
@@ -156,9 +164,13 @@
       "desc": "Open-mid front unrounded",
       "f1": 489,
       "f2": 1817,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/es.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
+        {
+          "text": "<b>e</b>s",
+          "audio": "lang/de/audio/es.mp3"
+        },
         {
           "text": "B<b>e</b>tt",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bett.ogg"
@@ -200,9 +212,13 @@
       "desc": "Open-mid front rounded",
       "f1": 474,
       "f2": 1477,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_rounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/oefter.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
       "words": [
+        {
+          "text": "<b>ö</b>fter",
+          "audio": "lang/de/audio/oefter.mp3"
+        },
         {
           "text": "zw<b>ö</b>lf",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-zwölf.ogg"
