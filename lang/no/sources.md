@@ -10,6 +10,7 @@ Kristoffersen, Gjert (2000), The Phonology of Norwegian, Oxford University Press
 [document.pdf](document.pdf)
 ![alt text](formants-book.png)
 
+https://en.wikipedia.org/wiki/Help:IPA/Norwegian
 
 # Alphabet
 https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_GA1Y4BUUFHZ2ZKTK.mp3#A

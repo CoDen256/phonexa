@@ -52,9 +52,13 @@
       "desc": "Near-close near-front unrounded",
       "f1": 272,
       "f2": 2090,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/i_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
+        {
+          "text": "<b>i</b>",
+          "audio": "lang/no/audio/i_vowel.mp3"
+        },
         {
           "text": "sk<b>i</b>lle",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/LL-Q9043_%28nor%29-Telaneo-skille.wav/LL-Q9043_%28nor%29-Telaneo-skille.wav.mp3"
@@ -70,9 +74,13 @@
       "desc": "Near-close near-front rounded (protruded)",
       "f1": 270,
       "f2": 1810,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_rounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/yndi_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
       "words": [
+        {
+          "text": "<b>y</b>ndi",
+          "audio": "lang/no/audio/yndi.mp3"
+        },
         {
           "text": "sk<b>y</b>dd",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/LL-Q9043_%28nor%29-Telaneo-skydd.wav/LL-Q9043_%28nor%29-Telaneo-skydd.wav.mp3"
@@ -98,7 +106,7 @@
       ]
     },
     {
-      "ipa": "ɛ ",
+      "ipa": "ɛ",
       "h": 0.5,
       "b": 0,
       "rounded": false,
@@ -106,9 +114,13 @@
       "desc": "Open-mid front unrounded",
       "f1": 465,
       "f2": 1730,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/aett_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
+        {
+          "text": "<b>æ</b>tt",
+          "audio": "lang/no/audio/aett.mp3"
+        },
         {
           "text": "skj<b>e</b>ll",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/LL-Q9043_%28nor%29-Telaneo-skjell.wav/LL-Q9043_%28nor%29-Telaneo-skjell.wav.mp3"
@@ -142,9 +154,13 @@
       "desc": "Open-mid front rounded",
       "f1": 400,
       "f2": 1326,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_front_rounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/oest_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
       "words": [
+        {
+          "text": "<b>oe</b>st",
+          "audio": "lang/no/audio/oest.mp3"
+        },
         {
           "text": "skj<b>ø</b>nne",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5e/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav.mp3"
@@ -178,9 +194,13 @@
       "desc": "Open-mid back rounded",
       "f1": 360,
       "f2": 778,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_rounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/og_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
       "words": [
+        {
+          "text": "<b>o</b>g",
+          "audio": "lang/no/audio/og.mp3"
+        },
         {
           "text": "skj<b>o</b>ld",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2d/LL-Q9043_%28nor%29-Telaneo-skjold.wav/LL-Q9043_%28nor%29-Telaneo-skjold.wav.mp3"
@@ -222,9 +242,13 @@
       "desc": "Near-close near-back rounded",
       "f1": 287,
       "f2": 685,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-back_rounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/loff_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
+        {
+          "text": "l<b>o</b>ff",
+          "audio": "lang/no/audio/loff.mp3"
+        },
         {
           "text": "j<b>ou</b>rnal",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/No-journal.ogg/No-journal.ogg.mp3"
@@ -240,12 +264,12 @@
       "desc": "Mid central (Schwa)",
       "f1": 433,
       "f2": 1334,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid-central_vowel.ogg",
+      "ipaAudio": "lang/no/audio/krysse_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
           "text": "kryss<b>e</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/LL-Q9043_%28nor%29-Telaneo-krysse.wav/LL-Q9043_%28nor%29-Telaneo-krysse.wav.mp3"
+          "audio": "lang/no/audio/krysse.mp3"
         },
         {
           "text": "b<b>e</b>rik<b>e</b>",
@@ -262,9 +286,13 @@
       "desc": "Open back unrounded",
       "f1": 602,
       "f2": 1000,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_back_unrounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/av_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": [
+        {
+          "text": "<b>a</b>v",
+          "audio": "lang/no/audio/av.mp3"
+        },
         {
           "text": "h<b>a</b>gle",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/38/LL-Q9043_%28nor%29-Telaneo-hagle.wav/LL-Q9043_%28nor%29-Telaneo-hagle.wav.mp3"
@@ -302,9 +330,13 @@
       "desc": "Close central rounded",
       "f1": 266,
       "f2": 1337,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_central_rounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/ull_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
       "words": [
+        {
+          "text": "<b>u</b>ll",
+          "audio": "lang/no/audio/ull.mp3"
+        },
         {
           "text": "sk<b>u</b>ffe",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/LL-Q9043_%28nor%29-Telaneo-skuffe.wav/LL-Q9043_%28nor%29-Telaneo-skuffe.wav.mp3"
@@ -342,9 +374,13 @@
       "desc": "Near-open front unrounded",
       "f1": 695,
       "f2": 1353,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-open_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/no/audio/aesj_vowel.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": [
+        {
+          "text": "<b>æ</b>sj",
+          "audio": "lang/no/audio/aesj.mp3"
+        },
         {
           "text": "kj<b>e</b>rring",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/LL-Q9043_%28nor%29-Telaneo-kjerring.wav/LL-Q9043_%28nor%29-Telaneo-kjerring.wav.mp3"
@@ -368,7 +404,7 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": [
         {
-          "text": "kj<b>erning</b>",
+          "text": "kj<b>e</b>rning",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Nb-kjerning.ogg/Nb-kjerning.ogg.mp3"
         },
         {
