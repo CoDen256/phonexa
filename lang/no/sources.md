@@ -42,3 +42,26 @@ https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_8YML6ASUKP
 https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ
 https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_9V9346SSTNJJF15W.mp3#Ø
 https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_LSAZ2422CMOF627R.mp3#Å
+
+
+# i & I:
+beat bit
+bieten bitten
+bite bitt
+бить бетон, быть
+
+#  ye & ye:
+bed bear
+
+# e & e:
+
+# oe & yo:
+
+
+# Y
+
+
+# u
+
+
+# u:
