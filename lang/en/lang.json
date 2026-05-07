@@ -16,7 +16,7 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
         {
-          "text": "r<b>e</b>d",
+          "text": "gr<b>ee</b>n",
           "audio": "lang/en/audio/ipa/green_word.mp3"
         },
         {
@@ -46,7 +46,7 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
         {
-          "text": "r<b>e</b>d",
+          "text": "p<b>i</b>nk",
           "audio": "lang/en/audio/ipa/pink_word.mp3"
         },
         {
@@ -125,8 +125,8 @@
     },
     {
       "ipa": "ɑ",
-      "h": 0.98,
-      "b": 0.5,
+      "h": 0.97,
+      "b": 0.9,
       "rounded": false,
       "type": "variable",
       "desc": "Open back unrounded",
