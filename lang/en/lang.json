@@ -16,6 +16,14 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
         {
+          "text": "r<b>e</b>d",
+          "audio": "lang/en/audio/ipa/green_word.mp3"
+        },
+        {
+          "text": "h<b>ee</b>d",
+          "audio": "lang/en/audio/h95/heed.wav"
+        },
+        {
           "text": "f<b>ee</b>t",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-feet.ogg"
         },
@@ -37,6 +45,14 @@
       "ipaAudio": "lang/en/audio/ipa/pink.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
+        {
+          "text": "r<b>e</b>d",
+          "audio": "lang/en/audio/ipa/pink_word.mp3"
+        },
+        {
+          "text": "h<b>i</b>d",
+          "audio": "lang/en/audio/h95/hid.wav"
+        },
         {
           "text": "k<b>i</b>t",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-kit.ogg"
@@ -60,6 +76,14 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
         {
+          "text": "r<b>e</b>d",
+          "audio": "lang/en/audio/ipa/red_word.mp3"
+        },
+        {
+          "text": "h<b>ea</b>d",
+          "audio": "lang/en/audio/h95/head.wav"
+        },
+        {
           "text": "dr<b>e</b>ss",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-dress.ogg"
         },
@@ -81,6 +105,14 @@
       "ipaAudio": "lang/en/audio/ipa/sand.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": [
+        {
+          "text": "s<b>a</b>nd",
+          "audio": "lang/en/audio/ipa/sand_word.mp3"
+        },
+        {
+          "text": "h<b>a</b>d",
+          "audio": "lang/en/audio/h95/had.wav"
+        },
         {
           "text": "tr<b>a</b>p",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-trap.ogg"
@@ -104,6 +136,14 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": [
         {
+          "text": "c<b>o</b>ffee",
+          "audio": "lang/en/audio/ipa/coffee_word.mp3"
+        },
+        {
+          "text": "h<b>o</b>d",
+          "audio": "lang/en/audio/h95/hod.wav"
+        },
+        {
           "text": "f<b>a</b>ther",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-father.ogg"
         },
@@ -125,6 +165,14 @@
       "ipaAudio": "lang/en/audio/ipa/mauve.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
       "words": [
+        {
+          "text": "m<b>au</b>ve",
+          "audio": "lang/en/audio/ipa/mauve_word.mp3"
+        },
+        {
+          "text": "h<b>awe</b>d",
+          "audio": "lang/en/audio/h95/hawed.wav"
+        },
         {
           "text": "th<b>ough</b>t",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-thought.ogg"
@@ -148,6 +196,14 @@
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
         {
+          "text": "w<b>oo</b>d",
+          "audio": "lang/en/audio/ipa/wood_word.mp3"
+        },
+        {
+          "text": "h<b>oo</b>d",
+          "audio": "lang/en/audio/h95/hood.wav"
+        },
+        {
           "text": "f<b>oo</b>t",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-foot.ogg"
         },
@@ -169,6 +225,14 @@
       "ipaAudio": "lang/en/audio/ipa/blue.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
+        {
+          "text": "bl<b>ue</b>",
+          "audio": "lang/en/audio/ipa/blue_word.mp3"
+        },
+        {
+          "text": "wh<b>o'</b>d",
+          "audio": "lang/en/audio/h95/whod.wav"
+        },
         {
           "text": "g<b>oo</b>se",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-goose.ogg"
