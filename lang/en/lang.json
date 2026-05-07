@@ -257,7 +257,7 @@
       "words": [
         {
           "text": "c<b>u</b>t",
-          "audio": "lang/en/audio/sa/cut.mp3"
+          "audio": "lang/en/audio/sa/cut_word.mp3"
         },
         {
           "text": "h<b>u</b>d",
@@ -265,7 +265,7 @@
         },
         {
           "text": "str<b>u</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-strut.ogg"
+          "audio": "https://dictionary.cambridge.org/media/english/us_pron/s/str/strut/strut.mp3"
         },
         {
           "text": "b<b>u</b>s",
