@@ -7,6 +7,8 @@ Walter F. Sendlmeier, Julia Seebode
 Vowel chart
 ![alt text](chart.png)
 
+Sounds:
+https://www.dict.cc/?s=bitte
 
 Alphabet
 https://0.tqn.com/z/g/german/library/media/Audio/a.wav

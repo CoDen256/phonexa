@@ -92,15 +92,7 @@
       "f2": 1543,
       "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-front_rounded_vowel.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
-      "words": [
-        {
-          "text": "h<b>ü</b>bsch",
-          "audio": null
-        },
-        {
-          "text": "fl<b>ü</b>sse",
-          "audio": null
-        },
+      "words": [ 
         {
           "text": "M<b>ü</b>ller",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/De-M%C3%BCller.ogg/De-M%C3%BCller.ogg.mp3"
@@ -230,9 +222,13 @@
       "desc": "Open front/central unrounded",
       "f1": 694,
       "f2": 737,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open_front_unrounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/ab.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
       "words": [
+        {
+          "text": "<b>a</b>b",
+          "audio": "lang/de/audio/ab.mp3"
+        },
         {
           "text": "M<b>a</b>nn",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mann.ogg"
@@ -308,9 +304,13 @@
       "desc": "Open-mid back rounded",
       "f1": 537,
       "f2": 1074,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Open-mid_back_rounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/ob.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
       "words": [
+        {
+          "text": "<b>o</b>b",
+          "audio": "lang/de/audio/ob.mp3"
+        },
         {
           "text": "K<b>o</b>pf",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kopf.ogg"
@@ -360,9 +360,13 @@
       "desc": "Near-close near-back rounded",
       "f1": 391,
       "f2": 1010,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Near-close_near-back_rounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/um.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
+        {
+          "text": "<b>u</b>m",
+          "audio": "lang/de/audio/um.mp3"
+        },
         {
           "text": "M<b>u</b>tter",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mutter.ogg"
@@ -382,20 +386,20 @@
       "desc": "Mid central (Schwa)",
       "f1": 517,
       "f2": 1447,
-      "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mid-central_vowel.ogg",
+      "ipaAudio": "lang/de/audio/bitte_end.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
-          "text": "hab<b>e</b>",
-          "audio": null
+          "text": "bitt<b>e</b>",
+          "audio": "lang/de/audio/bitte.mp3"
+        },
+        {
+          "text": "bitt<b>e</b> (2)",
+          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f4/De-bitte-2.ogg/De-bitte-2.ogg.mp3"
         },
         {
           "text": "Kett<b>e</b>",
           "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kette.ogg"
-        },
-        {
-          "text": "bitt<b>e</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f4/De-bitte-2.ogg/De-bitte-2.ogg.mp3"
         }
       ]
     },
@@ -408,16 +412,16 @@
       "desc": "Near open central unrounded",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "https://en.wikipedia.org/wiki/File:Near-open_central_unrounded_vowel.ogg",
+      "ipaAudio": "lang/de/audio/er_ending.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
       "words": [
         {
-          "text": "Op<b>er</b>",
-          "audio": null
+          "text": "e<b>r</b>",
+          "audio": "lang/de/audio/er.mp3"
         },
         {
-          "text": "w<b>ir</b>",
-          "audio": null
+          "text": "wi<b>r</b>",
+          "audio": "lang/de/audio/wir.mp3"
         },
         {
           "text": "Miet<b>er</b>",
@@ -426,6 +430,10 @@
         {
           "text": "Mutt<b>er</b>",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/De-Mutter.ogg/De-Mutter.ogg.mp3"
+        },
+                {
+          "text": "Op<b>er</b>",
+          "audio": null
         }
       ]
     }

@@ -8,6 +8,7 @@ Vowel chart:
 https://en.wikipedia.org/wiki/General_American_English
 ![alt text](General_American_monophthong_chart.svg.png)
 
+Sounds:
 https://americanipachart.com/
 https://pronuncian.com/sounds
 https://soundsamerican.net/article/vowel_sound_tense_i_as_in_be
