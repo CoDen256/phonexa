@@ -12,7 +12,7 @@
       "desc": "Close front unrounded",
       "f1": 263,
       "f2": 2171,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/i.wav",
+      "ipaAudio": "lang/de/audio/fit/i_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
         {
@@ -38,7 +38,7 @@
       "desc": "Close front rounded",
       "f1": 302,
       "f2": 1722,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/ue.wav",
+      "ipaAudio": "lang/de/audio/fit/y_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
       "words": [
         {
@@ -64,7 +64,7 @@
       "desc": "Near-close near-front unrounded",
       "f1": 369,
       "f2": 1902,
-      "ipaAudio": "lang/de/audio/in.mp3",
+      "ipaAudio": "lang/de/audio/fit/i_short.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
         {
@@ -94,9 +94,9 @@
       "desc": "Near-close near-front rounded",
       "f1": 373,
       "f2": 1543,
-      "ipaAudio": "lang/de/audio/duenn.mp3",
+      "ipaAudio": "lang/de/audio/fit/y_short.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
-      "words": [ 
+      "words": [
         {
           "text": "d<b>ü</b>nn",
           "audio": "lang/de/audio/duenn.mp3"
@@ -116,7 +116,7 @@
       "desc": "Close-mid front unrounded",
       "f1": 348,
       "f2": 2126,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/e.wav",
+      "ipaAudio": "lang/de/audio/fit/ee_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
       "words": [
         {
@@ -138,7 +138,7 @@
       "desc": "Close-mid front rounded",
       "f1": 371,
       "f2": 1501,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/oe.wav",
+      "ipaAudio": "lang/de/audio/fit/oe_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
       "words": [
         {
@@ -164,7 +164,7 @@
       "desc": "Open-mid front unrounded",
       "f1": 489,
       "f2": 1817,
-      "ipaAudio": "lang/de/audio/es.mp3",
+      "ipaAudio": "lang/de/audio/fit/e_short.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
         {
@@ -190,7 +190,7 @@
       "desc": "Open-mid front unrounded",
       "f1": 482,
       "f2": 1902,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/ae.wav",
+      "ipaAudio": "lang/de/audio/fit/e_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
         {
@@ -212,7 +212,7 @@
       "desc": "Open-mid front rounded",
       "f1": 474,
       "f2": 1477,
-      "ipaAudio": "lang/de/audio/oefter.mp3",
+      "ipaAudio": "lang/de/audio/fit/oe_short.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
       "words": [
         {
@@ -238,7 +238,7 @@
       "desc": "Open front/central unrounded",
       "f1": 694,
       "f2": 737,
-      "ipaAudio": "lang/de/audio/ab.mp3",
+      "ipaAudio": "lang/de/audio/fit/a_short.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
       "words": [
         {
@@ -268,7 +268,7 @@
       "desc": "Open central unrounded",
       "f1": 737,
       "f2": 1275,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/a.wav",
+      "ipaAudio": "lang/de/audio/fit/a_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
       "words": [
         {
@@ -294,7 +294,7 @@
       "desc": "Close-mid back rounded",
       "f1": 383,
       "f2": 841,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/o.wav",
+      "ipaAudio": "lang/de/audio/fit/o_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
       "words": [
         {
@@ -320,7 +320,7 @@
       "desc": "Open-mid back rounded",
       "f1": 537,
       "f2": 1074,
-      "ipaAudio": "lang/de/audio/ob.mp3",
+      "ipaAudio": "lang/de/audio/fit/o_short.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
       "words": [
         {
@@ -447,7 +447,7 @@
           "text": "Mutt<b>er</b>",
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/De-Mutter.ogg/De-Mutter.ogg.mp3"
         },
-                {
+        {
           "text": "Op<b>er</b>",
           "audio": null
         }
