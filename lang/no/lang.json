@@ -467,7 +467,7 @@
       "words": [
         {
           "text": "v<b>æ</b>rt",
-          "audio": "lang/no/audio/mjolnir/vaert.mp3"
+          "audio": "lang/no/audio/mjolnir/ae/vaert.mp3"
         },
         {
           "text": "<b>æ</b>sj",
@@ -497,11 +497,11 @@
       "words": [
         {
           "text": "<b>æ</b>",
-          "audio": "lang/no/audio/mjolnir/ae_long.mp3"
+          "audio": "lang/no/audio/mjolnir/ae/ae_long.mp3"
         },
         {
           "text": "l<b>æ</b>rer",
-          "audio": "lang/no/audio/mjolnir/laerer.mp3"
+          "audio": "lang/no/audio/mjolnir/ae/laerer.mp3"
         },
         {
           "text": "kj<b>e</b>rning",
