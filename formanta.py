@@ -25,6 +25,9 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     return send_from_directory(".", "index.html")
+@app.route("/index.html")
+def home():
+    return send_from_directory(".", "index.html")
 @app.route("/editor.html")
 def editor():
     return send_from_directory(".", "editor.html")
