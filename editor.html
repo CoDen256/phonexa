@@ -722,31 +722,22 @@ function isDiph(v){ return v.type==='diphthong' && v.h2!=null && v.b2!=null; }
 function drawDiphArrow(layer, x1, y1, x2, y2, v, c, isAct){
   const dist=Math.hypot(x2-x1,y2-y1); if(dist<3)return;
   const op=isAct?0.88:0.5;
-  const dx=x2-x1,dy=y2-y1,len=dist,off=Math.min(dist*0.28,40);
-  const cpx=(x1+x2)/2-(dy/len)*off, cpy=(y1+y2)/2+(dx/len)*off;
-  const pathD=`M${x1},${y1} Q${cpx},${cpy} ${x2},${y2}`;
-  const pathId=`edp_${v.ipa.replace(/[^\w]/g,'X')}_${Math.round(x1+y1)}`;
-  layer.appendChild($s('path',{id:pathId,d:pathD,fill:'none',stroke:'none'}));
-  const tx=x2-cpx,ty=y2-cpy,tl=Math.hypot(tx,ty),AR=9;
-  const xe=x2-tx/tl*AR, ye=y2-ty/tl*AR;
-  layer.appendChild($s('path',{
-    d:`M${x1},${y1} Q${cpx},${cpy} ${xe.toFixed(1)},${ye.toFixed(1)}`,
-    fill:'none',stroke:c,'stroke-width':isAct?2:1.5,opacity:op,'stroke-linecap':'round',style:'pointer-events:none',
-  }));
-  const ux=tx/tl,uy=ty/tl,W=4;
+  const ux=(x2-x1)/dist, uy=(y2-y1)/dist, AR=9, W=4;
+  const xe=x2-ux*AR, ye=y2-uy*AR;
+  // Straight arrow line
+  layer.appendChild($s('line',{x1,y1,x2:xe.toFixed(1),y2:ye.toFixed(1),
+    stroke:c,'stroke-width':isAct?2:1.5,opacity:op,'stroke-linecap':'round',style:'pointer-events:none'}));
+  // Arrowhead
   layer.appendChild($s('polygon',{
     points:`${x2.toFixed(1)},${y2.toFixed(1)} ${(xe-uy*W).toFixed(1)},${(ye+ux*W).toFixed(1)} ${(xe+uy*W).toFixed(1)},${(ye-ux*W).toFixed(1)}`,
-    fill:c,opacity:op,style:'pointer-events:none',
-  }));
-  if(isAct && v.ipa){
-    const textEl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    textEl.setAttribute('font-size','13'); textEl.setAttribute('font-family',"Georgia,'Noto Serif',serif");
-    textEl.setAttribute('fill',c); textEl.setAttribute('opacity','0.9'); textEl.setAttribute('dy','-4');
-    textEl.style.cssText='pointer-events:none;user-select:none';
-    const tp=document.createElementNS('http://www.w3.org/2000/svg','textPath');
-    tp.setAttribute('href','#'+pathId); tp.setAttribute('startOffset','50%'); tp.setAttribute('text-anchor','middle');
-    tp.textContent=v.ipa; textEl.appendChild(tp); layer.appendChild(textEl);
-  }
+    fill:c,opacity:op,style:'pointer-events:none'}));
+  // Horizontal label at midpoint (always, not just active)
+  const mx=(x1+x2)/2, my=(y1+y2)/2, FS=isAct?14:11;
+  const tw=(v.ipa||'').length*FS*0.6, PAD=2;
+  layer.appendChild($s('rect',{x:mx-tw/2-PAD,y:my-FS*0.72-PAD-7,width:tw+PAD*2,height:FS*0.85+PAD*2,rx:2,fill:'#192736',opacity:isAct?0.85:0.7,style:'pointer-events:none'}));
+  layer.appendChild($t(v.ipa||'?',{x:mx,y:my-7,dy:'0.36em','text-anchor':'middle','font-size':FS,
+    fill:c,opacity:isAct?0.95:0.7,'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
+    style:'pointer-events:none;user-select:none'}));
 }
 
 function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, showArrows=false){
@@ -787,9 +778,10 @@ function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, showArrows
     dotLayer.appendChild($s('circle',{cx:x,cy:y,r:dotR,fill:isAct?c:c+'99'}));
   });
 
-  // Labels
+  // Labels (skip diphthongs — their label is on the arrow)
   vowels.forEach((v,i)=>{
     if(validFn&&!validFn(v))return;
+    if(isDiph(v))return;  // diphthong label lives on the arrow, not next to dot
     const pos=posFn(v); if(!pos)return;
     const{x,y}=pos;
     const isAct=i===activeIdx;
