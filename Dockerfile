@@ -23,7 +23,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy application source code
-COPY . .
+COPY ./lang ./lang
+COPY ./editor.html ./editor.html
+COPY ./index.html ./index.html
+COPY ./formanta.py ./formanta.py
 
 # Expose Flask port
 EXPOSE 5000
