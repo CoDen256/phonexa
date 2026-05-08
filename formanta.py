@@ -11,7 +11,7 @@ The server listens on http://localhost:5050
 Keep it running while you use the IPA chart's 🎤 Practice panel.
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import parselmouth
 from parselmouth.praat import call
@@ -21,6 +21,16 @@ import math
 
 app = Flask(__name__)
 
+
+@app.route("/")
+def home():
+    return send_from_directory(".", "index.html")
+@app.route("/editor.html")
+def editor():
+    return send_from_directory(".", "editor.html")
+@app.route("/lang/<path:filename>")
+def lang_files(filename):
+    return send_from_directory("lang", filename)
 
 @app.route("/ping")
 def ping():
