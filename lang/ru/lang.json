@@ -149,7 +149,7 @@
         },
         {
           "text": "м<b>е</b>сте",
-          "audio": "lang/ru/audio/easy/meste.mp3"
+          "audio": "lang/ru/audio/forvo/meste.mp3"
         }
       ]
     },
@@ -171,11 +171,11 @@
         },
         {
           "text": "мо<b>ё</b>",
-          "audio": "https://easypronunciation.com/audio/russian/0192fa147bdbb9900586660ef9b7cec0.mp3"
+          "audio": "lang/ru/audio/easy/moe.mp3"
         },
         {
           "text": "жив<b>ё</b>т",
-          "audio": "https://easypronunciation.com/audio/russian/8f6fc58eabc94d3c884e180d6a7a45bd.mp3"
+          "audio": "lang/ru/audio/easy/jivet.mp3"
         }
       ]
     },
@@ -197,11 +197,11 @@
         },
         {
           "text": "эт<b>о</b>му",
-          "audio": " https://easypronunciation.com/audio/russian/1dcc80d8f49de6b7d6d65b4fa3d780f7.mp3"
+          "audio": "lang/ru/audio/easy/etomu.mp3"
         },
         {
           "text": "одновременн<b>о</b>",
-          "audio": "https://easypronunciation.com/audio/russian/260aeb7d78c8d05c04765fc5a49d89a4.mp3"
+          "audio": "lang/ru/audio/easy/odnovremenno.mp3"
         }
       ]
     },
@@ -219,7 +219,7 @@
       "words": [
         {
           "text": "т<b>о</b>т",
-          "audio": "https://easypronunciation.com/audio/russian/d35f48510ac4cfe28d07b72e78d8fbb6.mp3"
+          "audio": "lang/ru/audio/easy/tot.mp3"
         }
       ]
     },
@@ -237,7 +237,7 @@
       "words": [
         {
           "text": "<b>э<b>тот",
-          "audio": "https://easypronunciation.com/audio/russian/410c89ba5da960c01b587cbfdf879a1d.mp3"
+          "audio": "lang/ru/audio/easy/etot.mp3"
         }
       ]
     },
@@ -255,15 +255,15 @@
       "words": [
         {
           "text": "<b>о</b>на",
-          "audio": "lang/ru/audio/rufe/ona.mp3"
+          "audio": "lang/ru/audio/forvo/ona.mp3"
         },
         {
           "text": "х<b>о</b>тел",
-          "audio": "https://easypronunciation.com/audio/russian/d35f48510ac4cfe28d07b72e78d8fbb6.mp3"
+          "audio": "lang/ru/audio/easy/hotel.mp3"
         },
         {
           "text": "ст<b>о</b>яла",
-          "audio": "https://easypronunciation.com/audio/russian/e1284a100169b27d6c6f2b2a93cf8ab2.mp3"
+          "audio": "lang/ru/audio/easy/stoyala.mp3"
         },
         {
           "text": "гол<b>о</b>ва",
@@ -285,11 +285,7 @@
       "words": [
         {
           "text": "н<b>а</b>ми",
-          "audio": "https://easypronunciation.com/audio/russian/4e1f6788944f2b3de9407c6fc65f96e6.mp3"
-        },
-        {
-          "text": "<b>а</b>",
-          "audio": "https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound1.mp3#а"
+          "audio": "lang/ru/audio/easy/nami.mp3"
         }
       ]
     },
@@ -307,7 +303,7 @@
       "words": [
         {
           "text": "к<b>а</b>л ",
-          "audio": "lang/ru/audio/rufe/kal.mp3"
+          "audio": "lang/ru/audio/forvo/kal.mp3"
         },
         {
           "text": "п<b>а</b>лка ",
@@ -333,7 +329,7 @@
         },
         {
           "text": "ч<b>а</b>сти",
-          "audio": "https://easypronunciation.com/audio/russian/be7b2de05a612fb4c33ccaef4af012fe.mp3"
+          "audio": "lang/ru/audio/easy/chasti.mp3"
         },
         {
           "text": "п<b>я</b>ть",
