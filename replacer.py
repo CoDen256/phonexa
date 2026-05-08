@@ -81,16 +81,24 @@ def get_extension(url: str) -> str:
 
 def download_with_curl(url: str, out_path: str):
     try:
-        subprocess.run(
-            ["curl", "-L", "-o", out_path, url],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+        result = subprocess.run(
+            ["curl", "-k", "-L", "-v", "-o", out_path, url],
+            check=True,capture_output=True
         )
-        print(f"Downloaded: {url} -> {out_path}")
-        #raise ValueError("")
-    except subprocess.CalledProcessError:
-        print(f"Failed: {url}")
+        if result.stdout:
+            print("STDOUT:")
+            print(result.stdout)
+
+        if result.stderr:
+            print("STDERR:")
+            print(result.stderr)
+
+        if result.returncode != 0:
+            print(f"❌ Command failed with exit code {result.returncode}")
+            print(f"Downloaded: {url} -> {out_path}")
+            #raise ValueError("")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed: {url}", e)
 
 def process_vowels(vowels, json_dir):
     for vowel in vowels:
@@ -102,7 +110,7 @@ def process_vowels(vowels, json_dir):
 
             filename = f"{ipa_name}{ext}"
             full_path = os.path.join(json_dir, filename)
-
+            print(full_path)
             download_with_curl(ipa_url, full_path)
             vowel["ipaAudio"] = os.path.relpath(full_path, start=os.getcwd())
 
@@ -128,4 +136,4 @@ def walk(root="."):
                 process_json_file(os.path.join(dirpath, file))
 
 if __name__ == "__main__":
-    walk("./lang/no")
+    walk("./lang/cardinal")

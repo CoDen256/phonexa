@@ -12,7 +12,7 @@
       "desc": "Close front unroundedin",
       "f1": 274,
       "f2": 2083,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_I79Q5K15VFJ0A8AH.mp3#I",
+      "ipaAudio": "lang/no/audio/auto/i_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
         {
@@ -56,7 +56,7 @@
       "desc": "Close front rounded (protruded)",
       "f1": 231,
       "f2": 2091,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_FTGQGEJ5V2PPRTBZ.mp3#Y",
+      "ipaAudio": "lang/no/audio/auto/y_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
       "words": [
         {
@@ -108,7 +108,7 @@
       "desc": "Close central rounded",
       "f1": 239,
       "f2": 1509,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_3ERZLGAYK0GWGF1Q.mp3#U",
+      "ipaAudio": "lang/no/audio/auto/u_bar_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
       "words": [
         {
@@ -164,7 +164,7 @@
       "desc": "Close back rounded",
       "f1": 250,
       "f2": 567,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_BD62N319Y72ORH28.mp3#O",
+      "ipaAudio": "lang/no/audio/auto/u_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
         {
@@ -228,7 +228,7 @@
       "desc": "Close-mid front unrounded",
       "f1": 376,
       "f2": 2006,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_XHR7YLZNS6MOR5RQ.mp3#E",
+      "ipaAudio": "lang/no/audio/auto/e_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
       "words": [
         {
@@ -272,7 +272,7 @@
       "desc": "Close-mid front rounded",
       "f1": 337,
       "f2": 1254,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_9V9346SSTNJJF15W.mp3#Ø",
+      "ipaAudio": "lang/no/audio/auto/oe_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
       "words": [
         {
@@ -371,7 +371,7 @@
       "desc": "Close-mid back rounded",
       "f1": 341,
       "f2": 671,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_LSAZ2422CMOF627R.mp3#Å",
+      "ipaAudio": "lang/no/audio/auto/o_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
       "words": [
         {
@@ -461,7 +461,7 @@
       "desc": "Open back unrounded",
       "f1": 620,
       "f2": 924,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_GA1Y4BUUFHZ2ZKTK.mp3#A",
+      "ipaAudio": "lang/no/audio/auto/a_back_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": [
         {
