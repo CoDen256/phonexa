@@ -541,7 +541,7 @@
       "h2": 0.165,
       "b2": 0.3413,
       "rounded": false,
-      "desc": "Diphtong æ → ʉ",
+      "desc": "Diphtong æ (○ unrounded) → ʉ (⊙ rounded)",
       "type": "diphthong",
       "f1": null,
       "f2": null,
@@ -559,6 +559,62 @@
         {
           "text": "<b>Eu</b>ropa",
           "audio": "lang/no/audio/mjolnir/aeue/europa.mp3"
+        }
+      ]
+    },
+    {
+      "ipa": "æɪ",
+      "h": 0.98,
+      "b": 0.25,
+      "h2": 0.167,
+      "b2": 0.1,
+      "rounded": false,
+      "desc": "Diphtong æ (○ unrounded) → ɪ (○ unrounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/no/audio/mjolnir/aei/hei.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "h<b>ei</b>",
+          "audio": "lang/no/audio/mjolnir/aei/hei.mp3"
+        },
+        {
+          "text": "n<b>ei</b>",
+          "audio": "lang/no/audio/mjolnir/aei/nei.mp3"
+        },
+        {
+          "text": "b<b>ei</b>n",
+          "audio": "lang/no/audio/mjolnir/aei/bein.mp3"
+        }
+      ]
+    },
+    {
+      "ipa": "œʏ",
+      "h": 0.41,
+      "b": 0.5,
+      "h2": 0.167,
+      "b2": 0.1,
+      "rounded": true,
+      "desc": "Diphtong œ (⊙ rounded) → ʏ (⊙ rounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/no/audio/mjolnir/oey/goey.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "g<b>øy</b>",
+          "audio": "lang/no/audio/mjolnir/oey/goey.mp3"
+        },
+        {
+          "text": "<b>øy</b>e",
+          "audio": "lang/no/audio/mjolnir/oey/oeye.mp3"
+        },
+        {
+          "text": "h<b>øy</b>re",
+          "audio": "lang/no/audio/mjolnir/oey/hoeyre.mp3"
         }
       ]
     }
