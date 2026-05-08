@@ -12,7 +12,6 @@ Keep it running while you use the IPA chart's 🎤 Practice panel.
 """
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 import parselmouth
 from parselmouth.praat import call
 import tempfile
@@ -20,7 +19,6 @@ import os
 import math
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:*", "http://127.0.0.1:*", "null"])
 
 
 @app.route("/ping")
@@ -87,6 +85,5 @@ def analyze():
 
 if __name__ == "__main__":
     print("IPA Formant Analysis Server")
-    print("  Listening on http://localhost:5050")
     print("  Press Ctrl+C to stop\n")
-    app.run(host="127.0.0.1", port=5050, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=False)
