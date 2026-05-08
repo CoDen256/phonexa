@@ -514,6 +514,18 @@ function playUrlAtRate(url, rate=1) {
   a.play().catch(e=>console.warn('Audio:',e.message));
 }
 
+function spawnRing(svg, x, y, color, r0=4, speed=1.8, opStart=0.8) {
+  const ring=$s('circle',{cx:x,cy:y,r:r0,fill:'none',stroke:color,'stroke-width':1.5,opacity:opStart,style:'pointer-events:none'});
+  svg.appendChild(ring);
+  let r=r0, op=opStart;
+  const step=()=>{
+    if(!ring.parentNode)return; r+=speed; op-=speed*0.048;
+    ring.setAttribute('r',r); ring.setAttribute('opacity',Math.max(0,op).toFixed(3));
+    if(op>0)requestAnimationFrame(step); else ring.parentNode?.removeChild(ring);
+  };
+  requestAnimationFrame(step);
+}
+
 // Single dot + ring bursts at endpoints
 function pulseDiphthong(svgId, x1, y1, x2, y2, color) {
   const svg=document.getElementById(svgId); if(!svg)return;
@@ -559,14 +571,16 @@ function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, svgId) {
     fill:color,opacity:0.95,'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
     style:'pointer-events:none;user-select:none;filter:drop-shadow(0 0 4px rgba(20,30,46,1)) drop-shadow(0 0 8px rgba(20,30,46,0.9))'}));
   // Rate-aware click: second click within 5s → 0.75x speed
-  let lastClick=0;
+  let lastClick=0, slowed=false;
   const hit=$s('line',{x1,y1,x2,y2,stroke:'transparent','stroke-width':22,cursor:'pointer'});
   hit.addEventListener('mouseenter',e=>showTip(e,v,lang));
   hit.addEventListener('mousemove',moveTip); hit.addEventListener('mouseleave',hideTip);
   hit.addEventListener('click',()=>{
-    const now=Date.now(), rate=(now-lastClick)<5000?0.75:1.0;
+    const now=Date.now();
+    if(now-lastClick>5000) slowed=false;   // reset after 5s gap
+    else slowed=!slowed;                   // toggle within window
     lastClick=now;
-    playUrlAtRate(v.ipaAudio,rate);
+    playUrlAtRate(v.ipaAudio, slowed?0.75:1.0);
     pulseDiphthong(svgId,x1,y1,x2,y2,color);
   });
   arrowL.appendChild(hit);
@@ -901,3 +915,37 @@ document.getElementById('reloadBtn').addEventListener('click', async () => {
 
 </body>
 </html>
+
+[[('i_short',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w06_1.wav?_=1'),
+ ('u_short',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w06_2.wav?_=2'),
+ ('y_short',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w06_3.wav?_=3'),
+ ('o_short',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w06_4.wav?_=4'),
+ ('oe_short',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w06_5.wav?_=5'),
+ ('u_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w05_1.wav?_=1'),
+ ('o_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w05_2.wav?_=2'),
+ ('schwa',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w04_1.wav?_=1'),
+ ('er', 'https://fit-aussprache.com/wp-content/uploads/2018/09/w04_2.wav?_=2'),
+ ('e_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w02_1.wav?_=1'),
+ ('a_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w02_2-1.wav?_=2'),
+ ('e_short',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w02_3-1.wav?_=3'),
+ ('a_short',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w02_4-1.wav?_=4'),
+ ('i_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w01_1.wav?_=1'),
+ ('ee_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w01_2.wav?_=2'),
+ ('y_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w01_3.wav?_=3'),
+ ('oe_long',
+  'https://fit-aussprache.com/wp-content/uploads/2018/09/w01_4.wav?_=4')]]

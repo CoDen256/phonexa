@@ -9,6 +9,7 @@ Vowel chart
 
 Sounds:
 https://www.dict.cc/?s=bitte
+https://fit-aussprache.com/de/archives/144
 
 Alphabet
 https://0.tqn.com/z/g/german/library/media/Audio/a.wav
