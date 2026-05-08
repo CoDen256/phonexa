@@ -326,15 +326,15 @@
       ]
     },
     {
-      "ipa": "e",
+      "ipa": "eɪ",
       "h": 0.4,
       "b": 0.02,
       "rounded": false,
-      "type": "variable",
-      "desc": "Close-mid front unrounded (allophone of eɪ)",
+      "type": "diphthong",
+      "desc": "Diphtong  e (⊙ rounded) →  ɪ (○ unrounded)",
       "f1": 476,
       "f2": 2089,
-      "ipaAudio": "lang/en/audio/ipa/jade.mp3",
+      "ipaAudio": "lang/en/audio/ipa/ei.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
       "words": [
         {
@@ -345,15 +345,17 @@
           "text": "h<b>aye</b>d",
           "audio": "lang/en/audio/h95/hayed.wav"
         }
-      ]
+      ],
+      "h2": 0.25,
+      "b2": 0.2
     },
     {
-      "ipa": "o",
+      "ipa": "oʊ",
       "h": 0.44,
       "b": 0.9,
       "rounded": true,
-      "type": "variable",
-      "desc": "Close-mid back rounded (allophone of oʊ)",
+      "type": "diphthong",
+      "desc": "Diphtong o (⊙ rounded) → ʊ (⊙ rounded)",
       "f1": 498,
       "f2": 910,
       "ipaAudio": "lang/en/audio/ipa/gold.mp3",
@@ -366,6 +368,68 @@
         {
           "text": "h<b>oe</b>d",
           "audio": "lang/en/audio/h95/hoed.wav"
+        }
+      ],
+      "h2": 0.25,
+      "b2": 0.77
+    },
+    {
+      "ipa": "aɪ",
+      "h": 0.97,
+      "b": 0.2,
+      "h2": 0.25,
+      "b2": 0.2,
+      "rounded": false,
+      "desc": "Diphtong a (○ unrounded) → ɪ (○ unrounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/en/audio/ipa/ai.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "l<b>i</b>me",
+          "audio": "lang/en/audio/ipa/lime.mp3"
+        }
+      ]
+    },
+    {
+      "ipa": "aʊ",
+      "h": 0.97,
+      "b": 0.2,
+      "h2": 0.25,
+      "b2": 0.77,
+      "rounded": false,
+      "desc": "Diphtong a (○ unrounded) → ʊ (⊙ rounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/en/audio/ipa/au.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "br<b>ow</b>n",
+          "audio": "lang/en/audio/ipa/brown.mp3"
+        }
+      ]
+    },
+    {
+      "ipa": "ɔɪ",
+      "h": 0.5,
+      "b": 0.5,
+      "h2": 0.71,
+      "b2": 0.96,
+      "rounded": false,
+      "desc": "Diphtong  ɔ (⊙ rounded) →  ɪ (○ unrounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/en/audio/ipa/oi.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "turq<b>uoi</b>se",
+          "audio": "lang/en/audio/ipa/turquoise.mp3"
         }
       ]
     }
