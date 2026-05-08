@@ -244,7 +244,7 @@
   <button class="reload-btn" id="reloadBtn" type="button">
     <span class="reload-icon">↺</span> Reload languages
   </button>
-  <a href="editor.html" class="editor-link">✎ Edit languages</a>
+  <a href="editor.html"     class="editor-link">✎ Edit languages</a>
 </header>
 
 <div id="loading">
@@ -336,9 +336,7 @@ loadLanguages();
 let curAudio = null;
 function playUrl(url) {
   if (!url) return;
-  if (curAudio) { curAudio.pause(); curAudio.currentTime = 0; }
-  curAudio = new Audio(url);
-  curAudio.play().catch(e => console.warn('Audio:', e.message));
+  new Audio(url).play().catch(e => console.warn('Audio:', e.message));
 }
 
 function getLength(v) {
@@ -395,7 +393,7 @@ function passesFilters(lk, v) {
     // 'variable' chip matches variable, short, and long
     const passes = filters.length.has(t)
       || (t === 'variable')                                    // variable always shown when any length filter active
-      || (filters.length.has('variable') && (t === 'short' || t === 'long')); // variable chip covers short+long
+      || (filters.length.has('variable') && (t === 'variable')); // variable chip covers i
     if (!passes) return false;
   }
   if (filters.ipaBase.size   > 0 && !filters.ipaBase.has(getBase(v.ipa)))             return false;
@@ -503,27 +501,106 @@ function showPicker(cx, cy, group, svgId, dx, dy) {
 function hidePicker() { picker.style.display='none'; }
 document.addEventListener('click', e=>{ if(!picker.contains(e.target)) hidePicker(); }, true);
 
+function isDiph(v){ return v.type==='diphthong' && v.h2!=null && v.b2!=null; }
+
+// Animated pulse dot traveling along a quadratic bezier arc
+function pulseDiphthong(svgId, x1, y1, cpx, cpy, x2, y2, color) {
+  const svg=document.getElementById(svgId); if(!svg)return;
+  const dot=$s('circle',{r:5,fill:color,opacity:0.9,style:'pointer-events:none'});
+  svg.appendChild(dot);
+  let t=0;
+  const step=()=>{
+    if(!dot.parentNode)return;
+    t++; if(t>65){svg.removeChild(dot);return;}
+    const p=t/65, e=p<0.5?2*p*p:-1+(4-2*p)*p;
+    const it=1-e;
+    dot.setAttribute('cx',(it*it*x1+2*it*e*cpx+e*e*x2).toFixed(1));
+    dot.setAttribute('cy',(it*it*y1+2*it*e*cpy+e*e*y2).toFixed(1));
+    dot.setAttribute('opacity',p>0.75?((1-p)*4*0.9).toFixed(3):'0.9');
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// Full diphthong arrow: arc + arrowhead + label on arc (textPath) + clickable hit area
+function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, svgId) {
+  const color=lang.color;
+  const dist=Math.hypot(x2-x1,y2-y1); if(dist<5)return;
+  // Quadratic bezier control point — offset perpendicular to midpoint
+  const dx=x2-x1, dy=y2-y1, len=dist;
+  const off=Math.min(dist*0.28,50);
+  const cpx=(x1+x2)/2 - (dy/len)*off;
+  const cpy=(y1+y2)/2 + (dx/len)*off;
+  const pathD=`M${x1},${y1} Q${cpx},${cpy} ${x2},${y2}`;
+  // Unique ID for textPath reference
+  const pathId=`dp_${svgId}_${v.ipa.replace(/[^\w]/g,'X')}_${Math.round(x1+y1)}`;
+  // Hidden path for textPath
+  arrowL.appendChild($s('path',{id:pathId,d:pathD,fill:'none',stroke:'none'}));
+  // Visible arc (shorten at end to leave room for arrowhead)
+  const tx=x2-cpx, ty=y2-cpy, tl=Math.hypot(tx,ty), AR=11;
+  const xe=x2-tx/tl*AR, ye=y2-ty/tl*AR;
+  arrowL.appendChild($s('path',{
+    d:`M${x1},${y1} Q${cpx},${cpy} ${xe.toFixed(1)},${ye.toFixed(1)}`,
+    fill:'none',stroke:color,'stroke-width':2,opacity:0.82,
+    'stroke-linecap':'round',style:'pointer-events:none',
+  }));
+  // Arrowhead
+  const ux=tx/tl, uy=ty/tl, W=5;
+  arrowL.appendChild($s('polygon',{
+    points:`${x2.toFixed(1)},${y2.toFixed(1)} ${(xe-uy*W).toFixed(1)},${(ye+ux*W).toFixed(1)} ${(xe+uy*W).toFixed(1)},${(ye-ux*W).toFixed(1)}`,
+    fill:color,opacity:0.82,style:'pointer-events:none',
+  }));
+  // Source dot (filled)
+  dotL.appendChild($s('circle',{cx:x1,cy:y1,r:3,fill:color+'cc',style:'pointer-events:none'}));
+  // Target dot (outline)
+  dotL.appendChild($s('circle',{cx:x2,cy:y2,r:3.5,fill:'none',stroke:color,'stroke-width':1.5,opacity:0.65,style:'pointer-events:none'}));
+  // IPA label on arc via textPath
+  const textEl=document.createElementNS(NS,'text');
+  textEl.setAttribute('font-size','17');
+  textEl.setAttribute('font-family',"Georgia,'Noto Serif',serif");
+  textEl.setAttribute('fill',color);
+  textEl.setAttribute('opacity','0.92');
+  textEl.setAttribute('dy','-5');
+  textEl.style.cssText='pointer-events:none;user-select:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))';
+  const tp=document.createElementNS(NS,'textPath');
+  tp.setAttribute('href','#'+pathId);
+  tp.setAttribute('startOffset','50%');
+  tp.setAttribute('text-anchor','middle');
+  tp.textContent=v.ipa;
+  textEl.appendChild(tp);
+  arrowL.appendChild(textEl);
+  // Wide transparent hit area along the arc
+  const hit=$s('path',{d:pathD,fill:'none',stroke:'transparent','stroke-width':22,cursor:'pointer'});
+  hit.addEventListener('mouseenter',e=>showTip(e,v,lang));
+  hit.addEventListener('mousemove',moveTip);
+  hit.addEventListener('mouseleave',hideTip);
+  hit.addEventListener('click',()=>{playUrl(v.ipaAudio);pulseDiphthong(svgId,x1,y1,cpx,cpy,x2,y2,color);});
+  arrowL.appendChild(hit);
+}
+
 // ─── Chart builder (shared by IPA + Formant renderers) ───────────────────────
-function buildVowels(svg, getPos, svgId) {
-  const langL=$s('g'), cardL=$s('g'), dotL=$s('g');
-  svg.appendChild(langL); svg.appendChild(cardL); svg.appendChild(dotL);
+function buildVowels(svg, getPos, svgId, showArrows=false) {
+  const arrowL=$s('g'), langL=$s('g'), cardL=$s('g'), dotL=$s('g');
+  svg.appendChild(arrowL); svg.appendChild(langL); svg.appendChild(cardL); svg.appendChild(dotL);
 
   const SF='drop-shadow(0px 1px 2px rgba(0,0,0,0.45))';
-  const DOT_R=3;   // same small dot for all vowels
-  const DH=14;     // transparent hit radius on dots
-  const PROX=22;   // proximity threshold for clustering / picker
+  const DOT_R=3, DH=14, PROX=22;
 
-  // ── Step 1: collect visible vowels ──────────────────────────────────────────
-  const items=[];
+  // ── Step 1: separate diphthongs (IPA chart only) from monophthongs ───────────
+  const diphs=[], items=[];
   for (const [lk,lang] of Object.entries(LANGS)) {
     for (const v of lang.vowels) {
       if (!passesFilters(lk,v)) continue;
       const pos=getPos(v); if(!pos) continue;
-      items.push({lk,lang,v,dx:pos.x,dy:pos.y});
+      if (showArrows && isDiph(v)) {
+        diphs.push({lk,lang,v,dx:pos.x,dy:pos.y});
+      } else {
+        items.push({lk,lang,v,dx:pos.x,dy:pos.y});
+      }
     }
   }
 
-  // ── Step 2: greedy proximity clustering ─────────────────────────────────────
+  // ── Step 2: greedy proximity clustering of monophthongs ──────────────────────
   const clusters=[];
   for (const item of items) {
     let found=null, best=Infinity;
@@ -540,12 +617,11 @@ function buildVowels(svg, getPos, svgId) {
     }
   }
 
-  // ── Step 3: render ───────────────────────────────────────────────────────────
+  // ── Step 3: render monophthong clusters ──────────────────────────────────────
   for (const cl of clusters) {
     const {members,cx,cy}=cl;
     const multi=members.length>1;
 
-    // Labels — one per vowel, left (unrounded) or right (rounded) of its own dot
     for (const {lk,lang,v,dx,dy} of members) {
       const ic=lk==='cardinal', lyr=ic?cardL:langL;
       const FS=22, GAP=5, PAD=4;
@@ -562,19 +638,14 @@ function buildVowels(svg, getPos, svgId) {
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
       lg.addEventListener('click',()=>{playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
-
-      // Individual dot at exact position
       dotL.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
     }
 
-    // Transparent hit area — covers the cluster centroid, triggers picker if multi
     const dg=$s('g',{style:'cursor:pointer'});
     dg.appendChild($s('circle',{cx,cy,r:DH,fill:'transparent'}));
     if (multi) {
-      // Faint dashed indicator that multiple dots are here
       dg.appendChild($s('circle',{cx,cy,r:DOT_R+4,fill:'none',stroke:'#8090a8',
         'stroke-width':1,'stroke-dasharray':'3 2',opacity:0.5}));
-      // Hover: show all vowels in the cluster + click hint
       dg.addEventListener('mouseenter',e=>showClusterTip(e,members));
       dg.addEventListener('mousemove',moveTip);
       dg.addEventListener('mouseleave',hideTip);
@@ -591,6 +662,12 @@ function buildVowels(svg, getPos, svgId) {
       dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);}});
     }
     dotL.appendChild(dg);
+  }
+
+  // ── Step 4: render diphthong arrows (IPA chart only) ─────────────────────────
+  for (const {lk,lang,v,dx,dy} of diphs) {
+    const tp=getPos({...v,h:v.h2,b:v.b2});
+    if (tp) renderDiph(arrowL, dotL, dx, dy, tp.x, tp.y, v, lang, svgId);
   }
 }
 
@@ -614,7 +691,7 @@ function renderIpa() {
     const p=trapPos(0,b);
     svg.appendChild($t(l,{x:p.x,y:p.y-28,'text-anchor':'middle','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
   }
-  buildVowels(svg, v=>trapPos(v.h,v.b), 'chartIpa');
+  buildVowels(svg, v=>trapPos(v.h,v.b), 'chartIpa', true);
 }
 
 // ─── Formant Plot ─────────────────────────────────────────────────────────────

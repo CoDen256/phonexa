@@ -265,7 +265,7 @@ const TRAP_ROWS=[
 const state={
   langs:{}, selKey:null, langDraft:null,
   vowelIdx:null, vowelDraft:null,
-  dirHandle:null, unsaved:false, chartTab:'ipa',
+  dirHandle:null, unsaved:false, chartTab:'ipa', clickTarget:'start',
 };
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -391,8 +391,18 @@ function renderMain(){
     const svg=document.getElementById('langIpaSvg');
     const pt=svgPt(svg,clientX,clientY);
     const {h,b}=ltHB(pt.x,pt.y);
-    state.vowelDraft.h=h; state.vowelDraft.b=b;
+    const diph=state.vowelDraft.type==='diphthong';
+    if(diph && state.clickTarget==='target'){
+      state.vowelDraft.h2=h; state.vowelDraft.b2=b;
+      state.clickTarget='start';
+    } else {
+      state.vowelDraft.h=h; state.vowelDraft.b=b;
+      if(diph) state.clickTarget='target';
+    }
     syncCoordsToForm(); refreshCharts();
+    // Update the toggle label if visible
+    const lbl=document.getElementById('clickTargetLabel');
+    if(lbl) lbl.textContent=state.clickTarget==='target'?'Target':'Start';
   }
   function onFormClick(clientX,clientY){
     if(state.vowelIdx===null)return;
@@ -443,22 +453,30 @@ function refreshCharts(){
   renderLangIpa();
   renderLangFormant();
   const hint=document.getElementById('chartHint');
-  if(hint)hint.textContent=state.vowelIdx!==null?'Click chart to reposition vowel':'Click a vowel to edit it';
+  if(hint){
+    if(state.vowelIdx!==null && state.vowelDraft?.type==='diphthong'){
+      hint.textContent=`Click chart to set ${state.clickTarget==='target'?'TARGET (end)':'START (begin)'} position`;
+    } else {
+      hint.textContent=state.vowelIdx!==null?'Click chart to reposition vowel':'Click a vowel to edit it';
+    }
+  }
 }
 
 // ─── Sync coordinate form inputs from draft ───────────────────────────────────
 function syncCoordsToForm(){
   if(state.vowelDraft===null)return;
-  const ids=['veH','veB','veF1','veF2'];
-  const vals=[state.vowelDraft.h,state.vowelDraft.b,state.vowelDraft.f1||'',state.vowelDraft.f2||''];
-  ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value=vals[i];});
+  const map={veH:'h',veB:'b',veF1:'f1',veF2:'f2',veH2:'h2',veB2:'b2'};
+  for(const[id,key]of Object.entries(map)){
+    const el=document.getElementById(id);
+    if(el) el.value=state.vowelDraft[key]??'';
+  }
 }
 
 // ─── Open vowel editor ────────────────────────────────────────────────────────
 function openVowelEditor(idx){
   state.vowelIdx=idx;
   const existing=(idx>=0&&state.langDraft.vowels)?state.langDraft.vowels[idx]:null;
-  state.vowelDraft=existing?clone(existing):{ipa:'',h:0.5,b:0.5,rounded:false,desc:'',f1:null,f2:null,ipaAudio:'',wikiUrl:'',words:[]};
+  state.vowelDraft=existing?clone(existing):{ipa:'',h:0.5,b:0.5,h2:null,b2:null,rounded:false,desc:'',type:'short',f1:null,f2:null,ipaAudio:'',wikiUrl:'',words:[]};
   const veSection=document.getElementById('veInline');
   if(veSection){veSection.style.display='block';buildInlineForm();}
   renderVowelCards();
@@ -525,21 +543,49 @@ function buildInlineForm(){
     <div class="field" style="flex:0"><label>Rounded</label><div class="rounded-row"><input type="checkbox" id="fRounded" ${v.rounded?'checked':''}><span style="font-size:.8rem">Lip rounded</span></div></div>`;
   sec.appendChild(metaRow);
   metaRow.querySelector('#fDesc').addEventListener('input',e=>{v.desc=e.target.value;renderVowelCards();});
-  metaRow.querySelector('#fType').addEventListener('change',e=>{v.type=e.target.value;renderVowelCards();});
+  metaRow.querySelector('#fType').addEventListener('change',e=>{
+    v.type=e.target.value;
+    if(v.type!=='diphthong'){delete v.h2;delete v.b2;}
+    else if(v.h2==null){v.h2=v.h;v.b2=v.b;}
+    state.clickTarget='start';
+    buildInlineForm(); renderVowelCards(); refreshCharts();
+  });
   metaRow.querySelector('#fRounded').addEventListener('change',e=>{v.rounded=e.target.checked;refreshCharts();renderVowelCards();});
 
-  // Coordinate inputs (sync with chart clicks)
+  // Coordinate inputs
+  const diph=v.type==='diphthong';
   const coordsRow=document.createElement('div'); coordsRow.className='ve-coords';
   coordsRow.innerHTML=`
+    ${diph?`<div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Start position</span>
+      <button type="button" id="clickTargetBtn" style="font-size:.68rem;padding:2px 9px;border-radius:6px;border:1px solid var(--border);background:var(--input);color:var(--accent);cursor:pointer">
+        Next click → <b id="clickTargetLabel">${state.clickTarget==='target'?'Target':'Start'}</b>
+      </button>
+    </div>`:''}
     <div class="field"><label>h (0=Close · 1=Open)</label><input type="number" id="veH" min="0" max="1" step="0.001" value="${v.h??0.5}"></div>
     <div class="field"><label>b (0=Front · 1=Back)</label><input type="number" id="veB" min="0" max="1" step="0.001" value="${v.b??0.5}"></div>
     <div class="field"><label>F1 (Hz)</label><input type="number" id="veF1" min="${F1MIN}" max="${F1MAX}" step="1" value="${v.f1||''}"></div>
-    <div class="field"><label>F2 (Hz)</label><input type="number" id="veF2" min="${F2MIN}" max="${F2MAX}" step="1" value="${v.f2||''}"></div>`;
+    <div class="field"><label>F2 (Hz)</label><input type="number" id="veF2" min="${F2MIN}" max="${F2MAX}" step="1" value="${v.f2||''}"></div>
+    ${diph?`<div style="width:100%;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+      <span style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Target position (end of diphthong)</span>
+    </div>
+    <div class="field"><label>h Target</label><input type="number" id="veH2" min="0" max="1" step="0.001" value="${v.h2??v.h??0.5}"></div>
+    <div class="field"><label>b Target</label><input type="number" id="veB2" min="0" max="1" step="0.001" value="${v.b2??v.b??0.5}"></div>`:''}
+  `;
   sec.appendChild(coordsRow);
   coordsRow.querySelector('#veH').addEventListener('input',e=>{v.h=+e.target.value;refreshCharts();});
   coordsRow.querySelector('#veB').addEventListener('input',e=>{v.b=+e.target.value;refreshCharts();});
   coordsRow.querySelector('#veF1').addEventListener('input',e=>{v.f1=+e.target.value||null;refreshCharts();});
   coordsRow.querySelector('#veF2').addEventListener('input',e=>{v.f2=+e.target.value||null;refreshCharts();});
+  if(diph){
+    coordsRow.querySelector('#veH2').addEventListener('input',e=>{v.h2=+e.target.value;refreshCharts();});
+    coordsRow.querySelector('#veB2').addEventListener('input',e=>{v.b2=+e.target.value;refreshCharts();});
+    coordsRow.querySelector('#clickTargetBtn').addEventListener('click',()=>{
+      state.clickTarget=state.clickTarget==='target'?'start':'target';
+      document.getElementById('clickTargetLabel').textContent=state.clickTarget==='target'?'Target':'Start';
+      refreshCharts();
+    });
+  }
 
   // Audio + wiki
   const urlRow=document.createElement('div'); urlRow.className='ve-meta';
@@ -671,9 +717,55 @@ function drawCardinalDots(svg, posFn, validFn){
   });
 }
 
-function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, isDraft){
-  const dotLayer=$s('g'), labelLayer=$s('g');
-  svg.appendChild(dotLayer); svg.appendChild(labelLayer);
+function isDiph(v){ return v.type==='diphthong' && v.h2!=null && v.b2!=null; }
+
+function drawDiphArrow(layer, x1, y1, x2, y2, v, c, isAct){
+  const dist=Math.hypot(x2-x1,y2-y1); if(dist<3)return;
+  const op=isAct?0.88:0.5;
+  const dx=x2-x1,dy=y2-y1,len=dist,off=Math.min(dist*0.28,40);
+  const cpx=(x1+x2)/2-(dy/len)*off, cpy=(y1+y2)/2+(dx/len)*off;
+  const pathD=`M${x1},${y1} Q${cpx},${cpy} ${x2},${y2}`;
+  const pathId=`edp_${v.ipa.replace(/[^\w]/g,'X')}_${Math.round(x1+y1)}`;
+  layer.appendChild($s('path',{id:pathId,d:pathD,fill:'none',stroke:'none'}));
+  const tx=x2-cpx,ty=y2-cpy,tl=Math.hypot(tx,ty),AR=9;
+  const xe=x2-tx/tl*AR, ye=y2-ty/tl*AR;
+  layer.appendChild($s('path',{
+    d:`M${x1},${y1} Q${cpx},${cpy} ${xe.toFixed(1)},${ye.toFixed(1)}`,
+    fill:'none',stroke:c,'stroke-width':isAct?2:1.5,opacity:op,'stroke-linecap':'round',style:'pointer-events:none',
+  }));
+  const ux=tx/tl,uy=ty/tl,W=4;
+  layer.appendChild($s('polygon',{
+    points:`${x2.toFixed(1)},${y2.toFixed(1)} ${(xe-uy*W).toFixed(1)},${(ye+ux*W).toFixed(1)} ${(xe+uy*W).toFixed(1)},${(ye-ux*W).toFixed(1)}`,
+    fill:c,opacity:op,style:'pointer-events:none',
+  }));
+  if(isAct && v.ipa){
+    const textEl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    textEl.setAttribute('font-size','13'); textEl.setAttribute('font-family',"Georgia,'Noto Serif',serif");
+    textEl.setAttribute('fill',c); textEl.setAttribute('opacity','0.9'); textEl.setAttribute('dy','-4');
+    textEl.style.cssText='pointer-events:none;user-select:none';
+    const tp=document.createElementNS('http://www.w3.org/2000/svg','textPath');
+    tp.setAttribute('href','#'+pathId); tp.setAttribute('startOffset','50%'); tp.setAttribute('text-anchor','middle');
+    tp.textContent=v.ipa; textEl.appendChild(tp); layer.appendChild(textEl);
+  }
+}
+
+function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, showArrows=false){
+  const arrowL=$s('g'), dotLayer=$s('g'), labelLayer=$s('g');
+  svg.appendChild(arrowL); svg.appendChild(dotLayer); svg.appendChild(labelLayer);
+
+  // Draw diphthong arrows first (behind dots)
+  if(showArrows){
+    vowels.forEach((v,i)=>{
+      if(!isDiph(v))return;
+      if(validFn&&!validFn(v))return;
+      const sp=posFn(v); if(!sp)return;
+      const tp=posFn({...v,h:v.h2,b:v.b2}); if(!tp)return;
+      const isAct=i===activeIdx;
+      drawDiphArrow(arrowL,sp.x,sp.y,tp.x,tp.y,v,c,isAct);
+      // Hollow target dot
+      dotLayer.appendChild($s('circle',{cx:tp.x,cy:tp.y,r:isAct?6:4,fill:'none',stroke:c+(isAct?'cc':'88'),'stroke-width':isAct?2:1.5}));
+    });
+  }
 
   // Group by snapped pos
   const groups=new Map();
@@ -733,7 +825,7 @@ function renderLangIpa(){
   if(state.vowelDraft!==null&&activeIdx>=0) vowels[activeIdx]=state.vowelDraft;
   else if(state.vowelDraft!==null&&activeIdx<0) vowels.push(state.vowelDraft);
   const c=state.langDraft?.color||'#7eb8f7';
-  drawVowelsOnChart(svg,vowels,activeIdx<0?vowels.length-1:activeIdx,c,v=>ltPos(+v.h||0,+v.b||0));
+  drawVowelsOnChart(svg,vowels,activeIdx<0?vowels.length-1:activeIdx,c,v=>ltPos(+v.h||0,+v.b||0),null,true);
 }
 
 // ─── Render language formant chart ────────────────────────────────────────────

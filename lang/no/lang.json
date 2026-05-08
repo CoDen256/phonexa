@@ -533,6 +533,21 @@
           "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav.mp3"
         }
       ]
+    },
+    {
+      "ipa": "æʉ",
+      "h": 0.98,
+      "b": 0.25,
+      "h2": 0.165,
+      "b2": 0.3413,
+      "rounded": false,
+      "desc": "Diphtong",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/no/audio/mjolnir/aeue/sau.mp3",
+      "wikiUrl": "",
+      "words": []
     }
   ]
 }
