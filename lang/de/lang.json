@@ -350,7 +350,7 @@
       "desc": "Close back rounded",
       "f1": 310,
       "f2": 854,
-      "ipaAudio": "https://0.tqn.com/z/g/german/library/media/Audio/u.wav",
+      "ipaAudio": "lang/de/audio/fit/u_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
         {
@@ -376,7 +376,7 @@
       "desc": "Near-close near-back rounded",
       "f1": 391,
       "f2": 1010,
-      "ipaAudio": "lang/de/audio/um.mp3",
+      "ipaAudio": "lang/de/audio/fit/u_short.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
         {
@@ -402,7 +402,7 @@
       "desc": "Mid central (Schwa)",
       "f1": 517,
       "f2": 1447,
-      "ipaAudio": "lang/de/audio/bitte_end.mp3",
+      "ipaAudio": "lang/de/audio/fit/schwa.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
@@ -428,7 +428,7 @@
       "desc": "Near open central unrounded",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/de/audio/er_ending.mp3",
+      "ipaAudio": "lang/de/audio/fit/er.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
       "words": [
         {
