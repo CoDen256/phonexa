@@ -298,6 +298,9 @@
     <button class="pp-btn" id="ppClear" disabled>✕ Clear</button>
   </div>
   <div class="pp-status" id="ppStatus">Press Record and say a vowel</div>
+  <canvas id="waveCanvas" height="48"
+    style="display:none;width:100%;border-radius:6px;margin-top:6px;cursor:col-resize;touch-action:none"></canvas>
+  <div id="waveInfo" style="display:none;font-size:.62rem;color:var(--muted);text-align:center;margin-top:3px"></div>
 
   <!-- Formant analysis -->
   <div class="pp-divider"></div>
@@ -995,8 +998,61 @@ function renderDetail() {
 // ─── Practice panel ───────────────────────────────────────────────────────────
 const SERVER='http://localhost:5050';
 let recState='idle';
-let recBlob=null, recObjectURL=null;
-let recCtx=null, recProcessor=null, recStream=null, recChunks=[];
+let recBlob=null, recObjectURL=null, recSamples=null, recSampleRate=22050;
+let waveStart=0.33, waveEnd=0.67, waveDrag=null;
+
+// ── Waveform ──────────────────────────────────────────────────────────────────
+function drawWave(){
+  const canvas=document.getElementById('waveCanvas');
+  if(!canvas||!recSamples)return;
+  const W=canvas.width=canvas.offsetWidth, H=48;
+  canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#1a2e48'; ctx.fillRect(0,0,W,H);
+  const step=Math.max(1,Math.ceil(recSamples.length/W));
+  const sx=waveStart*W, ex=waveEnd*W;
+  for(let x=0;x<W;x++){
+    let pk=0;
+    for(let i=x*step;i<Math.min((x+1)*step,recSamples.length);i++) pk=Math.max(pk,Math.abs(recSamples[i]));
+    const h=Math.max(1,pk*(H-4));
+    ctx.fillStyle=(x>=sx&&x<=ex)?'#4a90c8':'#253d54';
+    ctx.fillRect(x,(H-h)/2,1,h);
+  }
+  ctx.fillStyle='rgba(74,144,200,0.12)'; ctx.fillRect(sx,0,ex-sx,H);
+  [[sx,'start'],[ex,'end']].forEach(([x,w])=>{
+    ctx.strokeStyle=waveDrag===w?'#fff':'#7eb8f7'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    ctx.fillStyle=waveDrag===w?'#fff':'#7eb8f7';
+    ctx.beginPath(); ctx.moveTo(x-5,0); ctx.lineTo(x+5,0); ctx.lineTo(x,8); ctx.fill();
+  });
+  const dur=recSamples.length/recSampleRate*1000;
+  const info=document.getElementById('waveInfo');
+  info.textContent=`Analysis: ${(waveStart*dur).toFixed(0)}ms → ${(waveEnd*dur).toFixed(0)}ms  (total ${dur.toFixed(0)}ms)`;
+}
+
+function waveX(canvas,e){const r=canvas.getBoundingClientRect();return((e.clientX??e.touches[0].clientX)-r.left)/r.width;}
+const GRAB=0.07;
+const waveCanvas=document.getElementById('waveCanvas');
+waveCanvas.addEventListener('mousedown',e=>{
+  const x=waveX(waveCanvas,e);
+  waveDrag=Math.abs(x-waveStart)<GRAB?'start':Math.abs(x-waveEnd)<GRAB?'end':null;
+});
+waveCanvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const x=waveX(waveCanvas,e);
+  waveDrag=Math.abs(x-waveStart)<GRAB?'start':Math.abs(x-waveEnd)<GRAB?'end':null;
+},{passive:false});
+function onWaveMove(e){
+  if(!waveDrag||!recSamples)return;
+  const x=Math.max(0,Math.min(1,waveX(waveCanvas,e)));
+  if(waveDrag==='start') waveStart=Math.min(x,waveEnd-0.05);
+  else waveEnd=Math.max(x,waveStart+0.05);
+  drawWave();
+}
+document.addEventListener('mousemove',e=>{if(waveDrag)onWaveMove(e);});
+document.addEventListener('touchmove',e=>{if(waveDrag){e.preventDefault();onWaveMove(e);}},{passive:false});
+document.addEventListener('mouseup',()=>waveDrag=null);
+document.addEventListener('touchend',()=>waveDrag=null);
 
 function updateHint(){
   const hint=document.getElementById('ppHint');
@@ -1008,7 +1064,7 @@ document.getElementById('practiceTrigger').addEventListener('click',()=>{
   const b=document.getElementById('practiceTrigger');
   const open=p.classList.toggle('open');
   b.classList.toggle('open',open);
-  if(open){ checkServer(); updateHint(); }
+  if(open){ checkServer(); updateHint(); if(recSamples)drawWave(); }
   else updateHint();
 });
 document.getElementById('ppClose').addEventListener('click',()=>{
@@ -1035,12 +1091,13 @@ function encodeWAV(samples, sampleRate){
 }
 
 // ── Recording ─────────────────────────────────────────────────────────────────
+let recCtx=null, recProcessor=null, recStream=null, recChunks=[];
 document.getElementById('ppRecord').addEventListener('click', async()=>{
   if(recState==='recording'){ stopRec(); return; }
   try{
     recChunks=[];
     recStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,sampleRate:22050}});
-    recCtx=new AudioContext();
+    recCtx=new AudioContext(); recSampleRate=recCtx.sampleRate;
     const src=recCtx.createMediaStreamSource(recStream);
     recProcessor=recCtx.createScriptProcessor(4096,1,1);
     recProcessor.onaudioprocess=e=>recChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
@@ -1059,21 +1116,25 @@ document.getElementById('ppRecord').addEventListener('click', async()=>{
 
 function stopRec(){
   recProcessor?.disconnect(); recStream?.getTracks().forEach(t=>t.stop());
-  const sr=recCtx?.sampleRate||22050;
   const total=recChunks.reduce((s,c)=>s+c.length,0);
-  const all=new Float32Array(total);
-  let off=0; for(const c of recChunks){all.set(c,off);off+=c.length;}
-  recBlob=encodeWAV(all,sr);
+  recSamples=new Float32Array(total);
+  let off=0; for(const c of recChunks){recSamples.set(c,off);off+=c.length;}
+  recBlob=encodeWAV(recSamples,recSampleRate);
   if(recObjectURL)URL.revokeObjectURL(recObjectURL);
   recObjectURL=URL.createObjectURL(recBlob);
+  // Reset window to middle third
+  waveStart=0.33; waveEnd=0.67;
   recState='ready';
   document.getElementById('ppRecord').textContent='● Record';
   document.getElementById('ppRecord').classList.remove('rec-active');
   document.getElementById('recDot').classList.remove('on');
-  document.getElementById('ppStatus').textContent=`Recorded ${(total/sr*1000).toFixed(0)} ms — click any vowel to compare`;
+  document.getElementById('ppStatus').textContent=`Recorded ${(total/recSampleRate*1000).toFixed(0)} ms — drag handles to set analysis window`;
   document.getElementById('ppPlay').disabled=false;
   document.getElementById('ppClear').disabled=false;
   document.getElementById('ppAnalyse').disabled=false;
+  document.getElementById('waveCanvas').style.display='block';
+  document.getElementById('waveInfo').style.display='block';
+  requestAnimationFrame(drawWave);
   updateHint();
 }
 
@@ -1081,15 +1142,16 @@ document.getElementById('ppPlay').addEventListener('click',()=>{
   if(recObjectURL) new Audio(recObjectURL).play().catch(()=>{});
 });
 document.getElementById('ppClear').addEventListener('click',()=>{
-  recBlob=null; if(recObjectURL){URL.revokeObjectURL(recObjectURL);recObjectURL=null;}
+  recBlob=null; recSamples=null; if(recObjectURL){URL.revokeObjectURL(recObjectURL);recObjectURL=null;}
   recState='idle'; recordedVowel=null;
   document.getElementById('ppStatus').textContent='Press Record and say a vowel';
   document.getElementById('ppPlay').disabled=true;
   document.getElementById('ppClear').disabled=true;
   document.getElementById('ppAnalyse').disabled=true;
   document.getElementById('ppFormants').textContent='';
-  updateHint();
-  renderFormant();
+  document.getElementById('waveCanvas').style.display='none';
+  document.getElementById('waveInfo').style.display='none';
+  updateHint(); renderFormant();
 });
 
 // ── Server check ──────────────────────────────────────────────────────────────
@@ -1112,7 +1174,11 @@ document.getElementById('ppAnalyse').addEventListener('click', async()=>{
   try{
     const resp=await fetch(SERVER+'/analyze',{
       method:'POST', body:recBlob,
-      headers:{'Content-Type':'audio/wav'},
+      headers:{
+        'Content-Type':'audio/wav',
+        'X-Window-Start':String(waveStart),
+        'X-Window-End':String(waveEnd),
+      },
       signal:AbortSignal.timeout(10000),
     });
     if(!resp.ok) throw new Error(await resp.text());

@@ -45,9 +45,13 @@ def analyze():
         if duration < 0.05:
             return jsonify({"error": f"Recording too short ({duration*1000:.0f} ms)"}), 400
 
-        # Analysis window: middle third of the recording (avoids onset/offset noise)
-        t_start = 0.5 * duration
-        t_end   = 0.67 * duration
+        # Analysis window from request headers (fractions 0–1), fallback to middle third
+        t_start_frac = float(request.headers.get('X-Window-Start', 0.33))
+        t_end_frac   = float(request.headers.get('X-Window-End',   0.67))
+        t_start = max(0.0, min(t_start_frac, 0.99)) * duration
+        t_end   = max(0.01, min(t_end_frac,  1.0))  * duration
+        if t_end <= t_start + 0.02:
+            t_end = min(duration, t_start + 0.05)
 
         # Auto-select formant ceiling: default 5500 Hz (works for most voices)
         # Users can POST JSON {"ceiling": 5000} to override (male voices)
