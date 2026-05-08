@@ -310,13 +310,10 @@
     Server not running — see <code>analyze_server.py</code>
   </div>
 
-  <!-- Comparison playback -->
+  <!-- Compare hint -->
   <div class="pp-divider"></div>
-  <div class="pp-label">Compare with (select vowels then play)</div>
-  <div class="compare-list" id="compareList"></div>
-  <div class="pp-row">
-    <button class="pp-btn" id="ppCompare" disabled>▶ Play sequence</button>
-    <span class="pp-status" id="cmpStatus"></span>
+  <div class="pp-hint" id="ppHint" style="font-size:.72rem;color:var(--muted);line-height:1.5;display:none">
+    🔊 Click any vowel on the chart or card — it plays first, then your recording follows.
   </div>
 </div>
 
@@ -407,9 +404,31 @@ loadLanguages();
 <script>
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 let curAudio = null;
+
+function isCompareMode() {
+  return !!(recObjectURL && document.getElementById('practicePanel')?.classList.contains('open'));
+}
+
 function playUrl(url) {
   if (!url) return;
-  new Audio(url).play().catch(e => console.warn('Audio:', e.message));
+  const a = new Audio(url);
+  if (isCompareMode()) {
+    a.onended = () => setTimeout(() => {
+      if (recObjectURL) new Audio(recObjectURL).play().catch(() => {});
+    }, 350);
+  }
+  a.play().catch(e => console.warn('Audio:', e.message));
+}
+
+function playUrlAtRate(url, rate=1) {
+  if (!url) return;
+  const a = new Audio(url); a.playbackRate = rate;
+  if (isCompareMode()) {
+    a.onended = () => setTimeout(() => {
+      if (recObjectURL) new Audio(recObjectURL).play().catch(() => {});
+    }, 350);
+  }
+  a.play().catch(e => console.warn('Audio:', e.message));
 }
 
 function getLength(v) {
@@ -975,21 +994,27 @@ function renderDetail() {
 
 // ─── Practice panel ───────────────────────────────────────────────────────────
 const SERVER='http://localhost:5050';
-let recState='idle'; // idle | recording | ready
+let recState='idle';
 let recBlob=null, recObjectURL=null;
 let recCtx=null, recProcessor=null, recStream=null, recChunks=[];
 
-// Toggle panel
+function updateHint(){
+  const hint=document.getElementById('ppHint');
+  if(hint) hint.style.display=(recObjectURL&&document.getElementById('practicePanel').classList.contains('open'))?'block':'none';
+}
+
 document.getElementById('practiceTrigger').addEventListener('click',()=>{
   const p=document.getElementById('practicePanel');
   const b=document.getElementById('practiceTrigger');
   const open=p.classList.toggle('open');
   b.classList.toggle('open',open);
-  if(open){ buildCompareList(); checkServer(); }
+  if(open){ checkServer(); updateHint(); }
+  else updateHint();
 });
 document.getElementById('ppClose').addEventListener('click',()=>{
   document.getElementById('practicePanel').classList.remove('open');
   document.getElementById('practiceTrigger').classList.remove('open');
+  updateHint();
 });
 
 // ── WAV encoder ───────────────────────────────────────────────────────────────
@@ -1027,7 +1052,6 @@ document.getElementById('ppRecord').addEventListener('click', async()=>{
     document.getElementById('ppStatus').textContent='Recording…';
     document.getElementById('ppPlay').disabled=true;
     document.getElementById('ppAnalyse').disabled=true;
-    document.getElementById('ppCompare').disabled=true;
   }catch(e){
     document.getElementById('ppStatus').textContent='Mic error: '+e.message;
   }
@@ -1046,12 +1070,11 @@ function stopRec(){
   document.getElementById('ppRecord').textContent='● Record';
   document.getElementById('ppRecord').classList.remove('rec-active');
   document.getElementById('recDot').classList.remove('on');
-  document.getElementById('ppStatus').textContent=`Recorded ${(total/sr*1000).toFixed(0)} ms`;
+  document.getElementById('ppStatus').textContent=`Recorded ${(total/sr*1000).toFixed(0)} ms — click any vowel to compare`;
   document.getElementById('ppPlay').disabled=false;
   document.getElementById('ppClear').disabled=false;
   document.getElementById('ppAnalyse').disabled=false;
-  document.getElementById('ppCompare').disabled=false;
-  buildCompareList();
+  updateHint();
 }
 
 document.getElementById('ppPlay').addEventListener('click',()=>{
@@ -1064,8 +1087,8 @@ document.getElementById('ppClear').addEventListener('click',()=>{
   document.getElementById('ppPlay').disabled=true;
   document.getElementById('ppClear').disabled=true;
   document.getElementById('ppAnalyse').disabled=true;
-  document.getElementById('ppCompare').disabled=true;
   document.getElementById('ppFormants').textContent='';
+  updateHint();
   renderFormant();
 });
 
@@ -1094,72 +1117,15 @@ document.getElementById('ppAnalyse').addEventListener('click', async()=>{
     });
     if(!resp.ok) throw new Error(await resp.text());
     const data=await resp.json();
-    recordedVowel={f1:data.f1,f2:data.f2,blob:recBlob};
+    recordedVowel={f1:data.f1,f2:data.f2};
     document.getElementById('ppFormants').innerHTML=
       `F1 <b>${data.f1.toFixed(0)} Hz</b> &nbsp; F2 <b>${data.f2.toFixed(0)} Hz</b>`;
-    // Switch to formant tab and re-render
     document.getElementById('tabFormant').click();
     renderFormant();
   }catch(e){
     document.getElementById('ppFormants').textContent='Error: '+e.message;
   }
   btn.textContent='⚡ Analyse F1/F2'; btn.disabled=false;
-});
-
-// ── Comparison playback ───────────────────────────────────────────────────────
-const selectedForCompare=new Set();
-function buildCompareList(){
-  const list=document.getElementById('compareList');
-  list.innerHTML='';
-  const all=[];
-  for(const[lk,lang]of Object.entries(LANGS)){
-    for(const v of lang.vowels){
-      if(passesFilters(lk,v)&&v.ipaAudio) all.push({lk,lang,v});
-    }
-  }
-  all.sort((a,b)=>a.v.h-b.v.h||a.v.b-b.v.b);
-  all.forEach(({lk,lang,v})=>{
-    const key=`${lk}::${v.ipa}`;
-    const chip=document.createElement('button');
-    chip.className='cmp-chip'+(selectedForCompare.has(key)?' sel':'');
-    chip.textContent=v.ipa; chip.title=`${lang.label}: ${v.desc}`;
-    chip.style.borderColor=lang.color; chip.style.color=selectedForCompare.has(key)?lang.color:'#8ab8d0';
-    chip.addEventListener('click',()=>{
-      if(selectedForCompare.has(key))selectedForCompare.delete(key);
-      else selectedForCompare.add(key);
-      buildCompareList();
-    });
-    list.appendChild(chip);
-  });
-}
-
-async function playAudioURL(url,rate=1){
-  if(!url)return;
-  return new Promise(res=>{
-    const a=new Audio(url); a.playbackRate=rate;
-    a.onended=res; a.onerror=res;
-    a.play().catch(res);
-  });
-}
-async function waitMs(ms){return new Promise(r=>setTimeout(r,ms));}
-
-document.getElementById('ppCompare').addEventListener('click', async()=>{
-  const btn=document.getElementById('ppCompare');
-  const st=document.getElementById('cmpStatus');
-  btn.disabled=true;
-  // Build sequence: recorded first, then selected vowels
-  const seq=[];
-  if(recObjectURL) seq.push({label:'Your recording',url:recObjectURL});
-  for(const[lk,lang]of Object.entries(LANGS)){
-    for(const v of lang.vowels){
-      const key=`${lk}::${v.ipa}`;
-      if(selectedForCompare.has(key)&&v.ipaAudio) seq.push({label:`${lang.label} ${v.ipa}`,url:v.ipaAudio});
-    }
-  }
-  for(const item of seq){
-    st.textContent=item.label; await playAudioURL(item.url); await waitMs(600);
-  }
-  st.textContent=''; btn.disabled=false;
 });
 function init() {
   if (!Object.keys(LANGS).length) {
