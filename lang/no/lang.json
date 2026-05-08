@@ -541,13 +541,26 @@
       "h2": 0.165,
       "b2": 0.3413,
       "rounded": false,
-      "desc": "Diphtong",
+      "desc": "Diphtong æ → ʉ",
       "type": "diphthong",
       "f1": null,
       "f2": null,
       "ipaAudio": "lang/no/audio/mjolnir/aeue/sau.mp3",
       "wikiUrl": "",
-      "words": []
+      "words": [
+        {
+          "text": "s<b>au</b>",
+          "audio": "lang/no/audio/mjolnir/aeue/sau.mp3"
+        },
+        {
+          "text": "t<b>au</b>",
+          "audio": "lang/no/audio/mjolnir/aeue/tau.mp3"
+        },
+        {
+          "text": "<b>Eu</b>ropa",
+          "audio": "lang/no/audio/mjolnir/aeue/europa.mp3"
+        }
+      ]
     }
   ]
 }
