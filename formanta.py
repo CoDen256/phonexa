@@ -12,6 +12,7 @@ Keep it running while you use the IPA chart's 🎤 Practice panel.
 """
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import parselmouth
 from parselmouth.praat import call
 import tempfile
@@ -24,6 +25,8 @@ app = Flask(__name__)
 @app.route("/ping")
 def ping():
     return jsonify({"ok": True, "service": "IPA formant analyser"})
+
+CORS(app, origins=["*"])
 
 
 @app.route("/analyze", methods=["POST"])
