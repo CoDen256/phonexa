@@ -230,6 +230,41 @@
   }
   .editor-link:hover { color:#7eb8f7; border-color:#7eb8f7; }
 
+  /* ── Practice / recording panel ─────────────────────────── */
+  .practice-btn {
+    display:inline-flex; align-items:center; gap:5px;
+    margin-top:6px; margin-left:8px; padding:3px 11px; font-size:.7rem;
+    color:#4a7090; background:none; border:1px solid #2e4560; border-radius:20px;
+    cursor:pointer; transition:color .15s,border-color .15s;
+  }
+  .practice-btn:hover,.practice-btn.open { color:#7eb8f7; border-color:#7eb8f7; }
+  #practicePanel {
+    display:none; position:fixed; right:16px; top:62px; width:310px; z-index:500;
+    background:#14202e; border:1px solid #2e4560; border-radius:14px;
+    box-shadow:0 8px 32px rgba(0,0,0,.75); padding:14px 16px; font-size:.8rem;
+  }
+  #practicePanel.open { display:block; }
+  .pp-title { font-size:.8rem; font-weight:700; color:#7eb8f7; margin-bottom:10px; display:flex; justify-content:space-between; }
+  .pp-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:.9rem; }
+  .pp-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  .pp-btn { padding:5px 12px; border-radius:8px; border:1px solid #2e4560; background:#1a2e48; color:#d8e8f4; cursor:pointer; font-size:.75rem; transition:background .12s,border-color .12s; }
+  .pp-btn:hover { background:#243c5a; border-color:#4a7098; }
+  .pp-btn.rec-active { border-color:#f43f5e; color:#f43f5e; }
+  .pp-btn:disabled { opacity:.4; cursor:default; }
+  .rec-dot { width:8px; height:8px; border-radius:50%; background:#f43f5e; flex-shrink:0; display:none; }
+  .rec-dot.on { display:inline-block; animation:recpulse 1s ease-in-out infinite; }
+  @keyframes recpulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+  .pp-status { font-size:.68rem; color:var(--muted); }
+  .pp-formants { font-size:.78rem; margin-top:3px; }
+  .pp-formants b { color:#7eb8f7; }
+  .pp-server { font-size:.62rem; color:#3a5878; margin-top:8px; }
+  .pp-server.ok { color:#34d399; }
+  .pp-divider { height:1px; background:#1e3048; margin:10px 0; }
+  .pp-label { font-size:.62rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:5px; }
+  .compare-list { display:flex; flex-wrap:wrap; gap:4px; max-height:80px; overflow-y:auto; margin-bottom:8px; }
+  .cmp-chip { font-family:Georgia,serif; font-size:.82rem; padding:2px 8px; border-radius:12px; border:1px solid #2e4560; cursor:pointer; background:none; color:#8ab8d0; transition:background .1s; }
+  .cmp-chip.sel { background:#1a3050; border-color:#7eb8f7; color:#7eb8f7; }
+
   @media (max-width:800px) {
     .chart-row { flex-direction:column; }
     .sidebar { width:100%; max-height:300px; }
@@ -245,8 +280,45 @@
     <span class="reload-icon">↺</span> Reload languages
   </button>
   <a href="editor.html"     class="editor-link">✎ Edit languages</a>
-  <a href="audiocutter.html" class="editor-link">✂ Audio cutter</a>
+  <button class="practice-btn" id="practiceTrigger" type="button">🎤 Practice</button>
 </header>
+
+<!-- ── Practice panel ───────────────────────────────────────────── -->
+<div id="practicePanel">
+  <div class="pp-title">
+    <span>🎤 Practice &amp; Analyse</span>
+    <button class="pp-close" id="ppClose">✕</button>
+  </div>
+
+  <!-- Recording -->
+  <div class="pp-row">
+    <button class="pp-btn" id="ppRecord">● Record</button>
+    <span class="rec-dot" id="recDot"></span>
+    <button class="pp-btn" id="ppPlay" disabled>▶ Play back</button>
+    <button class="pp-btn" id="ppClear" disabled>✕ Clear</button>
+  </div>
+  <div class="pp-status" id="ppStatus">Press Record and say a vowel</div>
+
+  <!-- Formant analysis -->
+  <div class="pp-divider"></div>
+  <div class="pp-label">Formant analysis (local server)</div>
+  <div class="pp-row">
+    <button class="pp-btn" id="ppAnalyse" disabled>⚡ Analyse F1/F2</button>
+  </div>
+  <div class="pp-formants" id="ppFormants"></div>
+  <div class="pp-server" id="ppServer">
+    Server not running — see <code>analyze_server.py</code>
+  </div>
+
+  <!-- Comparison playback -->
+  <div class="pp-divider"></div>
+  <div class="pp-label">Compare with (select vowels then play)</div>
+  <div class="compare-list" id="compareList"></div>
+  <div class="pp-row">
+    <button class="pp-btn" id="ppCompare" disabled>▶ Play sequence</button>
+    <span class="pp-status" id="cmpStatus"></span>
+  </div>
+</div>
 
 <div id="loading">
   <div class="spinner"></div>
@@ -560,26 +632,40 @@ function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, lk, svgId) {
   const ux=(x2-x1)/dist, uy=(y2-y1)/dist;
   const AR=11, W=5;
   const xe=x2-ux*AR, ye=y2-uy*AR;
-  arrowL.appendChild($s('line',{x1,y1,x2:xe.toFixed(1),y2:ye.toFixed(1),
-    stroke:color,'stroke-width':2,opacity:0.8,'stroke-linecap':'round',style:'pointer-events:none'}));
-  arrowL.appendChild($s('polygon',{
+  const FAINT=0.3;
+  const lineEl=$s('line',{x1,y1,x2:xe.toFixed(1),y2:ye.toFixed(1),
+    stroke:color,'stroke-width':1.5,opacity:FAINT,'stroke-linecap':'round',
+    'stroke-dasharray':'6 4',style:'pointer-events:none'});
+  arrowL.appendChild(lineEl);
+  const headEl=$s('polygon',{
     points:`${x2.toFixed(1)},${y2.toFixed(1)} ${(xe-uy*W).toFixed(1)},${(ye+ux*W).toFixed(1)} ${(xe+uy*W).toFixed(1)},${(ye-ux*W).toFixed(1)}`,
-    fill:color,opacity:0.8,style:'pointer-events:none'}));
-  dotL.appendChild($s('circle',{cx:x1,cy:y1,r:3,fill:color+'cc',style:'pointer-events:none'}));
-  dotL.appendChild($s('circle',{cx:x2,cy:y2,r:3.5,fill:'none',stroke:color,'stroke-width':1.5,opacity:0.65,style:'pointer-events:none'}));
-  // Label beside the arrow (perpendicular offset: right side of arrow direction)
+    fill:color,opacity:FAINT,style:'pointer-events:none'});
+  arrowL.appendChild(headEl);
+  dotL.appendChild($s('circle',{cx:x1,cy:y1,r:3,fill:color+'55',style:'pointer-events:none'}));
+  dotL.appendChild($s('circle',{cx:x2,cy:y2,r:3.5,fill:'none',stroke:color,'stroke-width':1,opacity:FAINT,style:'pointer-events:none'}));
+  // Label — always full color, independent of arrow state
   const SIDE=13, mx=(x1+x2)/2, my=(y1+y2)/2, FS=17;
   const lx=mx+uy*SIDE, ly=my-ux*SIDE;
   arrowL.appendChild($t(v.ipa,{x:lx,y:ly,dy:'0.36em','text-anchor':'middle','font-size':FS,
     fill:color,opacity:0.95,'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
     style:'pointer-events:none;user-select:none;filter:drop-shadow(0 0 4px rgba(20,30,46,1)) drop-shadow(0 0 8px rgba(20,30,46,0.9))'}));
-  // Rate-aware click: second click within 5s → 0.75x speed
-  // Persistent click state (survives chart re-renders)
+  // Hit area — hover highlights arrow to full solid, mouseleave reverts
   const stateKey=`${lk}::${v.ipa}`;
   if(!_diphState[stateKey]) _diphState[stateKey]={lastClick:0,slowed:false};
   const hit=$s('line',{x1,y1,x2,y2,stroke:'transparent','stroke-width':22,cursor:'pointer'});
-  hit.addEventListener('mouseenter',e=>showTip(e,v,lang));
-  hit.addEventListener('mousemove',moveTip); hit.addEventListener('mouseleave',hideTip);
+  hit.addEventListener('mouseenter',e=>{
+    lineEl.setAttribute('opacity','0.85');
+    lineEl.setAttribute('stroke-dasharray','none');
+    headEl.setAttribute('opacity','0.85');
+    showTip(e,v,lang);
+  });
+  hit.addEventListener('mousemove',moveTip);
+  hit.addEventListener('mouseleave',()=>{
+    lineEl.setAttribute('opacity',FAINT);
+    lineEl.setAttribute('stroke-dasharray','6 4');
+    headEl.setAttribute('opacity',FAINT);
+    hideTip();
+  });
   hit.addEventListener('click',()=>{
     const st=_diphState[stateKey], now=Date.now();
     if(now-st.lastClick>5000) st.slowed=false;
@@ -708,6 +794,8 @@ function renderIpa() {
 }
 
 // ─── Formant Plot ─────────────────────────────────────────────────────────────
+let recordedVowel=null; // {f1, f2, blob}
+
 function renderFormant() {
   const svg=document.getElementById('chartFormant');
   while(svg.firstChild)svg.removeChild(svg.firstChild);
@@ -728,6 +816,18 @@ function renderFormant() {
   svg.appendChild(f1el);
   svg.appendChild($s('rect',{x:FP.x0,y:FP.y0,width:FP.x1-FP.x0,height:FP.y1-FP.y0,fill:'none',stroke:'#385878','stroke-width':1.5,rx:6}));
   buildVowels(svg, v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null), 'chartFormant');
+
+  // Recorded vowel marker
+  if(recordedVowel){
+    const{x,y}=formantPos(recordedVowel.f1,recordedVowel.f2);
+    // Pulsing ring
+    const ring=$s('circle',{cx:x,cy:y,r:10,fill:'none',stroke:'#fff','stroke-width':1.5,opacity:0.4,style:'pointer-events:none'});
+    svg.appendChild(ring);
+    // Filled marker
+    svg.appendChild($s('circle',{cx:x,cy:y,r:6,fill:'#ffffff',opacity:0.9,style:'pointer-events:none'}));
+    // "You" label
+    svg.appendChild($t('You',{x:x+10,y,dy:'0.36em','font-size':12,fill:'#ffffff',opacity:0.9,'font-family':'system-ui,sans-serif','font-weight':'700',style:'pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))'}));
+  }
 }
 
 function renderAll() { renderIpa(); renderFormant(); renderDetail(); updateCount(); }
@@ -873,7 +973,194 @@ function renderDetail() {
   sec.appendChild(grid);
 }
 
-// ─── Init (called after all lang.js files have loaded) ───────────────────────
+// ─── Practice panel ───────────────────────────────────────────────────────────
+const SERVER='http://localhost:5050';
+let recState='idle'; // idle | recording | ready
+let recBlob=null, recObjectURL=null;
+let recCtx=null, recProcessor=null, recStream=null, recChunks=[];
+
+// Toggle panel
+document.getElementById('practiceTrigger').addEventListener('click',()=>{
+  const p=document.getElementById('practicePanel');
+  const b=document.getElementById('practiceTrigger');
+  const open=p.classList.toggle('open');
+  b.classList.toggle('open',open);
+  if(open){ buildCompareList(); checkServer(); }
+});
+document.getElementById('ppClose').addEventListener('click',()=>{
+  document.getElementById('practicePanel').classList.remove('open');
+  document.getElementById('practiceTrigger').classList.remove('open');
+});
+
+// ── WAV encoder ───────────────────────────────────────────────────────────────
+function encodeWAV(samples, sampleRate){
+  const buf=new ArrayBuffer(44+samples.length*2);
+  const v=new DataView(buf);
+  const ws=(off,str)=>{for(let i=0;i<str.length;i++)v.setUint8(off+i,str.charCodeAt(i));};
+  ws(0,'RIFF'); v.setUint32(4,36+samples.length*2,true); ws(8,'WAVE');
+  ws(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sampleRate,true); v.setUint32(28,sampleRate*2,true);
+  v.setUint16(32,2,true); v.setUint16(34,16,true);
+  ws(36,'data'); v.setUint32(40,samples.length*2,true);
+  for(let i=0,off=44;i<samples.length;i++,off+=2){
+    const s=Math.max(-1,Math.min(1,samples[i]));
+    v.setInt16(off,s<0?s*0x8000:s*0x7FFF,true);
+  }
+  return new Blob([buf],{type:'audio/wav'});
+}
+
+// ── Recording ─────────────────────────────────────────────────────────────────
+document.getElementById('ppRecord').addEventListener('click', async()=>{
+  if(recState==='recording'){ stopRec(); return; }
+  try{
+    recChunks=[];
+    recStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,sampleRate:22050}});
+    recCtx=new AudioContext();
+    const src=recCtx.createMediaStreamSource(recStream);
+    recProcessor=recCtx.createScriptProcessor(4096,1,1);
+    recProcessor.onaudioprocess=e=>recChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+    src.connect(recProcessor); recProcessor.connect(recCtx.destination);
+    recState='recording';
+    document.getElementById('ppRecord').textContent='■ Stop';
+    document.getElementById('ppRecord').classList.add('rec-active');
+    document.getElementById('recDot').classList.add('on');
+    document.getElementById('ppStatus').textContent='Recording…';
+    document.getElementById('ppPlay').disabled=true;
+    document.getElementById('ppAnalyse').disabled=true;
+    document.getElementById('ppCompare').disabled=true;
+  }catch(e){
+    document.getElementById('ppStatus').textContent='Mic error: '+e.message;
+  }
+});
+
+function stopRec(){
+  recProcessor?.disconnect(); recStream?.getTracks().forEach(t=>t.stop());
+  const sr=recCtx?.sampleRate||22050;
+  const total=recChunks.reduce((s,c)=>s+c.length,0);
+  const all=new Float32Array(total);
+  let off=0; for(const c of recChunks){all.set(c,off);off+=c.length;}
+  recBlob=encodeWAV(all,sr);
+  if(recObjectURL)URL.revokeObjectURL(recObjectURL);
+  recObjectURL=URL.createObjectURL(recBlob);
+  recState='ready';
+  document.getElementById('ppRecord').textContent='● Record';
+  document.getElementById('ppRecord').classList.remove('rec-active');
+  document.getElementById('recDot').classList.remove('on');
+  document.getElementById('ppStatus').textContent=`Recorded ${(total/sr*1000).toFixed(0)} ms`;
+  document.getElementById('ppPlay').disabled=false;
+  document.getElementById('ppClear').disabled=false;
+  document.getElementById('ppAnalyse').disabled=false;
+  document.getElementById('ppCompare').disabled=false;
+  buildCompareList();
+}
+
+document.getElementById('ppPlay').addEventListener('click',()=>{
+  if(recObjectURL) new Audio(recObjectURL).play().catch(()=>{});
+});
+document.getElementById('ppClear').addEventListener('click',()=>{
+  recBlob=null; if(recObjectURL){URL.revokeObjectURL(recObjectURL);recObjectURL=null;}
+  recState='idle'; recordedVowel=null;
+  document.getElementById('ppStatus').textContent='Press Record and say a vowel';
+  document.getElementById('ppPlay').disabled=true;
+  document.getElementById('ppClear').disabled=true;
+  document.getElementById('ppAnalyse').disabled=true;
+  document.getElementById('ppCompare').disabled=true;
+  document.getElementById('ppFormants').textContent='';
+  renderFormant();
+});
+
+// ── Server check ──────────────────────────────────────────────────────────────
+async function checkServer(){
+  const el=document.getElementById('ppServer');
+  try{
+    const r=await fetch(SERVER+'/ping',{signal:AbortSignal.timeout(1500)});
+    if(r.ok){el.textContent='✓ Local server connected';el.className='pp-server ok';return true;}
+  }catch(e){}
+  el.textContent='Server offline — run: python analyze_server.py';
+  el.className='pp-server';
+  return false;
+}
+
+// ── Formant analysis ──────────────────────────────────────────────────────────
+document.getElementById('ppAnalyse').addEventListener('click', async()=>{
+  if(!recBlob) return;
+  const btn=document.getElementById('ppAnalyse');
+  btn.textContent='Analysing…'; btn.disabled=true;
+  try{
+    const resp=await fetch(SERVER+'/analyze',{
+      method:'POST', body:recBlob,
+      headers:{'Content-Type':'audio/wav'},
+      signal:AbortSignal.timeout(10000),
+    });
+    if(!resp.ok) throw new Error(await resp.text());
+    const data=await resp.json();
+    recordedVowel={f1:data.f1,f2:data.f2,blob:recBlob};
+    document.getElementById('ppFormants').innerHTML=
+      `F1 <b>${data.f1.toFixed(0)} Hz</b> &nbsp; F2 <b>${data.f2.toFixed(0)} Hz</b>`;
+    // Switch to formant tab and re-render
+    document.getElementById('tabFormant').click();
+    renderFormant();
+  }catch(e){
+    document.getElementById('ppFormants').textContent='Error: '+e.message;
+  }
+  btn.textContent='⚡ Analyse F1/F2'; btn.disabled=false;
+});
+
+// ── Comparison playback ───────────────────────────────────────────────────────
+const selectedForCompare=new Set();
+function buildCompareList(){
+  const list=document.getElementById('compareList');
+  list.innerHTML='';
+  const all=[];
+  for(const[lk,lang]of Object.entries(LANGS)){
+    for(const v of lang.vowels){
+      if(passesFilters(lk,v)&&v.ipaAudio) all.push({lk,lang,v});
+    }
+  }
+  all.sort((a,b)=>a.v.h-b.v.h||a.v.b-b.v.b);
+  all.forEach(({lk,lang,v})=>{
+    const key=`${lk}::${v.ipa}`;
+    const chip=document.createElement('button');
+    chip.className='cmp-chip'+(selectedForCompare.has(key)?' sel':'');
+    chip.textContent=v.ipa; chip.title=`${lang.label}: ${v.desc}`;
+    chip.style.borderColor=lang.color; chip.style.color=selectedForCompare.has(key)?lang.color:'#8ab8d0';
+    chip.addEventListener('click',()=>{
+      if(selectedForCompare.has(key))selectedForCompare.delete(key);
+      else selectedForCompare.add(key);
+      buildCompareList();
+    });
+    list.appendChild(chip);
+  });
+}
+
+async function playAudioURL(url,rate=1){
+  if(!url)return;
+  return new Promise(res=>{
+    const a=new Audio(url); a.playbackRate=rate;
+    a.onended=res; a.onerror=res;
+    a.play().catch(res);
+  });
+}
+async function waitMs(ms){return new Promise(r=>setTimeout(r,ms));}
+
+document.getElementById('ppCompare').addEventListener('click', async()=>{
+  const btn=document.getElementById('ppCompare');
+  const st=document.getElementById('cmpStatus');
+  btn.disabled=true;
+  // Build sequence: recorded first, then selected vowels
+  const seq=[];
+  if(recObjectURL) seq.push({label:'Your recording',url:recObjectURL});
+  for(const[lk,lang]of Object.entries(LANGS)){
+    for(const v of lang.vowels){
+      const key=`${lk}::${v.ipa}`;
+      if(selectedForCompare.has(key)&&v.ipaAudio) seq.push({label:`${lang.label} ${v.ipa}`,url:v.ipaAudio});
+    }
+  }
+  for(const item of seq){
+    st.textContent=item.label; await playAudioURL(item.url); await waitMs(600);
+  }
+  st.textContent=''; btn.disabled=false;
+});
 function init() {
   if (!Object.keys(LANGS).length) {
     console.warn('No languages loaded — check lang/index.json and lang/*/lang.json');
