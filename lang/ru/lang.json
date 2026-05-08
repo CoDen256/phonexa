@@ -30,7 +30,7 @@
       "desc": "Near-close near-front unrounded",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/perehod_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/perehod.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
         {
@@ -52,7 +52,7 @@
       "desc": "Near-close near-back rounded",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/uje_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/uje.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
         {
@@ -96,7 +96,7 @@
       "desc": "Close central rounded",
       "f1": 309,
       "f2": 1662,
-      "ipaAudio": "lang/ru/audio/rufe/yu_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/yu.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
       "words": [
         {
@@ -140,7 +140,7 @@
       "desc": "Close-mid front unrounded",
       "f1": 417,
       "f2": 2307,
-      "ipaAudio": "lang/ru/audio/rufe/ye_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/ye.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
       "words": [
         {
@@ -162,7 +162,7 @@
       "desc": "Close-mid central rounded",
       "f1": 482,
       "f2": 1474,
-      "ipaAudio": "lang/ru/audio/rufe/yo_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/yo.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
       "words": [
         {
@@ -188,7 +188,7 @@
       "desc": "Mid central",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/mira_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/mira.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
@@ -250,7 +250,7 @@
       "desc": "Near-open central ʌ",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/ona_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/ona.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
       "words": [
         {
@@ -298,16 +298,16 @@
       "desc": "Open back unrounded",
       "f1": 941,
       "f2": 1346,
-      "ipaAudio": "lang/ru/audio/rufe/kal_vowel.mp3",
+      "ipaAudio": "https://ru.wiktionary.org/wiki/%D0%A4%D0%B0%D0%B9%D0%BB:Ru-%D0%BF%D0%B0%D0%BB%D0%BA%D0%B0.ogg",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
       "words": [
         {
-          "text": "к<b>а</b>л ",
-          "audio": "lang/ru/audio/forvo/kal.mp3"
-        },
-        {
           "text": "п<b>а</b>лка ",
           "audio": "https://ru.wiktionary.org/wiki/%D0%A4%D0%B0%D0%B9%D0%BB:Ru-%D0%BF%D0%B0%D0%BB%D0%BA%D0%B0.ogg"
+        },
+        {
+          "text": "к<b>а</b>л ",
+          "audio": "lang/ru/audio/forvo/kal.mp3"
         }
       ]
     },
@@ -320,7 +320,7 @@
       "desc": "Near open front unrounded",
       "f1": 912,
       "f2": 1768,
-      "ipaAudio": "lang/ru/audio/rufe/ya_vowel.mp3",
+      "ipaAudio": "lang/ru/audio/rufe/ya.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": [
         {
