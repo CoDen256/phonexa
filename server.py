@@ -17,6 +17,7 @@ import parselmouth
 from parselmouth.praat import call
 import tempfile
 import os
+import math
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:*", "http://127.0.0.1:*", "null"])
@@ -66,6 +67,9 @@ def analyze():
         formant = call(snd, "To Formant (burg)", 0.0, 5, ceiling, 0.025, 50.0)
         f1 = call(formant, "Get mean", 1, t_start, t_end, "hertz")
         f2 = call(formant, "Get mean", 2, t_start, t_end, "hertz")
+
+        if math.isnan(f1) or math.isnan(f2):
+            return jsonify({"error": "No formants detected — try a different window or check audio quality"}), 400
 
         return jsonify({
             "f1": round(f1, 1),

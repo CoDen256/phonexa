@@ -513,12 +513,12 @@
       "desc": "Near-open front unrounded",
       "f1": 778,
       "f2": 1360,
-      "ipaAudio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ",
+      "ipaAudio": "lang/no/audio/mjolnir/ae/ae_long.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
       "words": [
         {
           "text": "<b>æ</b>",
-          "audio": "lang/no/audio/mjolnir/ae/ae_long.mp3"
+          "audio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ"
         },
         {
           "text": "l<b>æ</b>rer",
