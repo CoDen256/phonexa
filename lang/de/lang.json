@@ -452,6 +452,102 @@
           "audio": null
         }
       ]
+    },
+    {
+      "ipa": "aɪ",
+      "h": 0.97,
+      "b": 0.47,
+      "h2": 0.4,
+      "b2": 0.05,
+      "rounded": false,
+      "desc": "Diphtong a (○ unrounded) → ɪ (○ unrounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/de/audio/fit/ai/ai.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "<b>ei</b>ns",
+          "audio": "lang/de/audio/fit/ai/ein.mp3"
+        },
+        {
+          "text": "arb<b>ei</b>t",
+          "audio": "lang/de/audio/fit/ai/arbeit.mp3"
+        },
+        {
+          "text": "<b>ei</b>ngang",
+          "audio": "lang/de/audio/fit/ai/eingang.mp3"
+        }
+      ]
+    },
+    {
+      "ipa": "aʊ",
+      "h": 0.97,
+      "b": 0.53,
+      "h2": 0.4,
+      "b2": 0.85,
+      "rounded": false,
+      "desc": "Diphtong a (○ unrounded) → ʊ (⊙ rounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/de/audio/fit/au/au.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "b<b>au</b>",
+          "audio": "lang/de/audio/fit/au/bau.mp3"
+        },
+        {
+          "text": "bl<b>au</b>",
+          "audio": "lang/de/audio/fit/au/blau.mp3"
+        },
+        {
+          "text": "gr<b>au</b>",
+          "audio": "lang/de/audio/fit/au/grau.mp3"
+        },
+        {
+          "text": "sch<b>au</b>",
+          "audio": "lang/de/audio/fit/au/schau.mp3"
+        }
+      ]
+    },
+    {
+      "ipa": "ɔɪ",
+      "h": 0.66666,
+      "b": 0.981,
+      "h2": 0.35,
+      "b2": 0.23,
+      "rounded": false,
+      "desc": "Diphtong  ɔ (⊙ rounded) →  ɪ (○ unrounded)",
+      "type": "diphthong",
+      "f1": null,
+      "f2": null,
+      "ipaAudio": "lang/de/audio/fit/oi/oi.mp3",
+      "wikiUrl": "",
+      "words": [
+        {
+          "text": "<b>eu</b>ro",
+          "audio": "lang/de/audio/fit/oi/euro.mp3"
+        },
+        {
+          "text": "<b>eu</b>ropa",
+          "audio": "lang/de/audio/fit/oi/europa.mp3"
+        },
+        {
+          "text": "n<b>eu</b>",
+          "audio": "lang/de/audio/fit/oi/neu.mp3"
+        },
+        {
+          "text": "Ger<b>äu</b>sch",
+          "audio": "lang/de/audio/fit/oi/geraeusch.mp3"
+        },
+        {
+          "text": "R<b>äu</b>ber",
+          "audio": "lang/de/audio/fit/oi/raeuber.mp3"
+        }
+      ]
     }
   ]
 }
