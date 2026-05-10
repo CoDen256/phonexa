@@ -30,7 +30,7 @@
       "desc": "Near-close near-front unrounded (reduced i/ɛ)",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/perehod.mp3",
+      "ipaAudio": "lang/ru/audio/forvo/perehod.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
       "words": [
         {
@@ -52,7 +52,7 @@
       "desc": "Near-close near-back rounded (reduced u)",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/uje.mp3",
+      "ipaAudio": "lang/ru/audio/easy/uje.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
       "words": [
         {
@@ -188,12 +188,12 @@
       "desc": "Mid central (reduced a/o)",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/mira.mp3",
+      "ipaAudio": "lang/ru/audio/easy/mira.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
       "words": [
         {
           "text": "мир<b>а</b>",
-          "audio": "lang/ru/audio/rufe/mira.mp3"
+          "audio": "lang/ru/audio/easy/mira.mp3"
         },
         {
           "text": "эт<b>о</b>му",
@@ -250,7 +250,7 @@
       "desc": "Near-open central ɐ (reduced, weak stressed a/o)",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/ru/audio/rufe/ona.mp3",
+      "ipaAudio": "lang/ru/audio/forvo/ona.mp3",
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
       "words": [
         {
@@ -290,12 +290,12 @@
       ]
     },
     {
-      "ipa": "ɑ (velarized a)",
+      "ipa": "ɑ",
       "h": 1,
       "b": 0.75,
       "rounded": false,
       "type": "variable",
-      "desc": "Open back unrounded",
+      "desc": "Open back unrounded (velarized a)",
       "f1": 941,
       "f2": 1346,
       "ipaAudio": "lang/ru/audio/auto/a_back.ogg",
