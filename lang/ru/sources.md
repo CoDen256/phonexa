@@ -9,6 +9,13 @@ https://books.google.de/books?id=Txw9AAAAIAAJ&redir_esc=y
 
 https://en.wikipedia.org/wiki/Help:IPA/Russian
 
+
+https://www.youtube.com/watch?v=BZkcIPfZ6Is
+Vowels: i ɨ u ɛ o a
+Reduced ɐ ə ʊ ɪ
+palatalized æ ʉ ɵ e
+velarized ɑ
+
 Alphabet:
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound1.mp3#а
 https://www.russianforeveryone.com/RufeA/Lessons/Introduction/Alphabet/Sound2.mp3#б
