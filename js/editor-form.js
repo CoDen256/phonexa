@@ -49,7 +49,7 @@ function buildInlineForm(){
         <option value="variable"   ${(v.type||'short')==='variable'   ?'selected':''}>Variable (long/short)</option>
       </select>
     </div>
-    <div class="field" style="flex:0"><label>Rounded</label><div class="rounded-row"><input type="checkbox" id="fRounded" ${v.rounded?'checked':''}><span style="font-size:.8rem">Lip rounded</span></div></div>`;
+    <div class="field" style="flex:0;min-width:100px"><label>Rounded</label><div class="rounded-row"><input type="checkbox" id="fRounded" ${v.rounded?'checked':''}><span style="font-size:.8rem;white-space:nowrap">Lip rounded</span></div></div>`;
   sec.appendChild(metaRow);
   metaRow.querySelector('#fDesc').addEventListener('input',e=>{v.desc=e.target.value;renderVowelCards();});
   metaRow.querySelector('#fType').addEventListener('change',e=>{

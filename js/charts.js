@@ -274,7 +274,7 @@ function buildSidebar() {
   updateCount();
 }
 
-document.getElementById('clearAllFilters').addEventListener('click',()=>{
+document.getElementById('clearAllFilters')?.addEventListener('click',()=>{
   filters.languages.clear(); filters.roundness.clear();
   filters.length.clear();    filters.ipaBase.clear();
   buildSidebar(); renderAll();

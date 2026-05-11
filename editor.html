@@ -36,6 +36,7 @@
         <button class="view-tab active" id="tabIpa" type="button">IPA Chart</button>
         <button class="view-tab" id="tabFormant" type="button">Formant Plot</button>
         <button class="cardinal-toggle active" id="cardinalToggle" title="Hide cardinal vowels" type="button">Cardinals</button>
+        <button class="cardinal-toggle" id="soloToggle" title="Show only current vowel" type="button" style="display:none">Solo</button>
       </div>
       <div style="position:relative">
         <div class="chart-panel active" id="panelIpa">
@@ -103,6 +104,7 @@ const state = {
   dirHandle:null, unsaved:false, chartTab:'ipa',
   pickingMode: null,  // null | 'ipa' | 'ipa-target' | 'formant'
   showCardinals: true,
+  showOtherVowels: true,
 };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }
@@ -125,11 +127,13 @@ function onVowelClicked(v, lang, lk) {
     w => w === v || (w.ipa === v.ipa && Math.abs((w.h||0)-(v.h||0)) < 0.01 && Math.abs((w.b||0)-(v.b||0)) < 0.01)
   );
   if (idx < 0) return;
-  // Auto-save current draft before switching
+  // Auto-save current draft before switching — only mark unsaved if something actually changed
   if (state.vowelIdx !== null && state.vowelDraft !== null && state.vowelDraft.ipa) {
+    const original = state.vowelIdx >= 0 ? state.langDraft.vowels?.[state.vowelIdx] : null;
+    const changed = !original || JSON.stringify(original) !== JSON.stringify(state.vowelDraft);
     if (state.vowelIdx < 0) (state.langDraft.vowels = state.langDraft.vowels||[]).push(state.vowelDraft);
     else state.langDraft.vowels[state.vowelIdx] = state.vowelDraft;
-    markUnsaved();
+    if (changed) markUnsaved();
   }
   openVowelEditor(idx);
 }
@@ -189,10 +193,15 @@ function renderEditorAll() {
   Object.keys(LANGS).forEach(k => delete LANGS[k]);
   if (state.showCardinals && state.langs?.cardinal) LANGS.cardinal = state.langs.cardinal;
   if (state.langDraft?.key) {
-    const vowels = [...(state.langDraft.vowels || [])];
+    let vowels = [...(state.langDraft.vowels || [])];
     if (state.vowelIdx !== null && state.vowelDraft !== null) {
       if (state.vowelIdx < 0) vowels.push(state.vowelDraft);
       else vowels[state.vowelIdx] = state.vowelDraft;
+    }
+    // Solo mode: only show the vowel currently being edited
+    if (!state.showOtherVowels && state.vowelIdx !== null) {
+      const activeIdx = state.vowelIdx < 0 ? vowels.length - 1 : state.vowelIdx;
+      vowels = vowels[activeIdx] ? [vowels[activeIdx]] : [];
     }
     LANGS[state.langDraft.key] = {...state.langDraft, vowels};
   }

@@ -97,6 +97,16 @@ function initEditorUI(){
       if(state.langDraft)refreshCharts();
     });
   }
+  // Solo toggle (show only current vowel)
+  const soloToggle=document.getElementById('soloToggle');
+  if(soloToggle){
+    soloToggle.addEventListener('click',()=>{
+      state.showOtherVowels=!state.showOtherVowels;
+      soloToggle.classList.toggle('active',!state.showOtherVowels);
+      soloToggle.title=state.showOtherVowels?'Show only current vowel':'Show all vowels';
+      if(state.langDraft)refreshCharts();
+    });
+  }
 
   // Chart tabs
   document.getElementById('tabIpa')?.addEventListener('click',()=>{
@@ -158,12 +168,16 @@ function openVowelEditor(idx){
   state.vowelDraft=existing?clone(existing):{ipa:'',h:0.5,b:0.5,h2:null,b2:null,rounded:false,desc:'',type:'short',f1:null,f2:null,ipaAudio:'',wikiUrl:'',words:[]};
   const ve=document.getElementById('veInline');
   if(ve){ve.style.display='block';buildInlineForm();}
+  const st=document.getElementById('soloToggle'); if(st) st.style.display='';
   renderVowelCards();
   refreshCharts();
 }
 
 function closeVowelEditor(){
   state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
+  state.showOtherVowels=true;
+  const st=document.getElementById('soloToggle');
+  if(st){st.style.display='none';st.classList.remove('active');st.title='Show only current vowel';}
   const ve=document.getElementById('veInline');
   if(ve) ve.style.display='none';
   renderVowelCards(); refreshCharts();

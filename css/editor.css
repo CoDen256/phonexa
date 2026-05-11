@@ -344,3 +344,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 .word-drag-handle:active { cursor:grabbing; }
 .word-row.dragging { opacity:.35; }
 .word-row.drag-over { outline:2px solid var(--accent); border-radius:4px; }
+
+/* ── Vowel card drag-to-reorder ─────────────────────────────── */
+.vowel-card.dragging { opacity:.3; }
+.vowel-card.drag-over { outline:2px solid var(--accent); border-radius:8px; }

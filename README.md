@@ -115,9 +115,10 @@ When the practice panel is open and a recording exists, `isCompareMode()` return
 # TODOS
 
 - changing slider automatically updates F1/F2
-- create separate f1/f2 for actual sounds and averages, display separately, filter option?
+- create separate f1/f2 for actual sounds and averages, display separately, filter option? and frequencies per word. 
+- add frequency checker when editing of the vowels
 - bug: selecting left part of sound slider sometimes locks itc
 - monothong / diphtong in a separate filter, not in vowel length
-- improve editor
+- other possible IPA symbols 
 ideas:
 - real time formants update?
