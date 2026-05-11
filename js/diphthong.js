@@ -153,8 +153,8 @@ function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, lk, svgId) {
     else st.slowed=!st.slowed;
     st.lastClick=now;
     playUrlAtRate(v.ipaAudio, st.slowed?0.5:1.0);
-    pulseDiphthong(svgId,x1,y1,x2,y2,color);
     onVowelClicked(v,lang,lk);
+    pulseDiphthong(svgId,x1,y1,x2,y2,color);
   });
   arrowL.appendChild(hit);
 }

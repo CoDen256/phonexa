@@ -75,7 +75,7 @@ function buildVowels(svg, getPos, svgId, showArrows=false) {
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);onVowelClicked(v,lang,lk);});
+      lg.addEventListener('click',()=>{playUrl(v.ipaAudio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
       dotL.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
     }
@@ -94,11 +94,11 @@ function buildVowels(svg, getPos, svgId, showArrows=false) {
       const {lk,lang,v,dx,dy}=members[0];
       dg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       dg.addEventListener('mousemove',moveTip); dg.addEventListener('mouseleave',hideTip);
-      dg.addEventListener('click',()=>{playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);onVowelClicked(v,lang,lk);});
+      dg.addEventListener('click',()=>{playUrl(v.ipaAudio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       let tm=false;
       dg.addEventListener('touchstart',e=>{tm=false;e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
       dg.addEventListener('touchmove', e=>{tm=true;moveTip(e.touches[0]);},{passive:false});
-      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playUrl(v.ipaAudio);pulse(svgId,dx,dy,lang.color);onVowelClicked(v,lang,lk);}});
+      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playUrl(v.ipaAudio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
     }
     dotL.appendChild(dg);
   }
@@ -274,7 +274,7 @@ function buildSidebar() {
   updateCount();
 }
 
-document.getElementById('clearAllFilters')?.addEventListener('click',()=>{
+document.getElementById('clearAllFilters').addEventListener('click',()=>{
   filters.languages.clear(); filters.roundness.clear();
   filters.length.clear();    filters.ipaBase.clear();
   buildSidebar(); renderAll();

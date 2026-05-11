@@ -68,18 +68,27 @@ function buildInlineForm(){
     <div class="field"><label>h (0=Close · 1=Open)</label><input type="number" id="veH" min="0" max="1" step="0.001" value="${v.h??0.5}"></div>
     <div class="field"><label>b (0=Front · 1=Back)</label><input type="number" id="veB" min="0" max="1" step="0.001" value="${v.b??0.5}"></div>
     <button class="btn btn-secondary btn-sm" id="pickIpa" type="button" style="align-self:flex-end">📍 Pick on IPA chart</button>
-    <div class="field"><label>F1 (Hz)</label><input type="number" id="veF1" min="${F1MIN}" max="${F1MAX}" step="1" value="${v.f1||''}"></div>
-    <div class="field"><label>F2 (Hz)</label><input type="number" id="veF2" min="${F2MIN}" max="${F2MAX}" step="1" value="${v.f2||''}"></div>
-    <button class="btn btn-secondary btn-sm" id="pickFormant" type="button" style="align-self:flex-end">📍 Pick on formant</button>
     ${diph?`<div class="field"><label>h Target</label><input type="number" id="veH2" min="0" max="1" step="0.001" value="${v.h2??v.h??0.5}"></div>
     <div class="field"><label>b Target</label><input type="number" id="veB2" min="0" max="1" step="0.001" value="${v.b2??v.b??0.5}"></div>
     <button class="btn btn-secondary btn-sm" id="pickIpaTarget" type="button" style="align-self:flex-end">📍 Pick target on IPA chart</button>`:''}
+    <div class="field"><label>F1 (Hz)</label><input type="number" id="veF1" min="${F1MIN}" max="${F1MAX}" step="1" value="${v.f1||''}"></div>
+    <div class="field"><label>F2 (Hz)</label><input type="number" id="veF2" min="${F2MIN}" max="${F2MAX}" step="1" value="${v.f2||''}"></div>
+    <button class="btn btn-secondary btn-sm" id="pickFormant" type="button" style="align-self:flex-end">📍 Pick on formant</button>
   `;
   sec.appendChild(coordsRow);
   coordsRow.querySelector('#veH').addEventListener('input',e=>{v.h=+e.target.value;refreshCharts();});
   coordsRow.querySelector('#veB').addEventListener('input',e=>{v.b=+e.target.value;refreshCharts();});
-  coordsRow.querySelector('#veF1').addEventListener('input',e=>{v.f1=+e.target.value||null;refreshCharts();});
-  coordsRow.querySelector('#veF2').addEventListener('input',e=>{v.f2=+e.target.value||null;refreshCharts();});
+  if(diph){
+    coordsRow.querySelector('#veH2').addEventListener('input',e=>{v.h2=+e.target.value;refreshCharts();});
+    coordsRow.querySelector('#veB2').addEventListener('input',e=>{v.b2=+e.target.value;refreshCharts();});
+    coordsRow.querySelector('#pickIpaTarget').addEventListener('click',()=>{
+      state.pickingMode='ipa-target';
+      document.getElementById('tabIpa').click();
+      refreshCharts();
+    });
+  }
+  coordsRow.querySelector('#veF1').addEventListener('input',e=>{v.f1=+e.target.value||null;refreshCharts();renderVowelCards();});
+  coordsRow.querySelector('#veF2').addEventListener('input',e=>{v.f2=+e.target.value||null;refreshCharts();renderVowelCards();});
   coordsRow.querySelector('#pickIpa').addEventListener('click',()=>{
     state.pickingMode='ipa';
     document.getElementById('tabIpa').click();
@@ -90,16 +99,6 @@ function buildInlineForm(){
     document.getElementById('tabFormant').click();
     refreshCharts();
   });
-  if(diph){
-    coordsRow.querySelector('#veH2').addEventListener('input',e=>{v.h2=+e.target.value;refreshCharts();});
-    coordsRow.querySelector('#veB2').addEventListener('input',e=>{v.b2=+e.target.value;refreshCharts();});
-    coordsRow.querySelector('#pickIpaTarget').addEventListener('click',()=>{
-      state.pickingMode='ipa-target';
-      document.getElementById('tabIpa').click();
-      refreshCharts();
-    });
-  }
-
   // Audio + wiki
   const urlRow=document.createElement('div'); urlRow.className='ve-meta';
   urlRow.innerHTML=`<div class="field"><label>IPA Audio URL</label><input type="url" id="fIpaAudio" value="${v.ipaAudio||''}" placeholder="https://..."></div><div class="field"><label>Wikipedia URL</label><input type="url" id="fWiki" value="${v.wikiUrl||''}" placeholder="https://en.wikipedia.org/..."></div>`;
@@ -113,7 +112,7 @@ function buildInlineForm(){
   const wordsList=document.createElement('div'); wordsList.className='words-list'; wordsList.id='wordsList';
   wordsSec.appendChild(wordsList);
   const addWordBtn=document.createElement('button'); addWordBtn.className='add-word-btn'; addWordBtn.type='button'; addWordBtn.textContent='+ Add word';
-  addWordBtn.addEventListener('click',()=>{v.words=[...(v.words||[]),{text:'',audio:null}];renderWordRows(wordsList,v);});
+  addWordBtn.addEventListener('click',()=>{v.words=[...(v.words||[]),{text:'',audio:null}];renderWordRows(wordsList,v);renderVowelCards();});
   wordsSec.appendChild(addWordBtn);
   sec.appendChild(wordsSec);
   renderWordRows(wordsList,v);
@@ -134,22 +133,21 @@ function applyVowel(){
 
 function renderWordRows(container,v){
   container.innerHTML='';
+  let dragSrcIdx=null;
   (v.words||[]).forEach((w,i)=>{
-    const row=document.createElement('div'); row.className='word-row';
-    // Order buttons
-    const orderWrap=document.createElement('div'); orderWrap.className='word-order-btns';
-    const upBtn=document.createElement('button'); upBtn.type='button'; upBtn.className='word-order-btn'; upBtn.textContent='↑'; upBtn.disabled=i===0;
-    upBtn.addEventListener('click',()=>{[v.words[i-1],v.words[i]]=[v.words[i],v.words[i-1]];renderWordRows(container,v);});
-    const dnBtn=document.createElement('button'); dnBtn.type='button'; dnBtn.className='word-order-btn'; dnBtn.textContent='↓'; dnBtn.disabled=i===(v.words.length-1);
-    dnBtn.addEventListener('click',()=>{[v.words[i],v.words[i+1]]=[v.words[i+1],v.words[i]];renderWordRows(container,v);});
-    orderWrap.appendChild(upBtn); orderWrap.appendChild(dnBtn);
-    row.appendChild(orderWrap);
-    row.innerHTML+=`<input type="text" class="word-text" placeholder="f&lt;b&gt;ee&lt;/b&gt;t" value="${(w.text||'').replace(/"/g,'&quot;')}"><input type="url" class="word-audio" placeholder="Audio URL" value="${w.audio||''}"><button class="word-del" title="Remove">✕</button>`;
-    // Re-attach orderWrap (innerHTML nuked it)
-    row.insertBefore(orderWrap,row.firstChild);
-    row.querySelector('.word-text').addEventListener('input',e=>w.text=e.target.value);
-    row.querySelector('.word-audio').addEventListener('input',e=>w.audio=e.target.value||null);
-    row.querySelector('.word-del').addEventListener('click',()=>{v.words.splice(i,1);renderWordRows(container,v);});
+    const row=document.createElement('div'); row.className='word-row'; row.draggable=true;
+    const handle=document.createElement('span'); handle.className='word-drag-handle'; handle.textContent='⠿'; handle.title='Drag to reorder';
+    const textIn=document.createElement('input'); textIn.type='text'; textIn.className='word-text'; textIn.placeholder='f<b>ee</b>t'; textIn.value=(w.text||'');
+    const audioIn=document.createElement('input'); audioIn.type='url'; audioIn.className='word-audio'; audioIn.placeholder='Audio URL'; audioIn.value=w.audio||'';
+    const delBtn=document.createElement('button'); delBtn.type='button'; delBtn.className='word-del'; delBtn.title='Remove'; delBtn.textContent='✕';
+    row.appendChild(handle); row.appendChild(textIn); row.appendChild(audioIn); row.appendChild(delBtn);
+    textIn.addEventListener('input',e=>{w.text=e.target.value;renderVowelCards();});
+    audioIn.addEventListener('input',e=>{w.audio=e.target.value||null;});
+    delBtn.addEventListener('click',()=>{v.words.splice(i,1);renderWordRows(container,v);renderVowelCards();});
+    row.addEventListener('dragstart',e=>{dragSrcIdx=i;row.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    row.addEventListener('dragend',()=>{row.classList.remove('dragging');container.querySelectorAll('.word-row').forEach(r=>r.classList.remove('drag-over'));});
+    row.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';container.querySelectorAll('.word-row').forEach(r=>r.classList.remove('drag-over'));if(i!==dragSrcIdx)row.classList.add('drag-over');});
+    row.addEventListener('drop',e=>{e.preventDefault();if(dragSrcIdx===null||dragSrcIdx===i)return;const[moved]=v.words.splice(dragSrcIdx,1);v.words.splice(i,0,moved);renderWordRows(container,v);renderVowelCards();});
     container.appendChild(row);
   });
 }

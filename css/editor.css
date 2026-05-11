@@ -326,3 +326,21 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 }
 .cardinal-toggle.active { color:#4a6888; border-color:#2e4560; background:#192535; }
 .cardinal-toggle:not(.active) { color:#3a5070; opacity:.6; }
+
+/* ── Rounded checkbox: keep label on one line ───────────────── */
+.rounded-row { flex-wrap:nowrap; }
+.rounded-row span { white-space:nowrap; }
+
+/* ── Drag-and-drop word rows ────────────────────────────────── */
+/* Replace old order-button columns with drag-handle column */
+.word-row { grid-template-columns:auto 1fr 1.5fr auto !important; }
+.word-order-btns, .word-order-btn { display:none !important; } /* hide old buttons if any remain */
+.word-drag-handle {
+  cursor:grab; color:var(--muted); font-size:.9rem;
+  padding:0 3px; user-select:none; display:flex; align-items:center;
+  opacity:.5; transition:opacity .12s;
+}
+.word-drag-handle:hover { opacity:1; }
+.word-drag-handle:active { cursor:grabbing; }
+.word-row.dragging { opacity:.35; }
+.word-row.drag-over { outline:2px solid var(--accent); border-radius:4px; }
