@@ -87,6 +87,17 @@ function initEditorUI(){
   const addBtn=document.getElementById('addVowelBtn');
   if(addBtn) addBtn.addEventListener('click',()=>openVowelEditor(-1));
 
+  // Cardinal vowels toggle
+  const cardinalToggle=document.getElementById('cardinalToggle');
+  if(cardinalToggle){
+    cardinalToggle.addEventListener('click',()=>{
+      state.showCardinals=!state.showCardinals;
+      cardinalToggle.classList.toggle('active',state.showCardinals);
+      cardinalToggle.title=state.showCardinals?'Hide cardinal vowels':'Show cardinal vowels';
+      if(state.langDraft)refreshCharts();
+    });
+  }
+
   // Chart tabs
   document.getElementById('tabIpa')?.addEventListener('click',()=>{
     state.chartTab='ipa';

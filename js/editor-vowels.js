@@ -32,6 +32,21 @@ function renderVowelCards(){
     const card=document.createElement('div');
     card.className='vowel-card'+(isActive?' active':'');
     card.style.borderColor=isActive?c:'';
+
+    // Delete button — top-right corner
+    const delBtn=document.createElement('button');
+    delBtn.className='vc-del-btn'; delBtn.title='Delete vowel'; delBtn.textContent='✕';
+    delBtn.addEventListener('click',e=>{
+      e.stopPropagation();
+      if(!confirm(`Delete vowel "${v.ipa}"?`))return;
+      state.langDraft.vowels.splice(i,1);
+      if(state.vowelIdx===i)closeVowelEditor();
+      else if(state.vowelIdx>i)state.vowelIdx--;
+      markUnsaved(); renderVowelCards(); refreshCharts(); updateSectionTitle();
+    });
+    card.appendChild(delBtn);
+
+    // Word chips
     const ws=v.words||[];
     let wordsHtml='';
     if(ws.length){
@@ -39,33 +54,25 @@ function renderVowelCards(){
       ws.forEach((w,wi)=>{const ha=!!w.audio;wordsHtml+=`<button class="vc-word ${ha?'has-audio':'no-audio'}" data-wi="${wi}" data-audio="${w.audio||''}">${ha?'<span class="pi">▶</span>':''}${w.text||''}</button>`;});
       wordsHtml+='</div>';
     }
-    card.innerHTML=`
+
+    const body=document.createElement('div');
+    body.innerHTML=`
       <div class="vc-ipa" style="color:${c}">${v.ipa||'?'}</div>
       <div class="vc-desc">${v.desc||''}</div>
       <div class="vc-round" style="color:${c}70">${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${v.type||'short'}</div>
       ${v.f1?`<div class="vc-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>`:''}
-      ${wordsHtml}
-      <div class="vc-actions">
-        <button class="vc-btn vc-play">▶ Sound</button>
-        <button class="vc-btn" data-i="${i}" data-action="edit">✎ Edit</button>
-        <button class="vc-btn del" data-i="${i}" data-action="del">✕</button>
-      </div>`;
+      ${wordsHtml}`;
+    card.appendChild(body);
+
+    // Word chip audio playback (stop propagation so card click doesn't also open editor)
     card.querySelectorAll('.vc-word.has-audio').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();playUrl(btn.dataset.audio);}));
-    card.querySelector('.vc-play').addEventListener('click',e=>{e.stopPropagation();playUrl(v.ipaAudio);});
-    card.querySelectorAll('.vc-btn[data-action]').forEach(btn=>{
-      btn.addEventListener('click',e=>{
-        e.stopPropagation();
-        const idx=+btn.dataset.i;
-        if(btn.dataset.action==='edit')openVowelEditor(idx);
-        else if(btn.dataset.action==='del'&&confirm(`Delete vowel "${v.ipa}"?`)){
-          state.langDraft.vowels.splice(idx,1);
-          if(state.vowelIdx===idx)closeVowelEditor();
-          else if(state.vowelIdx>idx)state.vowelIdx--;
-          markUnsaved(); renderVowelCards(); refreshCharts(); updateSectionTitle();
-        }
-      });
+
+    // Click card: play sound + open editor
+    card.addEventListener('click',()=>{
+      playUrl(v.ipaAudio);
+      openVowelEditor(i);
     });
-    card.addEventListener('click',()=>openVowelEditor(i));
+
     grid.appendChild(card);
   });
 }

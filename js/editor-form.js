@@ -136,7 +136,17 @@ function renderWordRows(container,v){
   container.innerHTML='';
   (v.words||[]).forEach((w,i)=>{
     const row=document.createElement('div'); row.className='word-row';
-    row.innerHTML=`<input type="text" class="word-text" placeholder="f&lt;b&gt;ee&lt;/b&gt;t" value="${(w.text||'').replace(/"/g,'&quot;')}"><input type="url" class="word-audio" placeholder="Audio URL" value="${w.audio||''}"><button class="word-del" title="Remove">✕</button>`;
+    // Order buttons
+    const orderWrap=document.createElement('div'); orderWrap.className='word-order-btns';
+    const upBtn=document.createElement('button'); upBtn.type='button'; upBtn.className='word-order-btn'; upBtn.textContent='↑'; upBtn.disabled=i===0;
+    upBtn.addEventListener('click',()=>{[v.words[i-1],v.words[i]]=[v.words[i],v.words[i-1]];renderWordRows(container,v);});
+    const dnBtn=document.createElement('button'); dnBtn.type='button'; dnBtn.className='word-order-btn'; dnBtn.textContent='↓'; dnBtn.disabled=i===(v.words.length-1);
+    dnBtn.addEventListener('click',()=>{[v.words[i],v.words[i+1]]=[v.words[i+1],v.words[i]];renderWordRows(container,v);});
+    orderWrap.appendChild(upBtn); orderWrap.appendChild(dnBtn);
+    row.appendChild(orderWrap);
+    row.innerHTML+=`<input type="text" class="word-text" placeholder="f&lt;b&gt;ee&lt;/b&gt;t" value="${(w.text||'').replace(/"/g,'&quot;')}"><input type="url" class="word-audio" placeholder="Audio URL" value="${w.audio||''}"><button class="word-del" title="Remove">✕</button>`;
+    // Re-attach orderWrap (innerHTML nuked it)
+    row.insertBefore(orderWrap,row.firstChild);
     row.querySelector('.word-text').addEventListener('input',e=>w.text=e.target.value);
     row.querySelector('.word-audio').addEventListener('input',e=>w.audio=e.target.value||null);
     row.querySelector('.word-del').addEventListener('click',()=>{v.words.splice(i,1);renderWordRows(container,v);});

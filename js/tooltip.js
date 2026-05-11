@@ -68,7 +68,7 @@ function showPicker(cx, cy, group, svgId, dx, dy) {
   for (const {lk,lang,v} of group) {
     const btn=document.createElement('button'); btn.className='picker-btn';
     btn.innerHTML=`<span class="picker-ipa" style="color:${lang.color}">${v.ipa}</span><span class="picker-info"><span class="picker-lang" style="color:${lang.color}">${lang.label}</span><span class="picker-desc">${v.desc}</span></span>`;
-    btn.addEventListener('click',()=>{ hidePicker(); playUrl(v.ipaAudio); pulse(svgId,dx,dy,lang.color); });
+    btn.addEventListener('click',()=>{ hidePicker(); playUrl(v.ipaAudio); pulse(svgId,dx,dy,lang.color); onVowelClicked(v,lang,lk); });
     document.getElementById('pickerItems').appendChild(btn);
   }
   picker.style.display='block';
