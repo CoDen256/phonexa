@@ -80,5 +80,3 @@ function showPicker(cx, cy, group, svgId, dx, dy) {
 }
 function hidePicker() { picker.style.display='none'; }
 document.addEventListener('click', e=>{ if(!picker.contains(e.target)) hidePicker(); }, true);
-
-function isDiph(v){ return v.type==='diphthong' && v.h2!=null && v.b2!=null; }
