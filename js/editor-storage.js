@@ -32,7 +32,11 @@ async function loadFromFolder(h){
         const dir=await h.getDirectoryHandle(name);
         const langFile=await dir.getFileHandle('lang.json');
         const data=JSON.parse(await(await langFile.getFile()).text());
-        if(data&&data.key){state.langs[data.key]=data; state.langSources[data.key]='folder'; loaded++;}
+        if(data&&data.key){
+          state.langs[data.key]=data; state.langSources[data.key]='folder';
+          if(!state.langOrder.includes(data.key)) state.langOrder.push(data.key);
+          loaded++;
+        }
       }catch(e){console.warn('Folder lang '+name+':',e);}
     }
   }catch(e){/* No index.json yet — empty folder, ok */}
@@ -53,11 +57,14 @@ async function writeToFolder(handle,data){
 
 // ─── Update index.json in a folder to list all saved language keys ────────────
 async function writeIndex(handle,keys){
-  let existing=[];
-  try{const f=await handle.getFileHandle('index.json');existing=JSON.parse(await(await f.getFile()).text()).languages||[];}catch(e){}
-  for(const k of keys) if(!existing.includes(k)) existing.push(k);
+  // Respect state.langOrder for the save order
+  const ordered=(state.langOrder||[]).filter(k=>keys.includes(k));
+  const rest=keys.filter(k=>!ordered.includes(k));
+  const finalKeys=[...ordered,...rest];
   const fh=await handle.getFileHandle('index.json',{create:true});
-  const w=await fh.createWritable(); await w.write(JSON.stringify({languages:existing},null,2)); await w.close();
+  const w=await fh.createWritable();
+  await w.write(JSON.stringify({languages:finalKeys},null,2));
+  await w.close();
 }
 
 // ─── Flush the current vowel/language draft into state.langs ─────────────────
@@ -140,7 +147,7 @@ document.getElementById('newLangBtn').addEventListener('click',()=>{
   if(state.unsaved&&!confirm('Discard unsaved changes?'))return;
   const key='lang-'+Date.now().toString(36);
   const fresh={key,label:'New Language',color:'#a78bfa',vowels:[]};
-  state.langs[key]=fresh; state.langSources[key]='new';
+  state.langs[key]=fresh; state.langSources[key]='new'; state.langOrder.push(key);
   state.selKey=key; state.langDraft=clone(fresh);
   state.unsaved=true; state.vowelIdx=null; state.vowelDraft=null;
   renderLangList(); renderMain();

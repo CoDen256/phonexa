@@ -37,7 +37,7 @@
         <button class="view-tab active" id="tabIpa" type="button">IPA Chart</button>
         <button class="view-tab" id="tabFormant" type="button">Formant Plot</button>
         <div style="margin-left:auto;display:flex;gap:4px;align-items:flex-end">
-          <button class="cardinal-toggle active" id="cardinalToggle" title="Hide cardinal vowels" type="button">Cardinals</button>
+          <button class="cardinal-toggle" id="cardinalToggle" title="Show cardinal vowels" type="button">Cardinals</button>
           <button class="cardinal-toggle" id="soloToggle" title="Show only current vowel" type="button" style="display:none">Only current</button>
         </div>
       </div>
@@ -106,9 +106,10 @@ const state = {
   vowelIdx:null, vowelDraft:null,
   dirHandle:null, unsaved:false, chartTab:'ipa',
   pickingMode: null,  // null | 'ipa' | 'ipa-target' | 'formant'
-  showCardinals: true,
+  showCardinals: false,
   showOtherVowels: true,
   langSources: {},    // key → 'builtin' | 'folder' | 'new'
+  langOrder: [],      // display/save order of language keys
 };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }

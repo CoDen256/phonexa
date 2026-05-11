@@ -9,9 +9,10 @@ async function loadLanguages(){
       fetch(`lang/${name}/lang.json?t=${Date.now()}`)
         .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
         .then(d=>{
-          if(d&&d.key&&!state.langSources[d.key]){ // don't overwrite folder langs
+          if(d&&d.key&&!state.langSources[d.key]){
             state.langs[d.key]=d;
             state.langSources[d.key]='builtin';
+            if(!state.langOrder.includes(d.key)) state.langOrder.push(d.key);
           }
         })
         .catch(e=>console.warn(`Skip ${name}:`,e.message))
@@ -21,22 +22,68 @@ async function loadLanguages(){
   updateSaveButtons();
 }
 
-// ─── Language tabs (horizontal) ───────────────────────────────────────────────
+// ─── Language tabs (horizontal) with drag-to-reorder and × removal ──────────
 function renderLangList(){
   const el=document.getElementById('langTabs'); if(!el)return;
   el.innerHTML='';
-  for(const[key,lang]of Object.entries(state.langs)){
+  // Ensure langOrder covers all current keys
+  for(const key of Object.keys(state.langs)) if(!state.langOrder.includes(key)) state.langOrder.push(key);
+  let dragSrcKey=null;
+
+  for(const key of state.langOrder){
+    const lang=state.langs[key]; if(!lang) continue;
     const src=state.langSources[key]||'builtin';
+    const isActive=state.selKey===key;
+
+    const wrap=document.createElement('div');
+    wrap.className='lang-tab-wrap'; wrap.draggable=true;
+
     const btn=document.createElement('button');
-    btn.type='button'; btn.className='lang-tab'+(state.selKey===key?' active':'');
+    btn.type='button'; btn.className='lang-tab'+(isActive?' active':'');
     if(src==='builtin') btn.classList.add('builtin');
-    btn.style.borderColor=state.selKey===key?lang.color:'';
-    btn.style.color=state.selKey===key?lang.color:'';
+    btn.style.borderColor=isActive?lang.color:'';
+    btn.style.color=isActive?lang.color:'';
     btn.textContent=lang.label||key;
-    if(src==='builtin') btn.title='Built-in language — editable, use Save As to export';
+    if(src==='builtin') btn.title='Built-in — editable, use Save As to export';
     btn.addEventListener('click',()=>selectLang(key));
-    el.appendChild(btn);
+
+    const delBtn=document.createElement('button');
+    delBtn.type='button'; delBtn.className='lang-tab-del'; delBtn.textContent='×';
+    delBtn.title='Remove from editor';
+    delBtn.addEventListener('click',e=>{e.stopPropagation();removeLang(key);});
+
+    wrap.appendChild(btn); wrap.appendChild(delBtn);
+
+    wrap.addEventListener('dragstart',e=>{dragSrcKey=key;wrap.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    wrap.addEventListener('dragend',()=>{wrap.classList.remove('dragging');el.querySelectorAll('.lang-tab-wrap').forEach(t=>t.classList.remove('drag-over'));});
+    wrap.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';el.querySelectorAll('.lang-tab-wrap').forEach(t=>t.classList.remove('drag-over'));if(key!==dragSrcKey)wrap.classList.add('drag-over');});
+    wrap.addEventListener('drop',e=>{
+      e.preventDefault(); if(!dragSrcKey||dragSrcKey===key)return;
+      const from=state.langOrder.indexOf(dragSrcKey), to=state.langOrder.indexOf(key);
+      if(from!==-1&&to!==-1){state.langOrder.splice(from,1);state.langOrder.splice(to,0,dragSrcKey);}
+      renderLangList();
+    });
+
+    el.appendChild(wrap);
   }
+}
+
+// ─── Remove a language from the editor ───────────────────────────────────────
+function removeLang(key){
+  const label=state.langs[key]?.label||key;
+  if(!confirm(`Remove "${label}" from the editor?\n(This does not delete the file from disk.)`))return;
+  delete state.langs[key]; delete state.langSources[key];
+  const idx=state.langOrder.indexOf(key); if(idx!==-1)state.langOrder.splice(idx,1);
+  if(state.selKey===key){
+    state.selKey=null; state.langDraft=null; state.vowelIdx=null;
+    state.vowelDraft=null; state.pickingMode=null; state.unsaved=false;
+    document.getElementById('langMetaForm')?.style && (document.getElementById('langMetaForm').style.display='none');
+    document.getElementById('vowelSection')?.style && (document.getElementById('vowelSection').style.display='none');
+    document.getElementById('veInline')?.style && (document.getElementById('veInline').style.display='none');
+    const ph=document.getElementById('editorPaneHint'); if(ph)ph.style.display='block';
+    const st=document.getElementById('soloToggle'); if(st){st.style.display='none';st.classList.remove('active');}
+  }
+  renderLangList(); updateSaveButtons(); renderEditorAll();
 }
 
 function selectLang(key){

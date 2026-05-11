@@ -352,3 +352,19 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 /* ── Built-in language tabs ─────────────────────────────────── */
 .lang-tab.builtin { opacity:.7; }
 .lang-tab-lock { font-size:.6rem; margin-right:3px; opacity:.6; }
+
+/* ── Language tab: drag-to-reorder + × removal ──────────────── */
+.lang-tab-wrap {
+  position:relative; display:inline-flex; align-items:center; flex-shrink:0;
+}
+.lang-tab-del {
+  display:none; position:absolute; top:-5px; right:-5px;
+  width:15px; height:15px; border-radius:50%; padding:0; line-height:1;
+  background:#f87171; border:none; color:#fff; cursor:pointer;
+  font-size:.7rem; align-items:center; justify-content:center; z-index:2;
+  transition:background .12s;
+}
+.lang-tab-del:hover { background:#ef4444; }
+.lang-tab-wrap:hover .lang-tab-del { display:flex; }
+.lang-tab-wrap.dragging { opacity:.35; }
+.lang-tab-wrap.drag-over .lang-tab { outline:2px solid var(--accent); border-radius:6px; }
