@@ -319,7 +319,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 
 /* ── Cardinal toggle button (sits beside chart tabs) ────────── */
 .cardinal-toggle {
-  margin-left:auto; padding:4px 10px; border-radius:6px 6px 0 0;
+  padding:4px 10px; border-radius:6px 6px 0 0;
   font-size:.68rem; cursor:pointer; border:1px solid var(--border);
   background:none; color:var(--muted); border-bottom:none;
   transition:all .12s; white-space:nowrap;
@@ -348,3 +348,7 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 /* ── Vowel card drag-to-reorder ─────────────────────────────── */
 .vowel-card.dragging { opacity:.3; }
 .vowel-card.drag-over { outline:2px solid var(--accent); border-radius:8px; }
+
+/* ── Built-in language tabs ─────────────────────────────────── */
+.lang-tab.builtin { opacity:.7; }
+.lang-tab-lock { font-size:.6rem; margin-right:3px; opacity:.6; }

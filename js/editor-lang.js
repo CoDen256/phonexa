@@ -2,18 +2,23 @@
 
 // ─── Load languages ───────────────────────────────────────────────────────────
 async function loadLanguages(){
-  state.langs={};
   try{
     const idx=await fetch(`lang/index.json?t=${Date.now()}`).then(r=>r.json());
     const names=(idx.languages||[]).filter(n=>!n.startsWith('_'));
     await Promise.all(names.map(name=>
       fetch(`lang/${name}/lang.json?t=${Date.now()}`)
         .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
-        .then(d=>{if(d&&d.key)state.langs[d.key]=d;})
+        .then(d=>{
+          if(d&&d.key&&!state.langSources[d.key]){ // don't overwrite folder langs
+            state.langs[d.key]=d;
+            state.langSources[d.key]='builtin';
+          }
+        })
         .catch(e=>console.warn(`Skip ${name}:`,e.message))
     ));
   }catch(e){console.error('Failed to load index',e);}
   renderLangList();
+  updateSaveButtons();
 }
 
 // ─── Language tabs (horizontal) ───────────────────────────────────────────────
@@ -21,11 +26,14 @@ function renderLangList(){
   const el=document.getElementById('langTabs'); if(!el)return;
   el.innerHTML='';
   for(const[key,lang]of Object.entries(state.langs)){
+    const src=state.langSources[key]||'builtin';
     const btn=document.createElement('button');
     btn.type='button'; btn.className='lang-tab'+(state.selKey===key?' active':'');
+    if(src==='builtin') btn.classList.add('builtin');
     btn.style.borderColor=state.selKey===key?lang.color:'';
     btn.style.color=state.selKey===key?lang.color:'';
     btn.textContent=lang.label||key;
+    if(src==='builtin') btn.title='Built-in language — editable, use Save As to export';
     btn.addEventListener('click',()=>selectLang(key));
     el.appendChild(btn);
   }
@@ -38,6 +46,7 @@ function selectLang(key){
   state.pickingMode=null;
   renderLangList();
   showLangPanel();
+  updateSaveButtons();
 }
 
 // ─── Show/populate the lang panel (runs once per language selection) ──────────
@@ -54,9 +63,7 @@ function showLangPanel(){
     if(fColor) fColor.value=state.langDraft.color||'#7eb8f7';
   }
 
-  // Save button
-  const saveBtn=document.getElementById('saveLangBtn');
-  if(saveBtn) saveBtn.style.display='inline-flex';
+  updateSaveButtons();
 
   // Vowel section
   const vs=document.getElementById('vowelSection');
@@ -71,6 +78,18 @@ function showLangPanel(){
 // renderMain kept for compatibility — just calls showLangPanel
 function renderMain(){ showLangPanel(); }
 
+// ─── Save button visibility ───────────────────────────────────────────────────
+function updateSaveButtons(){
+  const folderConnected=!!state.dirHandle;
+  const hasLangs=Object.keys(state.langs).some(k=>k!=='cardinal');
+  // Save: only when a folder is connected (saves everything to it)
+  const saveBtn=document.getElementById('saveLangBtn');
+  if(saveBtn) saveBtn.style.display=folderConnected?'inline-flex':'none';
+  // Save As: whenever there's anything to save (no folder needed)
+  const saveAsBtn=document.getElementById('saveAsLangBtn');
+  if(saveAsBtn) saveAsBtn.style.display=hasLangs?'inline-flex':'none';
+}
+
 // ─── One-time UI wiring (called from init) ────────────────────────────────────
 function initEditorUI(){
   // Lang meta inputs
@@ -79,9 +98,11 @@ function initEditorUI(){
   if(fLabel) fLabel.addEventListener('input',e=>{if(state.langDraft){state.langDraft.label=e.target.value;markUnsaved();renderLangList();}});
   if(fColor) fColor.addEventListener('input',e=>{if(state.langDraft){state.langDraft.color=e.target.value;markUnsaved();renderLangList();}});
 
-  // Save button
+  // Save / Save As buttons
   const saveBtn=document.getElementById('saveLangBtn');
   if(saveBtn) saveBtn.addEventListener('click',saveLang);
+  const saveAsBtn=document.getElementById('saveAsLangBtn');
+  if(saveAsBtn) saveAsBtn.addEventListener('click',saveAsLang);
 
   // Add vowel button
   const addBtn=document.getElementById('addVowelBtn');
