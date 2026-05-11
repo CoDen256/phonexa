@@ -1,4 +1,23 @@
-// ── Diphthong rendering + animation ─────────────────────────────────────────
+/**
+ * diphthong.js — Diphthong arrow rendering and click animation for the main chart.
+ *
+ * Diphthongs are excluded from the proximity-clustering system in buildVowels
+ * and always render as straight arrows. On the formant chart they appear as
+ * regular dots at their source F1/F2 position.
+ *
+ * Arrow style: faint dashed line at rest; brightens to solid on hover.
+ * The label is always full-color, independent of arrow hover state.
+ *
+ * Rate-aware click: each diphthong remembers its last click time and toggles
+ * between normal speed and 0.5× on successive clicks within 5 seconds.
+ * State is stored in _diphState (outside the render cycle) so it survives
+ * chart re-renders caused by filter changes.
+ *
+ * Dependencies: utils.js ($s, $t), index.html globals
+ *   (showTip, moveTip, hideTip, playUrlAtRate, isCompareMode, playSelection)
+ */
+
+/** Per-diphthong click state. Key: `${lk}::${ipa}` → {lastClick, slowed} */
 const _diphState = {};   // key: `${lk}::${ipa}` → {lastClick, slowed}
 
 function playUrlAtRate(url, rate=1) {
@@ -7,6 +26,17 @@ function playUrlAtRate(url, rate=1) {
   a.play().catch(e=>console.warn('Audio:',e.message));
 }
 
+/**
+ * Spawn a single expanding, fading ring at a point.
+ * Reused by pulseDiphthong (source/target bursts) and pulse() (monophthong clicks).
+ *
+ * @param {SVGElement} svg
+ * @param {number} x, y       Centre in SVG coords
+ * @param {string} color
+ * @param {number} r0         Starting radius
+ * @param {number} speed      Radius growth per frame
+ * @param {number} opStart    Starting opacity
+ */
 function spawnRing(svg, x, y, color, r0=4, speed=1.8, opStart=0.8) {
   const ring=$s('circle',{cx:x,cy:y,r:r0,fill:'none',stroke:color,'stroke-width':1.5,opacity:opStart,style:'pointer-events:none'});
   svg.appendChild(ring);
@@ -19,6 +49,14 @@ function spawnRing(svg, x, y, color, r0=4, speed=1.8, opStart=0.8) {
   requestAnimationFrame(step);
 }
 
+/**
+ * Click animation: ring bursts at source, dot travels to target, ring bursts on arrival.
+ *
+ * @param {string} svgId   Target SVG element ID
+ * @param {number} x1,y1   Source position (SVG coords)
+ * @param {number} x2,y2   Target position (SVG coords)
+ * @param {string} color
+ */
 // Single dot + ring bursts at endpoints
 function pulseDiphthong(svgId, x1, y1, x2, y2, color) {
   const svg=document.getElementById(svgId); if(!svg)return;
@@ -43,6 +81,31 @@ function pulseDiphthong(svgId, x1, y1, x2, y2, color) {
   requestAnimationFrame(step);
 }
 
+/**
+ * Render a diphthong arrow on the IPA chart.
+ *
+ * Visual elements (non-interactive):
+ *   - Source: filled r=3 dot; target: outline r=3.5 dot
+ *   - Arrow line: faint (opacity 0.3) dashed at rest, brightens to solid on hover
+ *   - Arrowhead: same opacity as line, responds to same hover
+ *   - Label: always full-color at opacity 0.95, unaffected by hover state
+ *     Positioned perpendicular to the arrow (right-hand side):
+ *       lx = midX + uy×SIDE,  ly = midY − ux×SIDE
+ *
+ * Interactive: wide transparent hit <line> covering the full arrow.
+ *   mouseenter → highlights line+head, shows tooltip
+ *   mouseleave → reverts line+head to faint/dashed, hides tooltip
+ *   click      → rate-aware playback + pulseDiphthong animation
+ *
+ * @param {SVGElement} arrowL   Layer for lines/labels (rendered below dots)
+ * @param {SVGElement} dotL     Layer for dots (rendered above labels)
+ * @param {number} x1,y1        Source position (SVG coords)
+ * @param {number} x2,y2        Target position (SVG coords)
+ * @param {object} v            Vowel object
+ * @param {object} lang         Language object
+ * @param {string} lk           Language key (used to key _diphState)
+ * @param {string} svgId        SVG element ID (passed to pulseDiphthong)
+ */
 // Diphthong arrow: straight line + arrowhead + label beside arrow + rate-aware playback
 function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, lk, svgId) {
   const color=lang.color, dist=Math.hypot(x2-x1,y2-y1);

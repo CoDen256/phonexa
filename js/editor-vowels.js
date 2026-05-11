@@ -1,4 +1,23 @@
-// ── Editor vowel cards, inline form, words editor ───────────────────────────
+/**
+ * editor-vowels.js — Vowel card rendering for the editor overview panel.
+ *
+ * renderVowelCards() builds the horizontal strip of vowel cards shown
+ * below the editor charts. Each card shows the IPA symbol, description,
+ * rounded/type info, formant values, example word chips (with audio), and
+ * Edit/Delete action buttons.
+ *
+ * Cards are rebuilt whenever:
+ *   - a vowel is applied or deleted
+ *   - the active vowel index changes (to update the highlighted card)
+ *   - any draft field changes that affects the card display
+ *
+ * Also exports updateSectionTitle() and markUnsaved() as small state helpers
+ * used by the editor's vowel lifecycle functions.
+ *
+ * Dependencies: editor.html globals (state, openVowelEditor, closeVowelEditor,
+ *   renderLangIpa, renderLangFormant)
+ */
+
 // ─── Vowel cards ─────────────────────────────────────────────────────────────
 function renderVowelCards(){
   const grid=document.getElementById('vowelCards');

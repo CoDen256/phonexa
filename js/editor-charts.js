@@ -1,4 +1,27 @@
-// ── Editor chart helpers: grid drawing, diphthong arrows, vowel overlay ──────
+/**
+ * editor-charts.js — SVG chart helpers for the language editor page.
+ *
+ * Provides two kinds of functionality:
+ *
+ * 1. Grid drawing primitives (drawGridIpa, drawGridFormant, drawCardinalDots)
+ *    These are called by renderLangIpa / renderLangFormant each time the
+ *    language draft changes to establish the background before vowels are drawn.
+ *
+ * 2. Vowel overlay (drawVowelsOnChart, drawDiphArrow, renderLangIpa, renderLangFormant)
+ *    Renders all vowels of the current draft onto the editor charts.
+ *    The actively-edited vowel (state.vowelIdx) is highlighted with a larger
+ *    dot, brighter label, and glow. Diphthong vowels skip the normal label
+ *    and get an arrow with the label beside it instead.
+ *
+ * Chart geometry uses a smaller 700×420 viewBox (vs 1270×730 in index.html):
+ *   LT / ltPos(h,b) / ltHB(px,py) — IPA trapezoid
+ *   LF / lfPos(f1,f2) / lfF1F2(px,py) — Formant scatter
+ *
+ * Dependencies: utils.js, editor.html globals
+ *   (state, LT, ltPos, LF, lfPos, F1MIN/MAX, F2MIN/MAX, TRAP_ROWS,
+ *    openVowelEditor, isDiph)
+ */
+
 // ─── SVG draw helpers ─────────────────────────────────────────────────────────
 function drawGridIpa(svg){
   TRAP_ROWS.forEach(row=>{

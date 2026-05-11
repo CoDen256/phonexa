@@ -1,4 +1,30 @@
-// ── Practice panel: recording, waveform, analysis, comparison ───────────────
+/**
+ * practice.js — Pronunciation practice panel.
+ *
+ * Manages the fixed bottom-bar panel with two columns:
+ *   Left  — user's own recording: mic capture, waveform with draggable selection
+ *           handles, WAV encoding, send to local server for F1/F2 analysis
+ *   Right — reference vowel: fetch + decode any vowel's audio, same waveform
+ *           and analysis flow
+ *
+ * Comparison mode: when a recording exists and the panel is open,
+ * every vowel click in the main chart triggers playback of the reference
+ * vowel followed by the user's selected recording slice.
+ *
+ * Waveform system: makeWavePainter() creates a canvas draw function;
+ * addWaveDrag() attaches drag interaction; playSlice() handles audio
+ * playback and animates the cursor on the waveform.
+ *
+ * Server: expects analyze_server.py running on localhost:5050.
+ * The browser sends a WAV slice (already trimmed to the selected window)
+ * with X-Window-Start:0 / X-Window-End:1 so the server analyses the
+ * whole clip. The server returns {f1, f2, duration_ms}.
+ *
+ * Dependencies: utils.js (encodeWAV), index.html globals
+ *   (LANGS, passesFilters, renderFormant, playUrl, playUrlAtRate,
+ *    recordedVowel, refAnalyzed, refVowelMeta, analyzedFormants)
+ */
+
 // ─── Practice panel ───────────────────────────────────────────────────────────
 const SERVER='http://localhost:5050';
 let recState='idle';

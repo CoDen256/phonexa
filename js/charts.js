@@ -1,4 +1,22 @@
-// ── Chart rendering: buildVowels, IPA, Formant, Detail ──────────────────────
+/**
+ * charts.js — All chart rendering for the main chart page.
+ *
+ * Rendering pipeline:
+ *   renderAll() → renderIpa() + renderFormant() + renderDetail() + updateCount()
+ *
+ * The core is buildVowels(), which is called by both renderIpa and renderFormant
+ * with different getPos functions. Everything else feeds into or wraps it.
+ *
+ * Also contains buildSidebar() which builds the filter UI, and renderDetail()
+ * which renders the per-language vowel card strip below the charts.
+ *
+ * Dependencies: utils.js, diphthong.js, index.html globals
+ *   (LANGS, filters, passesFilters, showTip, showClusterTip, moveTip, hideTip,
+ *    showPicker, pulse, onVowelClicked, playUrl, recordedVowel, analyzedFormants,
+ *    refAnalyzed, refVowelMeta, TRAP, trapPos, ROWS, FP, formantPos, F1MIN/MAX,
+ *    F2MIN/MAX, IPA_BASE_ORDER, getBase, getLength)
+ */
+
 // ─── Chart builder (shared by IPA + Formant renderers) ───────────────────────
 function buildVowels(svg, getPos, svgId, showArrows=false) {
   const arrowL=$s('g'), langL=$s('g'), cardL=$s('g'), dotL=$s('g');
