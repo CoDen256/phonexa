@@ -186,3 +186,104 @@
   *::-webkit-scrollbar-thumb { background:#2a4560; border-radius:10px; border:1px solid transparent; background-clip:padding-box; }
   *::-webkit-scrollbar-thumb:hover { background:#3a6080; }
   *::-webkit-scrollbar-corner { background:transparent; }
+/* ── New two-column editor layout ─────────────────────────── */
+.lang-tab-bar {
+  display:flex; align-items:center; gap:6px; padding:6px 12px;
+  border-bottom:1px solid var(--border); flex-shrink:0;
+  background:var(--surface); overflow-x:auto;
+}
+.lang-tab {
+  padding:4px 12px; border-radius:6px; border:1px solid var(--border);
+  background:none; color:var(--muted); font-size:.76rem; cursor:pointer;
+  white-space:nowrap; transition:all .12s;
+}
+.lang-tab:hover { border-color:#4a7098; color:#d8e8f4; }
+.lang-tab.active { border-color:var(--accent); color:var(--accent); background:#1a3050; }
+.lang-tab-sep { width:1px; height:18px; background:var(--border); flex-shrink:0; }
+.lang-tab-bar .btn { font-size:.72rem; padding:4px 10px; flex-shrink:0; }
+.lang-tab-bar .unsaved-note { font-size:.68rem; flex-shrink:0; }
+
+.editor-body { display:flex; flex:1; overflow:hidden; }
+.chart-pane  { flex:1; display:flex; flex-direction:column; overflow:hidden; padding:0; }
+.chart-pane .view-tabs { padding:8px 12px 0; display:flex; gap:6px; }
+.chart-pane .chart-panels { flex:1; position:relative; padding:0 12px 4px; overflow:hidden; }
+.chart-pane .chart-panels .chart-panel { height:100%; }
+.chart-pane .chart-panels .chart-wrap  { height:100%; }
+.chart-pane .chart-panels .chart-svg   { height:100%; }
+.chart-pane .chart-hint { padding:2px 12px 6px; font-size:.62rem; color:var(--muted); }
+
+.vowel-pane {
+  width:270px; flex-shrink:0; border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden; background:var(--card);
+}
+.vowel-pane-body { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+.lang-meta-form { padding:8px 12px; border-bottom:1px solid var(--border); }
+.lang-meta-form .form-row { flex-wrap:nowrap; gap:6px; }
+.lang-meta-form .field label { font-size:.56rem; }
+.lang-meta-form input[type=text] { font-size:.74rem; padding:4px 7px; }
+
+/* ── Layout ───────────────────────────────────────────────────── */
+body { display:flex; flex-direction:column; min-height:100vh; }
+.editor-body { display:flex; flex:1; overflow:hidden; }
+.main-col { flex:1; display:flex; flex-direction:column; overflow-y:auto; min-width:0; }
+.chart-section { flex-shrink:0; }
+/* Chart fills container width, maintains 5:3 aspect ratio */
+.chart-panel { display:none; }
+.chart-panel.active { display:block; }
+.chart-svg { display:block; width:100%; aspect-ratio:5/3; }
+/* Editor pane (right sidebar) */
+.editor-pane {
+  width:270px; flex-shrink:0; border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow-y:auto; background:var(--card);
+}
+.editor-pane-hint { font-size:.72rem; color:var(--muted); padding:16px 12px; }
+
+/* ── Compact vowel editor for 270px pane ─────────────────────── */
+.ve-inline { padding:8px; }
+.ve-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.ve-header h3 { font-size:.8rem; margin:0; }
+.ve-section-title { font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin:8px 0 4px; }
+.ve-row { display:flex; gap:6px; }
+.ve-row .field { flex:1; min-width:0; }
+.ve-row .field input, .ve-row .field select { width:100%; }
+.ve-coords { display:flex; flex-wrap:wrap; gap:5px; }
+.ve-coords .field { flex:1; min-width:80px; }
+.ve-coords .field input { width:100%; }
+.ve-coords button { flex:1 1 100%; font-size:.68rem; padding:3px 8px; }
+.ve-meta .field { margin-bottom:5px; }
+.ve-meta .field input { width:100%; font-size:.72rem; }
+.ve-meta .field label { font-size:.58rem; }
+/* IPA picker — compact grid */
+.ipa-picker-grid { display:flex; flex-wrap:wrap; gap:2px; margin:4px 0; }
+.ipa-picker-grid button { width:28px; height:26px; font-size:.85rem; padding:0; font-family:Georgia,serif; }
+.ipa-mods-row { display:flex; flex-wrap:wrap; gap:2px; margin-bottom:4px; }
+.ipa-mods-row button { padding:2px 5px; font-size:.72rem; }
+/* Word rows compact */
+.word-rows { display:flex; flex-direction:column; gap:4px; margin:4px 0; }
+.word-row { display:grid; grid-template-columns:1fr auto; gap:4px; align-items:center; }
+.word-row input { font-size:.72rem; min-width:0; width:100%; }
+.word-row-url { grid-column:1/-1; }
+
+/* ── Resize handle between main-col and editor-pane ──── */
+.resize-handle {
+  width:5px; flex-shrink:0; background:var(--border);
+  cursor:col-resize; transition:background .12s;
+}
+.resize-handle:hover, .resize-handle.dragging { background:var(--accent); }
+/* ── Override old chart size constraints ───────────────────── */
+/* Old rules had max-width:680px on .chart-section and max-height:320px
+   on .chart-wrap / .chart-svg. Use higher-specificity selectors to win. */
+.main-col .chart-section { max-width:none !important; padding:0 12px 4px; }
+.main-col .chart-wrap { max-height:none !important; overflow:visible !important; }
+.main-col .chart-svg { max-height:none !important; height:auto !important; width:100%; aspect-ratio:5/3; }
+
+/* ── Delete button right-aligned in vowel card ─────────────── */
+.vc-actions .del { margin-left:auto; }
+
+/* ── Editor pane: prevent horizontal overflow when resized wide ── */
+.editor-pane { overflow-x:hidden; }
+.ve-inline { overflow-x:hidden; min-width:0; }
+.ve-inline .ipa-section { flex-wrap:wrap; }
+.ve-inline .ipa-picker-box { min-width:0; }
+.ve-inline .ve-coords { flex-wrap:wrap; }
+.ve-inline .ve-meta { flex-wrap:wrap; }

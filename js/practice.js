@@ -26,7 +26,7 @@
  */
 
 // ─── Practice panel ───────────────────────────────────────────────────────────
-const SERVER='http://localhost:5050';
+const SERVER='http://localhost:5000';
 let recState='idle';
 let recBlob=null, recObjectURL=null, recSamples=null, recSampleRate=22050;
 let waveStart=0.33, waveEnd=0.67, waveDrag=null, waveCursorPos=null;

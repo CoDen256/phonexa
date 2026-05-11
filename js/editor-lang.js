@@ -1,4 +1,5 @@
-// ─── Language list, selection, main panel render, vowel editor open/close ─────
+// ─── Language list, selection, main panel, vowel editor ──────────────────────
+
 // ─── Load languages ───────────────────────────────────────────────────────────
 async function loadLanguages(){
   state.langs={};
@@ -15,16 +16,18 @@ async function loadLanguages(){
   renderLangList();
 }
 
-// ─── Language list ────────────────────────────────────────────────────────────
+// ─── Language tabs (horizontal) ───────────────────────────────────────────────
 function renderLangList(){
-  const el=document.getElementById('langList');
+  const el=document.getElementById('langTabs'); if(!el)return;
   el.innerHTML='';
   for(const[key,lang]of Object.entries(state.langs)){
-    const item=document.createElement('div');
-    item.className='lang-item'+(state.selKey===key?' active':'');
-    item.innerHTML=`<span class="lang-dot" style="background:${lang.color}"></span><span class="lang-item-name">${lang.label||key}</span><span class="lang-item-key">${key}</span>`;
-    item.addEventListener('click',()=>selectLang(key));
-    el.appendChild(item);
+    const btn=document.createElement('button');
+    btn.type='button'; btn.className='lang-tab'+(state.selKey===key?' active':'');
+    btn.style.borderColor=state.selKey===key?lang.color:'';
+    btn.style.color=state.selKey===key?lang.color:'';
+    btn.textContent=lang.label||key;
+    btn.addEventListener('click',()=>selectLang(key));
+    el.appendChild(btn);
   }
 }
 
@@ -32,81 +35,96 @@ function selectLang(key){
   if(state.unsaved&&!confirm('Discard unsaved changes?'))return;
   state.selKey=key; state.langDraft=clone(state.langs[key]);
   state.unsaved=false; state.vowelIdx=null; state.vowelDraft=null;
-  renderLangList(); renderMain();
+  state.pickingMode=null;
+  renderLangList();
+  showLangPanel();
 }
 
-// ─── Render main panel ────────────────────────────────────────────────────────
-function renderMain(){
-  const panel=document.getElementById('mainPanel');
-  const ph=document.getElementById('placeholder');
-  if(!state.langDraft){ph.style.display='flex';return;}
-  ph.style.display='none';
-  [...panel.children].forEach(c=>{if(c!==ph)c.remove();});
+// ─── Show/populate the lang panel (runs once per language selection) ──────────
+function showLangPanel(){
+  if(!state.langDraft) return;
 
-  // ── Language metadata form ──
-  const form=document.createElement('div');
-  form.className='lang-form';
-  form.innerHTML=`
-    <div class="form-row">
-      <div class="field"><label>Key</label><input type="text" id="fKey" value="${state.langDraft.key||''}" style="width:80px"></div>
-      <div class="field"><label>Label</label><input type="text" id="fLabel" value="${state.langDraft.label||''}" style="width:140px"></div>
-      <div class="field"><label>Color</label><input type="color" id="fColor" value="${state.langDraft.color||'#7eb8f7'}"></div>
-    </div>
-    <div class="lang-form-actions">
-      <button class="btn btn-primary" id="saveLangBtn" type="button">💾 Save</button>
-      <span class="unsaved-note" id="unsavedNote" style="display:none">● unsaved</span>
-    </div>`;
-  panel.appendChild(form);
-  ['fKey','fLabel','fColor'].forEach(id=>{
-    document.getElementById(id).addEventListener('input',e=>{
-      const map={fKey:'key',fLabel:'label',fColor:'color'};
-      state.langDraft[map[id]]=e.target.value; markUnsaved();
-    });
-  });
-  document.getElementById('saveLangBtn').addEventListener('click',saveLang);
+  // Lang meta form
+  const metaForm=document.getElementById('langMetaForm');
+  if(metaForm){
+    metaForm.style.display='block';
+    const fLabel=document.getElementById('fLabel');
+    const fColor=document.getElementById('fColor');
+    if(fLabel) fLabel.value=state.langDraft.label||'';
+    if(fColor) fColor.value=state.langDraft.color||'#7eb8f7';
+  }
 
-  // ── Chart section with tabs ──
-  const cs=document.createElement('div');
-  cs.className='chart-section';
-  cs.innerHTML=`
-    <div class="chart-top-bar">
-      <div class="chart-tabs">
-        <button class="chart-tab${state.chartTab==='ipa'?' active':''}" id="tabIpa" type="button">IPA Chart</button>
-        <button class="chart-tab${state.chartTab==='form'?' active':''}" id="tabForm" type="button">Formant Plot</button>
-      </div>
-    </div>
-    <div class="chart-tab-panel${state.chartTab==='ipa'?' active':''}" id="panelIpa">
-      <div class="chart-wrap"><svg class="chart-svg" id="chartIpa" viewBox="0 0 1200 720"></svg></div>
-    </div>
-    <div class="chart-tab-panel${state.chartTab==='form'?' active':''}" id="panelForm">
-      <div class="chart-wrap"><svg class="chart-svg" id="chartFormant" viewBox="0 0 1200 720"></svg></div>
-    </div>
-    <p class="chart-hint" id="chartHint">Click a vowel to edit · Use <b>Pick</b> button to set position on chart</p>`;
-  panel.appendChild(cs);
+  // Save button
+  const saveBtn=document.getElementById('saveLangBtn');
+  if(saveBtn) saveBtn.style.display='inline-flex';
 
-  document.getElementById('tabIpa').addEventListener('click',()=>{state.chartTab='ipa';document.getElementById('tabIpa').classList.add('active');document.getElementById('tabForm').classList.remove('active');document.getElementById('panelIpa').classList.add('active');document.getElementById('panelForm').classList.remove('active');});
-  document.getElementById('tabForm').addEventListener('click',()=>{state.chartTab='form';document.getElementById('tabForm').classList.add('active');document.getElementById('tabIpa').classList.remove('active');document.getElementById('panelForm').classList.add('active');document.getElementById('panelIpa').classList.remove('active');});
-
-  // ── Inline vowel editor (always in DOM, shown/hidden) ──
-  const veSection=document.createElement('div');
-  veSection.id='veInline';
-  veSection.className='ve-inline';
-  veSection.style.display=state.vowelIdx!==null?'block':'none';
-  panel.appendChild(veSection);
-
-  // ── Vowel cards ──
-  const vs=document.createElement('div');
-  vs.className='vowel-section';
-  vs.innerHTML=`<div class="section-head"><span class="section-title" id="sectionTitle">Vowels (${(state.langDraft.vowels||[]).length})</span><button class="btn btn-secondary btn-sm" id="addVowelBtn" type="button">+ Add Vowel</button></div><div class="vowel-cards" id="vowelCards"></div>`;
-  panel.appendChild(vs);
-  document.getElementById('addVowelBtn').addEventListener('click',()=>openVowelEditor(-1));
+  // Vowel section
+  const vs=document.getElementById('vowelSection');
+  if(vs) vs.style.display='block';
 
   refreshCharts();
   renderVowelCards();
   if(state.vowelIdx!==null) buildInlineForm();
+  updateSectionTitle();
 }
 
-// ─── Refresh charts (called on any draft change) ───────────────────────────────
+// renderMain kept for compatibility — just calls showLangPanel
+function renderMain(){ showLangPanel(); }
+
+// ─── One-time UI wiring (called from init) ────────────────────────────────────
+function initEditorUI(){
+  // Lang meta inputs
+  const fLabel=document.getElementById('fLabel');
+  const fColor=document.getElementById('fColor');
+  if(fLabel) fLabel.addEventListener('input',e=>{if(state.langDraft){state.langDraft.label=e.target.value;markUnsaved();renderLangList();}});
+  if(fColor) fColor.addEventListener('input',e=>{if(state.langDraft){state.langDraft.color=e.target.value;markUnsaved();renderLangList();}});
+
+  // Save button
+  const saveBtn=document.getElementById('saveLangBtn');
+  if(saveBtn) saveBtn.addEventListener('click',saveLang);
+
+  // Add vowel button
+  const addBtn=document.getElementById('addVowelBtn');
+  if(addBtn) addBtn.addEventListener('click',()=>openVowelEditor(-1));
+
+  // Chart tabs
+  document.getElementById('tabIpa')?.addEventListener('click',()=>{
+    state.chartTab='ipa';
+    document.getElementById('tabIpa').classList.add('active');
+    document.getElementById('tabFormant').classList.remove('active');
+    document.getElementById('panelIpa').classList.add('active');
+    document.getElementById('panelFormant').classList.remove('active');
+  });
+  document.getElementById('tabFormant')?.addEventListener('click',()=>{
+    state.chartTab='formant';
+    document.getElementById('tabFormant').classList.add('active');
+    document.getElementById('tabIpa').classList.remove('active');
+    document.getElementById('panelFormant').classList.add('active');
+    document.getElementById('panelIpa').classList.remove('active');
+  });
+
+  // Resizable editor pane
+  const rh=document.getElementById('resizeHandle');
+  const ep=document.getElementById('editorPane');
+  if(rh&&ep){
+    let dragging=false,startX,startW;
+    rh.addEventListener('mousedown',e=>{
+      dragging=true; startX=e.clientX; startW=ep.offsetWidth;
+      rh.classList.add('dragging'); document.body.style.userSelect='none'; document.body.style.cursor='col-resize';
+    });
+    document.addEventListener('mousemove',e=>{
+      if(!dragging)return;
+      const w=Math.max(180,Math.min(600,startW+(startX-e.clientX)));
+      ep.style.width=w+'px';
+    });
+    document.addEventListener('mouseup',()=>{
+      if(!dragging)return; dragging=false;
+      rh.classList.remove('dragging'); document.body.style.userSelect=''; document.body.style.cursor='';
+    });
+  }
+}
+
+// ─── Refresh charts ───────────────────────────────────────────────────────────
 function refreshCharts(){
   renderEditorAll();
 }
@@ -125,17 +143,17 @@ function syncCoordsToForm(){
 function openVowelEditor(idx){
   state.vowelIdx=idx;
   state.pickingMode=null;
-  const existing=(idx>=0&&state.langDraft.vowels)?state.langDraft.vowels[idx]:null;
+  const existing=(idx>=0&&state.langDraft?.vowels)?state.langDraft.vowels[idx]:null;
   state.vowelDraft=existing?clone(existing):{ipa:'',h:0.5,b:0.5,h2:null,b2:null,rounded:false,desc:'',type:'short',f1:null,f2:null,ipaAudio:'',wikiUrl:'',words:[]};
-  const veSection=document.getElementById('veInline');
-  if(veSection){veSection.style.display='block';buildInlineForm();}
+  const ve=document.getElementById('veInline');
+  if(ve){ve.style.display='block';buildInlineForm();}
   renderVowelCards();
   refreshCharts();
 }
 
 function closeVowelEditor(){
-  state.vowelIdx=null; state.vowelDraft=null;
-  const veSection=document.getElementById('veInline');
-  if(veSection)veSection.style.display='none';
+  state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
+  const ve=document.getElementById('veInline');
+  if(ve) ve.style.display='none';
   renderVowelCards(); refreshCharts();
 }

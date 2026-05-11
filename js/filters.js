@@ -24,14 +24,7 @@ function playUrlAtRate(url, rate=1) {
   a.play().catch(e => console.warn('Audio:', e.message));
 }
 
-function getLength(v) {
-  return v.type || 'short';  // 'short' | 'long' | 'diphthong'
-}
-
-function getBase(ipa) {
-  // Strip length mark, return first character as the base phoneme symbol
-  return ipa.replace('ː', '')[0] || ipa;
-}
+// getLength and getBase live in utils.js (shared with editor which doesn't load filters.js)
 
 // ─── Filter state ─────────────────────────────────────────────────────────────
 // ─── Filter state ─────────────────────────────────────────────────────────────
