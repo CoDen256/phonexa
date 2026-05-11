@@ -65,33 +65,37 @@ function buildInlineForm(){
   const diph=v.type==='diphthong';
   const coordsRow=document.createElement('div'); coordsRow.className='ve-coords';
   coordsRow.innerHTML=`
-    ${diph?`<div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-      <span style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Start position</span>
-      <button type="button" id="clickTargetBtn" style="font-size:.68rem;padding:2px 9px;border-radius:6px;border:1px solid var(--border);background:var(--input);color:var(--accent);cursor:pointer">
-        Next click → <b id="clickTargetLabel">${state.clickTarget==='target'?'Target':'Start'}</b>
-      </button>
-    </div>`:''}
     <div class="field"><label>h (0=Close · 1=Open)</label><input type="number" id="veH" min="0" max="1" step="0.001" value="${v.h??0.5}"></div>
     <div class="field"><label>b (0=Front · 1=Back)</label><input type="number" id="veB" min="0" max="1" step="0.001" value="${v.b??0.5}"></div>
+    <button class="btn btn-secondary btn-sm" id="pickIpa" type="button" style="align-self:flex-end">📍 Pick on IPA chart</button>
     <div class="field"><label>F1 (Hz)</label><input type="number" id="veF1" min="${F1MIN}" max="${F1MAX}" step="1" value="${v.f1||''}"></div>
     <div class="field"><label>F2 (Hz)</label><input type="number" id="veF2" min="${F2MIN}" max="${F2MAX}" step="1" value="${v.f2||''}"></div>
-    ${diph?`<div style="width:100%;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-      <span style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Target position (end of diphthong)</span>
-    </div>
-    <div class="field"><label>h Target</label><input type="number" id="veH2" min="0" max="1" step="0.001" value="${v.h2??v.h??0.5}"></div>
-    <div class="field"><label>b Target</label><input type="number" id="veB2" min="0" max="1" step="0.001" value="${v.b2??v.b??0.5}"></div>`:''}
+    <button class="btn btn-secondary btn-sm" id="pickFormant" type="button" style="align-self:flex-end">📍 Pick on formant</button>
+    ${diph?`<div class="field"><label>h Target</label><input type="number" id="veH2" min="0" max="1" step="0.001" value="${v.h2??v.h??0.5}"></div>
+    <div class="field"><label>b Target</label><input type="number" id="veB2" min="0" max="1" step="0.001" value="${v.b2??v.b??0.5}"></div>
+    <button class="btn btn-secondary btn-sm" id="pickIpaTarget" type="button" style="align-self:flex-end">📍 Pick target on IPA chart</button>`:''}
   `;
   sec.appendChild(coordsRow);
   coordsRow.querySelector('#veH').addEventListener('input',e=>{v.h=+e.target.value;refreshCharts();});
   coordsRow.querySelector('#veB').addEventListener('input',e=>{v.b=+e.target.value;refreshCharts();});
   coordsRow.querySelector('#veF1').addEventListener('input',e=>{v.f1=+e.target.value||null;refreshCharts();});
   coordsRow.querySelector('#veF2').addEventListener('input',e=>{v.f2=+e.target.value||null;refreshCharts();});
+  coordsRow.querySelector('#pickIpa').addEventListener('click',()=>{
+    state.pickingMode='ipa';
+    document.getElementById('tabIpa').click();
+    refreshCharts();
+  });
+  coordsRow.querySelector('#pickFormant').addEventListener('click',()=>{
+    state.pickingMode='formant';
+    document.getElementById('tabForm').click();
+    refreshCharts();
+  });
   if(diph){
     coordsRow.querySelector('#veH2').addEventListener('input',e=>{v.h2=+e.target.value;refreshCharts();});
     coordsRow.querySelector('#veB2').addEventListener('input',e=>{v.b2=+e.target.value;refreshCharts();});
-    coordsRow.querySelector('#clickTargetBtn').addEventListener('click',()=>{
-      state.clickTarget=state.clickTarget==='target'?'start':'target';
-      document.getElementById('clickTargetLabel').textContent=state.clickTarget==='target'?'Target':'Start';
+    coordsRow.querySelector('#pickIpaTarget').addEventListener('click',()=>{
+      state.pickingMode='ipa-target';
+      document.getElementById('tabIpa').click();
       refreshCharts();
     });
   }

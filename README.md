@@ -118,5 +118,6 @@ When the practice panel is open and a recording exists, `isCompareMode()` return
 - create separate f1/f2 for actual sounds and averages, display separately, filter option?
 - bug: selecting left part of sound slider sometimes locks itc
 - monothong / diphtong in a separate filter, not in vowel length
+- improve editor
 ideas:
 - real time formants update?

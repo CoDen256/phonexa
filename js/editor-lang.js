@@ -76,60 +76,16 @@ function renderMain(){
       </div>
     </div>
     <div class="chart-tab-panel${state.chartTab==='ipa'?' active':''}" id="panelIpa">
-      <div class="chart-wrap"><svg class="chart-svg" id="langIpaSvg" viewBox="0 0 700 420"></svg></div>
+      <div class="chart-wrap"><svg class="chart-svg" id="chartIpa" viewBox="0 0 1200 720"></svg></div>
     </div>
     <div class="chart-tab-panel${state.chartTab==='form'?' active':''}" id="panelForm">
-      <div class="chart-wrap"><svg class="chart-svg" id="langFormSvg" viewBox="0 0 700 420"></svg></div>
+      <div class="chart-wrap"><svg class="chart-svg" id="chartFormant" viewBox="0 0 1200 720"></svg></div>
     </div>
-    <p class="chart-hint" id="chartHint">${state.vowelIdx!==null?'Click chart to reposition vowel':'Click a vowel to edit it'}</p>`;
+    <p class="chart-hint" id="chartHint">Click a vowel to edit · Use <b>Pick</b> button to set position on chart</p>`;
   panel.appendChild(cs);
 
   document.getElementById('tabIpa').addEventListener('click',()=>{state.chartTab='ipa';document.getElementById('tabIpa').classList.add('active');document.getElementById('tabForm').classList.remove('active');document.getElementById('panelIpa').classList.add('active');document.getElementById('panelForm').classList.remove('active');});
   document.getElementById('tabForm').addEventListener('click',()=>{state.chartTab='form';document.getElementById('tabForm').classList.add('active');document.getElementById('tabIpa').classList.remove('active');document.getElementById('panelForm').classList.add('active');document.getElementById('panelIpa').classList.remove('active');});
-
-  // Chart click handlers — position a vowel being edited
-  function onIpaClick(clientX,clientY){
-    if(state.vowelIdx===null)return;
-    const svg=document.getElementById('langIpaSvg');
-    const pt=svgPt(svg,clientX,clientY);
-    const {h,b}=ltHB(pt.x,pt.y);
-    const diph=state.vowelDraft.type==='diphthong';
-    if(diph && state.clickTarget==='target'){
-      state.vowelDraft.h2=h; state.vowelDraft.b2=b;
-      state.clickTarget='start';
-    } else {
-      state.vowelDraft.h=h; state.vowelDraft.b=b;
-      if(diph) state.clickTarget='target';
-    }
-    syncCoordsToForm(); refreshCharts();
-    // Update the toggle label if visible
-    const lbl=document.getElementById('clickTargetLabel');
-    if(lbl) lbl.textContent=state.clickTarget==='target'?'Target':'Start';
-  }
-  function onFormClick(clientX,clientY){
-    if(state.vowelIdx===null)return;
-    const svg=document.getElementById('langFormSvg');
-    const pt=svgPt(svg,clientX,clientY);
-    const {f1,f2}=lfF1F2(pt.x,pt.y);
-    state.vowelDraft.f1=f1; state.vowelDraft.f2=f2;
-    syncCoordsToForm(); refreshCharts();
-  }
-  ['langIpaSvg'].forEach(id=>{
-    const s=document.getElementById(id);
-    let drag=false;
-    s.addEventListener('mousedown',e=>{drag=true;onIpaClick(e.clientX,e.clientY);});
-    s.addEventListener('mouseup',()=>drag=false);
-    s.addEventListener('mousemove',e=>{if(drag)onIpaClick(e.clientX,e.clientY);});
-    s.addEventListener('click',e=>onIpaClick(e.clientX,e.clientY));
-  });
-  ['langFormSvg'].forEach(id=>{
-    const s=document.getElementById(id);
-    let drag=false;
-    s.addEventListener('mousedown',e=>{drag=true;onFormClick(e.clientX,e.clientY);});
-    s.addEventListener('mouseup',()=>drag=false);
-    s.addEventListener('mousemove',e=>{if(drag)onFormClick(e.clientX,e.clientY);});
-    s.addEventListener('click',e=>onFormClick(e.clientX,e.clientY));
-  });
 
   // ── Inline vowel editor (always in DOM, shown/hidden) ──
   const veSection=document.createElement('div');
@@ -152,16 +108,7 @@ function renderMain(){
 
 // ─── Refresh charts (called on any draft change) ───────────────────────────────
 function refreshCharts(){
-  renderLangIpa();
-  renderLangFormant();
-  const hint=document.getElementById('chartHint');
-  if(hint){
-    if(state.vowelIdx!==null && state.vowelDraft?.type==='diphthong'){
-      hint.textContent=`Click chart to set ${state.clickTarget==='target'?'TARGET (end)':'START (begin)'} position`;
-    } else {
-      hint.textContent=state.vowelIdx!==null?'Click chart to reposition vowel':'Click a vowel to edit it';
-    }
-  }
+  renderEditorAll();
 }
 
 // ─── Sync coordinate form inputs from draft ───────────────────────────────────
@@ -177,6 +124,7 @@ function syncCoordsToForm(){
 // ─── Open vowel editor ────────────────────────────────────────────────────────
 function openVowelEditor(idx){
   state.vowelIdx=idx;
+  state.pickingMode=null;
   const existing=(idx>=0&&state.langDraft.vowels)?state.langDraft.vowels[idx]:null;
   state.vowelDraft=existing?clone(existing):{ipa:'',h:0.5,b:0.5,h2:null,b2:null,rounded:false,desc:'',type:'short',f1:null,f2:null,ipaAudio:'',wikiUrl:'',words:[]};
   const veSection=document.getElementById('veInline');

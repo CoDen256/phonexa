@@ -26,7 +26,7 @@ function ltHB(px,py){
 }
 // Formant plot (same viewBox)
 const LF={x0:60,x1:685,y0:30,y1:390};
-const F2MIN=400,F2MAX=2800,F1MIN=150,F1MAX=1000;
+// F2MIN/MAX/F1MIN/MAX are shared from geometry.js
 function lfPos(f1,f2){
   return{x:LF.x1-(f2-F2MIN)/(F2MAX-F2MIN)*(LF.x1-LF.x0),y:LF.y0+(f1-F1MIN)/(F1MAX-F1MIN)*(LF.y1-LF.y0)};
 }
