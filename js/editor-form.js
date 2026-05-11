@@ -87,7 +87,7 @@ function buildInlineForm(){
   });
   coordsRow.querySelector('#pickFormant').addEventListener('click',()=>{
     state.pickingMode='formant';
-    document.getElementById('tabForm').click();
+    document.getElementById('tabFormant').click();
     refreshCharts();
   });
   if(diph){

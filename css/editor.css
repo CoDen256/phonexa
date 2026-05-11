@@ -258,9 +258,9 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 .ipa-picker-grid button { width:28px; height:26px; font-size:.85rem; padding:0; font-family:Georgia,serif; }
 .ipa-mods-row { display:flex; flex-wrap:wrap; gap:2px; margin-bottom:4px; }
 .ipa-mods-row button { padding:2px 5px; font-size:.72rem; }
-/* Word rows compact */
+/* Word rows: text | audio-url | delete — all on one line */
 .word-rows { display:flex; flex-direction:column; gap:4px; margin:4px 0; }
-.word-row { display:grid; grid-template-columns:1fr auto; gap:4px; align-items:center; }
+.word-row { display:grid; grid-template-columns:1fr 1.5fr auto; gap:4px; align-items:center; }
 .word-row input { font-size:.72rem; min-width:0; width:100%; }
 .word-row-url { grid-column:1/-1; }
 
