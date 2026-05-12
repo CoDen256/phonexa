@@ -21,15 +21,29 @@ F1_BUF = deque(maxlen=5)
 F2_BUF = deque(maxlen=5)
 prev_f1, prev_f2 = None, None
 
+
+def rms(samples):
+    return np.sqrt(np.mean(samples ** 2))
+
+
 def extract_formants(samples):
-    # Energy gate — don't track silence/noise
-    if np.max(np.abs(samples)) < ENERGY_FLOOR:
+    rm =       rms(samples)
+    print(rm)
+    if rm < ENERGY_FLOOR:
         return None, None
 
     snd = parselmouth.Sound(samples.astype(np.float64), SAMPLE_RATE)
+
+    # Check voicing first — cheap gate before expensive formant analysis
+    pitch = call(snd, "To Pitch", 0, 75, 600)   # 75–600 Hz range covers all voices
+    voiced_frames = call(pitch, "Count voiced frames")
+
+    #if voiced_frames == 0:
+    #    return None, None   # noise, breath, unvoiced consonant — skip
+
+    # Now safe to extract formants
     formants = call(snd, "To Formant (burg)",
-                    0, N_FORMANTS, MAX_F,
-                    WINDOW_MS / 1000, PRE_EMPHASIS)
+                    0, N_FORMANTS, MAX_F, WINDOW_MS / 1000, PRE_EMPHASIS)
     t  = snd.duration / 2
     f1 = call(formants, "Get value at time", 1, t, "hertz", "Linear")
     f2 = call(formants, "Get value at time", 2, t, "hertz", "Linear")
@@ -72,13 +86,10 @@ async def handler(ws):
             window = np.array(ring)
 
             f1, f2 = extract_formants(window)
-            f1, f2 = reject_jumps(f1, f2)
+            #f1, f2 = reject_jumps(f1, f2)
             #f1, f2 = median_smooth(f1, f2)
 
             await ws.send(json.dumps({"f1": f1, "f2": f2}))
-
-def rms(samples):
-    return np.sqrt(np.mean(samples ** 2))
 
 
 async def main():
