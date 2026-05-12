@@ -5,34 +5,60 @@ import parselmouth
 from parselmouth.praat import call
 
 SAMPLE_RATE    = 16000
-WINDOW_MS      = 50          # analysis window (parselmouth needs ≥25 ms)
-STEP_MS        = 10          # how often we push a result → 100 fps max
-MAX_F          = 5500        # Hz ceiling (use 5000 for male voices)
+WINDOW_MS      = 50
+STEP_MS        = 10
+MAX_F          = 5000     # ← lowered
 N_FORMANTS     = 5
-PRE_EMPHASIS   = 50          # Hz, Praat default
+PRE_EMPHASIS   = 25       # ← lowered
+MAX_F2_JUMP    = 350
+MAX_F1_JUMP    = 250
+ENERGY_FLOOR   = 0.008    # skip silent frames entirely
 
 window_samples = int(SAMPLE_RATE * WINDOW_MS / 1000)
 step_samples   = int(SAMPLE_RATE * STEP_MS   / 1000)
 
-def extract_formants(samples: np.ndarray):
-    """Run Praat burg formant tracker on a short float32 array."""
-    if len(samples) < window_samples:
+F1_BUF = deque(maxlen=5)
+F2_BUF = deque(maxlen=5)
+prev_f1, prev_f2 = None, None
+
+def extract_formants(samples):
+    # Energy gate — don't track silence/noise
+    if np.max(np.abs(samples)) < ENERGY_FLOOR:
         return None, None
+
     snd = parselmouth.Sound(samples.astype(np.float64), SAMPLE_RATE)
     formants = call(snd, "To Formant (burg)",
-                    0,           # time step  (0 = auto ≈ 0.25×window)
-                    N_FORMANTS,
-                    MAX_F,
-                    WINDOW_MS / 1000,
-                    PRE_EMPHASIS)
-    t   = snd.duration / 2          # mid-point of the window
-    f1  = call(formants, "Get value at time", 1, t, "hertz", "Linear")
-    f2  = call(formants, "Get value at time", 2, t, "hertz", "Linear")
-    return (None if np.isnan(f1) else round(f1),
-            None if np.isnan(f2) else round(f2))
+                    0, N_FORMANTS, MAX_F,
+                    WINDOW_MS / 1000, PRE_EMPHASIS)
+    t  = snd.duration / 2
+    f1 = call(formants, "Get value at time", 1, t, "hertz", "Linear")
+    f2 = call(formants, "Get value at time", 2, t, "hertz", "Linear")
+
+    f1 = None if np.isnan(f1) else round(f1)
+    f2 = None if np.isnan(f2) else round(f2)
+    return f1, f2
+
+def reject_jumps(f1, f2):
+    global prev_f1, prev_f2
+    if f2 is not None and prev_f2 is not None:
+        if abs(f2 - prev_f2) > MAX_F2_JUMP:
+            f2 = None
+    if f1 is not None and prev_f1 is not None:
+        if abs(f1 - prev_f1) > MAX_F1_JUMP:
+            f1 = None
+    if f2 is not None: prev_f2 = f2
+    if f1 is not None: prev_f1 = f1
+    return f1, f2
+
+def median_smooth(f1, f2):
+    if f1 is not None: F1_BUF.append(f1)
+    if f2 is not None: F2_BUF.append(f2)
+    f1_out = int(np.median(F1_BUF)) if F1_BUF else None
+    f2_out = int(np.median(F2_BUF)) if F2_BUF else None
+    return f1_out, f2_out
 
 async def handler(ws):
-    ring = deque(maxlen=window_samples)   # keeps last 50 ms of PCM
+    ring = deque(maxlen=window_samples)
     samples_since_last = 0
 
     async for message in ws:
@@ -44,8 +70,16 @@ async def handler(ws):
         if samples_since_last >= step_samples:
             samples_since_last = 0
             window = np.array(ring)
+
             f1, f2 = extract_formants(window)
+            f1, f2 = reject_jumps(f1, f2)
+            #f1, f2 = median_smooth(f1, f2)
+
             await ws.send(json.dumps({"f1": f1, "f2": f2}))
+
+def rms(samples):
+    return np.sqrt(np.mean(samples ** 2))
+
 
 async def main():
     async with websockets.serve(handler, "localhost", 8765):
