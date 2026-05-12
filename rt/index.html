@@ -32,8 +32,7 @@
     <!-- Scrolling time plot -->
     <div>
       <canvas id="timeCanvas" width="680" height="240"></canvas>
-      <canvas id="rmsCanvas"  width="640" height="60"></canvas>  <!-- ← add this -->
-
+      <canvas id="rmsCanvas" width="680" height="240"></canvas>
       <div class="label">F1 (red) &amp; F2 (cyan) over time</div>
     </div>
     <!-- Vowel space -->
@@ -73,9 +72,12 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const norm  = (v, lo, hi) => clamp((v - lo) / (hi - lo), 0, 1);
 
 let currentRms = 0;
-const RMS_FLOOR   = 0.005;   // your gate threshold
-const RMS_MAX     = 0.5;     // expected peak
 const rmsHistory  = [];
+const RMS_MIN   = 0.00001;   // bottom of display (your noise floor)
+const RMS_MAX   = 1.0;       // top of display
+const RMS_FLOOR = 0.01;     // gate threshold
+const LABEL_W   = 52;        // pixels reserved for y-axis labels
+
 
 // ─── Draw scrolling time plot ─────────────────────────────────────────────────
 function drawTime() {
@@ -212,36 +214,82 @@ function drawVowel() {
   vctx.fillText("F1 (Hz) ↓", -30, 0);
   vctx.restore();
 }
+
+function logNorm(v) {
+  // maps RMS_MIN..RMS_MAX → 0..1 on a log scale
+  return (Math.log10(Math.max(v, RMS_MIN)) - Math.log10(RMS_MIN))
+       / (Math.log10(RMS_MAX) - Math.log10(RMS_MIN));
+}
+
 function drawRms() {
   const W = rcvs.width, H = rcvs.height;
+  const plotW = W - LABEL_W;
+
   rctx.clearRect(0, 0, W, H);
 
-  // threshold line
-  const threshY = (1 - RMS_FLOOR / RMS_MAX) * H;
-  rctx.strokeStyle = "#333"; rctx.lineWidth = 1;
-  rctx.setLineDash([4, 4]);
+  // ── y-axis tick marks and labels ────────────────────────────────
+  const ticks = [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5];
+  rctx.font = "10px monospace";
+
+  ticks.forEach(val => {
+    const y = (1 - logNorm(val)) * H;
+
+    // grid line across plot area
+    rctx.strokeStyle = "#222"; rctx.lineWidth = 1;
+    rctx.setLineDash([2, 4]);
+    rctx.beginPath();
+    rctx.moveTo(LABEL_W, y); rctx.lineTo(W, y);
+    rctx.stroke();
+    rctx.setLineDash([]);
+
+    // tick
+    rctx.strokeStyle = "#444"; rctx.lineWidth = 1;
+    rctx.beginPath();
+    rctx.moveTo(LABEL_W - 4, y); rctx.lineTo(LABEL_W, y);
+    rctx.stroke();
+
+    // label — right-align inside the label column
+    rctx.fillStyle = "#666";
+    rctx.textAlign = "right";
+    rctx.fillText(val < 0.001
+      ? val.toExponential(0)     // 1e-5, 1e-4
+      : val.toString(),          // 0.001, 0.01, 0.1, 0.5
+      LABEL_W - 7, y + 3);
+  });
+
+  rctx.textAlign = "left";   // reset
+
+  // ── gate threshold line ──────────────────────────────────────────
+  const threshY = (1 - logNorm(RMS_FLOOR)) * H;
+  rctx.strokeStyle = "#555"; rctx.lineWidth = 1;
+  rctx.setLineDash([5, 4]);
   rctx.beginPath();
-  rctx.moveTo(0, threshY); rctx.lineTo(W, threshY);
+  rctx.moveTo(LABEL_W, threshY); rctx.lineTo(W, threshY);
   rctx.stroke();
   rctx.setLineDash([]);
 
-  // bars
-  const barW = W / HISTORY_LEN;
-  rmsHistory.forEach((v, i) => {
-    const level  = Math.min(v / RMS_MAX, 1);
-    const barH   = level * H;
-    const gated  = v < RMS_FLOOR;
+  rctx.fillStyle = "#555"; rctx.font = "9px monospace";
+  rctx.fillText("gate", LABEL_W + 4, threshY - 3);
 
-    const r = Math.round(255 * Math.min(1, level * 2));
-    const g = Math.round(255 * Math.min(1, 2 - level * 2));
+  // ── bars ─────────────────────────────────────────────────────────
+  const barW = plotW / HISTORY_LEN;
+
+  rmsHistory.forEach((v, i) => {
+    const level = logNorm(v);
+    const barH  = level * H;
+    const gated = v < RMS_FLOOR;
+
+    const t = Math.min(level * 1.5, 1);    // colour ramp: green→yellow→red
+    const r = Math.round(255 * Math.min(1, t * 2));
+    const g = Math.round(255 * Math.min(1, 2 - t * 2));
+
     rctx.fillStyle = gated ? "#1c1c1c" : `rgb(${r},${g},30)`;
-    rctx.fillRect(i * barW, H - barH, barW - 1, barH);
+    rctx.fillRect(LABEL_W + i * barW, H - barH, Math.max(barW - 1, 1), barH);
   });
 
-  // current value label
-  rctx.fillStyle = "#555";
-  rctx.font = "11px monospace";
-  rctx.fillText(`RMS  ${currentRms.toFixed(4)}  |  gate ${RMS_FLOOR}`, 6, 12);
+  // ── current value readout ────────────────────────────────────────
+  rctx.fillStyle = "#666"; rctx.font = "10px monospace";
+  rctx.fillText(`${currentRms.toExponential(2)}`, LABEL_W + 4, 12);
 }
 
 // ─── Animation loop ───────────────────────────────────────────────────────────

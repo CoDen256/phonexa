@@ -12,7 +12,7 @@ N_FORMANTS     = 5
 PRE_EMPHASIS   = 25       # ← lowered
 MAX_F2_JUMP    = 350
 MAX_F1_JUMP    = 250
-ENERGY_FLOOR   = 0.008    # skip silent frames entirely
+ENERGY_FLOOR   = 0.01    # skip silent frames entirely
 
 window_samples = int(SAMPLE_RATE * WINDOW_MS / 1000)
 step_samples   = int(SAMPLE_RATE * STEP_MS   / 1000)
@@ -28,11 +28,9 @@ def rms(samples):
 
 def extract_formants(samples):
     rm =       rms(samples)
-    print(rm)
     if rm < ENERGY_FLOOR:
         return None, None
-    #print(rm)
-
+    
     snd = parselmouth.Sound(samples.astype(np.float64), SAMPLE_RATE)
 
     # Check voicing first — cheap gate before expensive formant analysis
