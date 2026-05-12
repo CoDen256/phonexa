@@ -19,6 +19,8 @@
       background: #4f8ef7; color: #fff; font-size: 1rem; cursor: pointer;
     }
     button:hover { background: #3a7be0; }
+    #timeCanvas { display: block; }
+    #rmsCanvas  { display: block; margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -29,7 +31,9 @@
   <div class="row">
     <!-- Scrolling time plot -->
     <div>
-      <canvas id="timeCanvas" width="640" height="240"></canvas>
+      <canvas id="timeCanvas" width="680" height="240"></canvas>
+      <canvas id="rmsCanvas"  width="640" height="60"></canvas>  <!-- ← add this -->
+
       <div class="label">F1 (red) &amp; F2 (cyan) over time</div>
     </div>
     <!-- Vowel space -->
@@ -60,55 +64,95 @@ const tcvs = document.getElementById("timeCanvas");
 const tctx = tcvs.getContext("2d");
 const vcvs = document.getElementById("vowelCanvas");
 const vctx = vcvs.getContext("2d");
+const rcvs = document.getElementById("rmsCanvas");
+const rctx = rcvs.getContext("2d");
+
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const norm  = (v, lo, hi) => clamp((v - lo) / (hi - lo), 0, 1);
 
+let currentRms = 0;
+const RMS_FLOOR   = 0.005;   // your gate threshold
+const RMS_MAX     = 0.5;     // expected peak
+const rmsHistory  = [];
+
 // ─── Draw scrolling time plot ─────────────────────────────────────────────────
 function drawTime() {
   const W = tcvs.width, H = tcvs.height;
+  const METER_W = 18;      // pixel width of the bar
+  const PLOT_W  = W - METER_W - 6;   // shrink plot area to make room
+
   tctx.clearRect(0, 0, W, H);
 
-  // background grid
+  // ── grid (scoped to plot area) ────────────────────────────────
   tctx.strokeStyle = "#222"; tctx.lineWidth = 1;
   [0.25, 0.5, 0.75].forEach(r => {
-    tctx.beginPath(); tctx.moveTo(0, r*H); tctx.lineTo(W, r*H); tctx.stroke();
+    tctx.beginPath();
+    tctx.moveTo(0, r * H); tctx.lineTo(PLOT_W, r * H);
+    tctx.stroke();
   });
 
-  // axis labels
-  tctx.fillStyle = "#555"; tctx.font = "11px monospace";
-  [[F1_MIN,"F1 lo"],[F1_MAX,"F1 hi"]].forEach(([hz, lbl]) => {
-    const y = (1 - norm(hz, F1_MIN, F1_MAX)) * H;
-    tctx.fillText(`${hz} Hz`, 4, y - 2);
-  });
-
+  // ── formant traces (use PLOT_W instead of W) ──────────────────
   const draw = (data, color, fMin, fMax) => {
     if (data.length < 2) return;
     tctx.strokeStyle = color; tctx.lineWidth = 2;
     tctx.beginPath();
     data.forEach((v, i) => {
       if (v == null) return;
-      const x = (i / HISTORY_LEN) * W;
+      const x = (i / HISTORY_LEN) * PLOT_W;
       const y = (1 - norm(v, fMin, fMax)) * H;
       i === 0 || data[i-1] == null ? tctx.moveTo(x, y) : tctx.lineTo(x, y);
     });
     tctx.stroke();
   };
 
-  // F2 scaled into F1 pixel range for single-canvas display (dual y-axis trick)
-  // We draw them on the same canvas with separate colour — label both axes
   draw(f1History, "#ff4c4c", F1_MIN, F1_MAX);
-
-  // Map F2 to the same pixel range for visual separation
   draw(f2History, "#00d4ff", F2_MIN, F2_MAX);
 
-  // current values readout
+  // readout
   const f1 = f1History.at(-1), f2 = f2History.at(-1);
   tctx.fillStyle = "#ff4c4c"; tctx.font = "bold 14px monospace";
-  tctx.fillText(`F1: ${f1 ?? "–"} Hz`, W - 130, 20);
+  tctx.fillText(`F1: ${f1 ?? "–"} Hz`, PLOT_W - 130, 20);
   tctx.fillStyle = "#00d4ff";
-  tctx.fillText(`F2: ${f2 ?? "–"} Hz`, W - 130, 38);
+  tctx.fillText(`F2: ${f2 ?? "–"} Hz`, PLOT_W - 130, 38);
+
+  // ── RMS meter bar ─────────────────────────────────────────────
+  const meterX = PLOT_W + 6;
+
+  // background track
+  tctx.fillStyle = "#1a1a1a";
+  tctx.fillRect(meterX, 0, METER_W, H);
+
+  // threshold line
+  const threshY = (1 - norm(RMS_FLOOR, 0, RMS_MAX)) * H;
+  tctx.strokeStyle = "#555"; tctx.lineWidth = 1;
+  tctx.setLineDash([3, 3]);
+  tctx.beginPath();
+  tctx.moveTo(meterX, threshY); tctx.lineTo(meterX + METER_W, threshY);
+  tctx.stroke();
+  tctx.setLineDash([]);
+
+  // filled level
+  const level = norm(currentRms, 0, RMS_MAX);
+  const barH  = level * H;
+  const barY  = H - barH;
+
+  // colour: green below threshold, yellow mid, red near peak
+  const r = Math.round(255 * Math.min(1, level * 2));
+  const g = Math.round(255 * Math.min(1, 2 - level * 2));
+  tctx.fillStyle = currentRms < RMS_FLOOR
+    ? "#2a2a2a"                         // muted when gated
+    : `rgb(${r},${g},30)`;
+  tctx.fillRect(meterX, barY, METER_W, barH);
+
+  // current value label
+  tctx.fillStyle = "#666"; tctx.font = "9px monospace";
+  tctx.save();
+  tctx.translate(meterX + METER_W - 4, H - 4);
+  tctx.rotate(-Math.PI / 2);
+  tctx.fillText(`RMS ${currentRms.toFixed(3)}`, 0, 0);
+  tctx.restore();
 }
 
 // ─── Draw vowel space ─────────────────────────────────────────────────────────
@@ -168,10 +212,42 @@ function drawVowel() {
   vctx.fillText("F1 (Hz) ↓", -30, 0);
   vctx.restore();
 }
+function drawRms() {
+  const W = rcvs.width, H = rcvs.height;
+  rctx.clearRect(0, 0, W, H);
+
+  // threshold line
+  const threshY = (1 - RMS_FLOOR / RMS_MAX) * H;
+  rctx.strokeStyle = "#333"; rctx.lineWidth = 1;
+  rctx.setLineDash([4, 4]);
+  rctx.beginPath();
+  rctx.moveTo(0, threshY); rctx.lineTo(W, threshY);
+  rctx.stroke();
+  rctx.setLineDash([]);
+
+  // bars
+  const barW = W / HISTORY_LEN;
+  rmsHistory.forEach((v, i) => {
+    const level  = Math.min(v / RMS_MAX, 1);
+    const barH   = level * H;
+    const gated  = v < RMS_FLOOR;
+
+    const r = Math.round(255 * Math.min(1, level * 2));
+    const g = Math.round(255 * Math.min(1, 2 - level * 2));
+    rctx.fillStyle = gated ? "#1c1c1c" : `rgb(${r},${g},30)`;
+    rctx.fillRect(i * barW, H - barH, barW - 1, barH);
+  });
+
+  // current value label
+  rctx.fillStyle = "#555";
+  rctx.font = "11px monospace";
+  rctx.fillText(`RMS  ${currentRms.toFixed(4)}  |  gate ${RMS_FLOOR}`, 6, 12);
+}
 
 // ─── Animation loop ───────────────────────────────────────────────────────────
 function frame() {
   drawTime();
+  drawRms();
   drawVowel();
   requestAnimationFrame(frame);
 }
@@ -181,19 +257,24 @@ requestAnimationFrame(frame);
 function connectWS() {
   ws = new WebSocket(WS_URL);
   ws.onmessage = ({ data }) => {
-    const { f1, f2 } = JSON.parse(data);
 
-    f1History.push(f1 ?? null);
-    f2History.push(f2 ?? null);
-    if (f1History.length > HISTORY_LEN) f1History.shift();
-    if (f2History.length > HISTORY_LEN) f2History.shift();
+  const { f1, f2, rms } = JSON.parse(data);   // ← destructure rms
 
-    trail.push({ f1, f2 });
-    if (trail.length > TRAIL_LEN) trail.shift();
-  };
+  currentRms = rms ?? 0;
+  rmsHistory.push(currentRms);
+  if (rmsHistory.length > HISTORY_LEN) rmsHistory.shift();
+
+  f1History.push(f1 ?? null);
+  f2History.push(f2 ?? null);
+  if (f1History.length > HISTORY_LEN) f1History.shift();
+  if (f2History.length > HISTORY_LEN) f2History.shift();
+
+  trail.push({ f1, f2 });
+  if (trail.length > TRAIL_LEN) trail.shift();
   ws.onopen  = () => setStatus("Connected ✓");
   ws.onerror = () => setStatus("WebSocket error");
   ws.onclose = () => { if (running) setTimeout(connectWS, 1000); };
+  }
 }
 
 // ─── Audio capture ────────────────────────────────────────────────────────────
