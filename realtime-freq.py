@@ -20,10 +20,10 @@ from parselmouth.praat import call
 # ─── Config ────────────────────────────────────────────────────────────────────
 
 SAMPLE_RATE  = 16000
-WINDOW_MS    = 50      # analysis window length in ms
+WINDOW_MS    = 100      # analysis window length in ms
 STEP_MS      = 10      # result emitted every N ms
-N_FORMANTS   = 5
-MAX_F        = 5000    # Hz ceiling for formant search
+N_FORMANTS   = 45      # 
+MAX_F        = 4000    # Hz ceiling for formant search 4000 - 5000
 PRE_EMPHASIS = 25      # Hz — lower = less boost of high freqs (better for u/o)
 ENERGY_FLOOR = 0.005   # RMS below this → skip (silence / noise gate)
 PITCH_MIN    = 75      # Hz
