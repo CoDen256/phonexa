@@ -62,6 +62,12 @@ def reject_jumps(f1, f2):
     if f2 is not None: prev_f2 = f2
     if f1 is not None: prev_f1 = f1
     return f1, f2
+def median_smooth(f1, f2):
+    if f1 is not None: F1_BUF.append(f1)
+    if f2 is not None: F2_BUF.append(f2)
+    f1_out = int(np.median(F1_BUF)) if F1_BUF else None
+    f2_out = int(np.median(F2_BUF)) if F2_BUF else None
+    return f1_out, f2_out
 
 async def handler(ws):
     ring = deque(maxlen=window_samples)
@@ -85,7 +91,7 @@ async def handler(ws):
             await ws.send(json.dumps({"f1": f1, "f2": f2, "rms": rms}))  # ← add rms
 
 async def main():
-    async with websockets.serve(handler, "localhost", 8765):
+    async with websockets.serve(handler, "localhost", 8000):
         await asyncio.Future()
 
 asyncio.run(main())
