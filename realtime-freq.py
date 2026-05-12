@@ -1,5 +1,5 @@
 # server.py
-import asyncio, websockets, json as np
+import asyncio, websockets, json, numpy as np
 from collections import deque
 import parselmouth
 from parselmouth.praat import call
