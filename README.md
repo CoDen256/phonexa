@@ -120,5 +120,6 @@ When the practice panel is open and a recording exists, `isCompareMode()` return
 - bug: selecting left part of sound slider sometimes locks itc
 - monothong / diphtong in a separate filter, not in vowel length
 - other possible IPA symbols 
+- fix removal and enabling of the langs. e.g. when i want completely remove a lang i can't
 ideas:
 - real time formants update?
