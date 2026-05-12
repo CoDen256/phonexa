@@ -14,11 +14,12 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
-      gap: 12px;
+      gap: 10px;
     }
 
     h2 { font-size: 1rem; font-weight: normal; color: #888; letter-spacing: .08em; }
 
+    /* ── top controls ── */
     .controls {
       display: flex;
       gap: 10px;
@@ -27,24 +28,88 @@
       justify-content: center;
     }
 
-    .divider { color: #333; }
+    .divider { color: #2a2f3a; }
 
     button {
-      padding: 7px 18px;
+      padding: 7px 16px;
       border-radius: 5px;
       border: 1px solid #2a2f3a;
       background: #161b27;
       color: #ccc;
       font-family: monospace;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
-      transition: background .15s;
+      transition: background .12s;
     }
-    button:hover:not(:disabled) { background: #1e2535; }
+    button:hover:not(:disabled) { background: #1e2535; border-color: #3a4050; }
     button:disabled { opacity: 0.35; cursor: default; }
+    button.active { border-color: #4a90d9; color: #4a90d9; }
 
-    .status { font-size: 0.78rem; color: #555; min-width: 80px; }
+    .status { font-size: 0.75rem; color: #555; min-width: 70px; }
 
+    /* ── settings panel ── */
+    #settingsPanel {
+      width: 100%;
+      max-width: 1094px;   /* matches canvas row */
+      background: #111722;
+      border: 1px solid #1e2530;
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: none;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 8px 24px;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-row label {
+      font-size: 0.75rem;
+      color: #778;
+      min-width: 100px;
+      text-align: right;
+    }
+
+    .setting-row input[type=range] {
+      flex: 1;
+      accent-color: #4a90d9;
+      height: 3px;
+      cursor: pointer;
+    }
+
+    .setting-row input[type=number] {
+      width: 52px;
+      background: #161b27;
+      border: 1px solid #2a2f3a;
+      border-radius: 3px;
+      color: #ccc;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 2px 4px;
+      text-align: right;
+    }
+
+    .setting-val {
+      font-size: 0.75rem;
+      color: #4a90d9;
+      min-width: 64px;
+      text-align: left;
+    }
+
+    .settings-hint {
+      font-size: 0.68rem;
+      color: #3a4050;
+      margin-top: 8px;
+    }
+
+    /* ── legend ── */
     .legend {
       display: flex;
       gap: 14px;
@@ -55,44 +120,83 @@
     .swatch-line { width: 14px; height: 2px; border-radius: 1px; display: inline-block; }
     .swatch-dot  { width: 8px;  height: 8px; border-radius: 50%; display: inline-block; }
 
-    .row {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-
+    /* ── canvas layout ── */
+    .row { display: flex; gap: 14px; align-items: flex-start; }
     .left-col { display: flex; flex-direction: column; gap: 2px; }
-
-    canvas {
-      display: block;
-      border: 1px solid #1a1f2a;
-      border-radius: 3px;
-    }
-
-    .clabel {
-      font-size: 0.7rem;
-      color: #444;
-      text-align: center;
-      margin-top: 5px;
-    }
+    canvas { display: block; border: 1px solid #1a1f2a; border-radius: 3px; }
+    .clabel { font-size: 0.7rem; color: #444; text-align: center; margin-top: 5px; }
   </style>
 </head>
 <body>
 
 <h2>FORMANT TRACKER · F1 / F2</h2>
 
+<!-- top controls -->
 <div class="controls">
   <button id="micBtn">▶ Start mic</button>
   <span id="micStatus" class="status">idle</span>
-
   <span class="divider">|</span>
-
   <input type="file" id="refFile" accept="audio/*" style="display:none">
   <button id="refLoadBtn">📂 Load reference</button>
   <button id="refPlayBtn" disabled>▶ Play</button>
   <span id="refStatus" class="status">no file</span>
+  <span class="divider">|</span>
+  <button id="settingsBtn">⚙ Settings</button>
 </div>
 
+<!-- settings panel -->
+<div id="settingsPanel">
+  <div class="settings-grid">
+
+    <div class="setting-row">
+      <label>Max formant (Hz)</label>
+      <input type="range" id="s_max_f" min="4000" max="6000" step="100" value="5000">
+      <span class="setting-val" id="v_max_f">5000 Hz</span>
+    </div>
+
+    <div class="setting-row">
+      <label>N formants</label>
+      <input type="range" id="s_n_formants" min="3" max="6" step="1" value="5">
+      <span class="setting-val" id="v_n_formants">5</span>
+    </div>
+
+    <div class="setting-row">
+      <label>Window (ms)</label>
+      <input type="range" id="s_window_ms" min="25" max="100" step="5" value="50">
+      <span class="setting-val" id="v_window_ms">50 ms</span>
+    </div>
+
+    <div class="setting-row">
+      <label>Pre-emphasis (Hz)</label>
+      <input type="range" id="s_pre_emphasis" min="0" max="80" step="5" value="25">
+      <span class="setting-val" id="v_pre_emphasis">25 Hz</span>
+    </div>
+
+    <div class="setting-row">
+      <label>Energy floor</label>
+      <input type="range" id="s_energy_floor" min="1" max="50" step="1" value="5">
+      <span class="setting-val" id="v_energy_floor">0.005</span>
+    </div>
+
+    <div class="setting-row">
+      <label>Pitch min (Hz)</label>
+      <input type="range" id="s_pitch_min" min="50" max="200" step="10" value="75">
+      <span class="setting-val" id="v_pitch_min">75 Hz</span>
+    </div>
+
+    <div class="setting-row">
+      <label>Pitch max (Hz)</label>
+      <input type="range" id="s_pitch_max" min="300" max="800" step="25" value="600">
+      <span class="setting-val" id="v_pitch_max">600 Hz</span>
+    </div>
+
+  </div>
+  <div class="settings-hint">
+    Tip for u/o: lower Max formant → 4000–4500 Hz · fewer N formants → 4 · lower Pre-emphasis → 0–10 Hz
+  </div>
+</div>
+
+<!-- legend -->
 <div class="legend">
   <span><span class="swatch-line" style="background:#ff4c4c"></span>F1 live</span>
   <span><span class="swatch-line" style="background:#00d4ff"></span>F2 live</span>
@@ -102,6 +206,7 @@
   <span><span class="swatch-dot"  style="background:#ffcc00;opacity:.7"></span>ref pos</span>
 </div>
 
+<!-- canvases -->
 <div class="row">
   <div class="left-col">
     <canvas id="timeCanvas" width="640" height="260"></canvas>
@@ -115,7 +220,18 @@
 </div>
 
 <script>
-// ─── Config ────────────────────────────────────────────────────────────────────
+// ─── Config (mirrors server DEFAULT_CONFIG) ────────────────────────────────────
+const config = {
+  max_f:        5000,
+  n_formants:   5,
+  window_ms:    50,
+  pre_emphasis: 25,
+  energy_floor: 0.005,
+  pitch_min:    75,
+  pitch_max:    600,
+};
+
+// ─── Canvas constants ──────────────────────────────────────────────────────────
 const WS_URL  = "ws://localhost:8000/ws";
 const API_URL = "http://localhost:8000/analyze";
 
@@ -124,55 +240,78 @@ const F2_MIN = 500,  F2_MAX = 3000;
 const HISTORY_LEN = 200;
 const TRAIL_LEN   = 80;
 const STEP_MS     = 10;
+const RMS_MIN     = 0.00001;
+const RMS_MAX     = 0.6;
 
-const RMS_MIN   = 0.00001;
-const RMS_MAX   = 0.6;
-const RMS_FLOOR = 0.005;
-
-// time canvas margins (left = F1 axis, right = F2 axis)
-const TPLOT_ML = 52;
-const TPLOT_MR = 52;
-
-// vowel canvas margins
+const TPLOT_ML = 52, TPLOT_MR = 52;
 const VML = 52, VMT = 32, VMR = 12, VMB = 28;
 
-// colours
 const REF_F1_COLOR  = "#ff9900";
 const REF_F2_COLOR  = "#aaee00";
 const REF_DOT_COLOR = "#ffcc00";
 
 // ─── State ─────────────────────────────────────────────────────────────────────
-
-// live mic histories
-const f1History  = [];
-const f2History  = [];
-const rmsHistory = [];
-const trail      = [];
+const f1History  = [], f2History  = [], rmsHistory = [], trail = [];
 let   currentRms = 0;
 
-// reference audio histories (rebuilt each frame from refFrames + playback time)
-let refFrames     = [];
-let refF1History  = [];
-let refF2History  = [];
-let refRmsHistory = [];
-let refAudio      = null;
-let refPlaying    = false;
-let refDuration   = 0;
+let refFrames = [], refF1History = [], refF2History = [], refRmsHistory = [];
+let refAudio = null, refPlaying = false, refDuration = 0;
 
 // ─── Canvas refs ───────────────────────────────────────────────────────────────
-const tcvs = document.getElementById("timeCanvas");
-const tctx = tcvs.getContext("2d");
-const rcvs = document.getElementById("rmsCanvas");
-const rctx = rcvs.getContext("2d");
-const vcvs = document.getElementById("vowelCanvas");
-const vctx = vcvs.getContext("2d");
+const tcvs = document.getElementById("timeCanvas"), tctx = tcvs.getContext("2d");
+const rcvs = document.getElementById("rmsCanvas"),  rctx = rcvs.getContext("2d");
+const vcvs = document.getElementById("vowelCanvas"), vctx = vcvs.getContext("2d");
 
-// ─── Math helpers ──────────────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const norm    = (v, lo, hi) => clamp((v - lo) / (hi - lo), 0, 1);
 const logNorm = v =>
   (Math.log10(Math.max(v, RMS_MIN)) - Math.log10(RMS_MIN)) /
   (Math.log10(RMS_MAX)              - Math.log10(RMS_MIN));
+
+// ─── Settings panel ────────────────────────────────────────────────────────────
+document.getElementById("settingsBtn").addEventListener("click", () => {
+  const panel = document.getElementById("settingsPanel");
+  const btn   = document.getElementById("settingsBtn");
+  const open  = panel.style.display === "block";
+  panel.style.display = open ? "none" : "block";
+  btn.classList.toggle("active", !open);
+});
+
+// slider definitions: [sliderId, valueId, configKey, unit, scale]
+// scale: function to convert raw slider int → actual config value (and back)
+const sliderDefs = [
+  { id: "s_max_f",        vid: "v_max_f",        key: "max_f",        fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
+  { id: "s_n_formants",   vid: "v_n_formants",   key: "n_formants",   fmt: v => `${v}`,      toVal: v => v,       toSlider: v => v       },
+  { id: "s_window_ms",    vid: "v_window_ms",    key: "window_ms",    fmt: v => `${v} ms`,   toVal: v => v,       toSlider: v => v       },
+  { id: "s_pre_emphasis", vid: "v_pre_emphasis", key: "pre_emphasis", fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
+  // energy_floor slider: 1–50 maps to 0.001–0.050 (÷1000)
+  { id: "s_energy_floor", vid: "v_energy_floor", key: "energy_floor", fmt: v => v.toFixed(3), toVal: v => v / 1000, toSlider: v => Math.round(v * 1000) },
+  { id: "s_pitch_min",    vid: "v_pitch_min",    key: "pitch_min",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
+  { id: "s_pitch_max",    vid: "v_pitch_max",    key: "pitch_max",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
+];
+
+sliderDefs.forEach(def => {
+  const slider = document.getElementById(def.id);
+  const valEl  = document.getElementById(def.vid);
+
+  // initialise display
+  valEl.textContent = def.fmt(config[def.key]);
+  slider.value      = def.toSlider(config[def.key]);
+
+  slider.addEventListener("input", () => {
+    const val = def.toVal(Number(slider.value));
+    config[def.key]   = val;
+    valEl.textContent = def.fmt(val);
+    sendConfig();
+  });
+});
+
+function sendConfig() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(config));
+  }
+}
 
 // ─── WebSocket ─────────────────────────────────────────────────────────────────
 let ws, running = false;
@@ -180,9 +319,13 @@ let ws, running = false;
 function connectWS() {
   ws = new WebSocket(WS_URL);
 
+  ws.onopen = () => {
+    setMicStatus("connected ✓");
+    sendConfig();   // push current slider state immediately on connect
+  };
+
   ws.onmessage = ({ data }) => {
     const { f1, f2, rms } = JSON.parse(data);
-
     currentRms = rms ?? 0;
 
     f1History.push(f1 ?? null);
@@ -196,25 +339,22 @@ function connectWS() {
     if (trail.length > TRAIL_LEN) trail.shift();
   };
 
-  ws.onopen  = () => setMicStatus("connected ✓");
   ws.onerror = () => setMicStatus("ws error");
   ws.onclose = () => { if (running) setTimeout(connectWS, 1000); };
 }
 
-// ─── Mic capture via AudioWorklet ───────────────────────────────────────────────
+// ─── Mic capture ───────────────────────────────────────────────────────────────
 let audioCtx, worklet, mediaStream;
 
 async function startMic() {
   audioCtx    = new AudioContext({ sampleRate: 16000 });
   mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
   const src   = audioCtx.createMediaStreamSource(mediaStream);
-
   await audioCtx.audioWorklet.addModule("processor.js");
   worklet = new AudioWorkletNode(audioCtx, "pcm-processor");
   worklet.port.onmessage = ({ data }) => {
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(data);
   };
-
   src.connect(worklet);
   worklet.connect(audioCtx.destination);
 }
@@ -225,7 +365,6 @@ function stopMic() {
   audioCtx?.close();
 }
 
-// ─── Mic UI ─────────────────────────────────────────────────────────────────────
 const micBtn = document.getElementById("micBtn");
 const setMicStatus = t => { document.getElementById("micStatus").textContent = t; };
 
@@ -246,7 +385,7 @@ micBtn.addEventListener("click", async () => {
   }
 });
 
-// ─── Reference: upload & analyze ───────────────────────────────────────────────
+// ─── Reference: upload ─────────────────────────────────────────────────────────
 const refPlayBtn  = document.getElementById("refPlayBtn");
 const refStatusEl = document.getElementById("refStatus");
 
@@ -257,12 +396,12 @@ document.getElementById("refLoadBtn").addEventListener("click", () => {
 document.getElementById("refFile").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
   refStatusEl.textContent = "analyzing…";
   refPlayBtn.disabled = true;
 
   const form = new FormData();
   form.append("file", file);
+  form.append("config", JSON.stringify(config));   // send current settings
 
   try {
     const res  = await fetch(API_URL, { method: "POST", body: form });
@@ -270,7 +409,6 @@ document.getElementById("refFile").addEventListener("change", async (e) => {
     refFrames   = data.frames;
     refDuration = data.duration;
 
-    // reset any previous playback
     if (refAudio) { refAudio.pause(); refAudio = null; }
     refF1History = []; refF2History = []; refRmsHistory = [];
 
@@ -286,68 +424,49 @@ document.getElementById("refFile").addEventListener("change", async (e) => {
   } catch (err) {
     refStatusEl.textContent = "error: " + err.message;
   }
-
-  e.target.value = ""; // allow re-selecting the same file
+  e.target.value = "";
 });
 
-// ─── Reference: play / stop ─────────────────────────────────────────────────────
+// ─── Reference: play / stop ────────────────────────────────────────────────────
 refPlayBtn.addEventListener("click", () => {
   if (!refAudio) return;
-
   if (refPlaying) {
-    refAudio.pause();
-    refAudio.currentTime = 0;
-    refPlaying = false;
-    refPlayBtn.textContent = "▶ Play";
+    refAudio.pause(); refAudio.currentTime = 0;
+    refPlaying = false; refPlayBtn.textContent = "▶ Play";
     refF1History = []; refF2History = []; refRmsHistory = [];
   } else {
-    refAudio.currentTime = 0;
-    refAudio.play();
-    refPlaying = true;
-    refPlayBtn.textContent = "⏹ Stop";
+    refAudio.currentTime = 0; refAudio.play();
+    refPlaying = true; refPlayBtn.textContent = "⏹ Stop";
   }
 });
 
-// ─── Reference: sync histories to playback position ─────────────────────────────
 function updateRefHistories() {
   if (!refPlaying || !refAudio || refFrames.length === 0) return;
-
-  const t     = refAudio.currentTime;
-  const step  = STEP_MS / 1000;
-  const idx   = Math.min(Math.round(t / step), refFrames.length - 1);
+  const idx   = Math.min(Math.round(refAudio.currentTime / (STEP_MS / 1000)), refFrames.length - 1);
   const start = Math.max(0, idx - HISTORY_LEN + 1);
   const slice = refFrames.slice(start, idx + 1);
-
   refF1History  = slice.map(f => f.f1);
   refF2History  = slice.map(f => f.f2);
   refRmsHistory = slice.map(f => f.rms);
 }
 
-// ─── Draw: time plot ────────────────────────────────────────────────────────────
+// ─── Draw: time ────────────────────────────────────────────────────────────────
 function drawTime() {
-  const W  = tcvs.width, H = tcvs.height;
-  const PW = W - TPLOT_ML - TPLOT_MR;
-
+  const W = tcvs.width, H = tcvs.height, PW = W - TPLOT_ML - TPLOT_MR;
   tctx.clearRect(0, 0, W, H);
 
-  // F1 left axis — red
   tctx.textAlign = "right";
   [200, 300, 400, 500, 600, 700, 800, 900, 1000].forEach(hz => {
     const y = (1 - norm(hz, F1_MIN, F1_MAX)) * H;
-    // grid
-    tctx.strokeStyle = "#171c27"; tctx.lineWidth = 1;
-    tctx.setLineDash([2, 5]);
-    tctx.beginPath(); tctx.moveTo(TPLOT_ML, y); tctx.lineTo(TPLOT_ML + PW, y);
-    tctx.stroke(); tctx.setLineDash([]);
-    // tick
+    tctx.strokeStyle = "#171c27"; tctx.lineWidth = 1; tctx.setLineDash([2, 5]);
+    tctx.beginPath(); tctx.moveTo(TPLOT_ML, y); tctx.lineTo(TPLOT_ML + PW, y); tctx.stroke();
+    tctx.setLineDash([]);
     tctx.strokeStyle = "#ff4c4c"; tctx.lineWidth = 1;
     tctx.beginPath(); tctx.moveTo(TPLOT_ML - 4, y); tctx.lineTo(TPLOT_ML, y); tctx.stroke();
-    // label
     tctx.fillStyle = "#ff4c4c"; tctx.font = "10px monospace";
     tctx.fillText(hz, TPLOT_ML - 7, y + 3);
   });
 
-  // F2 right axis — cyan
   tctx.textAlign = "left";
   [500, 1000, 1500, 2000, 2500, 3000].forEach(hz => {
     const y = (1 - norm(hz, F2_MIN, F2_MAX)) * H;
@@ -357,31 +476,22 @@ function drawTime() {
     tctx.fillText(hz, TPLOT_ML + PW + 7, y + 3);
   });
 
-  // axis borders
   tctx.strokeStyle = "#2a2f3a"; tctx.lineWidth = 1;
   tctx.beginPath(); tctx.moveTo(TPLOT_ML, 0); tctx.lineTo(TPLOT_ML, H); tctx.stroke();
   tctx.beginPath(); tctx.moveTo(TPLOT_ML + PW, 0); tctx.lineTo(TPLOT_ML + PW, H); tctx.stroke();
 
-  // axis titles (rotated)
   tctx.save();
   tctx.fillStyle = "#ff4c4c"; tctx.font = "11px monospace"; tctx.textAlign = "center";
-  tctx.translate(13, H / 2); tctx.rotate(-Math.PI / 2);
-  tctx.fillText("F1 (Hz)", 0, 0);
+  tctx.translate(13, H / 2); tctx.rotate(-Math.PI / 2); tctx.fillText("F1 (Hz)", 0, 0);
   tctx.restore();
-
   tctx.save();
   tctx.fillStyle = "#00d4ff"; tctx.font = "11px monospace"; tctx.textAlign = "center";
-  tctx.translate(W - 13, H / 2); tctx.rotate(Math.PI / 2);
-  tctx.fillText("F2 (Hz)", 0, 0);
+  tctx.translate(W - 13, H / 2); tctx.rotate(Math.PI / 2); tctx.fillText("F2 (Hz)", 0, 0);
   tctx.restore();
 
-  // draw line helper — works for both live and reference data
   const drawLine = (data, color, fMin, fMax, alpha) => {
     if (data.length < 2) return;
-    tctx.save();
-    tctx.globalAlpha = alpha;
-    tctx.strokeStyle = color;
-    tctx.lineWidth   = 2;
+    tctx.save(); tctx.globalAlpha = alpha; tctx.strokeStyle = color; tctx.lineWidth = 2;
     tctx.beginPath();
     data.forEach((v, i) => {
       if (v == null) return;
@@ -389,134 +499,103 @@ function drawTime() {
       const y = (1 - norm(v, fMin, fMax)) * H;
       i === 0 || data[i - 1] == null ? tctx.moveTo(x, y) : tctx.lineTo(x, y);
     });
-    tctx.stroke();
-    tctx.restore();
+    tctx.stroke(); tctx.restore();
   };
 
-  // reference (dim, painted first so live sits on top)
   if (refF1History.length > 1) {
     drawLine(refF1History, REF_F1_COLOR, F1_MIN, F1_MAX, 0.4);
     drawLine(refF2History, REF_F2_COLOR, F2_MIN, F2_MAX, 0.4);
   }
-
-  // live
   drawLine(f1History, "#ff4c4c", F1_MIN, F1_MAX, 1);
   drawLine(f2History, "#00d4ff", F2_MIN, F2_MAX, 1);
 
-  // current value readout (top-left of plot area)
-  tctx.textAlign = "left";
-  tctx.font = "bold 12px monospace";
+  tctx.textAlign = "left"; tctx.font = "bold 12px monospace";
   const lf1 = f1History.at(-1), lf2 = f2History.at(-1);
   if (lf1) { tctx.fillStyle = "#ff4c4c"; tctx.fillText(`F1 ${lf1} Hz`, TPLOT_ML + 6, 16); }
   if (lf2) { tctx.fillStyle = "#00d4ff"; tctx.fillText(`F2 ${lf2} Hz`, TPLOT_ML + 6, 32); }
 }
 
-// ─── Draw: RMS bar chart ────────────────────────────────────────────────────────
+// ─── Draw: RMS ─────────────────────────────────────────────────────────────────
 function drawRms() {
-  const W      = rcvs.width, H = rcvs.height;
-  const LW     = TPLOT_ML;                  // left label margin — aligns with time canvas
-  const plotW  = W - LW - TPLOT_MR;        // right margin also matches
-  const barW   = plotW / HISTORY_LEN;
-
+  const W = rcvs.width, H = rcvs.height, LW = TPLOT_ML, plotW = W - LW - TPLOT_MR;
+  const barW = plotW / HISTORY_LEN;
   rctx.clearRect(0, 0, W, H);
 
-  // y-axis ticks + grid
   rctx.textAlign = "right";
   [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5].forEach(val => {
     const y = (1 - logNorm(val)) * H;
-    rctx.strokeStyle = "#171c27"; rctx.lineWidth = 1;
-    rctx.setLineDash([2, 4]);
-    rctx.beginPath(); rctx.moveTo(LW, y); rctx.lineTo(LW + plotW, y);
-    rctx.stroke(); rctx.setLineDash([]);
+    rctx.strokeStyle = "#171c27"; rctx.lineWidth = 1; rctx.setLineDash([2, 4]);
+    rctx.beginPath(); rctx.moveTo(LW, y); rctx.lineTo(LW + plotW, y); rctx.stroke();
+    rctx.setLineDash([]);
     rctx.strokeStyle = "#333"; rctx.lineWidth = 1;
     rctx.beginPath(); rctx.moveTo(LW - 4, y); rctx.lineTo(LW, y); rctx.stroke();
     rctx.fillStyle = "#555"; rctx.font = "10px monospace";
     rctx.fillText(val < 0.001 ? val.toExponential(0) : val.toString(), LW - 7, y + 3);
   });
 
-  // gate threshold line
-  const threshY = (1 - logNorm(RMS_FLOOR)) * H;
-  rctx.strokeStyle = "#444"; rctx.lineWidth = 1;
-  rctx.setLineDash([5, 4]);
-  rctx.beginPath(); rctx.moveTo(LW, threshY); rctx.lineTo(LW + plotW, threshY);
-  rctx.stroke(); rctx.setLineDash([]);
-  rctx.fillStyle = "#555"; rctx.font = "9px monospace"; rctx.textAlign = "left";
-  rctx.fillText("gate", LW + 4, threshY - 3);
+  // gate line — reflects the live config.energy_floor value
+  const threshY = (1 - logNorm(config.energy_floor)) * H;
+  rctx.strokeStyle = "#4a90d9"; rctx.lineWidth = 1; rctx.setLineDash([5, 4]);
+  rctx.beginPath(); rctx.moveTo(LW, threshY); rctx.lineTo(LW + plotW, threshY); rctx.stroke();
+  rctx.setLineDash([]);
+  rctx.fillStyle = "#4a90d9"; rctx.font = "9px monospace"; rctx.textAlign = "left";
+  rctx.fillText(`gate ${config.energy_floor.toFixed(3)}`, LW + 4, threshY - 3);
 
-  // left axis border
   rctx.strokeStyle = "#2a2f3a"; rctx.lineWidth = 1;
   rctx.beginPath(); rctx.moveTo(LW, 0); rctx.lineTo(LW, H); rctx.stroke();
 
-  // reference bars (dim orange, behind live)
   refRmsHistory.forEach((v, i) => {
-    const level = logNorm(v ?? RMS_MIN);
-    const barH  = level * H;
+    const barH = logNorm(v ?? RMS_MIN) * H;
     rctx.fillStyle = "rgba(255,153,0,0.22)";
     rctx.fillRect(LW + i * barW, H - barH, Math.max(barW - 1, 1), barH);
   });
 
-  // live bars (green → yellow → red)
   rmsHistory.forEach((v, i) => {
-    const level = logNorm(v ?? RMS_MIN);
-    const barH  = level * H;
-    const gated = (v ?? 0) < RMS_FLOOR;
-    const t     = Math.min(level * 1.5, 1);
-    const r     = Math.round(255 * Math.min(1, t * 2));
-    const g     = Math.round(255 * Math.min(1, 2 - t * 2));
+    const level = logNorm(v ?? RMS_MIN), barH = level * H;
+    const gated = (v ?? 0) < config.energy_floor;
+    const t = Math.min(level * 1.5, 1);
+    const r = Math.round(255 * Math.min(1, t * 2)), g = Math.round(255 * Math.min(1, 2 - t * 2));
     rctx.fillStyle = gated ? "#181c26" : `rgb(${r},${g},30)`;
     rctx.fillRect(LW + i * barW, H - barH, Math.max(barW - 1, 1), barH);
   });
 
-  // current RMS value label
   rctx.fillStyle = "#555"; rctx.font = "10px monospace"; rctx.textAlign = "left";
   rctx.fillText(`RMS ${currentRms.toExponential(2)}`, LW + 6, 12);
 }
 
-// ─── Draw: vowel space ──────────────────────────────────────────────────────────
+// ─── Draw: vowel space ─────────────────────────────────────────────────────────
 function drawVowel() {
-  const W  = vcvs.width, H = vcvs.height;
-  const PW = W - VML - VMR;
-  const PH = H - VMT - VMB;
-
-  // coordinate helpers (F2 inverted on x: high F2 = left, matching IPA convention)
+  const W = vcvs.width, H = vcvs.height, PW = W - VML - VMR, PH = H - VMT - VMB;
   const vx = f2 => VML + (1 - norm(f2, F2_MIN, F2_MAX)) * PW;
   const vy = f1 => VMT + norm(f1, F1_MIN, F1_MAX) * PH;
-
   vctx.clearRect(0, 0, W, H);
 
-  // F2 top axis (inverted)
   vctx.textAlign = "center";
   [500, 1000, 1500, 2000, 2500, 3000].forEach(hz => {
     const x = vx(hz);
-    vctx.strokeStyle = "#171c27"; vctx.lineWidth = 1;
-    vctx.setLineDash([2, 5]);
-    vctx.beginPath(); vctx.moveTo(x, VMT); vctx.lineTo(x, VMT + PH);
-    vctx.stroke(); vctx.setLineDash([]);
+    vctx.strokeStyle = "#171c27"; vctx.lineWidth = 1; vctx.setLineDash([2, 5]);
+    vctx.beginPath(); vctx.moveTo(x, VMT); vctx.lineTo(x, VMT + PH); vctx.stroke();
+    vctx.setLineDash([]);
     vctx.strokeStyle = "#333"; vctx.lineWidth = 1;
     vctx.beginPath(); vctx.moveTo(x, VMT - 4); vctx.lineTo(x, VMT); vctx.stroke();
     vctx.fillStyle = "#667"; vctx.font = "10px monospace";
     vctx.fillText(hz, x, VMT - 9);
   });
 
-  // F1 left axis
   vctx.textAlign = "right";
   [200, 300, 400, 500, 600, 700, 800, 900, 1000].forEach(hz => {
     const y = vy(hz);
-    vctx.strokeStyle = "#171c27"; vctx.lineWidth = 1;
-    vctx.setLineDash([2, 5]);
-    vctx.beginPath(); vctx.moveTo(VML, y); vctx.lineTo(VML + PW, y);
-    vctx.stroke(); vctx.setLineDash([]);
+    vctx.strokeStyle = "#171c27"; vctx.lineWidth = 1; vctx.setLineDash([2, 5]);
+    vctx.beginPath(); vctx.moveTo(VML, y); vctx.lineTo(VML + PW, y); vctx.stroke();
+    vctx.setLineDash([]);
     vctx.strokeStyle = "#333"; vctx.lineWidth = 1;
     vctx.beginPath(); vctx.moveTo(VML - 4, y); vctx.lineTo(VML, y); vctx.stroke();
     vctx.fillStyle = "#667"; vctx.font = "10px monospace";
     vctx.fillText(hz, VML - 7, y + 3);
   });
 
-  // axis border box
   vctx.strokeStyle = "#2a2f3a"; vctx.lineWidth = 1;
   vctx.strokeRect(VML, VMT, PW, PH);
-
-  // axis titles
   vctx.fillStyle = "#556"; vctx.font = "11px monospace"; vctx.textAlign = "center";
   vctx.fillText("← F2 (Hz)", VML + PW / 2, H - 7);
   vctx.save();
@@ -525,49 +604,38 @@ function drawVowel() {
   vctx.restore();
   vctx.textAlign = "left";
 
-  // IPA reference vowel bubbles
-  const refs = [
-    { label: "i", f2: 2400, f1: 240 },  { label: "e", f2: 1900, f1: 610 },
-    { label: "ɛ", f2: 2300, f1: 390 },  { label: "a", f2: 1200, f1: 800 },
-    { label: "ɔ", f2: 800,  f1: 600 },  { label: "o", f2: 640,  f1: 360 },
-    { label: "u", f2: 595,  f1: 250 },  { label: "ə", f2: 1400, f1: 500 },
+  [
+    { label: "i", f2: 2400, f1: 280 }, { label: "e", f2: 2100, f1: 420 },
+    { label: "ɛ", f2: 1900, f1: 580 }, { label: "a", f2: 1200, f1: 800 },
+    { label: "ɔ", f2: 800,  f1: 600 }, { label: "o", f2: 700,  f1: 450 },
+    { label: "u", f2: 650,  f1: 300 }, { label: "ə", f2: 1400, f1: 500 },
     { label: "æ", f2: 1800, f1: 700 },
-  ];
-  refs.forEach(({ label, f1, f2 }) => {
+  ].forEach(({ label, f1, f2 }) => {
     const x = vx(f2), y = vy(f1);
     vctx.fillStyle = "#1e2535";
     vctx.beginPath(); vctx.arc(x, y, 17, 0, 2 * Math.PI); vctx.fill();
-    vctx.strokeStyle = "#2e3a4a"; vctx.lineWidth = 1;
-    vctx.stroke();
+    vctx.strokeStyle = "#2e3a4a"; vctx.lineWidth = 1; vctx.stroke();
     vctx.fillStyle = "#556"; vctx.font = "15px serif"; vctx.textAlign = "center";
     vctx.fillText(label, x, y + 5);
   });
 
-  // reference trail (orange fading)
   refF1History.forEach((f1, i) => {
     const f2 = refF2History[i];
     if (f1 == null || f2 == null) return;
-    const alpha = (i / refF1History.length) * 0.7;
-    vctx.fillStyle = `rgba(255,153,0,${alpha})`;
+    vctx.fillStyle = `rgba(255,153,0,${(i / refF1History.length) * 0.7})`;
     vctx.beginPath(); vctx.arc(vx(f2), vy(f1), 4, 0, 2 * Math.PI); vctx.fill();
   });
-
-  // reference current dot
   const rf1 = refF1History.at(-1), rf2 = refF2History.at(-1);
   if (rf1 != null && rf2 != null) {
     vctx.fillStyle = REF_DOT_COLOR;
     vctx.beginPath(); vctx.arc(vx(rf2), vy(rf1), 9, 0, 2 * Math.PI); vctx.fill();
   }
 
-  // live trail (gold fading)
   trail.forEach(({ f1, f2 }, i) => {
     if (f1 == null || f2 == null) return;
-    const alpha = (i / trail.length) * 0.7;
-    vctx.fillStyle = `rgba(255,210,0,${alpha})`;
+    vctx.fillStyle = `rgba(255,210,0,${(i / trail.length) * 0.7})`;
     vctx.beginPath(); vctx.arc(vx(f2), vy(f1), 4, 0, 2 * Math.PI); vctx.fill();
   });
-
-  // live current dot
   const lf1 = f1History.at(-1), lf2 = f2History.at(-1);
   if (lf1 != null && lf2 != null) {
     vctx.fillStyle = "#ffd700";
@@ -575,7 +643,7 @@ function drawVowel() {
   }
 }
 
-// ─── Animation loop ─────────────────────────────────────────────────────────────
+// ─── Loop ──────────────────────────────────────────────────────────────────────
 function frame() {
   updateRefHistories();
   drawTime();
@@ -583,7 +651,6 @@ function frame() {
   drawVowel();
   requestAnimationFrame(frame);
 }
-
 requestAnimationFrame(frame);
 </script>
 </body>
