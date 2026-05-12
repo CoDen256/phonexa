@@ -22,11 +22,10 @@ async function loadLanguages(){
   updateSaveButtons();
 }
 
-// ─── Language tabs (horizontal) with drag-to-reorder and × removal ──────────
+// ─── Language tabs with drag-to-reorder, disable/enable ─────────────────────
 function renderLangList(){
   const el=document.getElementById('langTabs'); if(!el)return;
   el.innerHTML='';
-  // Ensure langOrder covers all current keys
   for(const key of Object.keys(state.langs)) if(!state.langOrder.includes(key)) state.langOrder.push(key);
   let dragSrcKey=null;
 
@@ -34,56 +33,54 @@ function renderLangList(){
     const lang=state.langs[key]; if(!lang) continue;
     const src=state.langSources[key]||'builtin';
     const isActive=state.selKey===key;
+    const isDisabled=state.langDisabled.has(key);
 
     const wrap=document.createElement('div');
-    wrap.className='lang-tab-wrap'; wrap.draggable=true;
+    wrap.className='lang-tab-wrap'+(isDisabled?' tab-disabled':''); wrap.draggable=true;
 
     const btn=document.createElement('button');
-    btn.type='button'; btn.className='lang-tab'+(isActive?' active':'');
+    btn.type='button'; btn.className='lang-tab'+(isActive?' active':'')+(isDisabled?' disabled':'');
     if(src==='builtin') btn.classList.add('builtin');
-    btn.style.borderColor=isActive?lang.color:'';
-    btn.style.color=isActive?lang.color:'';
-    btn.textContent=lang.label||key;
-    if(src==='builtin') btn.title='Built-in — editable, use Save As to export';
+    btn.style.borderColor=isActive&&!isDisabled?lang.color:'';
+    btn.style.color=isActive&&!isDisabled?lang.color:'';
+    btn.textContent=(lang.label||key)+(isDisabled?' (off)':'');
+    btn.title=isDisabled?'Disabled — excluded from index.json. Use ↩ to re-enable.'
+      :src==='builtin'?'Built-in — editable, use Save As to export':'';
     btn.addEventListener('click',()=>selectLang(key));
 
-    const delBtn=document.createElement('button');
-    delBtn.type='button'; delBtn.className='lang-tab-del'; delBtn.textContent='×';
-    delBtn.title='Remove from editor';
-    delBtn.addEventListener('click',e=>{e.stopPropagation();removeLang(key);});
-
-    wrap.appendChild(btn); wrap.appendChild(delBtn);
+    if(isDisabled){
+      const enBtn=document.createElement('button');
+      enBtn.type='button'; enBtn.className='lang-tab-enable'; enBtn.textContent='↩'; enBtn.title='Re-enable';
+      enBtn.addEventListener('click',e=>{e.stopPropagation();enableLang(key);});
+      wrap.appendChild(btn); wrap.appendChild(enBtn);
+    }else{
+      const disBtn=document.createElement('button');
+      disBtn.type='button'; disBtn.className='lang-tab-del'; disBtn.textContent='×'; disBtn.title='Disable (exclude from index.json)';
+      disBtn.addEventListener('click',e=>{e.stopPropagation();disableLang(key);});
+      wrap.appendChild(btn); wrap.appendChild(disBtn);
+    }
 
     wrap.addEventListener('dragstart',e=>{dragSrcKey=key;wrap.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
     wrap.addEventListener('dragend',()=>{wrap.classList.remove('dragging');el.querySelectorAll('.lang-tab-wrap').forEach(t=>t.classList.remove('drag-over'));});
     wrap.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';el.querySelectorAll('.lang-tab-wrap').forEach(t=>t.classList.remove('drag-over'));if(key!==dragSrcKey)wrap.classList.add('drag-over');});
     wrap.addEventListener('drop',e=>{
       e.preventDefault(); if(!dragSrcKey||dragSrcKey===key)return;
-      const from=state.langOrder.indexOf(dragSrcKey), to=state.langOrder.indexOf(key);
+      const from=state.langOrder.indexOf(dragSrcKey),to=state.langOrder.indexOf(key);
       if(from!==-1&&to!==-1){state.langOrder.splice(from,1);state.langOrder.splice(to,0,dragSrcKey);}
       renderLangList();
     });
-
     el.appendChild(wrap);
   }
 }
 
-// ─── Remove a language from the editor ───────────────────────────────────────
-function removeLang(key){
-  const label=state.langs[key]?.label||key;
-  if(!confirm(`Remove "${label}" from the editor?\n(This does not delete the file from disk.)`))return;
-  delete state.langs[key]; delete state.langSources[key];
-  const idx=state.langOrder.indexOf(key); if(idx!==-1)state.langOrder.splice(idx,1);
-  if(state.selKey===key){
-    state.selKey=null; state.langDraft=null; state.vowelIdx=null;
-    state.vowelDraft=null; state.pickingMode=null; state.unsaved=false;
-    document.getElementById('langMetaForm')?.style && (document.getElementById('langMetaForm').style.display='none');
-    document.getElementById('vowelSection')?.style && (document.getElementById('vowelSection').style.display='none');
-    document.getElementById('veInline')?.style && (document.getElementById('veInline').style.display='none');
-    const ph=document.getElementById('editorPaneHint'); if(ph)ph.style.display='block';
-    const st=document.getElementById('soloToggle'); if(st){st.style.display='none';st.classList.remove('active');}
-  }
-  renderLangList(); updateSaveButtons(); renderEditorAll();
+// ─── Disable / enable language ────────────────────────────────────────────────
+function disableLang(key){
+  state.langDisabled.add(key);
+  markUnsaved(); renderLangList(); renderEditorAll();
+}
+function enableLang(key){
+  state.langDisabled.delete(key);
+  markUnsaved(); renderLangList(); renderEditorAll();
 }
 
 function selectLang(key){
@@ -104,8 +101,10 @@ function showLangPanel(){
   const metaForm=document.getElementById('langMetaForm');
   if(metaForm){
     metaForm.style.display='block';
+    const fKey=document.getElementById('fKey');
     const fLabel=document.getElementById('fLabel');
     const fColor=document.getElementById('fColor');
+    if(fKey) fKey.value=state.langDraft.key||'';
     if(fLabel) fLabel.value=state.langDraft.label||'';
     if(fColor) fColor.value=state.langDraft.color||'#7eb8f7';
   }
@@ -140,8 +139,25 @@ function updateSaveButtons(){
 // ─── One-time UI wiring (called from init) ────────────────────────────────────
 function initEditorUI(){
   // Lang meta inputs
+  const fKey=document.getElementById('fKey');
   const fLabel=document.getElementById('fLabel');
   const fColor=document.getElementById('fColor');
+  if(fKey) fKey.addEventListener('input',e=>{
+    if(!state.langDraft)return;
+    const raw=e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g,'-');
+    e.target.value=raw;
+    const oldKey=state.selKey; const newKey=raw;
+    if(!newKey||newKey===oldKey){state.langDraft.key=newKey||oldKey;return;}
+    // Rename in all state maps
+    state.langDraft.key=newKey;
+    state.langs[newKey]={...clone(state.langDraft),key:newKey};
+    delete state.langs[oldKey];
+    state.langSources[newKey]=state.langSources[oldKey]||'new'; delete state.langSources[oldKey];
+    const oi=state.langOrder.indexOf(oldKey); if(oi!==-1)state.langOrder[oi]=newKey;
+    if(state.langDisabled.has(oldKey)){state.langDisabled.delete(oldKey);state.langDisabled.add(newKey);}
+    state.selKey=newKey;
+    markUnsaved(); renderLangList();
+  });
   if(fLabel) fLabel.addEventListener('input',e=>{if(state.langDraft){state.langDraft.label=e.target.value;markUnsaved();renderLangList();}});
   if(fColor) fColor.addEventListener('input',e=>{if(state.langDraft){state.langDraft.color=e.target.value;markUnsaved();renderLangList();}});
 

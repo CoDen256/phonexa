@@ -22,29 +22,38 @@ function applyHandle(h){
 
 // ─── Load all languages from a folder into state.langs ───────────────────────
 async function loadFromFolder(h){
-  let loaded=0;
+  // Read index.json to know which are enabled (in active set)
+  let enabledKeys=[];
   try{
     const idxFile=await h.getFileHandle('index.json');
     const idx=JSON.parse(await(await idxFile.getFile()).text());
-    const names=(idx.languages||[]).filter(n=>!n.startsWith('_'));
-    for(const name of names){
+    enabledKeys=(idx.languages||[]).filter(n=>!n.startsWith('_'));
+  }catch(e){/* No index.json yet */}
+
+  // Scan ALL subdirectories for lang.json (finds disabled langs too)
+  let loaded=0;
+  try{
+    for await(const[name,entry]of h.entries()){
+      if(entry.kind!=='directory'||name.startsWith('_')||name==='cardinal')continue;
       try{
-        const dir=await h.getDirectoryHandle(name);
-        const langFile=await dir.getFileHandle('lang.json');
+        const langFile=await entry.getFileHandle('lang.json');
         const data=JSON.parse(await(await langFile.getFile()).text());
         if(data&&data.key){
-          state.langs[data.key]=data; state.langSources[data.key]='folder';
-          if(!state.langOrder.includes(data.key)) state.langOrder.push(data.key);
+          state.langs[data.key]=data;
+          state.langSources[data.key]='folder';
+          if(!state.langOrder.includes(data.key))state.langOrder.push(data.key);
+          // Mark disabled if not listed in index.json
+          if(!enabledKeys.includes(data.key))state.langDisabled.add(data.key);
+          else state.langDisabled.delete(data.key);
           loaded++;
         }
-      }catch(e){console.warn('Folder lang '+name+':',e);}
+      }catch(e){/* no lang.json in this subdir */}
     }
-  }catch(e){/* No index.json yet — empty folder, ok */}
-  renderLangList();
-  updateSaveButtons();
+  }catch(e){console.warn('Folder scan:',e);}
+
+  renderLangList(); updateSaveButtons();
   return loaded;
 }
-
 // ─── Write one language to a folder ──────────────────────────────────────────
 async function writeToFolder(handle,data){
   const key=data.key; if(!key)throw new Error('Language key required');
@@ -82,21 +91,22 @@ function flushCurrentDraft(){
 async function saveLang(){
   if(!state.dirHandle){return saveAsLang();}
   flushCurrentDraft();
-  const langs=Object.entries(state.langs).filter(([k])=>k!=='cardinal');
+  // Write all non-cardinal langs to disk; only include enabled in index.json
+  const allLangs=Object.entries(state.langs).filter(([k])=>k!=='cardinal');
+  const enabledKeys=allLangs.filter(([k])=>!state.langDisabled.has(k)).map(([k])=>k);
   let saved=0,errors=0;
-  for(const[,lang]of langs){
+  for(const[,lang]of allLangs){
     try{await writeToFolder(state.dirHandle,lang);saved++;}
     catch(e){console.error('Failed:',e);errors++;}
   }
-  try{await writeIndex(state.dirHandle,langs.map(([k])=>k));}catch(e){}
+  try{await writeIndex(state.dirHandle,enabledKeys);}catch(e){}
   markSaved(); renderLangList();
-  toast(errors?`Saved ${saved}, ${errors} failed`:`Saved ${saved} language${saved!==1?'s':''} to folder`);
+  toast(errors?`Saved ${saved}, ${errors} failed`:`Saved — ${enabledKeys.length} active, ${allLangs.length-enabledKeys.length} disabled`);
 }
 
 // ─── Save As: pick a new folder, save everything there, switch connection ─────
 async function saveAsLang(){
   if(!window.showDirectoryPicker){
-    // Fallback: can only download current language
     if(!state.langDraft){toast('No language selected');return;}
     flushCurrentDraft();
     const a=document.createElement('a');
@@ -108,19 +118,19 @@ async function saveAsLang(){
   try{
     const h=await window.showDirectoryPicker({mode:'readwrite',startIn:'documents'});
     flushCurrentDraft();
-    const langs=Object.entries(state.langs).filter(([k])=>k!=='cardinal');
+    const allLangs=Object.entries(state.langs).filter(([k])=>k!=='cardinal');
+    const enabledKeys=allLangs.filter(([k])=>!state.langDisabled.has(k)).map(([k])=>k);
     let saved=0,errors=0;
-    for(const[,lang]of langs){
+    for(const[,lang]of allLangs){
       try{await writeToFolder(h,lang);saved++;}
       catch(e){console.error('Failed:',e);errors++;}
     }
-    try{await writeIndex(h,langs.map(([k])=>k));}catch(e){}
-    // Mark all saved languages as folder source and connect
-    for(const[k]of langs) state.langSources[k]='folder';
+    try{await writeIndex(h,enabledKeys);}catch(e){}
+    for(const[k]of allLangs) state.langSources[k]='folder';
     applyHandle(h);
     await idbPut('dirHandle',h);
     markSaved(); renderLangList(); updateSaveButtons();
-    toast(errors?`Saved ${saved}, ${errors} failed`:`Saved ${saved} language${saved!==1?'s':''} to ${h.name}`);
+    toast(errors?`Saved ${saved}, ${errors} failed`:`Saved to ${h.name} — ${enabledKeys.length} active`);
   }catch(e){if(e.name!=='AbortError')toast('Save failed: '+e.message);}
 }
 

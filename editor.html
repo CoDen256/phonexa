@@ -68,7 +68,8 @@
   <div class="editor-pane" id="editorPane">
     <!-- Lang metadata (always visible when language selected) -->
     <div class="lang-meta-form" id="langMetaForm" style="display:none">
-      <div class="field"><label>Label</label><input type="text" id="fLabel"></div>
+      <div class="field"><label>Key <span style="font-weight:400;opacity:.6;font-size:.58rem">(folder name · a-z 0-9 -)</span></label><input type="text" id="fKey" placeholder="e.g. en" pattern="[a-z0-9_-]+"></div>
+      <div class="field" style="margin-top:4px"><label>Label</label><input type="text" id="fLabel"></div>
       <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
         <label style="font-size:.62rem;color:var(--muted)">Color</label>
         <input type="color" id="fColor">
@@ -110,6 +111,7 @@ const state = {
   showOtherVowels: true,
   langSources: {},    // key → 'builtin' | 'folder' | 'new'
   langOrder: [],      // display/save order of language keys
+  langDisabled: new Set(), // keys excluded from index.json (disabled)
 };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }

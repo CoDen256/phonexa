@@ -368,3 +368,15 @@ body { display:flex; flex-direction:column; min-height:100vh; }
 .lang-tab-wrap:hover .lang-tab-del { display:flex; }
 .lang-tab-wrap.dragging { opacity:.35; }
 .lang-tab-wrap.drag-over .lang-tab { outline:2px solid var(--accent); border-radius:6px; }
+
+/* ── Disabled language tab ──────────────────────────────────── */
+.lang-tab.disabled { opacity:.4; text-decoration:line-through; font-style:italic; }
+.lang-tab-enable {
+  display:none; position:absolute; top:-5px; right:-5px;
+  width:15px; height:15px; border-radius:50%; padding:0; line-height:1;
+  background:#34d399; border:none; color:#0a1a10; cursor:pointer;
+  font-size:.65rem; align-items:center; justify-content:center; z-index:2;
+  transition:background .12s;
+}
+.lang-tab-enable:hover { background:#10b981; }
+.tab-disabled:hover .lang-tab-enable { display:flex; }
