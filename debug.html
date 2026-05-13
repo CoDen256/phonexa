@@ -119,6 +119,7 @@
     .legend span { display: flex; align-items: center; gap: 5px; }
     .swatch-line { width: 14px; height: 2px; border-radius: 1px; display: inline-block; }
     .swatch-dot  { width: 8px;  height: 8px; border-radius: 50%; display: inline-block; }
+    
 
     /* ── canvas layout ── */
     .row { display: flex; gap: 14px; align-items: flex-start; }
@@ -204,6 +205,8 @@
   <span><span class="swatch-line" style="background:#aaee00;opacity:.6"></span>F2 ref</span>
   <span><span class="swatch-dot"  style="background:#ffd700"></span>live pos</span>
   <span><span class="swatch-dot"  style="background:#ffcc00;opacity:.7"></span>ref pos</span>
+  <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid #ff9900"></span>ref mean</span>
+  <span><span style="display:inline-block;width:8px;height:8px;transform:rotate(45deg);border:2px solid #ffd700"></span>5s mean</span>
 </div>
 
 <!-- canvases -->
@@ -220,6 +223,7 @@
 </div>
 
 <script>
+
 // ─── Config (mirrors server DEFAULT_CONFIG) ────────────────────────────────────
 const config = {
   max_f:        5000,
@@ -231,17 +235,27 @@ const config = {
   pitch_max:    600,
 };
 
+// reference mean (computed once when file loads)
+let refMeanF1 = null, refMeanF2 = null;
+
+// live voiced-only buffer — 500 voiced frames = ~5s of actual speech at 10ms/frame
+const VOICED_WINDOW  = 20;
+const voicedF1Buf    = [];
+const voicedF2Buf    = [];
+let   liveMeanF1     = null;
+let   liveMeanF2     = null;
+
 // ─── Canvas constants ──────────────────────────────────────────────────────────
 const WS_URL  = "ws://localhost:8000/ws";
 const API_URL = "http://localhost:8000/analyze";
 
-const F1_MIN = 200,  F1_MAX = 1000;
-const F2_MIN = 500,  F2_MAX = 3000;
+const F1_MIN = 150,  F1_MAX = 1050;
+const F2_MIN = 450,  F2_MAX = 3100;
 const HISTORY_LEN = 200;
 const TRAIL_LEN   = 80;
 const STEP_MS     = 10;
-const RMS_MIN     = 0.00001;
-const RMS_MAX     = 0.6;
+const RMS_MIN     = 0.000005;
+const RMS_MAX     = 0.8;
 
 const TPLOT_ML = 52, TPLOT_MR = 52;
 const VML = 52, VMT = 32, VMR = 12, VMB = 28;
@@ -261,7 +275,22 @@ let refAudio = null, refPlaying = false, refDuration = 0;
 const tcvs = document.getElementById("timeCanvas"), tctx = tcvs.getContext("2d");
 const rcvs = document.getElementById("rmsCanvas"),  rctx = rcvs.getContext("2d");
 const vcvs = document.getElementById("vowelCanvas"), vctx = vcvs.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
 
+function initHiDPI(canvas) {
+  const lw = canvas.width, lh = canvas.height;   // logical size from HTML attr
+  canvas.style.width  = lw + "px";               // keep CSS size the same
+  canvas.style.height = lh + "px";
+  canvas.width        = lw * dpr;                // grow backing store
+  canvas.height       = lh * dpr;
+  canvas.dataset.lw   = lw;                      // stash logical size
+  canvas.dataset.lh   = lh;
+  canvas.getContext("2d").scale(dpr, dpr);       // scale all draw calls
+}
+
+initHiDPI(tcvs);
+initHiDPI(rcvs);
+initHiDPI(vcvs);
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const norm    = (v, lo, hi) => clamp((v - lo) / (hi - lo), 0, 1);
@@ -337,10 +366,17 @@ function connectWS() {
 
     trail.push({ f1: f1 ?? null, f2: f2 ?? null });
     if (trail.length > TRAIL_LEN) trail.shift();
-  };
 
-  ws.onerror = () => setMicStatus("ws error");
-  ws.onclose = () => { if (running) setTimeout(connectWS, 1000); };
+    // ── only count voiced frames toward the 5s mean ───────────────────
+    if (f1 != null && f2 != null) {
+      voicedF1Buf.push(f1);
+      voicedF2Buf.push(f2);
+      if (voicedF1Buf.length > VOICED_WINDOW) voicedF1Buf.shift();
+      if (voicedF2Buf.length > VOICED_WINDOW) voicedF2Buf.shift();
+      liveMeanF1 = voicedF1Buf.reduce((a, b) => a + b, 0) / voicedF1Buf.length;
+      liveMeanF2 = voicedF2Buf.reduce((a, b) => a + b, 0) / voicedF2Buf.length;
+    }
+  }
 }
 
 // ─── Mic capture ───────────────────────────────────────────────────────────────
@@ -403,11 +439,20 @@ document.getElementById("refFile").addEventListener("change", async (e) => {
   form.append("file", file);
   form.append("config", JSON.stringify(config));   // send current settings
 
+
+
   try {
     const res  = await fetch(API_URL, { method: "POST", body: form });
     const data = await res.json();
     refFrames   = data.frames;
     refDuration = data.duration;
+    const validRef = refFrames.filter(f => f.f1 != null && f.f2 != null);
+    if (validRef.length) {
+      refMeanF1 = validRef.reduce((s, f) => s + f.f1, 0) / validRef.length;
+      refMeanF2 = validRef.reduce((s, f) => s + f.f2, 0) / validRef.length;
+    } else {
+      refMeanF1 = null; refMeanF2 = null;
+}
 
     if (refAudio) { refAudio.pause(); refAudio = null; }
     refF1History = []; refF2History = []; refRmsHistory = [];
@@ -424,6 +469,7 @@ document.getElementById("refFile").addEventListener("change", async (e) => {
   } catch (err) {
     refStatusEl.textContent = "error: " + err.message;
   }
+
   e.target.value = "";
 });
 
@@ -452,11 +498,11 @@ function updateRefHistories() {
 
 // ─── Draw: time ────────────────────────────────────────────────────────────────
 function drawTime() {
-  const W = tcvs.width, H = tcvs.height, PW = W - TPLOT_ML - TPLOT_MR;
+  const W = +tcvs.dataset.lw, H = +tcvs.dataset.lh, PW = W - TPLOT_ML - TPLOT_MR;
   tctx.clearRect(0, 0, W, H);
 
   tctx.textAlign = "right";
-  [200, 300, 400, 500, 600, 700, 800, 900, 1000].forEach(hz => {
+  [200, 400, 600,  800,  1000].forEach(hz => {
     const y = (1 - norm(hz, F1_MIN, F1_MAX)) * H;
     tctx.strokeStyle = "#171c27"; tctx.lineWidth = 1; tctx.setLineDash([2, 5]);
     tctx.beginPath(); tctx.moveTo(TPLOT_ML, y); tctx.lineTo(TPLOT_ML + PW, y); tctx.stroke();
@@ -517,7 +563,7 @@ function drawTime() {
 
 // ─── Draw: RMS ─────────────────────────────────────────────────────────────────
 function drawRms() {
-  const W = rcvs.width, H = rcvs.height, LW = TPLOT_ML, plotW = W - LW - TPLOT_MR;
+  const W = +rcvs.dataset.lw, H = +rcvs.dataset.lh, LW = TPLOT_ML, plotW = W - LW - TPLOT_MR;
   const barW = plotW / HISTORY_LEN;
   rctx.clearRect(0, 0, W, H);
 
@@ -565,7 +611,7 @@ function drawRms() {
 
 // ─── Draw: vowel space ─────────────────────────────────────────────────────────
 function drawVowel() {
-  const W = vcvs.width, H = vcvs.height, PW = W - VML - VMR, PH = H - VMT - VMB;
+  const W = +vcvs.dataset.lw, H = +vcvs.dataset.lh, PW = W - VML - VMR, PH = H - VMT - VMB;
   const vx = f2 => VML + (1 - norm(f2, F2_MIN, F2_MAX)) * PW;
   const vy = f1 => VMT + norm(f1, F1_MIN, F1_MAX) * PH;
   vctx.clearRect(0, 0, W, H);
@@ -583,7 +629,7 @@ function drawVowel() {
   });
 
   vctx.textAlign = "right";
-  [200, 300, 400, 500, 600, 700, 800, 900, 1000].forEach(hz => {
+  [200, 400, 600,  800,  1000].forEach(hz => {
     const y = vy(hz);
     vctx.strokeStyle = "#171c27"; vctx.lineWidth = 1; vctx.setLineDash([2, 5]);
     vctx.beginPath(); vctx.moveTo(VML, y); vctx.lineTo(VML + PW, y); vctx.stroke();
@@ -641,6 +687,22 @@ function drawVowel() {
     vctx.fillStyle = "#ffd700";
     vctx.beginPath(); vctx.arc(vx(lf2), vy(lf1), 9, 0, 2 * Math.PI); vctx.fill();
   }
+if (refMeanF1 != null && refMeanF2 != null) {
+  const x = vx(refMeanF2), y = vy(refMeanF1);
+  vctx.fillStyle = "#ff9900";
+  vctx.beginPath(); vctx.arc(x, y, 3, 0, 2 * Math.PI); vctx.fill();
+  vctx.fillStyle = "#ff9900"; vctx.font = "9px monospace"; vctx.textAlign = "center";
+  vctx.fillText(`${Math.round(refMeanF1)}·${Math.round(refMeanF2)}`, x, y + 13);
+}
+
+// live 5s voiced mean — tiny ring
+if (liveMeanF1 != null && liveMeanF2 != null) {
+  const x = vx(liveMeanF2), y = vy(liveMeanF1);
+  vctx.strokeStyle = "#ffd700"; vctx.lineWidth = 1.5;
+  vctx.beginPath(); vctx.arc(x, y, 3, 0, 2 * Math.PI); vctx.stroke();
+  vctx.fillStyle = "#ffd700"; vctx.font = "9px monospace"; vctx.textAlign = "center";
+  vctx.fillText(`${Math.round(liveMeanF1)}·${Math.round(liveMeanF2)}`, x, y + 13);
+}
 }
 
 // ─── Loop ──────────────────────────────────────────────────────────────────────
