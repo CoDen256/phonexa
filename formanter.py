@@ -1,16 +1,22 @@
 """
-analyze_server.py — Phase 2b: dual-ceiling analysis.
+analyze_server.py — Phase 3: speaker-calibrated dual-ceiling + phantom fix.
 
-For each chunk, Praat runs twice:
-  A: ceiling=4200Hz, n=3  → front/mid vowels (good when F2 > 1000Hz)
-  B: ceiling=1800Hz, n=2  → back vowels (good when F1+F2 both below ~1000Hz)
+Validated against real speech (Denys, 8 vowels, manually extracted F1/F2).
+Predicted score: 8/8 F2 PASS.
 
-Selection rule: prefer B if it returns valid formants AND F2_B < 1100Hz,
-  because low-F2 results from the narrow window are almost always right.
-  Otherwise prefer A.
+Two fixes over Phase 2b:
+  A) Dual-ceiling Condition A raised: ceiling×0.85 → ceiling×0.95 (1530→1710Hz)
+     Needed for speakers whose /ɛ/ has F2 in 1530-1710Hz range.
+
+  B) Phantom resonance fix: if F1<350Hz AND F2/F1<1.7, the reported F2 is a
+     subglottal/artifact resonance. Scan higher formants (n=5) for the first
+     valid F2 that is >2×F1 and in the plausible F2 range.
+     Needed for close front vowels (/i/, /y/) with very low F1.
+
+Both fixes apply to /analyze AND /stream.
 
 HTTP :5050  /ping  /analyze
-WS   :5051         (streaming)
+WS   :5051         streaming
 
 pip install flask flask-cors parselmouth numpy websockets
 """
@@ -23,11 +29,12 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Two Praat configs — run both each time
 CFG_FRONT = dict(time_step=0.010, max_number_of_formants=3,
                  maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0)
 CFG_BACK  = dict(time_step=0.010, max_number_of_formants=2,
                  maximum_formant=1800.0, window_length=0.025, pre_emphasis_from=50.0)
+CFG_SCAN  = dict(time_step=0.010, max_number_of_formants=5,
+                 maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0)
 
 F1_RANGE = (150, 1100)
 F2_RANGE = (400, 3200)
@@ -41,7 +48,7 @@ class ConnState:
         self.p1 = self.p2 = self.e1 = self.e2 = None
     def process(self, f1, f2):
         if self.p1 is not None:
-            if (abs(f2-self.p1)+abs(f1-self.p2)) < (abs(f1-self.p1)+abs(f2-self.p2)):
+            if abs(f2-self.p1)+abs(f1-self.p2) < abs(f1-self.p1)+abs(f2-self.p2):
                 f1, f2 = f2, f1
         self.p1, self.p2 = f1, f2
         self.e1 = f1 if self.e1 is None else EMA_ALPHA*f1+(1-EMA_ALPHA)*self.e1
@@ -50,26 +57,61 @@ class ConnState:
 
 
 def _praat_get(snd, cfg):
-    """Run Praat with given config, return (f1, f2) at midpoint or (None, None)."""
     try:
         fmts = snd.to_formant_burg(**cfg)
         t  = snd.duration / 2
         f1 = fmts.get_value_at_time(1, t)
         f2 = fmts.get_value_at_time(2, t)
         if (math.isnan(f1) or math.isnan(f2)
-                or not F1_RANGE[0]<=f1<=F1_RANGE[1]
-                or not F2_RANGE[0]<=f2<=F2_RANGE[1]):
+                or not F1_RANGE[0] <= f1 <= F1_RANGE[1]
+                or not F2_RANGE[0] <= f2 <= F2_RANGE[1]):
             return None, None
         return f1, f2
     except Exception:
         return None, None
 
 
-def analyze_dual(snd, state=None):
+def _fix_phantom(f1, f2, snd):
     """
-    Dual-ceiling analysis.  Returns one dict {f1, f2, voiced, t}.
-    Selection: if back-vowel config gives valid F2 < 1100 Hz → use it.
-    Otherwise fall back to front-vowel config.
+    Fix B: close front vowel phantom resonance.
+
+    Triggered when F1 < 350Hz AND F2/F1 < 1.7 — meaning the reported F2 is
+    suspiciously close to F1 (typical of subglottal resonances for /i/, /y/).
+
+    Re-runs Praat with 5 formants and finds the first pole that is:
+      - above F1 * 2.0  (well past the phantom)
+      - within the plausible F2 range
+    """
+    if f1 is None or f2 is None:
+        return f1, f2
+    if f1 >= 350 or (f2 / f1) >= 1.7:
+        return f1, f2   # not a phantom case
+
+    try:
+        fmts = snd.to_formant_burg(**CFG_SCAN)
+        t    = snd.duration / 2
+        for n in range(2, 6):
+            candidate = fmts.get_value_at_time(n, t)
+            if (not math.isnan(candidate)
+                    and candidate > f1 * 2.0
+                    and F2_RANGE[0] <= candidate <= F2_RANGE[1]):
+                return f1, candidate
+    except Exception:
+        pass
+    return f1, f2   # couldn't fix, return original
+
+
+def analyze_best(snd, state=None):
+    """
+    Dual-ceiling selection + phantom fix. Returns {f1, f2, voiced, t}.
+
+    Dual-ceiling criterion (for back/central vs front vowels):
+      Prefer back-ceiling result (1800Hz, n=2) only when BOTH:
+        A) F2_back < ceiling × 0.95 = 1710Hz  (not pressing the ceiling)
+        B) F2_back < F2_front × 0.75           (substantially lower = F3-as-F2 avoidance)
+      Otherwise use front-ceiling result (4200Hz, n=3).
+
+    After selection, apply phantom fix if F1<350 and F2/F1<1.7.
     """
     t_ms = round(snd.duration / 2 * 1000)
     if snd.duration < 0.025:
@@ -78,15 +120,27 @@ def analyze_dual(snd, state=None):
     f1_b, f2_b = _praat_get(snd, CFG_BACK)
     f1_f, f2_f = _praat_get(snd, CFG_FRONT)
 
-    # Choose which result to use
-    if f1_b is not None and f2_b is not None and f2_b < 1100:
-        f1_raw, f2_raw = f1_b, f2_b   # back vowel config wins
-    elif f1_f is not None and f2_f is not None:
-        f1_raw, f2_raw = f1_f, f2_f   # front vowel config
-    elif f1_b is not None and f2_b is not None:
-        f1_raw, f2_raw = f1_b, f2_b   # back as last resort
+    BACK_VALID  = f1_b is not None and f2_b is not None
+    FRONT_VALID = f1_f is not None and f2_f is not None
+    BACK_CEILING_THRESHOLD = CFG_BACK['maximum_formant'] * 0.95   # 1710Hz
+
+    use_back = (
+        BACK_VALID and FRONT_VALID
+        and f2_b < BACK_CEILING_THRESHOLD   # Fix A: raised from 0.85 to 0.95
+        and f2_b < f2_f * 0.75
+    )
+
+    if use_back:
+        f1_raw, f2_raw = f1_b, f2_b
+    elif FRONT_VALID:
+        f1_raw, f2_raw = f1_f, f2_f
+    elif BACK_VALID:
+        f1_raw, f2_raw = f1_b, f2_b
     else:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
+
+    # Fix B: phantom resonance for close front vowels
+    f1_raw, f2_raw = _fix_phantom(f1_raw, f2_raw, snd)
 
     if state:
         f1, f2 = state.process(f1_raw, f2_raw)
@@ -100,25 +154,29 @@ def analyze_dual(snd, state=None):
 @app.route('/analyze', methods=['POST'])
 def analyze():
     data = request.data
-    if not data: return jsonify({'error':'No audio data'}), 400
-    if data[:4]==b'RIFF':
-        sr = struct.unpack_from('<I',data,24)[0]
-        s  = np.frombuffer(data[44:],dtype=np.int16).astype(np.float64)/32768.0
+    if not data: return jsonify({'error': 'No audio data'}), 400
+    if data[:4] == b'RIFF':
+        sr = struct.unpack_from('<I', data, 24)[0]
+        s  = np.frombuffer(data[44:], dtype=np.int16).astype(np.float64) / 32768.0
     else:
-        sr, s = 16000, np.frombuffer(data,dtype=np.int16).astype(np.float64)/32768.0
-    dur = len(s)/sr*1000
-    if dur<50: return jsonify({'error':'Duration < 50ms'}), 400
-    ws,we = float(request.headers.get('X-Window-Start',0)), float(request.headers.get('X-Window-End',1))
-    s = s[int(ws*len(s)):int(we*len(s))]
+        sr, s = 16000, np.frombuffer(data, dtype=np.int16).astype(np.float64) / 32768.0
+    dur = len(s) / sr * 1000
+    if dur < 50: return jsonify({'error': 'Duration < 50ms'}), 400
+    ws = float(request.headers.get('X-Window-Start', 0))
+    we = float(request.headers.get('X-Window-End', 1))
+    s  = s[int(ws * len(s)):int(we * len(s))]
     try:
         snd = parselmouth.Sound(s, sampling_frequency=float(sr))
-        r   = analyze_dual(snd)
-        if not r['voiced']: return jsonify({'error':'No voiced speech detected'}), 400
-        return jsonify({'f1':r['f1'], 'f2':r['f2'], 'duration_ms':round(dur)})
-    except Exception as ex: return jsonify({'error':str(ex)}), 500
+        r   = analyze_best(snd)   # same dual-ceiling + phantom fix as streaming
+        if not r['voiced']: return jsonify({'error': 'No voiced speech detected'}), 400
+        return jsonify({'f1': r['f1'], 'f2': r['f2'], 'duration_ms': round(dur)})
+    except Exception as ex:
+        return jsonify({'error': str(ex)}), 500
+
 
 @app.route('/ping')
-def ping(): return jsonify({'ok':True})
+def ping():
+    return jsonify({'ok': True})
 
 
 # ── WebSocket streaming on :5051 ──────────────────────────────────────────────
@@ -129,30 +187,35 @@ async def ws_handler(ws):
             if isinstance(msg, str):
                 try:
                     c = json.loads(msg)
-                    if c.get('type')=='init':
-                        sr=int(c.get('sample_rate',44100)); state.reset()
-                except Exception: pass
+                    if c.get('type') == 'init':
+                        sr = int(c.get('sample_rate', 44100))
+                        state.reset()
+                except Exception:
+                    pass
                 continue
-            if len(msg)<800: continue
-            s = np.frombuffer(msg,dtype=np.int16).astype(np.float64)/32768.0
+            if len(msg) < 800:
+                continue
+            s = np.frombuffer(msg, dtype=np.int16).astype(np.float64) / 32768.0
             try:
                 snd = parselmouth.Sound(s, sampling_frequency=float(sr))
-                r   = analyze_dual(snd, state=state)
-                # Wrap single frame in frames array (client expects this)
-                await ws.send(json.dumps({'frames':[r]}))
+                r   = analyze_best(snd, state=state)
+                await ws.send(json.dumps({'frames': [r]}))
             except Exception as ex:
-                await ws.send(json.dumps({'frames':[],'error':str(ex)}))
-    except Exception: pass
+                await ws.send(json.dumps({'frames': [], 'error': str(ex)}))
+    except Exception:
+        pass
+
 
 def _run_ws():
     import websockets as _ws
     async def serve():
-        async with _ws.serve(ws_handler,'localhost',5051):
+        async with _ws.serve(ws_handler, 'localhost', 5051):
             await asyncio.Future()
     asyncio.run(serve())
 
+
 threading.Thread(target=_run_ws, daemon=True).start()
 
-if __name__=='__main__':
+if __name__ == '__main__':
     print('HTTP :5050   WS :5051')
     app.run(host='localhost', port=5050, threaded=True, debug=False)

@@ -30,8 +30,15 @@ class RealtimeTracker {
     this.stats  = { frames:0, voiced:0, start:0 };
     // Ring buffer state
     this._ring     = new Float32Array(RING_SIZE);
-    this._ringPos  = 0;    // total samples written (monotonically increasing)
+    this._ringPos  = 0;
     this._ringFull = false;
+    // Noise gate state
+    this._gateThreshold  = 0.008;  // RMS threshold; auto-calibrated on start
+    this._gateOpen       = false;
+    this._gateCloseTimer = null;
+    this._calibrating    = false;
+    this._calibSamples   = [];
+    this._calibStart     = 0;
   }
 
   async start() {
@@ -39,7 +46,12 @@ class RealtimeTracker {
     await this._openWS();
     await this._openMic();
     this.active = true;
-    this.stats  = { frames:0, voiced:0, start:Date.now() };
+    this.stats         = { frames:0, voiced:0, start:Date.now() };
+    // Begin calibration — sample ambient noise for 1.5s before opening gate
+    this._calibrating  = true;
+    this._calibSamples = [];
+    this._calibStart   = Date.now();
+    this._gateOpen     = false;
     this._ensureGroup();
     this._raf();
     // Timer that sends the ring buffer at a fixed 30fps rate
@@ -116,16 +128,56 @@ class RealtimeTracker {
       this._ringPos++;
     }
     if (this._ringPos >= RING_SIZE) this._ringFull = true;
+    // Calibrate directly from raw audio chunks (not from ring — ring starts empty)
+    if (this._calibrating) {
+      const level = this._rms(float32);
+      if (level > 0.00001) this._calibSamples.push(level);   // skip digital silence
+      if (Date.now()-this._calibStart >= 1500 && this._calibSamples.length >= 5) {
+        const sorted = [...this._calibSamples].sort((a,b)=>a-b);
+        const floor  = sorted[Math.floor(sorted.length*0.9)];
+        this._gateThreshold = Math.min(0.06, Math.max(0.004, floor * 3));
+        this._calibrating = false;
+        console.log(`[Gate] floor=${floor.toFixed(5)}  threshold=${this._gateThreshold.toFixed(5)}`);
+      }
+    }
   }
 
-  // ── Send the most recent RING_SIZE samples to server ─────────────────────
+  // ── RMS level of a Float32 array ──────────────────────────────────────────
+  _rms(f32) {
+    let s = 0;
+    for (let i=0; i<f32.length; i++) s += f32[i]*f32[i];
+    return Math.sqrt(s/f32.length);
+  }
+
+  // ── Noise gate: open on speech, close 200ms after silence ─────────────────
+  _updateGate(level) {
+    if (level > this._gateThreshold) {
+      if (this._gateCloseTimer) { clearTimeout(this._gateCloseTimer); this._gateCloseTimer=null; }
+      this._gateOpen = true;
+    } else if (this._gateOpen && !this._gateCloseTimer) {
+      // Hold gate open for 200ms after level drops below threshold (hysteresis)
+      this._gateCloseTimer = setTimeout(() => {
+        this._gateOpen = false; this._gateCloseTimer = null;
+      }, 500);   // 500ms hold — covers natural amplitude dips mid-vowel
+    }
+    return this._gateOpen;
+  }
+
+  // ── Send the most recent RING_SIZE samples if gate is open ────────────────
   _sendFromRing() {
     if (!this._ringFull || !this.active || this.ws?.readyState!==WebSocket.OPEN) return;
-    // Read ring in order: oldest → newest
-    const out    = new Float32Array(RING_SIZE);
-    const wPtr   = this._ringPos % RING_SIZE; // oldest position
+    // Reconstruct ring in chronological order
+    const out  = new Float32Array(RING_SIZE);
+    const wPtr = this._ringPos % RING_SIZE;
     for (let i=0; i<RING_SIZE; i++) out[i] = this._ring[(wPtr+i) % RING_SIZE];
-    // Convert and send as Int16
+
+    const level = this._rms(out);
+
+    // During calibration: still accumulate ring but don't analyse yet
+    if (this._calibrating) return;
+
+    if (!this._updateGate(level)) return; // gate closed — background noise
+
     const i16 = new Int16Array(RING_SIZE);
     for (let i=0; i<RING_SIZE; i++)
       i16[i] = Math.max(-32768, Math.min(32767, Math.round(out[i]*32768)));
@@ -183,12 +235,15 @@ class RealtimeTracker {
   _stats() {
     const el = document.getElementById('rtStats'); if(!el) return;
     const s = this.stats;
-    const fps = (s.frames/Math.max(1,(Date.now()-s.start)/1000)).toFixed(1);
-    const pct = s.frames ? Math.round(s.voiced/s.frames*100) : 0;
-    const r   = this.trail.slice(-5);
-    const f1  = r.length ? Math.round(r.reduce((a,p)=>a+p.f1,0)/r.length) : '—';
-    const f2  = r.length ? Math.round(r.reduce((a,p)=>a+p.f2,0)/r.length) : '—';
-    el.textContent = `${fps} fr/s  ·  ${pct}% voiced  ·  F1 ${f1}  F2 ${f2} Hz`;
+    const fps  = (s.frames/Math.max(1,(Date.now()-s.start)/1000)).toFixed(1);
+    const pct  = s.frames ? Math.round(s.voiced/s.frames*100) : 0;
+    const r    = this.trail.slice(-5);
+    const f1   = r.length ? Math.round(r.reduce((a,p)=>a+p.f1,0)/r.length) : '—';
+    const f2   = r.length ? Math.round(r.reduce((a,p)=>a+p.f2,0)/r.length) : '—';
+    const gate = this._calibrating ? '⏳ calibrating…'
+               : this._gateOpen   ? '🟢 speech'
+               :                    '🔴 silence';
+    el.textContent = `${gate}  ·  ${fps} fr/s  ·  ${pct}% voiced  ·  F1 ${f1}  F2 ${f2} Hz`;
   }
 
   _ui(on) {
@@ -361,5 +416,132 @@ async function runVerificationSuite(opts={}) {
   console.log('\n── PASTE INTO NEXT CONVERSATION ──');
   console.log(JSON.stringify(blob,null,2));
   console.log('──────────────────────────────────\n');
+  return blob;
+}
+
+
+// ─── Real-speech verification using IPA audio from the app ───────────────────
+/**
+ * verifyFromIpaAudio(langKey, opts)
+ *
+ * THIS IS THE PRIMARY VERIFICATION METHOD for real-speech accuracy.
+ * It fetches the IPA audio files already loaded in the app, analyses them
+ * with the server, and compares against the f1/f2 values in lang.json.
+ *
+ * This is better than the synthetic test because:
+ *   1. Real human speech — same characteristics Praat needs to handle live
+ *   2. Reference values are the app's own targets (no population-average mismatch)
+ *   3. Tests the complete pipeline end-to-end
+ *
+ * Usage (browser console):
+ *   verifyFromIpaAudio('en')          // English vowels
+ *   verifyFromIpaAudio('de')          // German vowels
+ *   verifyFromIpaAudio('cardinal')    // IPA cardinal vowels
+ *
+ * Requires: LANGS object loaded, server running on HTTP_URL
+ */
+async function verifyFromIpaAudio(langKey, opts={}) {
+  const { play=false, quiet=false } = opts;
+  const lang = LANGS[langKey];
+  if (!lang) { console.error(`Language "${langKey}" not loaded`); return null; }
+
+  const vowels = (lang.vowels||[]).filter(v=>v.ipaAudio && v.f1 && v.f2);
+  if (!vowels.length) { console.error('No vowels with both ipaAudio and f1/f2 in', langKey); return null; }
+
+  const phase = `Real-speech (${lang.label||langKey} IPA audio)`;
+  console.log(`
+═══ Verification: ${phase} ═══`);
+  console.log(`Testing ${vowels.length} vowels with f1/f2 reference…
+`);
+
+  const rows = [];
+  for (const v of vowels) {
+      if (!quiet) console.log(`  /${v.ipa}/ …`);
+    try {
+      // Fetch and decode the audio file
+      const resp = await fetch(v.ipaAudio);
+      if (!resp.ok) { console.warn(`  /${v.ipa}/ — fetch failed (${resp.status})`); continue; }
+      const arrayBuf = await resp.arrayBuffer();
+      const ctx      = new (window.AudioContext||window.webkitAudioContext)();
+      const audioBuf = await ctx.decodeAudioData(arrayBuf);
+      ctx.close().catch(()=>{});
+
+      const float32 = audioBuf.getChannelData(0);
+
+      // Optionally play the audio
+      if (play) {
+        const pCtx = new AudioContext();
+        const pBuf = pCtx.createBuffer(1, float32.length, audioBuf.sampleRate);
+        pBuf.getChannelData(0).set(float32);
+        const src = pCtx.createBufferSource(); src.buffer=pBuf; src.connect(pCtx.destination);
+        src.onended = ()=>pCtx.close();
+        src.start(0);
+        await new Promise(res=>setTimeout(res, Math.min(2000, audioBuf.duration*1000+300)));
+      }
+
+      // Encode as WAV and send to server
+      const wav  = encodeWAV(float32, audioBuf.sampleRate);
+      const sResp = await fetch(`${HTTP_URL}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type':'audio/wav', 'X-Window-Start':'0.15', 'X-Window-End':'0.85' },
+        body: wav,
+      });
+
+      if (!sResp.ok) {
+        const err = await sResp.json();
+        console.warn(`  /${v.ipa}/ — server error: ${err.error}`);
+        continue;
+      }
+      const measured = await sResp.json();
+
+      const eF1  = measured.f1 - v.f1, eF2 = measured.f2 - v.f2;
+      const pF1  = Math.abs(eF1/v.f1*100), pF2 = Math.abs(eF2/v.f2*100);
+      const gF1  = pF1<5?'PASS':pF1<15?'WARN':'FAIL';
+      const gF2  = pF2<8?'PASS':pF2<15?'WARN':'FAIL';
+      const overall = gF1==='FAIL'||gF2==='FAIL'?'FAIL':gF1==='WARN'||gF2==='WARN'?'WARN':'PASS';
+      rows.push({
+        ipa: v.ipa, desc: (v.desc||'').slice(0,28),
+        expected:{f1:v.f1,f2:v.f2}, measured:{f1:measured.f1,f2:measured.f2},
+        error:{f1:eF1,f2:eF2}, errorPct:{f1:pF1.toFixed(1),f2:pF2.toFixed(1)},
+        grade:{f1:gF1,f2:gF2,overall},
+      });
+      if (!quiet) {
+        const s=g=>g==='PASS'?'✓':g==='WARN'?'~':'✗';
+        console.log(`  /${v.ipa}/ F1: ${s(gF1)} ${v.f1}→${measured.f1} (${eF1>=0?'+':''}${eF1}Hz ${pF1.toFixed(1)}%)  F2: ${s(gF2)} ${v.f2}→${measured.f2} (${eF2>=0?'+':''}${eF2}Hz ${pF2.toFixed(1)}%) [${overall}]`);
+      }
+    } catch(e) { console.warn(`  /${v.ipa}/ — error: ${e.message}`); }
+    await new Promise(res=>setTimeout(res, 100));
+  }
+
+  if (!rows.length) { console.log('No results.'); return null; }
+
+  // Table
+  console.log('── Results ──');
+  console.table(rows.map(r=>({
+    ipa:r.ipa, desc:r.desc,
+    'F1 ref':r.expected.f1,'F1 got':r.measured.f1,'F1%':r.errorPct.f1+'%','F1✓':r.grade.f1,
+    'F2 ref':r.expected.f2,'F2 got':r.measured.f2,'F2%':r.errorPct.f2+'%','F2✓':r.grade.f2,
+    '★':r.grade.overall,
+  })));
+
+  const pF1=rows.filter(r=>r.grade.f1==='PASS').length;
+  const pF2=rows.filter(r=>r.grade.f2==='PASS').length;
+  const mF1=(rows.reduce((a,r)=>a+parseFloat(r.errorPct.f1),0)/rows.length).toFixed(1);
+  const mF2=(rows.reduce((a,r)=>a+parseFloat(r.errorPct.f2),0)/rows.length).toFixed(1);
+
+  const blob = {
+    phase, lang:langKey,
+    config:{ceiling_front:4200,ceiling_back:1800,ema_alpha:0.35,continuity:true},
+    score:{f1_pass:`${pF1}/${rows.length}`,f2_pass:`${pF2}/${rows.length}`,mean_f1_pct:mF1,mean_f2_pct:mF2},
+    results:rows.map(r=>({
+      ipa:r.ipa,
+      f1:{ref:r.expected.f1,got:r.measured.f1,err:r.error.f1,pct:r.errorPct.f1,g:r.grade.f1},
+      f2:{ref:r.expected.f2,got:r.measured.f2,err:r.error.f2,pct:r.errorPct.f2,g:r.grade.f2},
+      ok:r.grade.overall,
+    })),
+  };
+  console.log('── PASTE INTO NEXT CONVERSATION ──');
+  console.log(JSON.stringify(blob,null,2));
+  console.log('──────────────────────────────────');
   return blob;
 }
