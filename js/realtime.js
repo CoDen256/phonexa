@@ -226,7 +226,12 @@ function resonatorFilter(x, freq, bw, sr) {
 
 async function buildSynthBuffer(f1, f2, dur=0.6) {
   const SR  = 22050;
-  const F0  = 100;   // Hz — well below the smallest expected F1 (240Hz)
+  // Adaptive F0: choose so harmonic n0 lands exactly on F1.
+  // n0*F0 = F1, keeping F0 in the 80-130Hz realistic vocal range.
+  // This eliminates the pre-emphasis-induced F1 overestimation that occurs
+  // when F1 sits between two harmonics and the higher one gets boosted.
+  const n0 = Math.max(2, Math.round(f1 / 100));
+  const F0 = f1 / n0;   // n0-th harmonic lands exactly on F1
   const len = Math.round(SR * dur);
 
   // Glottal impulse train — one impulse every period
@@ -313,7 +318,7 @@ const CARDINALS = [
 
 async function runVerificationSuite(opts={}) {
   const { play=true } = opts;
-  const phase = 'Phase 2b (dual-ceiling: 4200/n3 front + 1800/n2 back, continuity+EMA, cascade resonator)';
+  const phase = 'Phase 2b-fix (dual-ceiling, continuity+EMA, cascade resonator + adaptive F0)';
   console.log(`\n═══ Verification Suite: ${phase} ═══`);
   const rows=[];
   for (const c of CARDINALS) {
@@ -348,7 +353,7 @@ async function runVerificationSuite(opts={}) {
   const pF2=rows.filter(r=>r.grade.f2==='PASS').length;
   const mF1=(rows.reduce((a,r)=>a+parseFloat(r.errorPct.f1),0)/rows.length).toFixed(1);
   const mF2=(rows.reduce((a,r)=>a+parseFloat(r.errorPct.f2),0)/rows.length).toFixed(1);
-  const blob={phase,config:{ceiling_front:4200,n_front:3,ceiling_back:1800,n_back:2,ema_alpha:0.35,continuity:true,source:'cascade_resonator_F0=100Hz'},
+  const blob={phase,config:{ceiling_front:4200,n_front:3,ceiling_back:1800,n_back:2,ema_alpha:0.35,continuity:true,source:'cascade_resonator_adaptive_F0'},
     score:{f1_pass:`${pF1}/${rows.length}`,f2_pass:`${pF2}/${rows.length}`,mean_f1_pct:mF1,mean_f2_pct:mF2},
     results:rows.map(r=>({ipa:r.ipa,
       f1:{exp:r.expected.f1,got:r.measured.f1,err:r.error.f1,pct:r.errorPct.f1,g:r.grade.f1},
