@@ -190,6 +190,11 @@
       <input type="range" id="s_pitch_max" min="300" max="800" step="25" value="600">
       <span class="setting-val" id="v_pitch_max">600 Hz</span>
     </div>
+    <div class="setting-row">
+      <label>Max bandwidth (Hz)</label>
+      <input type="range" id="s_max_bandwidth" min="100" max="700" step="25" value="400">
+      <span class="setting-val" id="v_max_bandwidth">400 Hz</span>
+    </div>
 
   </div>
   <div class="settings-hint">
@@ -270,7 +275,8 @@ let   currentRms = 0;
 
 let refFrames = [], refF1History = [], refF2History = [], refRmsHistory = [];
 let refAudio = null, refPlaying = false, refDuration = 0;
-
+let refFileObj     = null;   // keep the File so we can re-upload on config change
+let reanalyzeTimer = null;   // debounce handle
 // ─── Canvas refs ───────────────────────────────────────────────────────────────
 const tcvs = document.getElementById("timeCanvas"), tctx = tcvs.getContext("2d");
 const rcvs = document.getElementById("rmsCanvas"),  rctx = rcvs.getContext("2d");
@@ -318,6 +324,7 @@ const sliderDefs = [
   { id: "s_energy_floor", vid: "v_energy_floor", key: "energy_floor", fmt: v => v.toFixed(3), toVal: v => v / 1000, toSlider: v => Math.round(v * 1000) },
   { id: "s_pitch_min",    vid: "v_pitch_min",    key: "pitch_min",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
   { id: "s_pitch_max",    vid: "v_pitch_max",    key: "pitch_max",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
+  { id: "s_max_bandwidth", vid: "v_max_bandwidth", key: "max_bandwidth", fmt: v => `${v} Hz`, toVal: v => v, toSlider: v => v },
 ];
 
 sliderDefs.forEach(def => {
@@ -339,6 +346,12 @@ sliderDefs.forEach(def => {
 function sendConfig() {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(config));
+  }
+
+  // re-analyze reference file 600ms after the slider stops moving
+  if (refFileObj) {
+    clearTimeout(reanalyzeTimer);
+    reanalyzeTimer = setTimeout(reanalyzeRef, 600);
   }
 }
 
@@ -432,6 +445,7 @@ document.getElementById("refLoadBtn").addEventListener("click", () => {
 document.getElementById("refFile").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+  refFileObj = file;
   refStatusEl.textContent = "analyzing…";
   refPlayBtn.disabled = true;
 
@@ -472,7 +486,50 @@ document.getElementById("refFile").addEventListener("change", async (e) => {
 
   e.target.value = "";
 });
+async function reanalyzeRef() {
+  if (!refFileObj) return;
 
+  // stop playback if running
+  if (refPlaying) {
+    refAudio.pause(); refAudio.currentTime = 0;
+    refPlaying = false; refPlayBtn.textContent = "▶ Play";
+    refF1History = []; refF2History = []; refRmsHistory = [];
+  }
+
+  refStatusEl.textContent = "re-analyzing…";
+  refPlayBtn.disabled = true;
+
+  const form = new FormData();
+  form.append("file", refFileObj);
+  form.append("config", JSON.stringify(config));
+
+  try {
+    const res  = await fetch(API_URL, { method: "POST", body: form });
+    const data = await res.json();
+    refFrames   = data.frames;
+    refDuration = data.duration;
+
+    // recompute mean from new analysis
+    const valid = refFrames.filter(f => f.f1 != null && f.f2 != null);
+    refMeanF1 = valid.length ? valid.reduce((s, f) => s + f.f1, 0) / valid.length : null;
+    refMeanF2 = valid.length ? valid.reduce((s, f) => s + f.f2, 0) / valid.length : null;
+
+    refF1History = []; refF2History = []; refRmsHistory = [];
+
+    if (refAudio) { refAudio.pause(); refAudio = null; }
+    refAudio = new Audio(URL.createObjectURL(refFileObj));
+    refAudio.onended = () => {
+      refPlaying = false; refPlayBtn.textContent = "▶ Play";
+      refF1History = []; refF2History = []; refRmsHistory = [];
+    };
+
+    refPlayBtn.disabled = false;
+    refStatusEl.textContent = `${refFileObj.name} (${refDuration.toFixed(1)}s) ✓`;
+  } catch (err) {
+    refStatusEl.textContent = "error: " + err.message;
+    refPlayBtn.disabled = false;
+  }
+}
 // ─── Reference: play / stop ────────────────────────────────────────────────────
 refPlayBtn.addEventListener("click", () => {
   if (!refAudio) return;

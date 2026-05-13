@@ -27,6 +27,7 @@ DEFAULT_CONFIG = {
     "energy_floor": 0.005,  # RMS gate — below this = silence
     "pitch_min":    75,     # Hz
     "pitch_max":    600,    # Hz
+    "max_bandwidth":  400,  # ← formants wider than this are rejected
 }
 
 SAMPLE_RATE  = 16000
@@ -68,20 +69,30 @@ def check_voiced(snd: parselmouth.Sound, cfg: dict) -> bool:
 
 
 def get_formants(snd: parselmouth.Sound, cfg: dict) -> tuple:
-    """Return (F1, F2) in Hz, or None for each if unavailable."""
+    """
+    Burg LPC formant extraction with bandwidth filtering.
+    Bandwidth is the width of the spectral peak — real voiced formants
+    are narrow (<400 Hz). Wide peaks are noise or tracking errors.
+    """
     fm = call(snd, "To Formant (burg)",
               0,
               cfg["n_formants"],
               cfg["max_f"],
               cfg["window_ms"] / 1000,
               cfg["pre_emphasis"])
-    t  = snd.duration / 2
-    f1 = call(fm, "Get value at time", 1, t, "hertz", "Linear")
-    f2 = call(fm, "Get value at time", 2, t, "hertz", "Linear")
-    return (None if np.isnan(f1) else round(f1),
-            None if np.isnan(f2) else round(f2))
 
+    t   = snd.duration / 2
+    f1  = call(fm, "Get value at time", 1, t, "hertz", "Linear")
+    f2  = call(fm, "Get value at time", 2, t, "hertz", "Linear")
+    bw1 = call(fm, "Get bandwidth at time", 1, t, "hertz", "Linear")
+    bw2 = call(fm, "Get bandwidth at time", 2, t, "hertz", "Linear")
 
+    max_bw = cfg.get("max_bandwidth", 400)
+
+    f1 = None if (np.isnan(f1) or np.isnan(bw1) or bw1 > max_bw) else round(f1)
+    f2 = None if (np.isnan(f2) or np.isnan(bw2) or bw2 > max_bw) else round(f2)
+
+    return f1, f2
 # ─── Real-time window analysis ─────────────────────────────────────────────────
 
 def analyze_window(samples: np.ndarray, cfg: dict) -> dict:
@@ -123,33 +134,46 @@ def analyze_frame(formants, pitch_obj, samples, sr, cfg, frame_idx) -> dict:
 
     return {"t": round(t, 3), "f1": f1, "f2": f2, "rms": round(rms_val, 6)}
 
-
 def analyze_file(path: str, cfg: dict) -> tuple:
-    """
-    Analyze an entire audio file with the given config.
-    Returns (frames, duration_seconds).
-    """
     snd      = parselmouth.Sound(path)
     samples  = snd.values[0]
     sr       = snd.sampling_frequency
 
-    formants  = call(snd, "To Formant (burg)",
-                     STEP_MS / 1000,
-                     cfg["n_formants"],
-                     cfg["max_f"],
-                     cfg["window_ms"] / 1000,
-                     cfg["pre_emphasis"])
+    formants = call(snd, "To Formant (burg)",
+                    STEP_MS / 1000,
+                    cfg["n_formants"],
+                    cfg["max_f"],
+                    cfg["window_ms"] / 1000,
+                    cfg["pre_emphasis"])
+
+    # Track needs n_track <= minimum formants found across ALL frames.
+    # Query the actual minimum rather than assuming n_formants is safe.
+    n_frames_total = call(formants, "Get number of frames")
+    min_found = cfg["n_formants"]
+    for i in range(1, n_frames_total + 1):
+        n = call(formants, "Get number of formants", i)
+        if n < min_found:
+            min_found = n
+
+    n_track = min(3, min_found)   # track at most 3, but never more than what exists
+
+    if n_track >= 1:
+        tracked = call(formants, "Track",
+                       n_track,
+                       550, 1650, 2750, 3850, 4950,
+                       1.0, 1.0, 1.0)
+    else:
+        tracked = formants   # nothing to track, use raw
+
     pitch_obj = call(snd, "To Pitch", 0, cfg["pitch_min"], cfg["pitch_max"])
-    n_frames  = call(formants, "Get number of frames")
+    n_frames  = call(tracked, "Get number of frames")
 
     frames = [
-        analyze_frame(formants, pitch_obj, samples, sr, cfg, i)
+        analyze_frame(tracked, pitch_obj, samples, sr, cfg, i)
         for i in range(1, n_frames + 1)
     ]
 
     return frames, round(snd.duration, 3)
-
-
 # ─── HTTP route: POST /analyze ─────────────────────────────────────────────────
 
 @app.route("/analyze", methods=["POST"])
