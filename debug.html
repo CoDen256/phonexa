@@ -126,6 +126,14 @@
     .left-col { display: flex; flex-direction: column; gap: 2px; }
     canvas { display: block; border: 1px solid #1a1f2a; border-radius: 3px; }
     .clabel { font-size: 0.7rem; color: #444; text-align: center; margin-top: 5px; }
+
+.setting-row input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  accent-color: #4a90d9;
+  cursor: pointer;
+  flex-shrink: 0;
+}
   </style>
 </head>
 <body>
@@ -195,6 +203,42 @@
       <input type="range" id="s_max_bandwidth" min="100" max="700" step="25" value="400">
       <span class="setting-val" id="v_max_bandwidth">400 Hz</span>
     </div>
+    <div class="setting-row">
+  <label>Bandwidth filter</label>
+  <input type="checkbox" id="s_use_bandwidth" checked>
+  <span class="setting-val" id="v_use_bandwidth">on</span>
+</div>
+ 
+<div class="setting-row">
+  <label>Viterbi tracking</label>
+  <input type="checkbox" id="s_use_tracking" checked>
+  <span class="setting-val" id="v_use_tracking">on</span>
+</div>
+ 
+<div class="setting-row">
+  <label>FastTrack ceilings</label>
+  <input type="checkbox" id="s_use_fasttrack">
+  <span class="setting-val" id="v_use_fasttrack">off</span>
+</div>
+ 
+<!-- FastTrack params (shown/hidden with FastTrack toggle) -->
+<div class="setting-row" id="row_ft_min">
+  <label>FT ceiling min</label>
+  <input type="range" id="s_ft_min" min="3500" max="5500" step="250" value="4000">
+  <span class="setting-val" id="v_ft_min">4000 Hz</span>
+</div>
+ 
+<div class="setting-row" id="row_ft_max">
+  <label>FT ceiling max</label>
+  <input type="range" id="s_ft_max" min="5000" max="8000" step="250" value="7000">
+  <span class="setting-val" id="v_ft_max">7000 Hz</span>
+</div>
+ 
+<div class="setting-row" id="row_ft_step">
+  <label>FT ceiling step</label>
+  <input type="range" id="s_ft_step" min="100" max="1000" step="100" value="500">
+  <span class="setting-val" id="v_ft_step">500 Hz</span>
+</div>
 
   </div>
   <div class="settings-hint">
@@ -238,6 +282,13 @@ const config = {
   energy_floor: 0.005,
   pitch_min:    75,
   pitch_max:    600,
+  max_bandwidth: 400,
+  use_bandwidth: true,
+  use_tracking:  true,
+  use_fasttrack: false,
+  ft_min:        4000,
+  ft_max:        7000,
+  ft_step:       500,
 };
 
 // reference mean (computed once when file loads)
@@ -325,7 +376,46 @@ const sliderDefs = [
   { id: "s_pitch_min",    vid: "v_pitch_min",    key: "pitch_min",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
   { id: "s_pitch_max",    vid: "v_pitch_max",    key: "pitch_max",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
   { id: "s_max_bandwidth", vid: "v_max_bandwidth", key: "max_bandwidth", fmt: v => `${v} Hz`, toVal: v => v, toSlider: v => v },
+  { id:"s_ft_min",  vid:"v_ft_min",  key:"ft_min",  fmt:v=>`${v} Hz`, toVal:v=>v, toSlider:v=>v },
+{ id:"s_ft_max",  vid:"v_ft_max",  key:"ft_max",  fmt:v=>`${v} Hz`, toVal:v=>v, toSlider:v=>v },
+{ id:"s_ft_step", vid:"v_ft_step", key:"ft_step", fmt:v=>`${v} Hz`, toVal:v=>v, toSlider:v=>v },
 ];
+
+const toggleDefs = [
+  { id: "s_use_bandwidth", vid: "v_use_bandwidth", key: "use_bandwidth" },
+  { id: "s_use_tracking",  vid: "v_use_tracking",  key: "use_tracking"  },
+  { id: "s_use_fasttrack", vid: "v_use_fasttrack", key: "use_fasttrack" },
+];
+
+toggleDefs.forEach(def => {
+  const cb    = document.getElementById(def.id);
+  const valEl = document.getElementById(def.vid);
+ 
+  // sync initial display to config
+  cb.checked        = !!config[def.key];
+  valEl.textContent = cb.checked ? "on" : "off";
+  valEl.style.color = cb.checked ? "#4a90d9" : "#555";
+ 
+  cb.addEventListener("change", () => {
+    config[def.key]   = cb.checked;
+    valEl.textContent = cb.checked ? "on" : "off";
+    valEl.style.color = cb.checked ? "#4a90d9" : "#555";
+ 
+    // show/hide FastTrack ceiling sliders
+    if (def.key === "use_fasttrack") {
+      const display = cb.checked ? "flex" : "none";
+      ["row_ft_min", "row_ft_max", "row_ft_step"].forEach(id => {
+        document.getElementById(id).style.display = display;
+      });
+    }
+ 
+    sendConfig();
+  });
+});
+
+["row_ft_min", "row_ft_max", "row_ft_step"].forEach(id => {
+  document.getElementById(id).style.display = "none";
+});
 
 sliderDefs.forEach(def => {
   const slider = document.getElementById(def.id);
