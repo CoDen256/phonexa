@@ -16,7 +16,6 @@
   </button>
   <a href="editor.html"     class="editor-link">✎ Edit languages</a>
   <button class="practice-btn" id="practiceTrigger" type="button">🎤 Practice</button>
-  <a href="debug.html"     class="editor-link">Debug</a>
 </header>
 
 <!-- ── Practice panel (bottom bar) ──────────────────────────────── -->
@@ -25,8 +24,11 @@
     <span class="pp-topbar-title">🎤 Practice</span>
     <span id="ppHint" style="font-size:.62rem;color:#4a6888;margin-left:6px;display:none">· click a vowel to compare &amp; load reference</span>
     <span class="pp-server" id="ppServer">Server offline</span>
+    <button class="pp-btn" id="ppLive" type="button" title="Real-time formant trail on formant chart">⬤ Live</button>
     <button class="pp-close" id="ppClose">✕</button>
   </div>
+  <!-- Real-time stats (shown when Live is active) -->
+  <div id="rtStats" style="display:none;font-size:.6rem;color:#34d399;padding:2px 14px;background:#0a1520;border-bottom:1px solid #1a2e44;font-family:monospace"></div>
   <div class="pp-columns">
     <!-- ── Left: Your recording ── -->
     <div class="pp-col">
@@ -118,6 +120,11 @@
 <script src="js/diphthong.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/practice.js"></script>
+<script src="js/realtime.js"></script>
+<script>
+// Wire Live button
+document.getElementById('ppLive')?.addEventListener('click', toggleLive);
+</script>
 <script>
 function init() {
   if (!Object.keys(LANGS).length) {
