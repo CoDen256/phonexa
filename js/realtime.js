@@ -11,27 +11,22 @@
 
 const WS_URL   = (location.protocol==='https:'?'wss:':'ws:')+'//localhost:5051';
 const HTTP_URL = 'http://localhost:5050';
-const TRAIL_MAX_MS  = 3000;
-const TRAIL_COLOR   = '#34d399';
+const TRAIL_DOTS    = 50;     // keep last N voiced frames
+const TRAIL_COLOR   = '#ffd700'; // gold — matches reference style
 
 // Ring buffer config — separates "how often we capture" from "how much we analyze"
 const SP_BUF   = 512;    // ScriptProcessor fires every 512/sr ≈ 11ms (small = responsive)
-const RING_SIZE = 4096;  // analysis window: ~93ms at 44100Hz (enough for Praat)
-const SEND_HZ   = 30;    // target update rate in fps
-const SEND_MS   = Math.round(1000 / SEND_HZ);
+// Ring buffer and send timer removed — server now does sliding-window analysis
 
 class RealtimeTracker {
   constructor() {
     this.ws = this.audioCtx = this.workletNode = this.micStream = null;
     this.trail  = [];
     this.active = false;
-    this.rafId  = this.sendTimerId = null;
+    this.rafId  = null;
     this.svgGroup = null;
     this.stats  = { frames:0, voiced:0, start:0 };
-    // Ring buffer state
-    this._ring     = new Float32Array(RING_SIZE);
-    this._ringPos  = 0;
-    this._ringFull = false;
+    // Chunks sent directly to server; ring buffer is now server-side
     // Noise gate state
     this._gateThreshold  = 0.008;  // RMS threshold; auto-calibrated on start
     this._gateOpen       = false;
@@ -42,7 +37,7 @@ class RealtimeTracker {
     // Stability controls
     this._voicedStreak   = 0;   // consecutive voiced frames; draw only after >= 2
     this._medianWindow   = [];  // last N voiced {f1,f2} for median smoothing
-    this._MEDIAN_N       = 7;
+    this._MEDIAN_N       = 5;    // faster response, still robust
   }
 
   async start() {
@@ -58,23 +53,25 @@ class RealtimeTracker {
     this._gateOpen     = false;
     this._ensureGroup();
     this._raf();
-    // Timer that sends the ring buffer at a fixed 30fps rate
-    this.sendTimerId = setInterval(() => this._sendFromRing(), SEND_MS);
     this._ui(true);
   }
 
   stop() {
     this.active = false;
     cancelAnimationFrame(this.rafId);
-    clearInterval(this.sendTimerId);
-    this.rafId = this.sendTimerId = null;
+    this.rafId = null;
     try { this.workletNode?.disconnect(); } catch(_){}
     this.micStream?.getTracks().forEach(t=>t.stop());
     this.audioCtx?.close().catch(()=>{});
     try { this.ws?.close(); } catch(_){}
     this.ws = this.audioCtx = this.workletNode = this.micStream = null;
-    this._ringPos = 0; this._ringFull = false;
-    setTimeout(()=>{ this._clearGroup(); this.trail=[]; }, 1500);
+
+    // Don't _clearGroup() — that destroys the pool elements.
+    // Just hide them and null the pool so _ensureGroup recreates on next start.
+    if (this._dotPool) this._dotPool.forEach(el => el.setAttribute('opacity','0'));
+    this._dotPool  = null;
+    this.svgGroup  = null;
+    this.trail     = [];
     this._ui(false);
   }
 
@@ -125,17 +122,14 @@ class RealtimeTracker {
     }
   }
 
-  // ── Ring buffer — accumulate samples, don't send immediately ─────────────
+  // ── Audio chunk handler — calibrate, gate-check, send directly to server ──
+  // Server maintains the ring buffer and does sliding-window analysis every 10ms.
+  // This gives ~87 analyses/sec vs ~30 with the old client-side ring approach.
   _accumulate(float32) {
-    for (let i=0; i<float32.length; i++) {
-      this._ring[this._ringPos % RING_SIZE] = float32[i];
-      this._ringPos++;
-    }
-    if (this._ringPos >= RING_SIZE) this._ringFull = true;
-    // Calibrate directly from raw audio chunks (not from ring — ring starts empty)
+    // ── Calibration: sample ambient noise for first 1.5s ────────────────────
     if (this._calibrating) {
       const level = this._rms(float32);
-      if (level > 0.00001) this._calibSamples.push(level);   // skip digital silence
+      if (level > 0.00001) this._calibSamples.push(level);
       if (Date.now()-this._calibStart >= 1500 && this._calibSamples.length >= 5) {
         const sorted = [...this._calibSamples].sort((a,b)=>a-b);
         const floor  = sorted[Math.floor(sorted.length*0.9)];
@@ -143,7 +137,19 @@ class RealtimeTracker {
         this._calibrating = false;
         console.log(`[Gate] floor=${floor.toFixed(5)}  threshold=${this._gateThreshold.toFixed(5)}`);
       }
+      return;  // don't send during calibration
     }
+
+    // ── Gate check ───────────────────────────────────────────────────────────
+    const level = this._rms(float32);
+    if (!this._updateGate(level)) return;
+
+    // ── Send chunk directly to server (Int16 wire format) ────────────────────
+    if (!this.active || this.ws?.readyState !== WebSocket.OPEN) return;
+    const i16 = new Int16Array(float32.length);
+    for (let j=0; j<float32.length; j++)
+      i16[j] = Math.max(-32768, Math.min(32767, Math.round(float32[j]*32768)));
+    this.ws.send(i16.buffer);
   }
 
   // ── RMS level of a Float32 array ──────────────────────────────────────────
@@ -164,7 +170,8 @@ class RealtimeTracker {
         this._gateOpen = false; this._gateCloseTimer = null;
         this._voicedStreak = 0;
         this._medianWindow = [];
-        // Tell server to flush its continuity state (prevents EMA drag on next open)
+        this.trail = [];   // clear trail so stale history doesn't persist after pause
+        if (this._dotPool) this._dotPool.forEach(el => el.setAttribute('opacity','0'));
         if (this.ws?.readyState === WebSocket.OPEN)
           this.ws.send(JSON.stringify({ type: 'reset' }));
       }, 500);
@@ -172,42 +179,23 @@ class RealtimeTracker {
     return this._gateOpen;
   }
 
-  // ── Send the most recent RING_SIZE samples if gate is open ────────────────
-  _sendFromRing() {
-    if (!this._ringFull || !this.active || this.ws?.readyState!==WebSocket.OPEN) return;
-    // Reconstruct ring in chronological order
-    const out  = new Float32Array(RING_SIZE);
-    const wPtr = this._ringPos % RING_SIZE;
-    for (let i=0; i<RING_SIZE; i++) out[i] = this._ring[(wPtr+i) % RING_SIZE];
 
-    const level = this._rms(out);
-
-    // During calibration: still accumulate ring but don't analyse yet
-    if (this._calibrating) return;
-
-    if (!this._updateGate(level)) return; // gate closed — background noise
-
-    const i16 = new Int16Array(RING_SIZE);
-    for (let i=0; i<RING_SIZE; i++)
-      i16[i] = Math.max(-32768, Math.min(32767, Math.round(out[i]*32768)));
-    this.ws.send(i16.buffer);
-  }
 
   // ── Handle server response ─────────────────────────────────────────────────
   _msg(data) {
     const frames = data.frames || (data.voiced!==undefined ? [data] : []);
-    const now    = Date.now();
     for (const f of frames) {
       this.stats.frames++;
       if (!f.voiced) { this._voicedStreak=0; continue; }
       this.stats.voiced++;
       this._voicedStreak++;
-      if (this._voicedStreak < 2) continue;  // wait for stable onset
+      if (this._voicedStreak < 1) continue;  // respond on first voiced frame
       this._medianWindow.push({ f1:f.f1, f2:f.f2 });
       if (this._medianWindow.length > this._MEDIAN_N) this._medianWindow.shift();
       const mF1 = this._median(this._medianWindow.map(p=>p.f1));
       const mF2 = this._median(this._medianWindow.map(p=>p.f2));
-      this.trail.push({ f1:mF1, f2:mF2, raw_f1:f.f1, raw_f2:f.f2, t:now });
+      this.trail.push({ f1:mF1, f2:mF2 });
+      if (this.trail.length > TRAIL_DOTS) this.trail.shift();
     }
   }
 
@@ -232,44 +220,35 @@ class RealtimeTracker {
   _ensureGroup() {
     const svg = document.getElementById('chartFormant'); if(!svg) return;
     let g = svg.querySelector('#rt-trail-group');
-    if (!g) { g=$s('g',{id:'rt-trail-group',style:'pointer-events:none'}); svg.appendChild(g); }
+    if (!g || !this._dotPool) {
+      if (g) g.remove();   // remove stale empty group
+      g = $s('g', { id:'rt-trail-group', style:'pointer-events:none' });
+      svg.appendChild(g);
+      // Pre-allocate dot pool — updated in place every frame, no createElement overhead
+      this._dotPool = Array.from({ length: TRAIL_DOTS + 1 }, () => {
+        const c = $s('circle', { cx:'0', cy:'0', r:'4', fill:TRAIL_COLOR, opacity:'0' });
+        g.appendChild(c);
+        return c;
+      });
+    }
     this.svgGroup = g;
   }
-  _clearGroup() { if(this.svgGroup) while(this.svgGroup.firstChild) this.svgGroup.removeChild(this.svgGroup.firstChild); }
 
   _draw() {
-    if (!this.svgGroup) return;
-    const now = Date.now();
-    this.trail = this.trail.filter(p=>now-p.t<TRAIL_MAX_MS);
-    this._clearGroup();
-
-    // History trail: small fading dots (median-smoothed values)
-    this.trail.slice(0,-1).forEach(p=>{
-      const age = (now-p.t)/TRAIL_MAX_MS;
-      const {x,y} = formantPos(p.f1, p.f2);
-      this.svgGroup.appendChild($s('circle',{
-        cx:x.toFixed(1), cy:y.toFixed(1), r:3,
-        fill:TRAIL_COLOR, opacity:(0.6-age*0.55).toFixed(3),
-      }));
+    if (!this.svgGroup || !this._dotPool) return;
+    const n = this.trail.length;
+    // Update pre-allocated pool in place — no DOM creation, no GC, smooth RAF
+    this._dotPool.forEach((el, i) => {
+      if (i >= n) { el.setAttribute('opacity','0'); return; }
+      const p      = this.trail[i];
+      const {x, y} = formantPos(p.f1, p.f2);
+      const isCur  = i === n - 1;
+      el.setAttribute('cx', x.toFixed(1));
+      el.setAttribute('cy', y.toFixed(1));
+      el.setAttribute('r',  isCur ? '9' : '4');
+      // Reference-style opacity: index/total * 0.7, current solid
+      el.setAttribute('opacity', isCur ? '0.95' : ((i / n) * 0.7).toFixed(3));
     });
-
-    // Current position: large bright dot (most recent median value)
-    if (this.trail.length) {
-      const cur = this.trail[this.trail.length-1];
-      const {x,y} = formantPos(cur.f1, cur.f2);
-      this.svgGroup.appendChild($s('circle',{
-        cx:x.toFixed(1), cy:y.toFixed(1), r:10,
-        fill:TRAIL_COLOR, opacity:'0.92',
-      }));
-      // Thin ring for raw (unsmoothed) position — shows actual reading
-      if (cur.raw_f1 && cur.raw_f2) {
-        const {x:rx, y:ry} = formantPos(cur.raw_f1, cur.raw_f2);
-        this.svgGroup.appendChild($s('circle',{
-          cx:rx.toFixed(1), cy:ry.toFixed(1), r:5,
-          fill:'none', stroke:TRAIL_COLOR, 'stroke-width':'1.5', opacity:'0.4',
-        }));
-      }
-    }
   }
 
   _stats() {
@@ -459,23 +438,6 @@ async function runVerificationSuite(opts={}) {
   return blob;
 }
 
-// Debug /i/ — shows exactly what Praat returns with no filtering
-async function debugVowel(audioUrl) {
-  const resp = await fetch(audioUrl);
-  const ab   = await resp.arrayBuffer();
-  const ctx  = new (window.AudioContext || window.webkitAudioContext)();
-  const buf  = await ctx.decodeAudioData(ab);
-  ctx.close();
-  const wav  = encodeWAV(buf.getChannelData(0), buf.sampleRate);
-  const r    = await fetch('http://localhost:5050/analyze-debug', {
-    method: 'POST',
-    headers: { 'Content-Type':'audio/wav', 'X-Window-Start':'0.15', 'X-Window-End':'0.85' },
-    body: wav
-  });
-  const data = await r.json();
-  console.log(JSON.stringify(data, null, 2));
-  return data;
-}
 
 // ─── Real-speech verification using IPA audio from the app ───────────────────
 /**
@@ -573,7 +535,7 @@ async function verifyFromIpaAudio(langKey, opts={}) {
   if (!rows.length) { console.log('No results.'); return null; }
 
   // Table
-  console.log('── Results ──');
+  console.log('\n── Results ──');
   console.table(rows.map(r=>({
     ipa:r.ipa, desc:r.desc,
     'F1 ref':r.expected.f1,'F1 got':r.measured.f1,'F1%':r.errorPct.f1+'%','F1✓':r.grade.f1,
@@ -597,8 +559,27 @@ async function verifyFromIpaAudio(langKey, opts={}) {
       ok:r.grade.overall,
     })),
   };
-  console.log('── PASTE INTO NEXT CONVERSATION ──');
+  console.log('\n── PASTE INTO NEXT CONVERSATION ──');
   console.log(JSON.stringify(blob,null,2));
-  console.log('──────────────────────────────────');
+  console.log('──────────────────────────────────\n');
   return blob;
+}
+
+// ─── Debug helper — paste in browser console ─────────────────────────────────
+// debugVowel('lang/me/audio/i.wav')  →  shows raw Praat formant values
+async function debugVowel(audioUrl) {
+  const resp = await fetch(audioUrl);
+  const ab   = await resp.arrayBuffer();
+  const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+  const buf  = await ctx.decodeAudioData(ab);
+  ctx.close();
+  const wav  = encodeWAV(buf.getChannelData(0), buf.sampleRate);
+  const r    = await fetch(`${HTTP_URL}/analyze-debug`, {
+    method: 'POST',
+    headers: { 'Content-Type':'audio/wav', 'X-Window-Start':'0.15', 'X-Window-End':'0.85' },
+    body: wav,
+  });
+  const data = await r.json();
+  console.log(JSON.stringify(data, null, 2));
+  return data;
 }

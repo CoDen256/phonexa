@@ -1,52 +1,50 @@
 """
-analyze_server.py — Phase 3: speaker-calibrated dual-ceiling + phantom fix.
+analyze_server.py — Phase 4: sliding-window server + bandwidth filter.
 
-Validated against real speech (Denys, 8 vowels, manually extracted F1/F2).
-Predicted score: 8/8 F2 PASS.
+Key changes from Phase 3:
+  - Server maintains ring buffer; analyzes every STEP_MS of new audio.
+    Client sends raw 128-sample AudioWorklet chunks → ~87 analyses/sec instead of ~30.
+  - Bandwidth filter: rejects formants with bandwidth > MAX_BW Hz.
+    Wide bandwidth = broad spectral peak = noise/tracking error. Copied from reference.
+  - Accepts float32 or int16 PCM from client.
 
-Two fixes over Phase 2b:
-  A) Dual-ceiling Condition A raised: ceiling×0.85 → ceiling×0.95 (1530→1710Hz)
-     Needed for speakers whose /ɛ/ has F2 in 1530-1710Hz range.
-
-  B) Phantom resonance fix: if F1<350Hz AND F2/F1<1.7, the reported F2 is a
-     subglottal/artifact resonance. Scan higher formants (n=5) for the first
-     valid F2 that is >2×F1 and in the plausible F2 range.
-     Needed for close front vowels (/i/, /y/) with very low F1.
-
-Both fixes apply to /analyze AND /stream.
-
-HTTP :5050  /ping  /analyze
-WS   :5051         streaming
-
-pip install flask flask-cors parselmouth numpy websockets
+HTTP :5050   /ping  /analyze  /analyze-debug
+WS   :5051          streaming
 """
 import math, json, struct, asyncio, threading
+from collections import deque
+
 import numpy as np
 import parselmouth
+from parselmouth.praat import call
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
+# ── Praat configs ─────────────────────────────────────────────────────────────
+CFG_BACK = dict(time_step=0.010, max_number_of_formants=2,
+                maximum_formant=1800.0, window_length=0.025, pre_emphasis_from=50.0)
+CFG_SCAN = dict(time_step=0.010, max_number_of_formants=5,
+                maximum_formant=5000.0, window_length=0.025, pre_emphasis_from=50.0)
 CFG_FRONT = dict(time_step=0.010, max_number_of_formants=3,
-                 maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0)
-CFG_BACK  = dict(time_step=0.010, max_number_of_formants=2,
-                 maximum_formant=1800.0, window_length=0.025, pre_emphasis_from=50.0)
-CFG_SCAN  = dict(time_step=0.010, max_number_of_formants=5,
-                 maximum_formant=5000.0, window_length=0.025, pre_emphasis_from=50.0)
+                 maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0)  # kept for debug endpoint
 
-F1_RANGE = (150, 1100)
-F2_RANGE = (400, 3200)
-# EMA moved to client (median filter). Server does continuity only.
+F1_RANGE  = (150, 1100)
+F2_RANGE  = (400, 3200)
+MAX_BW    = 400      # Hz — formants with wider bandwidth are rejected (reference default)
+
+# ── Sliding window params ─────────────────────────────────────────────────────
+STEP_MS      = 10                  # analyse every N ms of NEW audio received
+WINDOW_SAMP  = 4096                # ring buffer size (93ms at 44100Hz)
 
 
+# ── ConnState — continuity tracking only ──────────────────────────────────────
 class ConnState:
-    """Continuity tracking only. EMA removed — client applies median smoothing."""
-    def __init__(self):
-        self.reset()
-    def reset(self):
-        self.p1 = self.p2 = None
+    """Un-swap F1/F2 if tracks cross. No EMA — client does median smoothing."""
+    def __init__(self): self.reset()
+    def reset(self): self.p1 = self.p2 = None
     def process(self, f1, f2):
         if self.p1 is not None:
             if abs(f2-self.p1)+abs(f1-self.p2) < abs(f1-self.p1)+abs(f2-self.p2):
@@ -55,39 +53,33 @@ class ConnState:
         return round(f1), round(f2)
 
 
+# ── Praat helpers ─────────────────────────────────────────────────────────────
 def _praat_get(snd, cfg):
-    """Return (f1, f2) from Praat, validating only F1 range.
-    F2 is NOT range-checked here: phantom values below 400Hz must pass through
-    so that _fix_phantom can detect and correct them in analyze_best."""
+    """Run Burg LPC. F2 range NOT checked here — phantoms must reach _fix_phantom."""
     try:
         fmts = snd.to_formant_burg(**cfg)
-        t  = snd.duration / 2
-        f1 = fmts.get_value_at_time(1, t)
-        f2 = fmts.get_value_at_time(2, t)
-        if (math.isnan(f1) or math.isnan(f2)
-                or not F1_RANGE[0] <= f1 <= F1_RANGE[1]):
-            return None, None
-        return f1, f2   # f2 may be phantom — handled downstream
+        t    = snd.duration / 2
+        f1   = fmts.get_value_at_time(1, t)
+        f2   = fmts.get_value_at_time(2, t)
+        if math.isnan(f1) or math.isnan(f2) or not F1_RANGE[0] <= f1 <= F1_RANGE[1]:
+            return None, None, None
+        # ── Bandwidth filter (from reference) ─────────────────────────────────
+        bw1 = call(fmts, "Get bandwidth at time", 1, t, "hertz", "Linear")
+        bw2 = call(fmts, "Get bandwidth at time", 2, t, "hertz", "Linear")
+        if math.isnan(bw1) or bw1 > MAX_BW:
+            return None, None, None   # F1 bandwidth too wide → noisy frame
+        return f1, f2, fmts           # return fmts for phantom fix
     except Exception:
-        return None, None
+        return None, None, None
 
 
 def _fix_phantom(f1, f2, snd):
     """
-    Fix B: close front vowel phantom resonance.
-
-    Triggered when F1 < 350Hz AND F2/F1 < 1.7 — meaning the reported F2 is
-    suspiciously close to F1 (typical of subglottal resonances for /i/, /y/).
-
-    Re-runs Praat with 5 formants and finds the first pole that is:
-      - above F1 * 2.0  (well past the phantom)
-      - within the plausible F2 range
+    For close front vowels (F1<350Hz, F2/F1<1.7): the LPC places a phantom
+    pole between F1 and the real F2. Re-scan with n=5 to find the real F2.
     """
-    if f1 is None or f2 is None:
+    if f1 is None or f2 is None or f1 >= 350 or (f2 / f1) >= 1.7:
         return f1, f2
-    if f1 >= 350 or (f2 / f1) >= 1.7:
-        return f1, f2   # not a phantom case
-
     try:
         fmts = snd.to_formant_burg(**CFG_SCAN)
         t    = snd.duration / 2
@@ -99,35 +91,29 @@ def _fix_phantom(f1, f2, snd):
                 return f1, candidate
     except Exception:
         pass
-    return f1, f2   # couldn't fix, return original
+    return f1, f2
 
 
 def analyze_best(snd, state=None):
     """
-    Dual-ceiling selection + phantom fix. Returns {f1, f2, voiced, t}.
-
-    Dual-ceiling criterion (for back/central vs front vowels):
-      Prefer back-ceiling result (1800Hz, n=2) only when BOTH:
-        A) F2_back < ceiling × 0.95 = 1710Hz  (not pressing the ceiling)
-        B) F2_back < F2_front × 0.75           (substantially lower = F3-as-F2 avoidance)
-      Otherwise use front-ceiling result (4200Hz, n=3).
-
-    After selection, apply phantom fix if F1<350 and F2/F1<1.7.
+    Dual-ceiling + bandwidth filter + phantom fix.
+    Primary: CFG_SCAN (n=5, 5000Hz) — robust for all vowels including /i/.
+    Disambiguation: CFG_BACK (n=2, 1800Hz) for back vowels (/u/ /o/).
     """
     t_ms = round(snd.duration / 2 * 1000)
     if snd.duration < 0.025:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
 
-    f1_b, f2_b = _praat_get(snd, CFG_BACK)   # back vowel disambiguation
-    f1_f, f2_f = _praat_get(snd, CFG_SCAN)   # primary: n=5 robust (replaces broken n=3 CFG_FRONT)
+    f1_b, f2_b, _ = _praat_get(snd, CFG_BACK)
+    f1_f, f2_f, _ = _praat_get(snd, CFG_SCAN)
 
     BACK_VALID  = f1_b is not None and f2_b is not None
     FRONT_VALID = f1_f is not None and f2_f is not None
-    BACK_CEILING_THRESHOLD = CFG_BACK['maximum_formant'] * 0.95   # 1710Hz
+    BACK_CEILING_THRESHOLD = CFG_BACK['maximum_formant'] * 0.95  # 1710Hz
 
     use_back = (
             BACK_VALID and FRONT_VALID
-            and f2_b < BACK_CEILING_THRESHOLD   # Fix A: raised from 0.85 to 0.95
+            and f2_b < BACK_CEILING_THRESHOLD
             and f2_b < f2_f * 0.75
     )
 
@@ -140,10 +126,8 @@ def analyze_best(snd, state=None):
     else:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
 
-    # Fix B: phantom resonance for close front vowels
     f1_raw, f2_raw = _fix_phantom(f1_raw, f2_raw, snd)
 
-    # Final range check AFTER phantom correction
     if not F2_RANGE[0] <= f2_raw <= F2_RANGE[1]:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
 
@@ -155,7 +139,19 @@ def analyze_best(snd, state=None):
     return {'voiced': True, 'f1': f1, 'f2': f2, 't': t_ms}
 
 
-# ── HTTP endpoints ────────────────────────────────────────────────────────────
+def _decode_pcm(msg, sr):
+    """Decode Int16 PCM from client. Client always sends Int16 (see realtime.js _accumulate).
+    Note: float32 detection was removed — Int16 bytes often pass abs<=1.0 float32 check
+    (small values give denormal float32 representations), causing near-zero audio → no formants."""
+    return np.frombuffer(msg, dtype=np.int16).astype(np.float64) / 32768.0
+
+
+# ── HTTP endpoints ─────────────────────────────────────────────────────────────
+@app.route('/ping')
+def ping():
+    return jsonify({'ok': True})
+
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     data = request.data
@@ -167,26 +163,21 @@ def analyze():
         sr, s = 16000, np.frombuffer(data, dtype=np.int16).astype(np.float64) / 32768.0
     dur = len(s) / sr * 1000
     if dur < 50: return jsonify({'error': 'Duration < 50ms'}), 400
-    ws = float(request.headers.get('X-Window-Start', 0))
-    we = float(request.headers.get('X-Window-End', 1))
-    s  = s[int(ws * len(s)):int(we * len(s))]
+    ws_start = float(request.headers.get('X-Window-Start', 0))
+    ws_end   = float(request.headers.get('X-Window-End', 1))
+    s = s[int(ws_start * len(s)):int(ws_end * len(s))]
     try:
         snd = parselmouth.Sound(s, sampling_frequency=float(sr))
-        r   = analyze_best(snd)   # same dual-ceiling + phantom fix as streaming
+        r   = analyze_best(snd)
         if not r['voiced']: return jsonify({'error': 'No voiced speech detected'}), 400
         return jsonify({'f1': r['f1'], 'f2': r['f2'], 'duration_ms': round(dur)})
     except Exception as ex:
         return jsonify({'error': str(ex)}), 500
 
 
-@app.route('/ping')
-def ping():
-    return jsonify({'ok': True})
-
-
 @app.route('/analyze-debug', methods=['POST'])
 def analyze_debug():
-    """Returns raw Praat formant values with zero filtering — for diagnosing rejections."""
+    """Raw Praat values with no filtering — for diagnosing rejections."""
     data = request.data
     if not data: return jsonify({'error': 'No audio data'}), 400
     if data[:4] == b'RIFF':
@@ -194,26 +185,25 @@ def analyze_debug():
         s  = np.frombuffer(data[44:], dtype=np.int16).astype(np.float64) / 32768.0
     else:
         sr, s = 16000, np.frombuffer(data, dtype=np.int16).astype(np.float64) / 32768.0
-    ws = float(request.headers.get('X-Window-Start', 0))
-    we = float(request.headers.get('X-Window-End', 1))
-    s  = s[int(ws*len(s)):int(we*len(s))]
+    ws_s = float(request.headers.get('X-Window-Start', 0))
+    ws_e = float(request.headers.get('X-Window-End', 1))
+    s    = s[int(ws_s * len(s)):int(ws_e * len(s))]
     try:
         snd = parselmouth.Sound(s, sampling_frequency=float(sr))
         t   = snd.duration / 2
-        out = { 'sample_rate': sr, 'duration_ms': round(len(s)/sr*1000),
-                'analysis_t_ms': round(t*1000), 'configs': {} }
+        out = {'sample_rate': sr, 'duration_ms': round(len(s)/sr*1000),
+               'analysis_t_ms': round(t*1000), 'configs': {}}
         for name, cfg in [('FRONT', CFG_FRONT), ('BACK', CFG_BACK), ('SCAN', CFG_SCAN)]:
             try:
                 fmts = snd.to_formant_burg(**cfg)
                 vals = {}
                 for n in range(1, cfg['max_number_of_formants'] + 2):
-                    v = fmts.get_value_at_time(n, t)
+                    v  = fmts.get_value_at_time(n, t)
+                    bw = call(fmts, "Get bandwidth at time", n, t, "hertz", "Linear")
                     vals[f'F{n}'] = None if math.isnan(v) else round(v, 1)
-                out['configs'][name] = {
-                    'ceiling': cfg['maximum_formant'],
-                    'n': cfg['max_number_of_formants'],
-                    'formants': vals
-                }
+                    vals[f'BW{n}'] = None if math.isnan(bw) else round(bw, 1)
+                out['configs'][name] = {'ceiling': cfg['maximum_formant'],
+                                        'n': cfg['max_number_of_formants'], 'formants': vals}
             except Exception as ex:
                 out['configs'][name] = {'error': str(ex)}
         return jsonify(out)
@@ -221,27 +211,43 @@ def analyze_debug():
         return jsonify({'error': str(ex)}), 500
 
 
-# ── WebSocket streaming on :5051 ──────────────────────────────────────────────
+# ── WebSocket streaming — sliding window ──────────────────────────────────────
 async def ws_handler(ws):
-    sr, state = 44100, ConnState()
+    sr    = 44100
+    state = ConnState()
+    ring  = deque(maxlen=WINDOW_SAMP)
+    since = 0   # samples received since last analysis
+
     try:
         async for msg in ws:
+            # ── Text: control messages ─────────────────────────────────────
             if isinstance(msg, str):
                 try:
                     c = json.loads(msg)
                     if c.get('type') == 'init':
                         sr = int(c.get('sample_rate', 44100))
-                        state.reset()
+                        state.reset(); ring.clear(); since = 0
                     elif c.get('type') == 'reset':
-                        state.reset()  # gate closed — flush stale continuity
+                        state.reset(); ring.clear(); since = 0
                 except Exception:
                     pass
                 continue
-            if len(msg) < 800:
+
+            if len(msg) < 64:
                 continue
-            s = np.frombuffer(msg, dtype=np.int16).astype(np.float64) / 32768.0
+
+            # ── Binary: PCM audio chunk ────────────────────────────────────
+            chunk = _decode_pcm(msg, sr)
+            ring.extend(chunk)
+            since += len(chunk)
+
+            step = int(sr * STEP_MS / 1000)   # 441 at 44100Hz = 10ms
+            if since < step or len(ring) < WINDOW_SAMP:
+                continue    # not enough new audio yet
+
+            since = 0
             try:
-                snd = parselmouth.Sound(s, sampling_frequency=float(sr))
+                snd = parselmouth.Sound(np.array(ring), float(sr))
                 r   = analyze_best(snd, state=state)
                 await ws.send(json.dumps({'frames': [r]}))
             except Exception as ex:
