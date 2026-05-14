@@ -38,22 +38,21 @@ CFG_SCAN  = dict(time_step=0.010, max_number_of_formants=5,
 
 F1_RANGE = (150, 1100)
 F2_RANGE = (400, 3200)
-EMA_ALPHA = 0.35
+# EMA moved to client (median filter). Server does continuity only.
 
 
 class ConnState:
+    """Continuity tracking only. EMA removed — client applies median smoothing."""
     def __init__(self):
         self.reset()
     def reset(self):
-        self.p1 = self.p2 = self.e1 = self.e2 = None
+        self.p1 = self.p2 = None
     def process(self, f1, f2):
         if self.p1 is not None:
             if abs(f2-self.p1)+abs(f1-self.p2) < abs(f1-self.p1)+abs(f2-self.p2):
                 f1, f2 = f2, f1
         self.p1, self.p2 = f1, f2
-        self.e1 = f1 if self.e1 is None else EMA_ALPHA*f1+(1-EMA_ALPHA)*self.e1
-        self.e2 = f2 if self.e2 is None else EMA_ALPHA*f2+(1-EMA_ALPHA)*self.e2
-        return round(self.e1), round(self.e2)
+        return round(f1), round(f2)
 
 
 def _praat_get(snd, cfg):
@@ -125,9 +124,9 @@ def analyze_best(snd, state=None):
     BACK_CEILING_THRESHOLD = CFG_BACK['maximum_formant'] * 0.95   # 1710Hz
 
     use_back = (
-        BACK_VALID and FRONT_VALID
-        and f2_b < BACK_CEILING_THRESHOLD   # Fix A: raised from 0.85 to 0.95
-        and f2_b < f2_f * 0.75
+            BACK_VALID and FRONT_VALID
+            and f2_b < BACK_CEILING_THRESHOLD   # Fix A: raised from 0.85 to 0.95
+            and f2_b < f2_f * 0.75
     )
 
     if use_back:
@@ -190,6 +189,8 @@ async def ws_handler(ws):
                     if c.get('type') == 'init':
                         sr = int(c.get('sample_rate', 44100))
                         state.reset()
+                    elif c.get('type') == 'reset':
+                        state.reset()  # gate closed — flush stale continuity
                 except Exception:
                     pass
                 continue

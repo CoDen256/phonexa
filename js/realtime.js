@@ -39,6 +39,10 @@ class RealtimeTracker {
     this._calibrating    = false;
     this._calibSamples   = [];
     this._calibStart     = 0;
+    // Stability controls
+    this._voicedStreak   = 0;   // consecutive voiced frames; draw only after >= 2
+    this._medianWindow   = [];  // last N voiced {f1,f2} for median smoothing
+    this._MEDIAN_N       = 7;
   }
 
   async start() {
@@ -103,7 +107,7 @@ class RealtimeTracker {
     try {
       await this.audioCtx.audioWorklet.addModule('js/audio-worklet.js');
       this.workletNode = new AudioWorkletNode(this.audioCtx,'chunk-processor',
-        { processorOptions:{ chunkSize: SP_BUF } });
+          { processorOptions:{ chunkSize: SP_BUF } });
       this.workletNode.port.onmessage = e=>{
         if (this.active && e.data.type==='chunk') this._accumulate(e.data.data);
       };
@@ -158,7 +162,12 @@ class RealtimeTracker {
       // Hold gate open for 200ms after level drops below threshold (hysteresis)
       this._gateCloseTimer = setTimeout(() => {
         this._gateOpen = false; this._gateCloseTimer = null;
-      }, 500);   // 500ms hold — covers natural amplitude dips mid-vowel
+        this._voicedStreak = 0;
+        this._medianWindow = [];
+        // Tell server to flush its continuity state (prevents EMA drag on next open)
+        if (this.ws?.readyState === WebSocket.OPEN)
+          this.ws.send(JSON.stringify({ type: 'reset' }));
+      }, 500);
     }
     return this._gateOpen;
   }
@@ -190,10 +199,23 @@ class RealtimeTracker {
     const now    = Date.now();
     for (const f of frames) {
       this.stats.frames++;
-      if (!f.voiced) continue;
+      if (!f.voiced) { this._voicedStreak=0; continue; }
       this.stats.voiced++;
-      this.trail.push({ f1:f.f1, f2:f.f2, t:now });
+      this._voicedStreak++;
+      if (this._voicedStreak < 2) continue;  // wait for stable onset
+      this._medianWindow.push({ f1:f.f1, f2:f.f2 });
+      if (this._medianWindow.length > this._MEDIAN_N) this._medianWindow.shift();
+      const mF1 = this._median(this._medianWindow.map(p=>p.f1));
+      const mF2 = this._median(this._medianWindow.map(p=>p.f2));
+      this.trail.push({ f1:mF1, f2:mF2, raw_f1:f.f1, raw_f2:f.f2, t:now });
     }
+  }
+
+  _median(arr) {
+    if (!arr.length) return 0;
+    const s = [...arr].sort((a,b)=>a-b);
+    const m = Math.floor(s.length/2);
+    return s.length%2 ? s[m] : Math.round((s[m-1]+s[m])/2);
   }
 
   // ── Trail rendering at screen refresh rate ────────────────────────────────
@@ -220,16 +242,34 @@ class RealtimeTracker {
     const now = Date.now();
     this.trail = this.trail.filter(p=>now-p.t<TRAIL_MAX_MS);
     this._clearGroup();
-    this.trail.forEach((p,i)=>{
+
+    // History trail: small fading dots (median-smoothed values)
+    this.trail.slice(0,-1).forEach(p=>{
       const age = (now-p.t)/TRAIL_MAX_MS;
       const {x,y} = formantPos(p.f1, p.f2);
       this.svgGroup.appendChild($s('circle',{
-        cx:x.toFixed(1), cy:y.toFixed(1),
-        r: i===this.trail.length-1 ? 9 : 4,
-        fill:TRAIL_COLOR,
-        opacity:(1-age*0.85).toFixed(3),
+        cx:x.toFixed(1), cy:y.toFixed(1), r:3,
+        fill:TRAIL_COLOR, opacity:(0.6-age*0.55).toFixed(3),
       }));
     });
+
+    // Current position: large bright dot (most recent median value)
+    if (this.trail.length) {
+      const cur = this.trail[this.trail.length-1];
+      const {x,y} = formantPos(cur.f1, cur.f2);
+      this.svgGroup.appendChild($s('circle',{
+        cx:x.toFixed(1), cy:y.toFixed(1), r:10,
+        fill:TRAIL_COLOR, opacity:'0.92',
+      }));
+      // Thin ring for raw (unsmoothed) position — shows actual reading
+      if (cur.raw_f1 && cur.raw_f2) {
+        const {x:rx, y:ry} = formantPos(cur.raw_f1, cur.raw_f2);
+        this.svgGroup.appendChild($s('circle',{
+          cx:rx.toFixed(1), cy:ry.toFixed(1), r:5,
+          fill:'none', stroke:TRAIL_COLOR, 'stroke-width':'1.5', opacity:'0.4',
+        }));
+      }
+    }
   }
 
   _stats() {
@@ -241,8 +281,8 @@ class RealtimeTracker {
     const f1   = r.length ? Math.round(r.reduce((a,p)=>a+p.f1,0)/r.length) : '—';
     const f2   = r.length ? Math.round(r.reduce((a,p)=>a+p.f2,0)/r.length) : '—';
     const gate = this._calibrating ? '⏳ calibrating…'
-               : this._gateOpen   ? '🟢 speech'
-               :                    '🔴 silence';
+        : this._gateOpen   ? '🟢 speech'
+            :                    '🔴 silence';
     el.textContent = `${gate}  ·  ${fps} fr/s  ·  ${pct}% voiced  ·  F1 ${f1}  F2 ${f2} Hz`;
   }
 
@@ -273,8 +313,8 @@ function resonatorFilter(x, freq, bw, sr) {
   const y  = new Float32Array(x.length);
   for (let i = 0; i < x.length; i++) {
     y[i] = x[i]
-         + (i > 0 ? a1 * y[i-1] : 0)
-         + (i > 1 ? a2 * y[i-2] : 0);
+        + (i > 0 ? a1 * y[i-1] : 0)
+        + (i > 1 ? a2 * y[i-2] : 0);
   }
   return y;
 }
@@ -456,7 +496,7 @@ async function verifyFromIpaAudio(langKey, opts={}) {
 
   const rows = [];
   for (const v of vowels) {
-      if (!quiet) console.log(`  /${v.ipa}/ …`);
+    if (!quiet) console.log(`  /${v.ipa}/ …`);
     try {
       // Fetch and decode the audio file
       const resp = await fetch(v.ipaAudio);

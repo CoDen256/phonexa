@@ -10,8 +10,8 @@
       "rounded": false,
       "type": "variable",
       "desc": "Close front unrounded",
-      "f1": 292,
-      "f2": 2299,
+      "f1": 271.48,
+      "f2": 2380.40,
       "ipaAudio": "lang/me/audio/i.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
@@ -28,8 +28,8 @@
       "rounded": false,
       "type": "variable",
       "desc": "Close central unrounded",
-      "f1": 299.56,
-      "f2": 1621.94,
+      "f1": 339.86,
+      "f2": 1854.85,
       "ipaAudio": "lang/me/audio/i_bar.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
       "words": [
@@ -40,36 +40,14 @@
       ]
     },
     {
-      "ipa": "ʉ",
-      "h": 0.1,
-      "b": 0.5,
-      "rounded": true,
-      "type": "variable",
-      "desc": "Close central rounded (palatalized u)",
-      "f1": 290.87,
-      "f2": 1580.48,
-      "ipaAudio": "lang/me/audio/u_bar.wav",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
-      "words": [
-        {
-          "text": "<b>ю</b>",
-          "audio": "lang/ru/audio/rufe/yu.mp3"
-        },
-        {
-          "text": "сво<b>ю</b>",
-          "audio": "lang/ru/audio/easy/svou.mp3"
-        }
-      ]
-    },
-    {
       "ipa": "u",
       "h": 0.09,
       "b": 1,
       "rounded": true,
       "type": "variable",
       "desc": "Close back rounded",
-      "f1": 326 ,
-      "f2": 619,
+      "f1": 317.03 ,
+      "f2": 565.81,
       "ipaAudio": "lang/me/audio/u.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
@@ -84,36 +62,14 @@
       ]
     },
     {
-      "ipa": "e",
-      "h": 0.3333,
-      "b": 0,
-      "rounded": false,
-      "type": "variable",
-      "desc": "Close-mid front unrounded",
-      "f1": 413.74,
-      "f2": 1238.49,
-      "ipaAudio": "lang/me/audio/e.wav",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "<b>e</b>",
-          "audio": "lang/ru/audio/rufe/ye.mp3"
-        },
-        {
-          "text": "м<b>е</b>сте",
-          "audio": "lang/ru/audio/forvo/meste.mp3"
-        }
-      ]
-    },
-    {
       "ipa": "o",
       "h": 0.61,
       "b": 1,
       "rounded": true,
       "type": "variable",
       "desc": "Mid front rounded ɔ̝/o̞",
-      "f1": 539.50,
-      "f2": 793.19,
+      "f1": 526.83  ,
+      "f2": 803.64,
       "ipaAudio": "lang/me/audio/o.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
       "words": [
@@ -130,8 +86,8 @@
       "rounded": false,
       "type": "variable",
       "desc": "Open-mid front unrounded",
-      "f1": 604.30,
-      "f2": 1656.14,
+      "f1": 629.02,
+      "f2": 1830.72,
       "ipaAudio": "lang/me/audio/e_open.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
@@ -149,8 +105,8 @@
       "rounded": false,
       "type": "variable",
       "desc": "Open front unrounded",
-      "f1": 887,
-      "f2": 1264.87,
+      "f1": 853.77,
+      "f2": 1309.47,
       "ipaAudio": "lang/me/audio/a.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
       "words": [
