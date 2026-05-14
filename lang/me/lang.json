@@ -15,10 +15,6 @@
       "ipaAudio": "lang/me/audio/i.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
       "words": [
-        {
-          "text": "м<b>и</b>р",
-          "audio": "lang/ru/audio/easy/mir.mp3"
-        }
       ]
     },
     {
@@ -33,10 +29,6 @@
       "ipaAudio": "lang/me/audio/i_bar.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
       "words": [
-        {
-          "text": "б<b>ы</b>л",
-          "audio": "lang/ru/audio/easy/byl.mp3"
-        }
       ]
     },
     {
@@ -51,14 +43,6 @@
       "ipaAudio": "lang/me/audio/u.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
       "words": [
-        {
-          "text": "ем<b>у</b>",
-          "audio": "lang/ru/audio/easy/emu.mp3"
-        },
-        {
-          "text": "т<b>у</b>п",
-          "audio": null
-        }
       ]
     },
     {
@@ -73,10 +57,6 @@
       "ipaAudio": "lang/me/audio/o.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
       "words": [
-        {
-          "text": "т<b>о</b>т",
-          "audio": "lang/ru/audio/easy/tot.mp3"
-        }
       ]
     },
     {
@@ -91,10 +71,6 @@
       "ipaAudio": "lang/me/audio/e_open.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
       "words": [
-        {
-          "text": "<b>э<b>тот",
-          "audio": "lang/ru/audio/easy/etot.mp3"
-        }
       ]
     },
    
@@ -110,10 +86,6 @@
       "ipaAudio": "lang/me/audio/a.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
       "words": [
-        {
-          "text": "н<b>а</b>ми",
-          "audio": "lang/ru/audio/easy/nami.mp3"
-        }
       ]
     }
   ]

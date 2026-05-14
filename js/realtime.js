@@ -459,6 +459,23 @@ async function runVerificationSuite(opts={}) {
   return blob;
 }
 
+// Debug /i/ — shows exactly what Praat returns with no filtering
+async function debugVowel(audioUrl) {
+  const resp = await fetch(audioUrl);
+  const ab   = await resp.arrayBuffer();
+  const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+  const buf  = await ctx.decodeAudioData(ab);
+  ctx.close();
+  const wav  = encodeWAV(buf.getChannelData(0), buf.sampleRate);
+  const r    = await fetch('http://localhost:5050/analyze-debug', {
+    method: 'POST',
+    headers: { 'Content-Type':'audio/wav', 'X-Window-Start':'0.15', 'X-Window-End':'0.85' },
+    body: wav
+  });
+  const data = await r.json();
+  console.log(JSON.stringify(data, null, 2));
+  return data;
+}
 
 // ─── Real-speech verification using IPA audio from the app ───────────────────
 /**

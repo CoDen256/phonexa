@@ -34,7 +34,7 @@ CFG_FRONT = dict(time_step=0.010, max_number_of_formants=3,
 CFG_BACK  = dict(time_step=0.010, max_number_of_formants=2,
                  maximum_formant=1800.0, window_length=0.025, pre_emphasis_from=50.0)
 CFG_SCAN  = dict(time_step=0.010, max_number_of_formants=5,
-                 maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0)
+                 maximum_formant=5000.0, window_length=0.025, pre_emphasis_from=50.0)
 
 F1_RANGE = (150, 1100)
 F2_RANGE = (400, 3200)
@@ -56,16 +56,18 @@ class ConnState:
 
 
 def _praat_get(snd, cfg):
+    """Return (f1, f2) from Praat, validating only F1 range.
+    F2 is NOT range-checked here: phantom values below 400Hz must pass through
+    so that _fix_phantom can detect and correct them in analyze_best."""
     try:
         fmts = snd.to_formant_burg(**cfg)
         t  = snd.duration / 2
         f1 = fmts.get_value_at_time(1, t)
         f2 = fmts.get_value_at_time(2, t)
         if (math.isnan(f1) or math.isnan(f2)
-                or not F1_RANGE[0] <= f1 <= F1_RANGE[1]
-                or not F2_RANGE[0] <= f2 <= F2_RANGE[1]):
+                or not F1_RANGE[0] <= f1 <= F1_RANGE[1]):
             return None, None
-        return f1, f2
+        return f1, f2   # f2 may be phantom — handled downstream
     except Exception:
         return None, None
 
@@ -116,8 +118,8 @@ def analyze_best(snd, state=None):
     if snd.duration < 0.025:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
 
-    f1_b, f2_b = _praat_get(snd, CFG_BACK)
-    f1_f, f2_f = _praat_get(snd, CFG_FRONT)
+    f1_b, f2_b = _praat_get(snd, CFG_BACK)   # back vowel disambiguation
+    f1_f, f2_f = _praat_get(snd, CFG_SCAN)   # primary: n=5 robust (replaces broken n=3 CFG_FRONT)
 
     BACK_VALID  = f1_b is not None and f2_b is not None
     FRONT_VALID = f1_f is not None and f2_f is not None
@@ -140,6 +142,10 @@ def analyze_best(snd, state=None):
 
     # Fix B: phantom resonance for close front vowels
     f1_raw, f2_raw = _fix_phantom(f1_raw, f2_raw, snd)
+
+    # Final range check AFTER phantom correction
+    if not F2_RANGE[0] <= f2_raw <= F2_RANGE[1]:
+        return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
 
     if state:
         f1, f2 = state.process(f1_raw, f2_raw)
@@ -176,6 +182,43 @@ def analyze():
 @app.route('/ping')
 def ping():
     return jsonify({'ok': True})
+
+
+@app.route('/analyze-debug', methods=['POST'])
+def analyze_debug():
+    """Returns raw Praat formant values with zero filtering — for diagnosing rejections."""
+    data = request.data
+    if not data: return jsonify({'error': 'No audio data'}), 400
+    if data[:4] == b'RIFF':
+        sr = struct.unpack_from('<I', data, 24)[0]
+        s  = np.frombuffer(data[44:], dtype=np.int16).astype(np.float64) / 32768.0
+    else:
+        sr, s = 16000, np.frombuffer(data, dtype=np.int16).astype(np.float64) / 32768.0
+    ws = float(request.headers.get('X-Window-Start', 0))
+    we = float(request.headers.get('X-Window-End', 1))
+    s  = s[int(ws*len(s)):int(we*len(s))]
+    try:
+        snd = parselmouth.Sound(s, sampling_frequency=float(sr))
+        t   = snd.duration / 2
+        out = { 'sample_rate': sr, 'duration_ms': round(len(s)/sr*1000),
+                'analysis_t_ms': round(t*1000), 'configs': {} }
+        for name, cfg in [('FRONT', CFG_FRONT), ('BACK', CFG_BACK), ('SCAN', CFG_SCAN)]:
+            try:
+                fmts = snd.to_formant_burg(**cfg)
+                vals = {}
+                for n in range(1, cfg['max_number_of_formants'] + 2):
+                    v = fmts.get_value_at_time(n, t)
+                    vals[f'F{n}'] = None if math.isnan(v) else round(v, 1)
+                out['configs'][name] = {
+                    'ceiling': cfg['maximum_formant'],
+                    'n': cfg['max_number_of_formants'],
+                    'formants': vals
+                }
+            except Exception as ex:
+                out['configs'][name] = {'error': str(ex)}
+        return jsonify(out)
+    except Exception as ex:
+        return jsonify({'error': str(ex)}), 500
 
 
 # ── WebSocket streaming on :5051 ──────────────────────────────────────────────
