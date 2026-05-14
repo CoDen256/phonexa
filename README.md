@@ -123,3 +123,16 @@ When the practice panel is open and a recording exists, `isCompareMode()` return
 - fix removal and enabling of the langs. e.g. when i want completely remove a lang i can't
 ideas:
 - real time formants update?
+
+
+- each vowel comes with average, not tied to an audio, can be generated?
+- each vowel has uses/words/phrases/letters/examples, each has
+  - has spelling
+  - maybe // (phonemic) or [] (phonetic)
+  - audio
+  - f1/f2 and slice of audio + params? ceiling fq and window size, formants?, how measured
+- first use is always the representative isolated sound if possible
+- chart can display:
+  - staticly premeasured f1/f2
+  - staticly custom measurement
+  - dynamic trail of speech

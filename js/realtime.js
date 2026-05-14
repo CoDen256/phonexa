@@ -11,8 +11,8 @@
 
 const WS_URL   = (location.protocol==='https:'?'wss:':'ws:')+'//localhost:5051';
 const HTTP_URL = 'http://localhost:5050';
-const TRAIL_DOTS    = 25;     // keep last N voiced frames
-const TRAIL_COLOR   = '#ffd700'; // gold — matches reference style
+const TRAIL_MAX_MS  = 3000;
+const TRAIL_COLOR   = '#34d399';
 
 // Ring buffer config — separates "how often we capture" from "how much we analyze"
 const SP_BUF   = 512;    // ScriptProcessor fires every 512/sr ≈ 11ms (small = responsive)
@@ -42,7 +42,7 @@ class RealtimeTracker {
     // Stability controls
     this._voicedStreak   = 0;   // consecutive voiced frames; draw only after >= 2
     this._medianWindow   = [];  // last N voiced {f1,f2} for median smoothing
-    this._MEDIAN_N       = 5;    // faster response, still robust
+    this._MEDIAN_N       = 7;
   }
 
   async start() {
@@ -164,8 +164,7 @@ class RealtimeTracker {
         this._gateOpen = false; this._gateCloseTimer = null;
         this._voicedStreak = 0;
         this._medianWindow = [];
-        this.trail = [];   // clear trail so stale history doesn't persist after pause
-        if (this._dotPool) this._dotPool.forEach(el => el.setAttribute('opacity','0'));
+        // Tell server to flush its continuity state (prevents EMA drag on next open)
         if (this.ws?.readyState === WebSocket.OPEN)
           this.ws.send(JSON.stringify({ type: 'reset' }));
       }, 500);
@@ -197,18 +196,18 @@ class RealtimeTracker {
   // ── Handle server response ─────────────────────────────────────────────────
   _msg(data) {
     const frames = data.frames || (data.voiced!==undefined ? [data] : []);
+    const now    = Date.now();
     for (const f of frames) {
       this.stats.frames++;
       if (!f.voiced) { this._voicedStreak=0; continue; }
       this.stats.voiced++;
       this._voicedStreak++;
-      if (this._voicedStreak < 1) continue;  // respond on first voiced frame
+      if (this._voicedStreak < 2) continue;  // wait for stable onset
       this._medianWindow.push({ f1:f.f1, f2:f.f2 });
       if (this._medianWindow.length > this._MEDIAN_N) this._medianWindow.shift();
       const mF1 = this._median(this._medianWindow.map(p=>p.f1));
       const mF2 = this._median(this._medianWindow.map(p=>p.f2));
-      this.trail.push({ f1:mF1, f2:mF2 });
-      if (this.trail.length > TRAIL_DOTS) this.trail.shift();
+      this.trail.push({ f1:mF1, f2:mF2, raw_f1:f.f1, raw_f2:f.f2, t:now });
     }
   }
 
@@ -233,35 +232,44 @@ class RealtimeTracker {
   _ensureGroup() {
     const svg = document.getElementById('chartFormant'); if(!svg) return;
     let g = svg.querySelector('#rt-trail-group');
-    if (!g) {
-      g = $s('g', { id:'rt-trail-group', style:'pointer-events:none' });
-      svg.appendChild(g);
-      // Pre-allocate dot pool — updated in place every frame, no createElement overhead
-      this._dotPool = Array.from({ length: TRAIL_DOTS + 1 }, () => {
-        const c = $s('circle', { cx:'0', cy:'0', r:'4', fill:TRAIL_COLOR, opacity:'0' });
-        g.appendChild(c);
-        return c;
-      });
-    }
+    if (!g) { g=$s('g',{id:'rt-trail-group',style:'pointer-events:none'}); svg.appendChild(g); }
     this.svgGroup = g;
   }
   _clearGroup() { if(this.svgGroup) while(this.svgGroup.firstChild) this.svgGroup.removeChild(this.svgGroup.firstChild); }
 
   _draw() {
-    if (!this.svgGroup || !this._dotPool) return;
-    const n = this.trail.length;
-    // Update pre-allocated pool in place — no DOM creation, no GC, smooth RAF
-    this._dotPool.forEach((el, i) => {
-      if (i >= n) { el.setAttribute('opacity','0'); return; }
-      const p      = this.trail[i];
-      const {x, y} = formantPos(p.f1, p.f2);
-      const isCur  = i === n - 1;
-      el.setAttribute('cx', x.toFixed(1));
-      el.setAttribute('cy', y.toFixed(1));
-      el.setAttribute('r',  isCur ? '9' : '4');
-      // Reference-style opacity: index/total * 0.7, current solid
-      el.setAttribute('opacity', isCur ? '0.95' : ((i / n) * 0.7).toFixed(3));
+    if (!this.svgGroup) return;
+    const now = Date.now();
+    this.trail = this.trail.filter(p=>now-p.t<TRAIL_MAX_MS);
+    this._clearGroup();
+
+    // History trail: small fading dots (median-smoothed values)
+    this.trail.slice(0,-1).forEach(p=>{
+      const age = (now-p.t)/TRAIL_MAX_MS;
+      const {x,y} = formantPos(p.f1, p.f2);
+      this.svgGroup.appendChild($s('circle',{
+        cx:x.toFixed(1), cy:y.toFixed(1), r:3,
+        fill:TRAIL_COLOR, opacity:(0.6-age*0.55).toFixed(3),
+      }));
     });
+
+    // Current position: large bright dot (most recent median value)
+    if (this.trail.length) {
+      const cur = this.trail[this.trail.length-1];
+      const {x,y} = formantPos(cur.f1, cur.f2);
+      this.svgGroup.appendChild($s('circle',{
+        cx:x.toFixed(1), cy:y.toFixed(1), r:10,
+        fill:TRAIL_COLOR, opacity:'0.92',
+      }));
+      // Thin ring for raw (unsmoothed) position — shows actual reading
+      if (cur.raw_f1 && cur.raw_f2) {
+        const {x:rx, y:ry} = formantPos(cur.raw_f1, cur.raw_f2);
+        this.svgGroup.appendChild($s('circle',{
+          cx:rx.toFixed(1), cy:ry.toFixed(1), r:5,
+          fill:'none', stroke:TRAIL_COLOR, 'stroke-width':'1.5', opacity:'0.4',
+        }));
+      }
+    }
   }
 
   _stats() {
