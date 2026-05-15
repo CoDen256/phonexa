@@ -1,37 +1,24 @@
 """
 analyze_server.py
 =================
-Dual-ceiling Praat formant tracker — Flask HTTP + websockets WS.
+Dual-ceiling Praat formant tracker.
 
-Architecture
-------------
-  HTTP :5050
-    GET  /ping          — health check
-    POST /analyze       — single-window analysis (practice tool & verifier)
-    POST /analyze-file  — whole-file frame-by-frame analysis (debug page)
-    POST /analyze-debug — raw Praat output from all three configs, unfiltered
+HTTP :5050  —  /ping  /analyze  /analyze-file  /analyze-debug
+WS   :5051  —  streaming PCM → voiced frames
 
-  WS :5051
-    Binary frames : Int16 PCM audio chunks from the client.
-    Text frames   : JSON control messages
-                     {type:'init',  sample_rate:<int>}   — (re)start, set SR
-                     {type:'reset'}                      — flush continuity state
-                     {type:'config', <ConnConfig fields>} — update analysis params
+Algorithm (see ``analyze_window`` for the full flow)
+------------------------------------------------------
+1. Run Burg LPC with two ceiling configs:
+     SCAN (wide ceiling, many poles)  — primary, handles all vowels
+     BACK (narrow ceiling, 2 poles)   — back-vowel disambiguation
+2. Prefer BACK result when its F2 is well below the ceiling AND
+   substantially lower than SCAN's F2 (F3-as-F2 confusion fix).
+3. Phantom-resonance fix: close front vowels (/i/, /y/) sometimes
+   produce a spurious LPC pole between F1 and the real F2.
+   Re-scan with more poles to skip it.
+4. Frame-to-frame continuity: un-swap F1/F2 if tracks cross.
 
-Algorithm summary
------------------
-  1. Run Burg LPC with two ceiling configs:
-       SCAN (n_formants, max_f)   — primary; works for all vowel types
-       BACK (2 formants, back_ceiling) — back-vowel disambiguation
-  2. Dual-ceiling selection: prefer BACK when its F2 is well below the ceiling
-     AND substantially lower than SCAN's F2 (indicating F3-as-F2 confusion).
-  3. Phantom fix: for close front vowels (F1<350Hz, F2/F1<1.7), re-scan with
-     more poles to find the real F2 above the phantom LPC resonance.
-  4. ConnState: un-swap F1/F2 if tracks cross frame-to-frame.
-
-Install
--------
-  pip install flask flask-cors parselmouth numpy websockets
+Install:  pip install flask flask-cors parselmouth numpy websockets
 """
 
 from __future__ import annotations
@@ -53,335 +40,428 @@ from parselmouth.praat import call
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-# ── Flask app ─────────────────────────────────────────────────────────────────
+# ── App ────────────────────────────────────────────────────────────────────────
 app = Flask(__name__)
 CORS(app)
 
-# ── Global constants ──────────────────────────────────────────────────────────
 
-# Accepted formant frequency ranges used as sanity gates.
-F1_RANGE = (150, 1100)   # Hz  — F1 outside this range → reject frame
-F2_RANGE = (400, 3200)   # Hz  — F2 outside this range → reject frame (after phantom fix)
+# ══════════════════════════════════════════════════════════════════════════════
+# Constants
+# ══════════════════════════════════════════════════════════════════════════════
 
-# Ring buffer for WebSocket sliding-window analysis.
-STEP_MS     = 10     # ms — analyse every N ms of new audio received
-WINDOW_SAMP = 4096   # samples — ring buffer length (~93 ms at 44 100 Hz)
+# Sanity ranges for accepted formant values.
+F1_VALID_RANGE = (150, 1100)   # Hz
+F2_VALID_RANGE = (400, 3200)   # Hz
 
-# Debug endpoint: fixed config for the "FRONT" column.
-# This is intentionally NOT derived from ConnConfig — it exists only
-# to show what the old n=3 / 4200 Hz config returns for comparison.
-_DEBUG_FRONT_CFG = dict(
+# WebSocket sliding-window parameters.
+ANALYSIS_STEP_MS       = 10     # ms  — analyse every N ms of new audio
+RING_BUFFER_SAMPLES    = 4096   # samples — ~93 ms at 44 100 Hz
+
+# Fixed Praat config used only by /analyze-debug to show the old n=3 result.
+_DEBUG_LEGACY_FRONT_CFG = dict(
     time_step=0.010, max_number_of_formants=3,
     maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0,
 )
 
 
-# ── Per-connection configuration ──────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# Configuration
+# ══════════════════════════════════════════════════════════════════════════════
 
 @dataclass
 class ConnConfig:
     """
-    All tunable parameters for one WebSocket connection (or one HTTP request).
+    All tunable analysis parameters for one connection or request.
 
-    The debug page exposes every field as a slider and sends updates as
-    ``{type: 'config', <field>: <value>, ...}`` WebSocket messages.
-    The practice app never sends config messages and therefore runs on the
-    defaults, with ``energy_floor=0`` (server gate disabled — the client
-    gates instead).
+    The debug page sends ``{type: 'config', <field>: <value>}`` WebSocket
+    messages whenever the user moves a slider.  The practice app never sends
+    config messages and runs on the defaults.
 
-    Field naming
+    Field groups
     ~~~~~~~~~~~~
-    * Fields that feed directly into ``to_formant_burg()`` match Praat's
-      parameter names as closely as possible.
-    * Fields controlling the dual-ceiling selection criterion are prefixed
-      ``back_``.
+    * ``max_f / n_formants / window_ms / pre_emphasis``
+          Feed directly into Praat's ``to_formant_burg()``.
+    * ``back_*``
+          Control the dual-ceiling selection criterion.
+    * ``energy_floor``
+          Server-side RMS gate.  Set to 0 (disabled) for the practice app,
+          which applies its own client-side gate.
     """
 
-    # ── Primary Burg LPC analysis ─────────────────────────────────────────
+    # ── Primary Burg LPC (SCAN config) ────────────────────────────────────
     max_f:        float = 5000   # maximum_formant  (Hz)
     n_formants:   int   = 5      # max_number_of_formants
-    window_ms:    float = 25     # window_length (converted to seconds internally)
-    pre_emphasis: float = 50     # pre_emphasis_from (Hz)
+    window_ms:    float = 25     # window_length  (converted → seconds)
+    pre_emphasis: float = 50     # pre_emphasis_from  (Hz)
 
-    # ── Back-vowel disambiguation ─────────────────────────────────────────
-    back_ceiling:       float = 1800   # maximum_formant for BACK config (Hz)
-    back_ceiling_ratio: float = 0.95   # use BACK when f2_back < back_ceiling × ratio
-    back_front_ratio:   float = 0.75   # use BACK when f2_back < f2_scan × ratio
+    # ── Back-vowel disambiguation (BACK config) ───────────────────────────
+    back_ceiling:        float = 1800  # maximum_formant for BACK config (Hz)
+    back_ceiling_ratio:  float = 0.95  # use BACK when f2_back < back_ceiling × ratio
+    back_front_ratio:    float = 0.75  # use BACK when f2_back < f2_scan   × ratio
 
     # ── Server-side energy gate ───────────────────────────────────────────
-    energy_floor: float = 0.0   # RMS threshold; 0 = disabled (client gates instead)
+    energy_floor: float = 0.0  # RMS threshold; 0 = gate disabled
 
-    # ── Config update ─────────────────────────────────────────────────────
-
-    def update(self, d: dict) -> None:
-        """Overwrite fields present in *d*, coercing to the declared type."""
-        for key, value in d.items():
-            if hasattr(self, key):
+    def update_from_dict(self, updates: dict) -> None:
+        """Apply *updates*, coercing each value to the field's declared type."""
+        for field_name, value in updates.items():
+            if hasattr(self, field_name):
                 try:
-                    setattr(self, key, type(getattr(self, key))(value))
+                    setattr(self, field_name, type(getattr(self, field_name))(value))
                 except (TypeError, ValueError):
                     pass
 
     # ── Praat kwargs builders ─────────────────────────────────────────────
 
-    def _base_praat_kwargs(self) -> dict:
-        """Shared keyword arguments for every ``to_formant_burg()`` call."""
+    def _shared_burg_kwargs(self) -> dict:
+        """Parameters common to both SCAN and BACK Burg analyses."""
         return {
-            'time_step':        0.010,
-            'window_length':    self.window_ms / 1000,
+            'time_step':         0.010,
+            'window_length':     self.window_ms / 1000,
             'pre_emphasis_from': self.pre_emphasis,
         }
 
-    def scan_cfg(self) -> dict:
-        """Kwargs for the primary (SCAN) Burg analysis."""
+    def scan_burg_kwargs(self) -> dict:
+        """Praat kwargs for the primary (wide-ceiling) analysis."""
         return {
-            **self._base_praat_kwargs(),
+            **self._shared_burg_kwargs(),
             'max_number_of_formants': self.n_formants,
             'maximum_formant':        self.max_f,
         }
 
-    def back_cfg(self) -> dict:
-        """Kwargs for the back-vowel disambiguation (BACK) Burg analysis."""
+    def back_burg_kwargs(self) -> dict:
+        """Praat kwargs for the back-vowel disambiguation analysis."""
         return {
-            **self._base_praat_kwargs(),
+            **self._shared_burg_kwargs(),
             'max_number_of_formants': 2,
             'maximum_formant':        self.back_ceiling,
         }
 
-    def phantom_scan_cfg(self) -> dict:
+    def phantom_scan_kwargs(self) -> dict:
         """
-        Kwargs for the phantom-resonance re-scan.
-        Uses at least 5 formants so the pole above the phantom is reachable.
+        Praat kwargs for the phantom-resonance re-scan.
+        Uses at least 5 poles so the real F2 above the phantom can be reached.
         """
         return {
-            **self._base_praat_kwargs(),
+            **self._shared_burg_kwargs(),
             'max_number_of_formants': max(5, self.n_formants),
             'maximum_formant':        self.max_f,
         }
 
 
-# ── Continuity state ──────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# Continuity state
+# ══════════════════════════════════════════════════════════════════════════════
 
 class ConnState:
     """
     Per-connection frame-to-frame continuity tracker.
 
     Prevents F1/F2 track swaps: if swapping the current frame's values
-    reduces the total distance to the previous frame, we swap them back.
-    No EMA — smoothing is done client-side with a median window.
+    reduces the total distance to the previous frame, the values are swapped
+    back before being returned.
+
+    No EMA smoothing — that is done client-side with a median window.
     """
 
     def __init__(self) -> None:
         self.reset()
 
     def reset(self) -> None:
-        self.p1: float | None = None
-        self.p2: float | None = None
+        self.previous_f1: float | None = None
+        self.previous_f2: float | None = None
 
-    def process(self, f1: float, f2: float) -> tuple[int, int]:
-        """Return (f1, f2) after applying continuity correction."""
-        if self.p1 is not None:
-            if (abs(f2 - self.p1) + abs(f1 - self.p2) <
-                    abs(f1 - self.p1) + abs(f2 - self.p2)):
+    def apply_continuity(self, f1: float, f2: float) -> tuple[int, int]:
+        """Return (f1, f2), swapping if that reduces distance to previous frame."""
+        if self.previous_f1 is not None:
+            distance_as_is   = abs(f1 - self.previous_f1) + abs(f2 - self.previous_f2)
+            distance_swapped = abs(f2 - self.previous_f1) + abs(f1 - self.previous_f2)
+            if distance_swapped < distance_as_is:
                 f1, f2 = f2, f1
-        self.p1, self.p2 = f1, f2
+        self.previous_f1, self.previous_f2 = f1, f2
         return round(f1), round(f2)
 
 
-# ── Audio helpers ─────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# Audio helpers
+# ══════════════════════════════════════════════════════════════════════════════
 
-def _decode_pcm(data: bytes) -> np.ndarray:
-    """Int16 PCM bytes → float64 array in [-1, 1].  Clients always send Int16."""
-    return np.frombuffer(data, dtype=np.int16).astype(np.float64) / 32768.0
+def decode_int16_pcm(raw_bytes: bytes) -> np.ndarray:
+    """Int16 PCM bytes → float64 samples normalised to [-1, 1]."""
+    return np.frombuffer(raw_bytes, dtype=np.int16).astype(np.float64) / 32768.0
 
 
-def _parse_wav_body(data: bytes) -> tuple[np.ndarray, int]:
+def parse_wav_or_pcm(raw_bytes: bytes) -> tuple[np.ndarray, int]:
     """
-    Parse an HTTP request body that is either a WAV file or raw Int16 PCM.
-    Returns (samples_float64, sample_rate_hz).
+    Parse audio from raw bytes.
+
+    Accepts either a WAV file (detected by the ``RIFF`` header) or raw
+    Int16 PCM at an assumed 16 000 Hz.  Returns (samples, sample_rate).
     """
-    if data[:4] == b'RIFF':
-        sr      = struct.unpack_from('<I', data, 24)[0]
-        samples = _decode_pcm(data[44:])
+    is_wav = raw_bytes[:4] == b'RIFF'
+    if is_wav:
+        sample_rate = struct.unpack_from('<I', raw_bytes, 24)[0]
+        samples     = decode_int16_pcm(raw_bytes[44:])
     else:
-        sr, samples = 16000, _decode_pcm(data)
-    return samples, sr
+        sample_rate = 16_000
+        samples     = decode_int16_pcm(raw_bytes)
+    return samples, sample_rate
 
 
-def _window_samples(samples: np.ndarray, start: float, end: float) -> np.ndarray:
-    """Slice *samples* to the [start, end] fraction (from X-Window-* headers)."""
-    n = len(samples)
-    return samples[int(start * n):int(end * n)]
+def trim_to_window_fraction(samples: np.ndarray, start: float, end: float) -> np.ndarray:
+    """Slice *samples* to the [start, end] fraction (values in [0, 1])."""
+    total = len(samples)
+    return samples[int(start * total):int(end * total)]
 
 
-def _get_window_fraction(req) -> tuple[float, float]:
-    """Read X-Window-Start / X-Window-End headers (default 0 / 1)."""
-    return (float(req.headers.get('X-Window-Start', 0)),
-            float(req.headers.get('X-Window-End',   1)))
+def read_window_fraction_headers(http_request) -> tuple[float, float]:
+    """Read X-Window-Start / X-Window-End headers (defaults: 0 and 1)."""
+    start = float(http_request.headers.get('X-Window-Start', 0))
+    end   = float(http_request.headers.get('X-Window-End',   1))
+    return start, end
 
 
-def _rms(samples: np.ndarray) -> float:
+def compute_rms(samples: np.ndarray) -> float:
+    """Root-mean-square amplitude of *samples*."""
     return float(np.sqrt(np.mean(samples ** 2)))
 
 
-# ── Praat analysis ────────────────────────────────────────────────────────────
+def make_praat_sound(samples: np.ndarray, sample_rate: float) -> parselmouth.Sound:
+    """Wrap a NumPy array in a ``parselmouth.Sound`` object."""
+    return parselmouth.Sound(samples, sampling_frequency=float(sample_rate))
 
-def _praat_get(snd: parselmouth.Sound, cfg_kwargs: dict) -> tuple[float | None, float | None]:
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Frame construction helpers
+# ══════════════════════════════════════════════════════════════════════════════
+
+def voiced_frame(f1: int, f2: int, midpoint_ms: int) -> dict:
+    """Build a voiced analysis result dict."""
+    return {'voiced': True, 'f1': f1, 'f2': f2, 't_ms': midpoint_ms}
+
+
+def unvoiced_frame(midpoint_ms: int) -> dict:
+    """Build an unvoiced (or rejected) analysis result dict."""
+    return {'voiced': False, 'f1': None, 'f2': None, 't_ms': midpoint_ms}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Praat interface
+# ══════════════════════════════════════════════════════════════════════════════
+
+def extract_formants_at_midpoint(
+        sound: parselmouth.Sound,
+        burg_kwargs: dict,
+) -> tuple[float | None, float | None]:
     """
-    Run Burg LPC with *cfg_kwargs* and read F1/F2 at the midpoint.
+    Run Burg LPC and read F1 / F2 at the sound's temporal midpoint.
 
-    Only F1 is range-checked here.  F2 is intentionally left unchecked so that
-    phantom resonances (very low F2 values) can reach ``_fix_phantom`` intact —
-    range-checking F2 before the phantom fix would silently drop frames where
-    F2 is a sub-400 Hz artifact rather than the real formant.
+    F1 is range-checked against F1_VALID_RANGE.  F2 is deliberately **not**
+    range-checked here — phantom values below 400 Hz must reach
+    ``fix_phantom_resonance`` intact so they can be corrected.
+
+    Returns (f1, f2) or (None, None) if Praat returns NaN or F1 is out of range.
     """
     try:
-        fmts = snd.to_formant_burg(**cfg_kwargs)
-        t    = snd.duration / 2
-        f1   = fmts.get_value_at_time(1, t)
-        f2   = fmts.get_value_at_time(2, t)
-        if math.isnan(f1) or math.isnan(f2) or not F1_RANGE[0] <= f1 <= F1_RANGE[1]:
+        formant_track  = sound.to_formant_burg(**burg_kwargs)
+        midpoint_time  = sound.duration / 2
+        f1             = formant_track.get_value_at_time(1, midpoint_time)
+        f2             = formant_track.get_value_at_time(2, midpoint_time)
+
+        any_nan        = math.isnan(f1) or math.isnan(f2)
+        f1_in_range    = F1_VALID_RANGE[0] <= f1 <= F1_VALID_RANGE[1]
+        if any_nan or not f1_in_range:
             return None, None
+
         return f1, f2
     except Exception:
         return None, None
 
 
-def _fix_phantom(
-        f1: float, f2: float,
-        snd: parselmouth.Sound,
-        cfg: ConnConfig,
+# ══════════════════════════════════════════════════════════════════════════════
+# Algorithm steps
+# ══════════════════════════════════════════════════════════════════════════════
+
+def select_best_formants(
+        f1_back: float | None, f2_back: float | None,
+        f1_scan: float | None, f2_scan: float | None,
+        config:  ConnConfig,
+) -> tuple[float | None, float | None]:
+    """
+    Choose between BACK and SCAN formant estimates.
+
+    BACK is preferred when **both** conditions are met:
+      a) f2_back is well below the BACK ceiling (not a ceiling artefact)
+      b) f2_back is substantially lower than f2_scan (F3-as-F2 confusion)
+
+    Otherwise SCAN is used.  Falls back to the remaining valid config if
+    one failed entirely.  Returns (None, None) when both configs failed.
+    """
+    back_has_result = f1_back is not None and f2_back is not None
+    scan_has_result = f1_scan is not None and f2_scan is not None
+
+    back_not_at_ceiling     = f2_back < config.back_ceiling * config.back_ceiling_ratio
+    back_lower_than_scan    = f2_back < f2_scan * config.back_front_ratio
+    prefer_back             = back_has_result and scan_has_result \
+                              and back_not_at_ceiling and back_lower_than_scan
+
+    if prefer_back:
+        return f1_back, f2_back
+    elif scan_has_result:
+        return f1_scan, f2_scan
+    elif back_has_result:
+        return f1_back, f2_back   # last resort
+    else:
+        return None, None
+
+
+def fix_phantom_resonance(
+        f1:     float,
+        f2:     float,
+        sound:  parselmouth.Sound,
+        config: ConnConfig,
 ) -> tuple[float, float]:
     """
-    Correct phantom LPC resonances for close front vowels.
+    Correct a phantom LPC pole for close front vowels.
 
-    For vowels where F1 < 350 Hz and F2/F1 < 1.7 the LPC algorithm often
-    places a spurious pole between F1 and the real F2 (a subglottal resonance
-    or LPC artefact).  We detect this signature and re-scan with more poles to
-    find the first valid formant that is above F1 × 2 and within F2_RANGE.
+    Signature: F1 < 350 Hz **and** F2/F1 < 1.7 — the LPC placed a spurious
+    pole (subglottal resonance or artefact) between F1 and the real F2.
+    Re-scan with more poles and return the first candidate that satisfies
+    ``candidate > F1 × 2`` and lies within F2_VALID_RANGE.
+
+    Returns (f1, f2) unchanged when the signature is absent.
     """
-    if f1 is None or f2 is None or f1 >= 350 or (f2 / f1) >= 1.7:
+    is_close_front_vowel    = f1 < 350
+    f2_suspiciously_close   = (f2 / f1) < 1.7
+    if not (is_close_front_vowel and f2_suspiciously_close):
         return f1, f2
+
     try:
-        fmts = snd.to_formant_burg(**cfg.phantom_scan_cfg())
-        t    = snd.duration / 2
-        for n in range(2, cfg.phantom_scan_cfg()['max_number_of_formants'] + 2):
-            candidate = fmts.get_value_at_time(n, t)
-            if (not math.isnan(candidate)
-                    and candidate > f1 * 2.0
-                    and F2_RANGE[0] <= candidate <= F2_RANGE[1]):
+        extended_formant_track = sound.to_formant_burg(**config.phantom_scan_kwargs())
+        midpoint_time          = sound.duration / 2
+        max_pole_index         = config.phantom_scan_kwargs()['max_number_of_formants'] + 1
+
+        for pole_index in range(2, max_pole_index + 1):
+            candidate = extended_formant_track.get_value_at_time(pole_index, midpoint_time)
+            above_phantom = candidate > f1 * 2.0
+            in_f2_range   = F2_VALID_RANGE[0] <= candidate <= F2_VALID_RANGE[1]
+            if not math.isnan(candidate) and above_phantom and in_f2_range:
                 return f1, candidate
     except Exception:
         pass
-    return f1, f2
+
+    return f1, f2  # phantom fix failed — return original values
 
 
-def analyze_best(
-        snd: parselmouth.Sound,
-        state: ConnState | None = None,
-        cfg: ConnConfig | None = None,
+# ══════════════════════════════════════════════════════════════════════════════
+# Core analysis entry point
+# ══════════════════════════════════════════════════════════════════════════════
+
+def analyze_window(
+        window_samples: np.ndarray,
+        sample_rate:    float,
+        config:         ConnConfig | None = None,
+        state:          ConnState  | None = None,
 ) -> dict:
     """
-    Main analysis entry point — dual-ceiling selection + phantom fix.
+    Analyse one window of audio samples and return a frame dict.
 
-    Returns a dict with keys: ``voiced`` (bool), ``f1`` (int|None),
-    ``f2`` (int|None), ``t`` (int, midpoint ms).
+    This is the **single entry point** for all formant analysis — HTTP
+    endpoints and the WebSocket handler all call this function.
 
-    Selection logic
-    ~~~~~~~~~~~~~~~
-    1. Run SCAN (n_formants, max_f) — primary config, robust for all vowels.
-    2. Run BACK (2 formants, back_ceiling) — back-vowel disambiguation.
-    3. Prefer BACK when *both* conditions hold:
-         a. f2_back < back_ceiling × back_ceiling_ratio  (not pressing the ceiling)
-         b. f2_back < f2_scan   × back_front_ratio       (F3-as-F2 avoidance)
-    4. Apply phantom fix to the chosen (f1, f2) pair.
-    5. Validate final F2 against F2_RANGE.
-    6. Apply ConnState continuity correction (un-swap if tracks crossed).
+    Return keys: ``voiced`` (bool), ``f1`` (int|None), ``f2`` (int|None),
+    ``t_ms`` (int — midpoint of the window in milliseconds).
+
+    Full flow
+    ~~~~~~~~~
+    1. Build a Praat Sound from *window_samples*.
+    2. Run SCAN and BACK Burg analyses simultaneously.
+    3. Select the best (f1, f2) pair via the dual-ceiling criterion.
+    4. Apply the phantom-resonance fix for close front vowels.
+    5. Validate the final F2 against F2_VALID_RANGE.
+    6. Apply frame-to-frame continuity correction (if *state* provided).
     """
-    if cfg is None:
-        cfg = ConnConfig()
+    if config is None:
+        config = ConnConfig()
 
-    t_ms = round(snd.duration / 2 * 1000)
-    if snd.duration < 0.025:
-        return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
+    sound       = make_praat_sound(window_samples, sample_rate)
+    midpoint_ms = round(sound.duration / 2 * 1000)
 
-    f1_b, f2_b = _praat_get(snd, cfg.back_cfg())
-    f1_f, f2_f = _praat_get(snd, cfg.scan_cfg())
+    if sound.duration < config.window_ms / 1000:
+        return unvoiced_frame(midpoint_ms)
 
-    back_valid  = f1_b is not None and f2_b is not None
-    front_valid = f1_f is not None and f2_f is not None
+    f1_back, f2_back = extract_formants_at_midpoint(sound, config.back_burg_kwargs())
+    f1_scan, f2_scan = extract_formants_at_midpoint(sound, config.scan_burg_kwargs())
 
-    use_back = (
-            back_valid and front_valid
-            and f2_b < cfg.back_ceiling * cfg.back_ceiling_ratio
-            and f2_b < f2_f * cfg.back_front_ratio
-    )
+    f1_raw, f2_raw   = select_best_formants(f1_back, f2_back, f1_scan, f2_scan, config)
+    if f1_raw is None:
+        return unvoiced_frame(midpoint_ms)
 
-    if use_back:
-        f1_raw, f2_raw = f1_b, f2_b
-    elif front_valid:
-        f1_raw, f2_raw = f1_f, f2_f
-    elif back_valid:
-        f1_raw, f2_raw = f1_b, f2_b
+    f1_raw, f2_raw   = fix_phantom_resonance(f1_raw, f2_raw, sound, config)
+
+    f2_is_valid = F2_VALID_RANGE[0] <= f2_raw <= F2_VALID_RANGE[1]
+    if not f2_is_valid:
+        return unvoiced_frame(midpoint_ms)
+
+    if state is not None:
+        f1, f2 = state.apply_continuity(f1_raw, f2_raw)
     else:
-        return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
+        f1, f2 = round(f1_raw), round(f2_raw)
 
-    f1_raw, f2_raw = _fix_phantom(f1_raw, f2_raw, snd, cfg)
-
-    if not F2_RANGE[0] <= f2_raw <= F2_RANGE[1]:
-        return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
-
-    f1, f2 = state.process(f1_raw, f2_raw) if state else (round(f1_raw), round(f2_raw))
-    return {'voiced': True, 'f1': f1, 'f2': f2, 't': t_ms}
+    return voiced_frame(f1, f2, midpoint_ms)
 
 
-# ── Whole-file frame extraction ───────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# Whole-file analysis  (used by /analyze-file)
+# ══════════════════════════════════════════════════════════════════════════════
 
-def _analyze_file_frames(path: str, cfg: ConnConfig) -> tuple[list[dict], float]:
+def analyze_all_windows(file_path: str, config: ConnConfig) -> tuple[list[dict], float]:
     """
-    Slide a WINDOW_SAMP-sample window across an audio file in STEP_MS steps,
-    returning per-frame analysis results for the debug page.
+    Slide a window across an audio file and analyse each position.
 
-    Each frame dict has keys: ``t`` (float, seconds), ``f1``, ``f2``
-    (int|None), ``rms`` (float).  Frames below ``cfg.energy_floor`` are
-    returned with f1=None, f2=None (displayed as gaps in the time plot).
+    Returns (frames, duration_seconds).  Each frame dict has:
+    ``t`` (float, seconds), ``f1``, ``f2`` (int|None), ``rms`` (float).
+
+    Frames below ``config.energy_floor`` are returned as silent (f1=f2=None)
+    so the debug page renders them as gaps rather than showing noise.
     """
-    snd     = parselmouth.Sound(path)
-    sr      = snd.sampling_frequency
-    samples = snd.values[0].astype(np.float64)
-    dur     = snd.duration
+    sound        = parselmouth.Sound(file_path)
+    sample_rate  = sound.sampling_frequency
+    all_samples  = sound.values[0].astype(np.float64)
+    duration_sec = sound.duration
 
-    step_n = max(1, int(sr * STEP_MS / 1000))
-    win_n  = WINDOW_SAMP
-    state  = ConnState()
+    step_samples   = max(1, int(sample_rate * ANALYSIS_STEP_MS / 1000))
+    window_samples = RING_BUFFER_SAMPLES
+    state          = ConnState()
     frames: list[dict] = []
 
-    for pos in range(win_n, len(samples) + 1, step_n):
-        win   = samples[pos - win_n:pos]
-        frame_rms = round(_rms(win), 6)
-        t     = round(pos / sr, 3)
+    for window_end in range(window_samples, len(all_samples) + 1, step_samples):
+        window      = all_samples[window_end - window_samples: window_end]
+        window_rms  = round(compute_rms(window), 6)
+        time_sec    = round(window_end / sample_rate, 3)
 
-        # Energy gate — matches the server-side gate in ws_handler
-        if cfg.energy_floor > 0 and frame_rms < cfg.energy_floor:
-            frames.append({'t': t, 'f1': None, 'f2': None, 'rms': frame_rms})
+        below_energy_floor = config.energy_floor > 0 and window_rms < config.energy_floor
+        if below_energy_floor:
+            frames.append({'t': time_sec, 'f1': None, 'f2': None, 'rms': window_rms})
             continue
 
         try:
-            w_snd = parselmouth.Sound(win, sampling_frequency=float(sr))
-            r     = analyze_best(w_snd, state=state, cfg=cfg)
+            result = analyze_window(window, sample_rate, config, state)
             frames.append({
-                't':   t,
-                'f1':  r['f1'] if r['voiced'] else None,
-                'f2':  r['f2'] if r['voiced'] else None,
-                'rms': frame_rms,
+                't':   time_sec,
+                'f1':  result['f1'] if result['voiced'] else None,
+                'f2':  result['f2'] if result['voiced'] else None,
+                'rms': window_rms,
             })
         except Exception:
-            frames.append({'t': t, 'f1': None, 'f2': None, 'rms': frame_rms})
+            frames.append({'t': time_sec, 'f1': None, 'f2': None, 'rms': window_rms})
 
-    return frames, round(dur, 3)
+    return frames, round(duration_sec, 3)
 
 
-# ── HTTP endpoints ─────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# HTTP endpoints
+# ══════════════════════════════════════════════════════════════════════════════
 
 @app.route('/ping')
 def ping():
@@ -389,226 +469,252 @@ def ping():
 
 
 @app.route('/analyze', methods=['POST'])
-def analyze():
+def http_analyze():
     """
-    Single-window formant analysis.
+    Single-window formant analysis for the practice tool and verifier.
 
-    Used by:
-      * Practice tool (record + analyse a sustained vowel)
-      * verifyFromIpaAudio() in realtime.js
-
-    Accepts raw WAV or Int16 PCM in the request body.
-    Optional headers:
-      X-Window-Start  — start of analysis window as fraction of total (default 0)
-      X-Window-End    — end   of analysis window as fraction of total (default 1)
+    Flow: parse audio → validate duration → trim to window fraction →
+          analyze_window (default config) → return {f1, f2, duration_ms}.
     """
     if not request.data:
         return jsonify({'error': 'No audio data'}), 400
 
-    samples, sr = _parse_wav_body(request.data)
-    dur_ms      = len(samples) / sr * 1000
+    audio_samples, sample_rate = parse_wav_or_pcm(request.data)
+    duration_ms                = len(audio_samples) / sample_rate * 1000
+    minimum_duration_ms        = ConnConfig().window_ms
 
-    # Minimum duration = one analysis window (default 25 ms).
-    min_dur_ms = ConnConfig().window_ms
-    if dur_ms < min_dur_ms:
-        return jsonify({'error': f'Duration {dur_ms:.0f} ms < minimum {min_dur_ms:.0f} ms'}), 400
+    if duration_ms < minimum_duration_ms:
+        return jsonify({
+            'error': f'Audio too short: {duration_ms:.0f} ms '
+                     f'(minimum is one analysis window = {minimum_duration_ms:.0f} ms)'
+        }), 400
 
-    ws_start, ws_end = _get_window_fraction(request)
-    samples = _window_samples(samples, ws_start, ws_end)
+    window_start, window_end = read_window_fraction_headers(request)
+    analysis_samples         = trim_to_window_fraction(audio_samples, window_start, window_end)
 
     try:
-        snd = parselmouth.Sound(samples, sampling_frequency=float(sr))
-        r   = analyze_best(snd)
-        if not r['voiced']:
+        result = analyze_window(analysis_samples, sample_rate)
+        if not result['voiced']:
             return jsonify({'error': 'No voiced speech detected'}), 400
-        return jsonify({'f1': r['f1'], 'f2': r['f2'], 'duration_ms': round(dur_ms)})
-    except Exception as ex:
-        return jsonify({'error': str(ex)}), 500
+        return jsonify({'f1': result['f1'], 'f2': result['f2'], 'duration_ms': round(duration_ms)})
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
 
 
 @app.route('/analyze-file', methods=['POST'])
-def analyze_file():
+def http_analyze_file():
     """
     Whole-file frame-by-frame analysis for the debug page's reference audio.
 
+    Flow: save uploaded file → parse config from form → analyze_all_windows →
+          return {frames: [{t, f1, f2, rms}], duration}.
+
     Accepts multipart/form-data:
-      file   — audio file (any format Praat can read)
-      config — JSON string with ConnConfig field overrides (optional)
-
-    Returns: {frames: [{t, f1, f2, rms}, ...], duration}
+      file   — audio file (any format readable by Praat / libsndfile)
+      config — JSON string of ConnConfig field overrides  (optional)
     """
-    file = request.files.get('file')
-    if not file:
-        return jsonify({'error': 'no file'}), 400
+    uploaded_file = request.files.get('file')
+    if not uploaded_file:
+        return jsonify({'error': 'No file uploaded'}), 400
 
-    cfg = ConnConfig()
+    config = ConnConfig()
     try:
-        cfg.update(json.loads(request.form.get('config', '{}')))
+        config.update_from_dict(json.loads(request.form.get('config', '{}')))
     except Exception:
-        pass
+        pass   # malformed config → use defaults
 
-    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as f:
-        file.save(f.name)
-        tmp = f.name
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:
+        uploaded_file.save(tmp.name)
+        tmp_path = tmp.name
 
     try:
-        frames, duration = _analyze_file_frames(tmp, cfg)
-        return jsonify({'frames': frames, 'duration': duration})
-    except Exception as ex:
-        return jsonify({'error': str(ex)}), 500
+        frames, duration_sec = analyze_all_windows(tmp_path, config)
+        return jsonify({'frames': frames, 'duration': duration_sec})
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
     finally:
-        os.unlink(tmp)
+        os.unlink(tmp_path)
 
 
 @app.route('/analyze-debug', methods=['POST'])
-def analyze_debug():
+def http_analyze_debug():
     """
-    Diagnostic endpoint — returns raw Praat formant values from all three
-    configs (FRONT, BACK, SCAN) with no range-checking or phantom fix.
+    Diagnostic endpoint — raw Praat output from FRONT, BACK, and SCAN configs.
 
-    Useful for diagnosing why a particular recording is being rejected
-    or why a specific vowel produces unexpected results.
+    No range-checking, no phantom fix, no continuity.  Use this to diagnose
+    why a recording is being rejected or producing unexpected values.
+
+    Returns bandwidths alongside formant frequencies so you can see whether
+    a formant is a sharp resonance (narrow bandwidth) or noise (wide bandwidth).
     """
     if not request.data:
         return jsonify({'error': 'No audio data'}), 400
 
-    samples, sr  = _parse_wav_body(request.data)
-    ws_start, ws_end = _get_window_fraction(request)
-    samples      = _window_samples(samples, ws_start, ws_end)
+    audio_samples, sample_rate = parse_wav_or_pcm(request.data)
+    window_start, window_end   = read_window_fraction_headers(request)
+    analysis_samples           = trim_to_window_fraction(audio_samples, window_start, window_end)
 
     try:
-        snd   = parselmouth.Sound(samples, sampling_frequency=float(sr))
-        t     = snd.duration / 2
-        cfg   = ConnConfig()   # default params for SCAN/BACK columns
-        named = [
-            ('FRONT', _DEBUG_FRONT_CFG),
-            ('BACK',  cfg.back_cfg()),
-            ('SCAN',  cfg.scan_cfg()),
+        sound        = make_praat_sound(analysis_samples, sample_rate)
+        midpoint_sec = sound.duration / 2
+        default_cfg  = ConnConfig()
+
+        named_configs = [
+            ('FRONT', _DEBUG_LEGACY_FRONT_CFG),
+            ('BACK',  default_cfg.back_burg_kwargs()),
+            ('SCAN',  default_cfg.scan_burg_kwargs()),
         ]
-        configs_out = {}
-        for name, kwargs in named:
+        configs_output = {}
+
+        for config_name, burg_kwargs in named_configs:
             try:
-                fmts = snd.to_formant_burg(**kwargs)
-                n_max = kwargs['max_number_of_formants'] + 1
-                formants = {}
-                for n in range(1, n_max + 1):
-                    v  = fmts.get_value_at_time(n, t)
-                    bw = call(fmts, 'Get bandwidth at time', n, t, 'hertz', 'Linear')
-                    formants[f'F{n}']  = None if math.isnan(v)  else round(v,  1)
-                    formants[f'BW{n}'] = None if math.isnan(bw) else round(bw, 1)
-                configs_out[name] = {
-                    'ceiling':  kwargs['maximum_formant'],
-                    'n':        kwargs['max_number_of_formants'],
-                    'formants': formants,
+                formant_track  = sound.to_formant_burg(**burg_kwargs)
+                max_pole_index = burg_kwargs['max_number_of_formants'] + 1
+                formant_values = {}
+
+                for pole_index in range(1, max_pole_index + 1):
+                    frequency = formant_track.get_value_at_time(pole_index, midpoint_sec)
+                    bandwidth = call(formant_track, 'Get bandwidth at time',
+                                     pole_index, midpoint_sec, 'hertz', 'Linear')
+                    formant_values[f'F{pole_index}']  = None if math.isnan(frequency) else round(frequency, 1)
+                    formant_values[f'BW{pole_index}'] = None if math.isnan(bandwidth)  else round(bandwidth,  1)
+
+                configs_output[config_name] = {
+                    'ceiling':  burg_kwargs['maximum_formant'],
+                    'n':        burg_kwargs['max_number_of_formants'],
+                    'formants': formant_values,
                 }
-            except Exception as ex:
-                configs_out[name] = {'error': str(ex)}
+            except Exception as error:
+                configs_output[config_name] = {'error': str(error)}
 
         return jsonify({
-            'sample_rate':    sr,
-            'duration_ms':    round(len(samples) / sr * 1000),
-            'analysis_t_ms':  round(t * 1000),
-            'configs':        configs_out,
+            'sample_rate':   sample_rate,
+            'duration_ms':   round(len(analysis_samples) / sample_rate * 1000),
+            'analysis_t_ms': round(midpoint_sec * 1000),
+            'configs':       configs_output,
         })
-    except Exception as ex:
-        return jsonify({'error': str(ex)}), 500
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
 
 
-# ── WebSocket streaming ────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# WebSocket streaming
+# ══════════════════════════════════════════════════════════════════════════════
 
-async def ws_handler(ws) -> None:
+async def ws_handler(websocket) -> None:
     """
     Handle one WebSocket connection.
 
     Audio flow
     ~~~~~~~~~~
-    Client sends 128-sample Int16 chunks (2.9 ms at 44 100 Hz).
-    Server accumulates them in a ring buffer (WINDOW_SAMP samples).
-    Every STEP_MS of new audio, the ring is analysed and a result is sent.
+    The client sends 128-sample Int16 chunks (~2.9 ms at 44 100 Hz).
+    The server accumulates them in a ring buffer (RING_BUFFER_SAMPLES samples).
+    Every ANALYSIS_STEP_MS of new audio it analyses the full ring and sends one
+    voiced/unvoiced frame back.
 
     Control messages (text frames)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    {type: 'init',   sample_rate: <int>}  — reset state, update SR
-    {type: 'reset'}                       — flush continuity, clear ring
-    {type: 'config', <ConnConfig fields>} — update analysis params
+    ``{type:'init',   sample_rate:<int>}``  — (re)start with given sample rate
+    ``{type:'reset'}``                       — flush ring and continuity state
+    ``{type:'config', <ConnConfig fields>}`` — update analysis parameters live
     """
-    sr    = 44100
-    state = ConnState()
-    ring  = deque(maxlen=WINDOW_SAMP)
-    since = 0          # samples received since the last analysis trigger
-    cfg   = ConnConfig()
+    sample_rate                  = 44_100
+    continuity_state             = ConnState()
+    audio_ring                   = deque(maxlen=RING_BUFFER_SAMPLES)
+    samples_since_last_analysis  = 0
+    config                       = ConnConfig()
 
     try:
-        async for msg in ws:
-            # ── Text: control message ──────────────────────────────────
-            if isinstance(msg, str):
+        async for message in websocket:
+
+            # ── Text frame: control message ────────────────────────────────
+            if isinstance(message, str):
                 try:
-                    c    = json.loads(msg)
-                    kind = c.get('type', '')
-                    if kind == 'init':
-                        sr = int(c.get('sample_rate', 44100))
-                        state.reset(); ring.clear(); since = 0
-                    elif kind == 'reset':
-                        state.reset(); ring.clear(); since = 0
-                    elif kind == 'config':
-                        cfg.update(c)
-                        state.reset()   # reset continuity after param change
+                    payload      = json.loads(message)
+                    message_type = payload.get('type', '')
+
+                    if message_type == 'init':
+                        sample_rate = int(payload.get('sample_rate', 44_100))
+                        continuity_state.reset()
+                        audio_ring.clear()
+                        samples_since_last_analysis = 0
+
+                    elif message_type == 'reset':
+                        continuity_state.reset()
+                        audio_ring.clear()
+                        samples_since_last_analysis = 0
+
+                    elif message_type == 'config':
+                        config.update_from_dict(payload)
+                        continuity_state.reset()   # continuity is per-vowel, not per-config
+
                 except Exception:
                     pass
                 continue
 
-            # ── Binary: PCM audio chunk ────────────────────────────────
-            if len(msg) < 64:
+            # ── Binary frame: PCM audio ────────────────────────────────────
+            too_short = len(message) < 64
+            if too_short:
                 continue
 
-            chunk = _decode_pcm(msg)
-            ring.extend(chunk)
-            since += len(chunk)
+            incoming_chunk              = decode_int16_pcm(message)
+            audio_ring.extend(incoming_chunk)
+            samples_since_last_analysis += len(incoming_chunk)
 
-            step = int(sr * STEP_MS / 1000)   # samples per analysis step
-            if since < step or len(ring) < WINDOW_SAMP:
+            step_samples = int(sample_rate * ANALYSIS_STEP_MS / 1000)
+            ring_not_full   = len(audio_ring) < RING_BUFFER_SAMPLES
+            not_enough_new  = samples_since_last_analysis < step_samples
+            if ring_not_full or not_enough_new:
                 continue
-            since = 0
+            samples_since_last_analysis = 0
 
-            buf       = np.array(ring)
-            frame_rms = round(_rms(buf), 6)
+            window_samples = np.array(audio_ring)
+            window_rms     = round(compute_rms(window_samples), 6)
 
-            # ── Energy gate ────────────────────────────────────────────
-            # Disabled (energy_floor=0) for the practice app, which gates
-            # client-side.  Enabled for the debug page via config message.
-            if cfg.energy_floor > 0 and frame_rms < cfg.energy_floor:
-                await ws.send(json.dumps({'frames': [
-                    {'voiced': False, 'f1': None, 'f2': None, 'rms': frame_rms}
-                ]}))
+            # ── Energy gate (disabled when energy_floor == 0) ─────────────
+            below_energy_floor = config.energy_floor > 0 and window_rms < config.energy_floor
+            if below_energy_floor:
+                silent_result = {'voiced': False, 'f1': None, 'f2': None, 'rms': window_rms}
+                await websocket.send(json.dumps({'frames': [silent_result]}))
                 continue
 
+            # ── Analyse and stream result ──────────────────────────────────
             try:
-                snd = parselmouth.Sound(buf, float(sr))
-                r   = analyze_best(snd, state=state, cfg=cfg)
-                r['rms'] = frame_rms
-                await ws.send(json.dumps({'frames': [r]}))
-            except Exception as ex:
-                await ws.send(json.dumps({'frames': [], 'error': str(ex)}))
+                result = analyze_window(window_samples, sample_rate, config, continuity_state)
+                frame  = {'voiced': result['voiced'],
+                          'f1':     result['f1'],
+                          'f2':     result['f2'],
+                          'rms':    window_rms,
+                          't':      result['t_ms']}
+                await websocket.send(json.dumps({'frames': [frame]}))
+            except Exception as error:
+                await websocket.send(json.dumps({'frames': [], 'error': str(error)}))
 
     except Exception:
-        pass
+        pass   # client disconnected
 
 
-# ── WebSocket server thread ───────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# WebSocket server thread
+# ══════════════════════════════════════════════════════════════════════════════
 
-def _run_ws() -> None:
-    """Run the websockets server on port 5051 in its own event loop."""
-    import websockets as _ws
+def _start_websocket_server() -> None:
+    """Launch the websockets server on port 5051 in a background thread."""
+    import websockets as _websockets
 
-    async def _serve():
-        async with _ws.serve(ws_handler, 'localhost', 5051):
-            await asyncio.Future()   # run forever
+    async def _serve_forever():
+        async with _websockets.serve(ws_handler, 'localhost', 5051):
+            await asyncio.Future()   # run until cancelled
 
-    asyncio.run(_serve())
+    asyncio.run(_serve_forever())
 
 
-threading.Thread(target=_run_ws, daemon=True).start()
+threading.Thread(target=_start_websocket_server, daemon=True).start()
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Entry point
+# ══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
     print('HTTP :5050   WS :5051')
