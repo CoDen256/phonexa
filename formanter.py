@@ -1,17 +1,11 @@
 """
-analyze_server.py — Phase 4: sliding-window server + bandwidth filter.
+analyze_server.py  — dual-ceiling formant tracker
+HTTP :5050   /ping  /analyze  /analyze-file  /analyze-debug
+WS   :5051          streaming with per-connection config
 
-Key changes from Phase 3:
-  - Server maintains ring buffer; analyzes every STEP_MS of new audio.
-    Client sends raw 128-sample AudioWorklet chunks → ~87 analyses/sec instead of ~30.
-  - Bandwidth filter: rejects formants with bandwidth > MAX_BW Hz.
-    Wide bandwidth = broad spectral peak = noise/tracking error. Copied from reference.
-  - Accepts float32 or int16 PCM from client.
-
-HTTP :5050   /ping  /analyze  /analyze-debug
-WS   :5051          streaming
+pip install flask flask-cors parselmouth numpy websockets
 """
-import math, json, struct, asyncio, threading
+import json, math, os, struct, asyncio, threading, tempfile
 from collections import deque
 
 import numpy as np
@@ -23,26 +17,51 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# ── Praat configs ─────────────────────────────────────────────────────────────
-CFG_BACK = dict(time_step=0.010, max_number_of_formants=2,
-                maximum_formant=1800.0, window_length=0.025, pre_emphasis_from=50.0)
+# ── Base Praat configs (overridden per-connection via conn_cfg) ───────────────
 CFG_SCAN = dict(time_step=0.010, max_number_of_formants=5,
                 maximum_formant=5000.0, window_length=0.025, pre_emphasis_from=50.0)
-CFG_FRONT = dict(time_step=0.010, max_number_of_formants=3,
-                 maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0)  # kept for debug endpoint
+CFG_BACK = dict(time_step=0.010, max_number_of_formants=2,
+                maximum_formant=1800.0, window_length=0.025, pre_emphasis_from=50.0)
+CFG_FRONT = dict(time_step=0.010, max_number_of_formants=3,  # debug endpoint only
+                 maximum_formant=4200.0, window_length=0.025, pre_emphasis_from=50.0)
 
-F1_RANGE  = (150, 1100)
-F2_RANGE  = (400, 3200)
-MAX_BW    = 400      # Hz — formants with wider bandwidth are rejected (reference default)
+F1_RANGE = (150, 1100)
+F2_RANGE = (400, 3200)
 
-# ── Sliding window params ─────────────────────────────────────────────────────
-STEP_MS      = 10                  # analyse every N ms of NEW audio received
-WINDOW_SAMP  = 4096                # ring buffer size (93ms at 44100Hz)
+STEP_MS     = 10
+WINDOW_SAMP = 4096   # ring buffer samples (~93ms at 44100Hz)
+
+# ── Per-connection config defaults (sent by debug.html sliders) ───────────────
+DEFAULT_CONN_CFG = {
+    'max_f':               5000,   # CFG_SCAN maximum_formant
+    'n_formants':          5,      # CFG_SCAN max_number_of_formants
+    'window_ms':           25,     # analysis window length in ms
+    'pre_emphasis':        50,     # pre-emphasis from (Hz)
+    'back_ceiling':        1800,   # CFG_BACK maximum_formant
+    'back_ceiling_ratio':  0.95,   # prefer BACK when f2_b < back_ceiling × ratio
+    'back_front_ratio':    0.75,   # prefer BACK when f2_b < f2_scan × ratio
+}
 
 
-# ── ConnState — continuity tracking only ──────────────────────────────────────
+def _make_cfgs(conn_cfg):
+    """Build parselmouth kwargs from per-connection config."""
+    wl = float(conn_cfg.get('window_ms', 25)) / 1000
+    pe = float(conn_cfg.get('pre_emphasis', 50))
+    scan = {**CFG_SCAN,
+            'maximum_formant':       float(conn_cfg.get('max_f', 5000)),
+            'max_number_of_formants': int(conn_cfg.get('n_formants', 5)),
+            'window_length':          wl,
+            'pre_emphasis_from':      pe}
+    back = {**CFG_BACK,
+            'maximum_formant':  float(conn_cfg.get('back_ceiling', 1800)),
+            'window_length':    wl,
+            'pre_emphasis_from': pe}
+    return scan, back
+
+
+# ── ConnState ─────────────────────────────────────────────────────────────────
 class ConnState:
-    """Un-swap F1/F2 if tracks cross. No EMA — client does median smoothing."""
+    """Continuity tracking only — no EMA (client does median smoothing)."""
     def __init__(self): self.reset()
     def reset(self): self.p1 = self.p2 = None
     def process(self, f1, f2):
@@ -55,35 +74,32 @@ class ConnState:
 
 # ── Praat helpers ─────────────────────────────────────────────────────────────
 def _praat_get(snd, cfg):
-    """Run Burg LPC. F2 range NOT checked here — phantoms must reach _fix_phantom."""
+    """Run Burg LPC; validate F1 range only (F2 phantoms pass through to _fix_phantom)."""
     try:
         fmts = snd.to_formant_burg(**cfg)
         t    = snd.duration / 2
         f1   = fmts.get_value_at_time(1, t)
         f2   = fmts.get_value_at_time(2, t)
         if math.isnan(f1) or math.isnan(f2) or not F1_RANGE[0] <= f1 <= F1_RANGE[1]:
-            return None, None, None
-        # ── Bandwidth filter (from reference) ─────────────────────────────────
-        bw1 = call(fmts, "Get bandwidth at time", 1, t, "hertz", "Linear")
-        bw2 = call(fmts, "Get bandwidth at time", 2, t, "hertz", "Linear")
-        if math.isnan(bw1) or bw1 > MAX_BW:
-            return None, None, None   # F1 bandwidth too wide → noisy frame
-        return f1, f2, fmts           # return fmts for phantom fix
+            return None, None
+        return f1, f2
     except Exception:
-        return None, None, None
+        return None, None
 
 
-def _fix_phantom(f1, f2, snd):
+def _fix_phantom(f1, f2, snd, cfg_scan):
     """
-    For close front vowels (F1<350Hz, F2/F1<1.7): the LPC places a phantom
-    pole between F1 and the real F2. Re-scan with n=5 to find the real F2.
+    Close front vowels (F1<350Hz, F2/F1<1.7) often have a phantom LPC pole
+    between F1 and the real F2. Re-scan with more formants to find the real F2.
     """
     if f1 is None or f2 is None or f1 >= 350 or (f2 / f1) >= 1.7:
         return f1, f2
     try:
-        fmts = snd.to_formant_burg(**CFG_SCAN)
+        # Use at least 5 formants for phantom scan
+        scan_cfg = {**cfg_scan, 'max_number_of_formants': max(5, cfg_scan['max_number_of_formants'])}
+        fmts = snd.to_formant_burg(**scan_cfg)
         t    = snd.duration / 2
-        for n in range(2, 6):
+        for n in range(2, scan_cfg['max_number_of_formants'] + 2):
             candidate = fmts.get_value_at_time(n, t)
             if (not math.isnan(candidate)
                     and candidate > f1 * 2.0
@@ -94,27 +110,32 @@ def _fix_phantom(f1, f2, snd):
     return f1, f2
 
 
-def analyze_best(snd, state=None):
+def analyze_best(snd, state=None, conn_cfg=None):
     """
-    Dual-ceiling + bandwidth filter + phantom fix.
-    Primary: CFG_SCAN (n=5, 5000Hz) — robust for all vowels including /i/.
-    Disambiguation: CFG_BACK (n=2, 1800Hz) for back vowels (/u/ /o/).
+    Dual-ceiling formant analysis + phantom fix.
+    conn_cfg overrides the default algorithm parameters per-connection.
     """
+    if conn_cfg is None:
+        conn_cfg = DEFAULT_CONN_CFG
+
     t_ms = round(snd.duration / 2 * 1000)
     if snd.duration < 0.025:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
 
-    f1_b, f2_b, _ = _praat_get(snd, CFG_BACK)
-    f1_f, f2_f, _ = _praat_get(snd, CFG_SCAN)
+    cfg_scan, cfg_back = _make_cfgs(conn_cfg)
+
+    f1_b, f2_b = _praat_get(snd, cfg_back)
+    f1_f, f2_f = _praat_get(snd, cfg_scan)
 
     BACK_VALID  = f1_b is not None and f2_b is not None
     FRONT_VALID = f1_f is not None and f2_f is not None
-    BACK_CEILING_THRESHOLD = CFG_BACK['maximum_formant'] * 0.95  # 1710Hz
+    back_ceil_thresh = float(conn_cfg.get('back_ceiling', 1800)) * float(conn_cfg.get('back_ceiling_ratio', 0.95))
+    back_front_ratio = float(conn_cfg.get('back_front_ratio', 0.75))
 
     use_back = (
             BACK_VALID and FRONT_VALID
-            and f2_b < BACK_CEILING_THRESHOLD
-            and f2_b < f2_f * 0.75
+            and f2_b < back_ceil_thresh
+            and f2_b < f2_f * back_front_ratio
     )
 
     if use_back:
@@ -126,7 +147,7 @@ def analyze_best(snd, state=None):
     else:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
 
-    f1_raw, f2_raw = _fix_phantom(f1_raw, f2_raw, snd)
+    f1_raw, f2_raw = _fix_phantom(f1_raw, f2_raw, snd, cfg_scan)
 
     if not F2_RANGE[0] <= f2_raw <= F2_RANGE[1]:
         return {'voiced': False, 'f1': None, 'f2': None, 't': t_ms}
@@ -139,10 +160,8 @@ def analyze_best(snd, state=None):
     return {'voiced': True, 'f1': f1, 'f2': f2, 't': t_ms}
 
 
-def _decode_pcm(msg, sr):
-    """Decode Int16 PCM from client. Client always sends Int16 (see realtime.js _accumulate).
-    Note: float32 detection was removed — Int16 bytes often pass abs<=1.0 float32 check
-    (small values give denormal float32 representations), causing near-zero audio → no formants."""
+def _decode_pcm(msg):
+    """Always decode as Int16 — that's what our clients send."""
     return np.frombuffer(msg, dtype=np.int16).astype(np.float64) / 32768.0
 
 
@@ -154,6 +173,7 @@ def ping():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
+    """Single-window analysis for the practice tool."""
     data = request.data
     if not data: return jsonify({'error': 'No audio data'}), 400
     if data[:4] == b'RIFF':
@@ -163,9 +183,9 @@ def analyze():
         sr, s = 16000, np.frombuffer(data, dtype=np.int16).astype(np.float64) / 32768.0
     dur = len(s) / sr * 1000
     if dur < 50: return jsonify({'error': 'Duration < 50ms'}), 400
-    ws_start = float(request.headers.get('X-Window-Start', 0))
-    ws_end   = float(request.headers.get('X-Window-End', 1))
-    s = s[int(ws_start * len(s)):int(ws_end * len(s))]
+    ws_s = float(request.headers.get('X-Window-Start', 0))
+    ws_e = float(request.headers.get('X-Window-End', 1))
+    s = s[int(ws_s * len(s)):int(ws_e * len(s))]
     try:
         snd = parselmouth.Sound(s, sampling_frequency=float(sr))
         r   = analyze_best(snd)
@@ -175,9 +195,65 @@ def analyze():
         return jsonify({'error': str(ex)}), 500
 
 
+@app.route('/analyze-file', methods=['POST'])
+def analyze_file():
+    """
+    Whole-file frame-by-frame analysis — used by debug.html for reference audio.
+    Accepts multipart form: file=<audio>, config=<json string with conn_cfg keys>.
+    Returns {frames: [{t, f1, f2, rms}], duration}.
+    """
+    file = request.files.get('file')
+    if not file: return jsonify({'error': 'no file'}), 400
+
+    conn_cfg = dict(DEFAULT_CONN_CFG)
+    try:
+        cfg_update = json.loads(request.form.get('config', '{}'))
+        for k in DEFAULT_CONN_CFG:
+            if k in cfg_update:
+                conn_cfg[k] = cfg_update[k]
+    except Exception:
+        pass
+
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as f:
+        file.save(f.name); tmp = f.name
+
+    try:
+        snd      = parselmouth.Sound(tmp)
+        sr       = snd.sampling_frequency
+        samples  = snd.values[0].astype(np.float64)
+        dur      = snd.duration
+
+        step_n   = max(1, int(sr * STEP_MS / 1000))
+        win_n    = WINDOW_SAMP
+        state    = ConnState()
+        frames   = []
+
+        pos = win_n
+        while pos <= len(samples):
+            win = samples[pos - win_n:pos]
+            rms = float(np.sqrt(np.mean(win ** 2)))
+            t   = round(pos / sr, 3)
+            try:
+                w_snd = parselmouth.Sound(win, sampling_frequency=float(sr))
+                r     = analyze_best(w_snd, state=state, conn_cfg=conn_cfg)
+                frames.append({'t': t,
+                               'f1': r['f1'] if r['voiced'] else None,
+                               'f2': r['f2'] if r['voiced'] else None,
+                               'rms': round(rms, 6)})
+            except Exception:
+                frames.append({'t': t, 'f1': None, 'f2': None, 'rms': round(rms, 6)})
+            pos += step_n
+
+        return jsonify({'frames': frames, 'duration': round(dur, 3)})
+    except Exception as ex:
+        return jsonify({'error': str(ex)}), 500
+    finally:
+        os.unlink(tmp)
+
+
 @app.route('/analyze-debug', methods=['POST'])
 def analyze_debug():
-    """Raw Praat values with no filtering — for diagnosing rejections."""
+    """Raw Praat formant values — for diagnosing rejections."""
     data = request.data
     if not data: return jsonify({'error': 'No audio data'}), 400
     if data[:4] == b'RIFF':
@@ -200,7 +276,7 @@ def analyze_debug():
                 for n in range(1, cfg['max_number_of_formants'] + 2):
                     v  = fmts.get_value_at_time(n, t)
                     bw = call(fmts, "Get bandwidth at time", n, t, "hertz", "Linear")
-                    vals[f'F{n}'] = None if math.isnan(v) else round(v, 1)
+                    vals[f'F{n}']  = None if math.isnan(v)  else round(v, 1)
                     vals[f'BW{n}'] = None if math.isnan(bw) else round(bw, 1)
                 out['configs'][name] = {'ceiling': cfg['maximum_formant'],
                                         'n': cfg['max_number_of_formants'], 'formants': vals}
@@ -211,44 +287,50 @@ def analyze_debug():
         return jsonify({'error': str(ex)}), 500
 
 
-# ── WebSocket streaming — sliding window ──────────────────────────────────────
+# ── WebSocket streaming ────────────────────────────────────────────────────────
 async def ws_handler(ws):
-    sr    = 44100
-    state = ConnState()
-    ring  = deque(maxlen=WINDOW_SAMP)
-    since = 0   # samples received since last analysis
+    sr       = 44100
+    state    = ConnState()
+    ring     = deque(maxlen=WINDOW_SAMP)
+    since    = 0
+    conn_cfg = dict(DEFAULT_CONN_CFG)
 
     try:
         async for msg in ws:
-            # ── Text: control messages ─────────────────────────────────────
             if isinstance(msg, str):
                 try:
                     c = json.loads(msg)
-                    if c.get('type') == 'init':
+                    t = c.get('type', '')
+                    if t == 'init':
                         sr = int(c.get('sample_rate', 44100))
                         state.reset(); ring.clear(); since = 0
-                    elif c.get('type') == 'reset':
+                    elif t == 'reset':
                         state.reset(); ring.clear(); since = 0
+                    elif t == 'config':
+                        for k in DEFAULT_CONN_CFG:
+                            if k in c:
+                                conn_cfg[k] = c[k]
+                        state.reset()  # reset continuity when params change
                 except Exception:
                     pass
                 continue
 
-            if len(msg) < 64:
-                continue
+            if len(msg) < 64: continue
 
-            # ── Binary: PCM audio chunk ────────────────────────────────────
-            chunk = _decode_pcm(msg, sr)
+            chunk = _decode_pcm(msg)
+            rms   = float(np.sqrt(np.mean(chunk ** 2)))
             ring.extend(chunk)
             since += len(chunk)
 
-            step = int(sr * STEP_MS / 1000)   # 441 at 44100Hz = 10ms
+            step = int(sr * STEP_MS / 1000)
             if since < step or len(ring) < WINDOW_SAMP:
-                continue    # not enough new audio yet
-
+                continue
             since = 0
+
             try:
                 snd = parselmouth.Sound(np.array(ring), float(sr))
-                r   = analyze_best(snd, state=state)
+                r   = analyze_best(snd, state=state, conn_cfg=conn_cfg)
+                r['rms'] = round(rms, 6)
                 await ws.send(json.dumps({'frames': [r]}))
             except Exception as ex:
                 await ws.send(json.dumps({'frames': [], 'error': str(ex)}))

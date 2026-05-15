@@ -2,865 +2,597 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Formant Tracker</title>
+  <title>Formant Debug — Our Server</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      background: #0e1117;
-      color: #eee;
-      font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      gap: 10px;
+      background: #0e1117; color: #eee; font-family: monospace;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px; gap: 10px;
     }
-
     h2 { font-size: 1rem; font-weight: normal; color: #888; letter-spacing: .08em; }
-
-    /* ── top controls ── */
-    .controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
+    .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
     .divider { color: #2a2f3a; }
-
     button {
-      padding: 7px 16px;
-      border-radius: 5px;
-      border: 1px solid #2a2f3a;
-      background: #161b27;
-      color: #ccc;
-      font-family: monospace;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: background .12s;
+      padding: 7px 16px; border-radius: 5px; border: 1px solid #2a2f3a;
+      background: #161b27; color: #ccc; font-family: monospace;
+      font-size: 0.82rem; cursor: pointer; transition: background .12s;
     }
     button:hover:not(:disabled) { background: #1e2535; border-color: #3a4050; }
     button:disabled { opacity: 0.35; cursor: default; }
     button.active { border-color: #4a90d9; color: #4a90d9; }
-
     .status { font-size: 0.75rem; color: #555; min-width: 70px; }
-
-    /* ── settings panel ── */
     #settingsPanel {
-      width: 100%;
-      max-width: 1094px;   /* matches canvas row */
-      background: #111722;
-      border: 1px solid #1e2530;
-      border-radius: 6px;
-      padding: 12px 16px;
-      display: none;
+      width: 100%; max-width: 1094px;
+      background: #111722; border: 1px solid #1e2530;
+      border-radius: 6px; padding: 12px 16px; display: none;
     }
-
-    .settings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 8px 24px;
-    }
-
-    .setting-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .setting-row label {
-      font-size: 0.75rem;
-      color: #778;
-      min-width: 100px;
-      text-align: right;
-    }
-
-    .setting-row input[type=range] {
-      flex: 1;
-      accent-color: #4a90d9;
-      height: 3px;
-      cursor: pointer;
-    }
-
-    .setting-row input[type=number] {
-      width: 52px;
-      background: #161b27;
-      border: 1px solid #2a2f3a;
-      border-radius: 3px;
-      color: #ccc;
-      font-family: monospace;
-      font-size: 0.75rem;
-      padding: 2px 4px;
-      text-align: right;
-    }
-
-    .setting-val {
-      font-size: 0.75rem;
-      color: #4a90d9;
-      min-width: 64px;
-      text-align: left;
-    }
-
-    .settings-hint {
-      font-size: 0.68rem;
-      color: #3a4050;
-      margin-top: 8px;
-    }
-
-    /* ── legend ── */
-    .legend {
-      display: flex;
-      gap: 14px;
-      font-size: 0.72rem;
-      color: #666;
-    }
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 8px 24px; }
+    .setting-row { display: flex; align-items: center; gap: 8px; }
+    .setting-row label { font-size: 0.75rem; color: #778; min-width: 150px; text-align: right; }
+    .setting-row input[type=range] { flex: 1; accent-color: #4a90d9; height: 3px; cursor: pointer; }
+    .setting-val { font-size: 0.75rem; color: #4a90d9; min-width: 70px; }
+    .settings-section { font-size: 0.68rem; color: #446; margin: 8px 0 2px; letter-spacing: .08em; grid-column: 1/-1; border-bottom: 1px solid #1a2030; padding-bottom: 4px; }
+    .settings-hint { font-size: 0.68rem; color: #3a4050; margin-top: 8px; line-height: 1.6; }
+    .legend { display: flex; gap: 14px; font-size: 0.72rem; color: #666; flex-wrap: wrap; }
     .legend span { display: flex; align-items: center; gap: 5px; }
     .swatch-line { width: 14px; height: 2px; border-radius: 1px; display: inline-block; }
-    .swatch-dot  { width: 8px;  height: 8px; border-radius: 50%; display: inline-block; }
-    
-
-    /* ── canvas layout ── */
+    .swatch-dot  { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
     .row { display: flex; gap: 14px; align-items: flex-start; }
     .left-col { display: flex; flex-direction: column; gap: 2px; }
     canvas { display: block; border: 1px solid #1a1f2a; border-radius: 3px; }
     .clabel { font-size: 0.7rem; color: #444; text-align: center; margin-top: 5px; }
-
-.setting-row input[type=checkbox] {
-  width: 16px;
-  height: 16px;
-  accent-color: #4a90d9;
-  cursor: pointer;
-  flex-shrink: 0;
-}
   </style>
 </head>
 <body>
 
-<h2>FORMANT TRACKER · F1 / F2</h2>
+<h2>FORMANT DEBUG &mdash; Our Server (ws://localhost:5051)</h2>
 
-<!-- top controls -->
 <div class="controls">
-  <button id="micBtn">▶ Start mic</button>
+  <button id="micBtn">&#9654; Start mic</button>
   <span id="micStatus" class="status">idle</span>
   <span class="divider">|</span>
   <input type="file" id="refFile" accept="audio/*" style="display:none">
-  <button id="refLoadBtn">📂 Load reference</button>
-  <button id="refPlayBtn" disabled>▶ Play</button>
+  <button id="refLoadBtn">&#128194; Load reference</button>
+  <button id="refPlayBtn" disabled>&#9654; Play</button>
   <span id="refStatus" class="status">no file</span>
   <span class="divider">|</span>
-  <button id="settingsBtn">⚙ Settings</button>
+  <button id="settingsBtn">&#9881; Settings</button>
 </div>
 
-<!-- settings panel -->
 <div id="settingsPanel">
   <div class="settings-grid">
 
+    <div class="settings-section">PRIMARY ANALYSIS (CFG_SCAN)</div>
+
     <div class="setting-row">
-      <label>Max formant (Hz)</label>
-      <input type="range" id="s_max_f" min="4000" max="6000" step="100" value="5000">
+      <label>SCAN ceiling (Hz)</label>
+      <input type="range" id="s_max_f" min="3000" max="7000" step="100" value="5000">
       <span class="setting-val" id="v_max_f">5000 Hz</span>
     </div>
-
     <div class="setting-row">
-      <label>N formants</label>
-      <input type="range" id="s_n_formants" min="3" max="6" step="1" value="5">
+      <label>SCAN n formants</label>
+      <input type="range" id="s_n_formants" min="3" max="7" step="1" value="5">
       <span class="setting-val" id="v_n_formants">5</span>
     </div>
-
     <div class="setting-row">
       <label>Window (ms)</label>
-      <input type="range" id="s_window_ms" min="25" max="100" step="5" value="50">
-      <span class="setting-val" id="v_window_ms">50 ms</span>
+      <input type="range" id="s_window_ms" min="10" max="100" step="5" value="25">
+      <span class="setting-val" id="v_window_ms">25 ms</span>
     </div>
-
     <div class="setting-row">
       <label>Pre-emphasis (Hz)</label>
-      <input type="range" id="s_pre_emphasis" min="0" max="80" step="5" value="25">
-      <span class="setting-val" id="v_pre_emphasis">25 Hz</span>
+      <input type="range" id="s_pre_emphasis" min="0" max="100" step="5" value="50">
+      <span class="setting-val" id="v_pre_emphasis">50 Hz</span>
     </div>
+
+    <div class="settings-section">BACK VOWEL DISAMBIGUATION (CFG_BACK)</div>
+
+    <div class="setting-row">
+      <label>BACK ceiling (Hz)</label>
+      <input type="range" id="s_back_ceiling" min="800" max="2500" step="100" value="1800">
+      <span class="setting-val" id="v_back_ceiling">1800 Hz</span>
+    </div>
+    <div class="setting-row">
+      <label>BACK/ceiling ratio</label>
+      <input type="range" id="s_back_ceiling_ratio" min="70" max="100" step="5" value="95">
+      <span class="setting-val" id="v_back_ceiling_ratio">0.95</span>
+    </div>
+    <div class="setting-row">
+      <label>BACK/FRONT ratio</label>
+      <input type="range" id="s_back_front_ratio" min="50" max="95" step="5" value="75">
+      <span class="setting-val" id="v_back_front_ratio">0.75</span>
+    </div>
+
+    <div class="settings-section">GATE</div>
 
     <div class="setting-row">
       <label>Energy floor</label>
-      <input type="range" id="s_energy_floor" min="1" max="50" step="1" value="5">
+      <input type="range" id="s_energy_floor" min="1" max="60" step="1" value="5">
       <span class="setting-val" id="v_energy_floor">0.005</span>
     </div>
 
-    <div class="setting-row">
-      <label>Pitch min (Hz)</label>
-      <input type="range" id="s_pitch_min" min="50" max="200" step="10" value="75">
-      <span class="setting-val" id="v_pitch_min">75 Hz</span>
-    </div>
-
-    <div class="setting-row">
-      <label>Pitch max (Hz)</label>
-      <input type="range" id="s_pitch_max" min="300" max="800" step="25" value="600">
-      <span class="setting-val" id="v_pitch_max">600 Hz</span>
-    </div>
-    <div class="setting-row">
-      <label>Max bandwidth (Hz)</label>
-      <input type="range" id="s_max_bandwidth" min="100" max="700" step="25" value="400">
-      <span class="setting-val" id="v_max_bandwidth">400 Hz</span>
-    </div>
-    <div class="setting-row">
-  <label>Bandwidth filter</label>
-  <input type="checkbox" id="s_use_bandwidth" checked>
-  <span class="setting-val" id="v_use_bandwidth">on</span>
-</div>
- 
-<div class="setting-row">
-  <label>Viterbi tracking</label>
-  <input type="checkbox" id="s_use_tracking" checked>
-  <span class="setting-val" id="v_use_tracking">on</span>
-</div>
- 
-<div class="setting-row">
-  <label>FastTrack ceilings</label>
-  <input type="checkbox" id="s_use_fasttrack">
-  <span class="setting-val" id="v_use_fasttrack">off</span>
-</div>
- 
-<!-- FastTrack params (shown/hidden with FastTrack toggle) -->
-<div class="setting-row" id="row_ft_min">
-  <label>FT ceiling min</label>
-  <input type="range" id="s_ft_min" min="3500" max="5500" step="250" value="4000">
-  <span class="setting-val" id="v_ft_min">4000 Hz</span>
-</div>
- 
-<div class="setting-row" id="row_ft_max">
-  <label>FT ceiling max</label>
-  <input type="range" id="s_ft_max" min="5000" max="8000" step="250" value="7000">
-  <span class="setting-val" id="v_ft_max">7000 Hz</span>
-</div>
- 
-<div class="setting-row" id="row_ft_step">
-  <label>FT ceiling step</label>
-  <input type="range" id="s_ft_step" min="100" max="1000" step="100" value="500">
-  <span class="setting-val" id="v_ft_step">500 Hz</span>
-</div>
-
   </div>
   <div class="settings-hint">
-    Tip for u/o: lower Max formant → 4000–4500 Hz · fewer N formants → 4 · lower Pre-emphasis → 0–10 Hz
+    <b>Back vowel problems (/u/ /o/ showing too front):</b> raise BACK/FRONT ratio down to 0.60, raise BACK ceiling to 2000.<br>
+    <b>/i/ detection problems:</b> raise SCAN formants to 6-7.<br>
+    <b>Too many rejections (silence):</b> lower Energy floor.<br>
+    Reference audio is re-analyzed automatically 0.6s after any slider change.
   </div>
 </div>
 
-<!-- legend -->
 <div class="legend">
   <span><span class="swatch-line" style="background:#ff4c4c"></span>F1 live</span>
   <span><span class="swatch-line" style="background:#00d4ff"></span>F2 live</span>
   <span><span class="swatch-line" style="background:#ff9900;opacity:.6"></span>F1 ref</span>
   <span><span class="swatch-line" style="background:#aaee00;opacity:.6"></span>F2 ref</span>
-  <span><span class="swatch-dot"  style="background:#ffd700"></span>live pos</span>
-  <span><span class="swatch-dot"  style="background:#ffcc00;opacity:.7"></span>ref pos</span>
+  <span><span class="swatch-dot" style="background:#ffd700"></span>live pos</span>
+  <span><span class="swatch-dot" style="background:#ffcc00;opacity:.7"></span>ref pos</span>
   <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid #ff9900"></span>ref mean</span>
-  <span><span style="display:inline-block;width:8px;height:8px;transform:rotate(45deg);border:2px solid #ffd700"></span>5s mean</span>
+  <span><span style="display:inline-block;width:8px;height:8px;transform:rotate(45deg);border:2px solid #ffd700"></span>live mean</span>
 </div>
 
-<!-- canvases -->
 <div class="row">
   <div class="left-col">
     <canvas id="timeCanvas" width="640" height="260"></canvas>
     <canvas id="rmsCanvas"  width="640" height="120"></canvas>
-    <div class="clabel">time → · F1 left axis (red) · F2 right axis (cyan) · RMS below</div>
+    <div class="clabel">time &#8594; &nbsp; F1 left axis (red) &nbsp; F2 right axis (cyan) &nbsp; RMS below</div>
   </div>
   <div>
     <canvas id="vowelCanvas" width="420" height="420"></canvas>
-    <div class="clabel">vowel space · F2 → · F1 ↓</div>
+    <div class="clabel">vowel space &nbsp; F2 &#8594; &nbsp; F1 &#8595;</div>
   </div>
 </div>
 
 <script>
+  // ─── URLs ─────────────────────────────────────────────────────────────────────
+  const WS_URL  = 'ws://localhost:5051';
+  const API_URL = 'http://localhost:5050/analyze-file';
 
-// ─── Config (mirrors server DEFAULT_CONFIG) ────────────────────────────────────
-const config = {
-  max_f:        5000,
-  n_formants:   5,
-  window_ms:    50,
-  pre_emphasis: 25,
-  energy_floor: 0.005,
-  pitch_min:    75,
-  pitch_max:    600,
-  max_bandwidth: 400,
-  use_bandwidth: true,
-  use_tracking:  true,
-  use_fasttrack: false,
-  ft_min:        4000,
-  ft_max:        7000,
-  ft_step:       500,
-};
-
-// reference mean (computed once when file loads)
-let refMeanF1 = null, refMeanF2 = null;
-
-// live voiced-only buffer — 500 voiced frames = ~5s of actual speech at 10ms/frame
-const VOICED_WINDOW  = 20;
-const voicedF1Buf    = [];
-const voicedF2Buf    = [];
-let   liveMeanF1     = null;
-let   liveMeanF2     = null;
-
-// ─── Canvas constants ──────────────────────────────────────────────────────────
-const WS_URL  = "ws://localhost:8000/ws";
-const API_URL = "http://localhost:8000/analyze";
-
-const F1_MIN = 150,  F1_MAX = 1050;
-const F2_MIN = 450,  F2_MAX = 3100;
-const HISTORY_LEN = 200;
-const TRAIL_LEN   = 80;
-const STEP_MS     = 10;
-const RMS_MIN     = 0.000005;
-const RMS_MAX     = 0.8;
-
-const TPLOT_ML = 52, TPLOT_MR = 52;
-const VML = 52, VMT = 32, VMR = 12, VMB = 28;
-
-const REF_F1_COLOR  = "#ff9900";
-const REF_F2_COLOR  = "#aaee00";
-const REF_DOT_COLOR = "#ffcc00";
-
-// ─── State ─────────────────────────────────────────────────────────────────────
-const f1History  = [], f2History  = [], rmsHistory = [], trail = [];
-let   currentRms = 0;
-
-let refFrames = [], refF1History = [], refF2History = [], refRmsHistory = [];
-let refAudio = null, refPlaying = false, refDuration = 0;
-let refFileObj     = null;   // keep the File so we can re-upload on config change
-let reanalyzeTimer = null;   // debounce handle
-// ─── Canvas refs ───────────────────────────────────────────────────────────────
-const tcvs = document.getElementById("timeCanvas"), tctx = tcvs.getContext("2d");
-const rcvs = document.getElementById("rmsCanvas"),  rctx = rcvs.getContext("2d");
-const vcvs = document.getElementById("vowelCanvas"), vctx = vcvs.getContext("2d");
-  const dpr = window.devicePixelRatio || 1;
-
-function initHiDPI(canvas) {
-  const lw = canvas.width, lh = canvas.height;   // logical size from HTML attr
-  canvas.style.width  = lw + "px";               // keep CSS size the same
-  canvas.style.height = lh + "px";
-  canvas.width        = lw * dpr;                // grow backing store
-  canvas.height       = lh * dpr;
-  canvas.dataset.lw   = lw;                      // stash logical size
-  canvas.dataset.lh   = lh;
-  canvas.getContext("2d").scale(dpr, dpr);       // scale all draw calls
-}
-
-initHiDPI(tcvs);
-initHiDPI(rcvs);
-initHiDPI(vcvs);
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-const clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const norm    = (v, lo, hi) => clamp((v - lo) / (hi - lo), 0, 1);
-const logNorm = v =>
-  (Math.log10(Math.max(v, RMS_MIN)) - Math.log10(RMS_MIN)) /
-  (Math.log10(RMS_MAX)              - Math.log10(RMS_MIN));
-
-// ─── Settings panel ────────────────────────────────────────────────────────────
-document.getElementById("settingsBtn").addEventListener("click", () => {
-  const panel = document.getElementById("settingsPanel");
-  const btn   = document.getElementById("settingsBtn");
-  const open  = panel.style.display === "block";
-  panel.style.display = open ? "none" : "block";
-  btn.classList.toggle("active", !open);
-});
-
-// slider definitions: [sliderId, valueId, configKey, unit, scale]
-// scale: function to convert raw slider int → actual config value (and back)
-const sliderDefs = [
-  { id: "s_max_f",        vid: "v_max_f",        key: "max_f",        fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
-  { id: "s_n_formants",   vid: "v_n_formants",   key: "n_formants",   fmt: v => `${v}`,      toVal: v => v,       toSlider: v => v       },
-  { id: "s_window_ms",    vid: "v_window_ms",    key: "window_ms",    fmt: v => `${v} ms`,   toVal: v => v,       toSlider: v => v       },
-  { id: "s_pre_emphasis", vid: "v_pre_emphasis", key: "pre_emphasis", fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
-  // energy_floor slider: 1–50 maps to 0.001–0.050 (÷1000)
-  { id: "s_energy_floor", vid: "v_energy_floor", key: "energy_floor", fmt: v => v.toFixed(3), toVal: v => v / 1000, toSlider: v => Math.round(v * 1000) },
-  { id: "s_pitch_min",    vid: "v_pitch_min",    key: "pitch_min",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
-  { id: "s_pitch_max",    vid: "v_pitch_max",    key: "pitch_max",    fmt: v => `${v} Hz`,   toVal: v => v,       toSlider: v => v       },
-  { id: "s_max_bandwidth", vid: "v_max_bandwidth", key: "max_bandwidth", fmt: v => `${v} Hz`, toVal: v => v, toSlider: v => v },
-  { id:"s_ft_min",  vid:"v_ft_min",  key:"ft_min",  fmt:v=>`${v} Hz`, toVal:v=>v, toSlider:v=>v },
-{ id:"s_ft_max",  vid:"v_ft_max",  key:"ft_max",  fmt:v=>`${v} Hz`, toVal:v=>v, toSlider:v=>v },
-{ id:"s_ft_step", vid:"v_ft_step", key:"ft_step", fmt:v=>`${v} Hz`, toVal:v=>v, toSlider:v=>v },
-];
-
-const toggleDefs = [
-  { id: "s_use_bandwidth", vid: "v_use_bandwidth", key: "use_bandwidth" },
-  { id: "s_use_tracking",  vid: "v_use_tracking",  key: "use_tracking"  },
-  { id: "s_use_fasttrack", vid: "v_use_fasttrack", key: "use_fasttrack" },
-];
-
-toggleDefs.forEach(def => {
-  const cb    = document.getElementById(def.id);
-  const valEl = document.getElementById(def.vid);
- 
-  // sync initial display to config
-  cb.checked        = !!config[def.key];
-  valEl.textContent = cb.checked ? "on" : "off";
-  valEl.style.color = cb.checked ? "#4a90d9" : "#555";
- 
-  cb.addEventListener("change", () => {
-    config[def.key]   = cb.checked;
-    valEl.textContent = cb.checked ? "on" : "off";
-    valEl.style.color = cb.checked ? "#4a90d9" : "#555";
- 
-    // show/hide FastTrack ceiling sliders
-    if (def.key === "use_fasttrack") {
-      const display = cb.checked ? "flex" : "none";
-      ["row_ft_min", "row_ft_max", "row_ft_step"].forEach(id => {
-        document.getElementById(id).style.display = display;
-      });
-    }
- 
-    sendConfig();
-  });
-});
-
-["row_ft_min", "row_ft_max", "row_ft_step"].forEach(id => {
-  document.getElementById(id).style.display = "none";
-});
-
-sliderDefs.forEach(def => {
-  const slider = document.getElementById(def.id);
-  const valEl  = document.getElementById(def.vid);
-
-  // initialise display
-  valEl.textContent = def.fmt(config[def.key]);
-  slider.value      = def.toSlider(config[def.key]);
-
-  slider.addEventListener("input", () => {
-    const val = def.toVal(Number(slider.value));
-    config[def.key]   = val;
-    valEl.textContent = def.fmt(val);
-    sendConfig();
-  });
-});
-
-function sendConfig() {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(config));
-  }
-
-  // re-analyze reference file 600ms after the slider stops moving
-  if (refFileObj) {
-    clearTimeout(reanalyzeTimer);
-    reanalyzeTimer = setTimeout(reanalyzeRef, 600);
-  }
-}
-
-// ─── WebSocket ─────────────────────────────────────────────────────────────────
-let ws, running = false;
-
-function connectWS() {
-  ws = new WebSocket(WS_URL);
-
-  ws.onopen = () => {
-    setMicStatus("connected ✓");
-    sendConfig();   // push current slider state immediately on connect
+  // ─── Config — mirrors DEFAULT_CONN_CFG in analyze_server.py ──────────────────
+  const config = {
+    max_f:              5000,
+    n_formants:         5,
+    window_ms:          25,
+    pre_emphasis:       50,
+    back_ceiling:       1800,
+    back_ceiling_ratio: 0.95,
+    back_front_ratio:   0.75,
+    energy_floor:       0.005,
   };
 
-  ws.onmessage = ({ data }) => {
-    const { f1, f2, rms } = JSON.parse(data);
-    currentRms = rms ?? 0;
+  // ─── Canvas constants ─────────────────────────────────────────────────────────
+  const F1_MIN = 150, F1_MAX = 1050;
+  const F2_MIN = 450, F2_MAX = 3100;
+  const HISTORY_LEN = 200;
+  const TRAIL_LEN   = 80;
+  const STEP_MS     = 10;
+  const RMS_MIN     = 0.000005;
+  const RMS_MAX     = 0.8;
+  const TPLOT_ML = 52, TPLOT_MR = 52;
+  const VML = 52, VMT = 32, VMR = 12, VMB = 28;
+  const REF_F1_COLOR = '#ff9900', REF_F2_COLOR = '#aaee00', REF_DOT_COLOR = '#ffcc00';
 
-    f1History.push(f1 ?? null);
-    f2History.push(f2 ?? null);
-    rmsHistory.push(currentRms);
-    if (f1History.length  > HISTORY_LEN) f1History.shift();
-    if (f2History.length  > HISTORY_LEN) f2History.shift();
-    if (rmsHistory.length > HISTORY_LEN) rmsHistory.shift();
+  // ─── State ────────────────────────────────────────────────────────────────────
+  const f1History = [], f2History = [], rmsHistory = [], trail = [];
+  let currentRms = 0;
+  let refFrames = [], refF1History = [], refF2History = [], refRmsHistory = [];
+  let refAudio = null, refPlaying = false, refDuration = 0;
+  let refFileObj = null, reanalyzeTimer = null;
+  let refMeanF1 = null, refMeanF2 = null;
+  const VOICED_WINDOW = 20;
+  const voicedF1Buf = [], voicedF2Buf = [];
+  let liveMeanF1 = null, liveMeanF2 = null;
 
-    trail.push({ f1: f1 ?? null, f2: f2 ?? null });
-    if (trail.length > TRAIL_LEN) trail.shift();
+  // ─── Canvas ───────────────────────────────────────────────────────────────────
+  const tcvs = document.getElementById('timeCanvas'),  tctx = tcvs.getContext('2d');
+  const rcvs = document.getElementById('rmsCanvas'),   rctx = rcvs.getContext('2d');
+  const vcvs = document.getElementById('vowelCanvas'), vctx = vcvs.getContext('2d');
+  const dpr  = window.devicePixelRatio || 1;
 
-    // ── only count voiced frames toward the 5s mean ───────────────────
-    if (f1 != null && f2 != null) {
-      voicedF1Buf.push(f1);
-      voicedF2Buf.push(f2);
-      if (voicedF1Buf.length > VOICED_WINDOW) voicedF1Buf.shift();
-      if (voicedF2Buf.length > VOICED_WINDOW) voicedF2Buf.shift();
-      liveMeanF1 = voicedF1Buf.reduce((a, b) => a + b, 0) / voicedF1Buf.length;
-      liveMeanF2 = voicedF2Buf.reduce((a, b) => a + b, 0) / voicedF2Buf.length;
-    }
+  function initHiDPI(c) {
+    const lw = c.width, lh = c.height;
+    c.style.width = lw+'px'; c.style.height = lh+'px';
+    c.width = lw*dpr; c.height = lh*dpr;
+    c.dataset.lw = lw; c.dataset.lh = lh;
+    c.getContext('2d').scale(dpr, dpr);
   }
-}
+  initHiDPI(tcvs); initHiDPI(rcvs); initHiDPI(vcvs);
 
-// ─── Mic capture ───────────────────────────────────────────────────────────────
-let audioCtx, worklet, mediaStream;
+  const clamp   = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
+  const norm    = (v,lo,hi) => clamp((v-lo)/(hi-lo), 0, 1);
+  const logNorm = v =>
+          (Math.log10(Math.max(v, RMS_MIN)) - Math.log10(RMS_MIN)) /
+          (Math.log10(RMS_MAX)              - Math.log10(RMS_MIN));
 
-async function startMic() {
-  audioCtx    = new AudioContext({ sampleRate: 16000 });
-  mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-  const src   = audioCtx.createMediaStreamSource(mediaStream);
-  await audioCtx.audioWorklet.addModule("processor.js");
-  worklet = new AudioWorkletNode(audioCtx, "pcm-processor");
-  worklet.port.onmessage = ({ data }) => {
-    if (ws && ws.readyState === WebSocket.OPEN) ws.send(data);
-  };
-  src.connect(worklet);
-  worklet.connect(audioCtx.destination);
-}
-
-function stopMic() {
-  worklet?.disconnect();
-  mediaStream?.getTracks().forEach(t => t.stop());
-  audioCtx?.close();
-}
-
-const micBtn = document.getElementById("micBtn");
-const setMicStatus = t => { document.getElementById("micStatus").textContent = t; };
-
-micBtn.addEventListener("click", async () => {
-  if (!running) {
-    running = true;
-    micBtn.textContent = "⏹ Stop mic";
-    setMicStatus("connecting…");
-    connectWS();
-    await startMic();
-    setMicStatus("recording…");
-  } else {
-    running = false;
-    micBtn.textContent = "▶ Start mic";
-    stopMic();
-    ws?.close();
-    setMicStatus("stopped");
-  }
-});
-
-// ─── Reference: upload ─────────────────────────────────────────────────────────
-const refPlayBtn  = document.getElementById("refPlayBtn");
-const refStatusEl = document.getElementById("refStatus");
-
-document.getElementById("refLoadBtn").addEventListener("click", () => {
-  document.getElementById("refFile").click();
-});
-
-document.getElementById("refFile").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  refFileObj = file;
-  refStatusEl.textContent = "analyzing…";
-  refPlayBtn.disabled = true;
-
-  const form = new FormData();
-  form.append("file", file);
-  form.append("config", JSON.stringify(config));   // send current settings
-
-
-
-  try {
-    const res  = await fetch(API_URL, { method: "POST", body: form });
-    const data = await res.json();
-    refFrames   = data.frames;
-    refDuration = data.duration;
-    const validRef = refFrames.filter(f => f.f1 != null && f.f2 != null);
-    if (validRef.length) {
-      refMeanF1 = validRef.reduce((s, f) => s + f.f1, 0) / validRef.length;
-      refMeanF2 = validRef.reduce((s, f) => s + f.f2, 0) / validRef.length;
-    } else {
-      refMeanF1 = null; refMeanF2 = null;
-}
-
-    if (refAudio) { refAudio.pause(); refAudio = null; }
-    refF1History = []; refF2History = []; refRmsHistory = [];
-
-    refAudio = new Audio(URL.createObjectURL(file));
-    refAudio.onended = () => {
-      refPlaying = false;
-      refPlayBtn.textContent = "▶ Play";
-      refF1History = []; refF2History = []; refRmsHistory = [];
-    };
-
-    refPlayBtn.disabled = false;
-    refStatusEl.textContent = `${file.name} (${refDuration.toFixed(1)}s)`;
-  } catch (err) {
-    refStatusEl.textContent = "error: " + err.message;
-  }
-
-  e.target.value = "";
-});
-async function reanalyzeRef() {
-  if (!refFileObj) return;
-
-  // stop playback if running
-  if (refPlaying) {
-    refAudio.pause(); refAudio.currentTime = 0;
-    refPlaying = false; refPlayBtn.textContent = "▶ Play";
-    refF1History = []; refF2History = []; refRmsHistory = [];
-  }
-
-  refStatusEl.textContent = "re-analyzing…";
-  refPlayBtn.disabled = true;
-
-  const form = new FormData();
-  form.append("file", refFileObj);
-  form.append("config", JSON.stringify(config));
-
-  try {
-    const res  = await fetch(API_URL, { method: "POST", body: form });
-    const data = await res.json();
-    refFrames   = data.frames;
-    refDuration = data.duration;
-
-    // recompute mean from new analysis
-    const valid = refFrames.filter(f => f.f1 != null && f.f2 != null);
-    refMeanF1 = valid.length ? valid.reduce((s, f) => s + f.f1, 0) / valid.length : null;
-    refMeanF2 = valid.length ? valid.reduce((s, f) => s + f.f2, 0) / valid.length : null;
-
-    refF1History = []; refF2History = []; refRmsHistory = [];
-
-    if (refAudio) { refAudio.pause(); refAudio = null; }
-    refAudio = new Audio(URL.createObjectURL(refFileObj));
-    refAudio.onended = () => {
-      refPlaying = false; refPlayBtn.textContent = "▶ Play";
-      refF1History = []; refF2History = []; refRmsHistory = [];
-    };
-
-    refPlayBtn.disabled = false;
-    refStatusEl.textContent = `${refFileObj.name} (${refDuration.toFixed(1)}s) ✓`;
-  } catch (err) {
-    refStatusEl.textContent = "error: " + err.message;
-    refPlayBtn.disabled = false;
-  }
-}
-// ─── Reference: play / stop ────────────────────────────────────────────────────
-refPlayBtn.addEventListener("click", () => {
-  if (!refAudio) return;
-  if (refPlaying) {
-    refAudio.pause(); refAudio.currentTime = 0;
-    refPlaying = false; refPlayBtn.textContent = "▶ Play";
-    refF1History = []; refF2History = []; refRmsHistory = [];
-  } else {
-    refAudio.currentTime = 0; refAudio.play();
-    refPlaying = true; refPlayBtn.textContent = "⏹ Stop";
-  }
-});
-
-function updateRefHistories() {
-  if (!refPlaying || !refAudio || refFrames.length === 0) return;
-  const idx   = Math.min(Math.round(refAudio.currentTime / (STEP_MS / 1000)), refFrames.length - 1);
-  const start = Math.max(0, idx - HISTORY_LEN + 1);
-  const slice = refFrames.slice(start, idx + 1);
-  refF1History  = slice.map(f => f.f1);
-  refF2History  = slice.map(f => f.f2);
-  refRmsHistory = slice.map(f => f.rms);
-}
-
-// ─── Draw: time ────────────────────────────────────────────────────────────────
-function drawTime() {
-  const W = +tcvs.dataset.lw, H = +tcvs.dataset.lh, PW = W - TPLOT_ML - TPLOT_MR;
-  tctx.clearRect(0, 0, W, H);
-
-  tctx.textAlign = "right";
-  [200, 400, 600,  800,  1000].forEach(hz => {
-    const y = (1 - norm(hz, F1_MIN, F1_MAX)) * H;
-    tctx.strokeStyle = "#171c27"; tctx.lineWidth = 1; tctx.setLineDash([2, 5]);
-    tctx.beginPath(); tctx.moveTo(TPLOT_ML, y); tctx.lineTo(TPLOT_ML + PW, y); tctx.stroke();
-    tctx.setLineDash([]);
-    tctx.strokeStyle = "#ff4c4c"; tctx.lineWidth = 1;
-    tctx.beginPath(); tctx.moveTo(TPLOT_ML - 4, y); tctx.lineTo(TPLOT_ML, y); tctx.stroke();
-    tctx.fillStyle = "#ff4c4c"; tctx.font = "10px monospace";
-    tctx.fillText(hz, TPLOT_ML - 7, y + 3);
+  // ─── Settings ─────────────────────────────────────────────────────────────────
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    const p = document.getElementById('settingsPanel');
+    const open = p.style.display === 'block';
+    p.style.display = open ? 'none' : 'block';
+    document.getElementById('settingsBtn').classList.toggle('active', !open);
   });
 
-  tctx.textAlign = "left";
-  [500, 1000, 1500, 2000, 2500, 3000].forEach(hz => {
-    const y = (1 - norm(hz, F2_MIN, F2_MAX)) * H;
-    tctx.strokeStyle = "#00d4ff"; tctx.lineWidth = 1;
-    tctx.beginPath(); tctx.moveTo(TPLOT_ML + PW, y); tctx.lineTo(TPLOT_ML + PW + 4, y); tctx.stroke();
-    tctx.fillStyle = "#00d4ff"; tctx.font = "10px monospace";
-    tctx.fillText(hz, TPLOT_ML + PW + 7, y + 3);
-  });
+  // Slider definitions [id, valueId, configKey, formatter, rawToConfig, configToSlider]
+  const sliders = [
+    ['s_max_f',              'v_max_f',              'max_f',              v => v+' Hz',      v => v,         v => v    ],
+    ['s_n_formants',         'v_n_formants',         'n_formants',         v => ''+v,         v => v,         v => v    ],
+    ['s_window_ms',          'v_window_ms',          'window_ms',          v => v+' ms',      v => v,         v => v    ],
+    ['s_pre_emphasis',       'v_pre_emphasis',       'pre_emphasis',       v => v+' Hz',      v => v,         v => v    ],
+    ['s_back_ceiling',       'v_back_ceiling',       'back_ceiling',       v => v+' Hz',      v => v,         v => v    ],
+    // ratios: slider 70-100 → config 0.70-1.00
+    ['s_back_ceiling_ratio', 'v_back_ceiling_ratio', 'back_ceiling_ratio', v => v.toFixed(2), v => v/100,     v => Math.round(v*100)],
+    ['s_back_front_ratio',   'v_back_front_ratio',   'back_front_ratio',   v => v.toFixed(2), v => v/100,     v => Math.round(v*100)],
+    // energy_floor: slider 1-60 → config 0.001-0.060
+    ['s_energy_floor',       'v_energy_floor',       'energy_floor',       v => v.toFixed(3), v => v/1000,    v => Math.round(v*1000)],
+  ];
 
-  tctx.strokeStyle = "#2a2f3a"; tctx.lineWidth = 1;
-  tctx.beginPath(); tctx.moveTo(TPLOT_ML, 0); tctx.lineTo(TPLOT_ML, H); tctx.stroke();
-  tctx.beginPath(); tctx.moveTo(TPLOT_ML + PW, 0); tctx.lineTo(TPLOT_ML + PW, H); tctx.stroke();
-
-  tctx.save();
-  tctx.fillStyle = "#ff4c4c"; tctx.font = "11px monospace"; tctx.textAlign = "center";
-  tctx.translate(13, H / 2); tctx.rotate(-Math.PI / 2); tctx.fillText("F1 (Hz)", 0, 0);
-  tctx.restore();
-  tctx.save();
-  tctx.fillStyle = "#00d4ff"; tctx.font = "11px monospace"; tctx.textAlign = "center";
-  tctx.translate(W - 13, H / 2); tctx.rotate(Math.PI / 2); tctx.fillText("F2 (Hz)", 0, 0);
-  tctx.restore();
-
-  const drawLine = (data, color, fMin, fMax, alpha) => {
-    if (data.length < 2) return;
-    tctx.save(); tctx.globalAlpha = alpha; tctx.strokeStyle = color; tctx.lineWidth = 2;
-    tctx.beginPath();
-    data.forEach((v, i) => {
-      if (v == null) return;
-      const x = TPLOT_ML + (i / HISTORY_LEN) * PW;
-      const y = (1 - norm(v, fMin, fMax)) * H;
-      i === 0 || data[i - 1] == null ? tctx.moveTo(x, y) : tctx.lineTo(x, y);
+  sliders.forEach(([id, vid, key, fmt, toConf, toSlider]) => {
+    const sl  = document.getElementById(id);
+    const vel = document.getElementById(vid);
+    vel.textContent = fmt(config[key]);
+    sl.value = toSlider(config[key]);
+    sl.addEventListener('input', () => {
+      config[key]  = toConf(Number(sl.value));
+      vel.textContent = fmt(config[key]);
+      sendConfig();
     });
-    tctx.stroke(); tctx.restore();
-  };
+  });
 
-  if (refF1History.length > 1) {
-    drawLine(refF1History, REF_F1_COLOR, F1_MIN, F1_MAX, 0.4);
-    drawLine(refF2History, REF_F2_COLOR, F2_MIN, F2_MAX, 0.4);
+  function sendConfig() {
+    if (ws && ws.readyState === WebSocket.OPEN)
+      ws.send(JSON.stringify({ type: 'config', ...config }));
+    if (refFileObj) {
+      clearTimeout(reanalyzeTimer);
+      reanalyzeTimer = setTimeout(reanalyzeRef, 600);
+    }
   }
-  drawLine(f1History, "#ff4c4c", F1_MIN, F1_MAX, 1);
-  drawLine(f2History, "#00d4ff", F2_MIN, F2_MAX, 1);
 
-  tctx.textAlign = "left"; tctx.font = "bold 12px monospace";
-  const lf1 = f1History.at(-1), lf2 = f2History.at(-1);
-  if (lf1) { tctx.fillStyle = "#ff4c4c"; tctx.fillText(`F1 ${lf1} Hz`, TPLOT_ML + 6, 16); }
-  if (lf2) { tctx.fillStyle = "#00d4ff"; tctx.fillText(`F2 ${lf2} Hz`, TPLOT_ML + 6, 32); }
-}
+  // ─── WebSocket ────────────────────────────────────────────────────────────────
+  let ws, running = false;
 
-// ─── Draw: RMS ─────────────────────────────────────────────────────────────────
-function drawRms() {
-  const W = +rcvs.dataset.lw, H = +rcvs.dataset.lh, LW = TPLOT_ML, plotW = W - LW - TPLOT_MR;
-  const barW = plotW / HISTORY_LEN;
-  rctx.clearRect(0, 0, W, H);
+  function connectWS() {
+    ws = new WebSocket(WS_URL);
+    ws.binaryType = 'arraybuffer';
+    ws.onopen = () => {
+      setMicStatus('connected');
+      ws.send(JSON.stringify({ type: 'init', sample_rate: audioCtx ? audioCtx.sampleRate : 44100 }));
+      sendConfig();
+    };
+    ws.onmessage = ({ data }) => {
+      let payload; try { payload = JSON.parse(data); } catch { return; }
+      const frames = payload.frames || (payload.voiced !== undefined ? [payload] : []);
+      for (const fr of frames) {
+        const f1  = fr.voiced ? fr.f1 : null;
+        const f2  = fr.voiced ? fr.f2 : null;
+        const rms = fr.rms ?? 0;
+        currentRms = rms;
+        f1History.push(f1); f2History.push(f2); rmsHistory.push(rms);
+        if (f1History.length  > HISTORY_LEN) f1History.shift();
+        if (f2History.length  > HISTORY_LEN) f2History.shift();
+        if (rmsHistory.length > HISTORY_LEN) rmsHistory.shift();
+        trail.push({ f1, f2 });
+        if (trail.length > TRAIL_LEN) trail.shift();
+        if (f1 != null && f2 != null) {
+          voicedF1Buf.push(f1); voicedF2Buf.push(f2);
+          if (voicedF1Buf.length > VOICED_WINDOW) voicedF1Buf.shift();
+          if (voicedF2Buf.length > VOICED_WINDOW) voicedF2Buf.shift();
+          liveMeanF1 = voicedF1Buf.reduce((a,b)=>a+b,0)/voicedF1Buf.length;
+          liveMeanF2 = voicedF2Buf.reduce((a,b)=>a+b,0)/voicedF2Buf.length;
+        }
+      }
+    };
+    ws.onerror = () => setMicStatus('WS error');
+    ws.onclose = () => { if (running) setMicStatus('disconnected'); };
+  }
 
-  rctx.textAlign = "right";
-  [0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5].forEach(val => {
-    const y = (1 - logNorm(val)) * H;
-    rctx.strokeStyle = "#171c27"; rctx.lineWidth = 1; rctx.setLineDash([2, 4]);
-    rctx.beginPath(); rctx.moveTo(LW, y); rctx.lineTo(LW + plotW, y); rctx.stroke();
+  // ─── Mic ──────────────────────────────────────────────────────────────────────
+  let audioCtx, workletOrProc, mediaStream;
+
+  async function startMic() {
+    audioCtx    = new AudioContext({ sampleRate: 44100 });
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const src   = audioCtx.createMediaStreamSource(mediaStream);
+
+    function sendF32(f32) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      const i16 = new Int16Array(f32.length);
+      for (let j = 0; j < f32.length; j++)
+        i16[j] = Math.max(-32768, Math.min(32767, Math.round(f32[j] * 32768)));
+      ws.send(i16.buffer);
+    }
+
+    try {
+      await audioCtx.audioWorklet.addModule('audio-worklet.js');
+      workletOrProc = new AudioWorkletNode(audioCtx, 'pcm-processor');
+      workletOrProc.port.onmessage = ({ data }) => sendF32(new Float32Array(data));
+      src.connect(workletOrProc);
+      workletOrProc.connect(audioCtx.destination);
+    } catch {
+      workletOrProc = audioCtx.createScriptProcessor(512, 1, 1);
+      workletOrProc.onaudioprocess = e => sendF32(e.inputBuffer.getChannelData(0));
+      src.connect(workletOrProc);
+      workletOrProc.connect(audioCtx.destination);
+    }
+  }
+
+  function stopMic() {
+    try { workletOrProc?.disconnect(); } catch {}
+    mediaStream?.getTracks().forEach(t => t.stop());
+    audioCtx?.close().catch(() => {});
+    audioCtx = workletOrProc = mediaStream = null;
+  }
+
+  const setMicStatus = t => { document.getElementById('micStatus').textContent = t; };
+
+  document.getElementById('micBtn').addEventListener('click', async () => {
+    if (!running) {
+      running = true;
+      document.getElementById('micBtn').textContent = 'Stop mic';
+      setMicStatus('connecting...');
+      connectWS();
+      await startMic();
+      setMicStatus('recording...');
+    } else {
+      running = false;
+      document.getElementById('micBtn').textContent = 'Start mic';
+      stopMic(); ws?.close(); setMicStatus('stopped');
+      voicedF1Buf.length = voicedF2Buf.length = 0;
+      liveMeanF1 = liveMeanF2 = null;
+    }
+  });
+
+  // ─── Reference file ───────────────────────────────────────────────────────────
+  const refPlayBtn  = document.getElementById('refPlayBtn');
+  const refStatusEl = document.getElementById('refStatus');
+
+  document.getElementById('refLoadBtn').addEventListener('click', () =>
+          document.getElementById('refFile').click());
+
+  document.getElementById('refFile').addEventListener('change', async e => {
+    const file = e.target.files[0]; if (!file) return;
+    refFileObj = file; await uploadRef(file); e.target.value = '';
+  });
+
+  async function uploadRef(file) {
+    refStatusEl.textContent = 'analyzing...'; refPlayBtn.disabled = true;
+    const form = new FormData();
+    form.append('file', file);
+    form.append('config', JSON.stringify(config));
+    try {
+      const res  = await fetch(API_URL, { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.error) { refStatusEl.textContent = 'Error: ' + data.error; return; }
+      refFrames = data.frames; refDuration = data.duration;
+      const valid = refFrames.filter(f => f.f1 != null && f.f2 != null);
+      refMeanF1 = valid.length ? valid.reduce((s,f)=>s+f.f1,0)/valid.length : null;
+      refMeanF2 = valid.length ? valid.reduce((s,f)=>s+f.f2,0)/valid.length : null;
+      refF1History = []; refF2History = []; refRmsHistory = [];
+      if (refAudio) { refAudio.pause(); refAudio = null; }
+      refAudio = new Audio(URL.createObjectURL(file));
+      refAudio.onended = () => {
+        refPlaying = false; refPlayBtn.textContent = 'Play';
+        refF1History = []; refF2History = []; refRmsHistory = [];
+      };
+      refPlayBtn.disabled = false;
+      refStatusEl.textContent = file.name + ' (' + refDuration.toFixed(1) + 's)';
+    } catch (err) {
+      refStatusEl.textContent = 'Error: ' + err.message;
+    }
+  }
+
+  async function reanalyzeRef() {
+    if (!refFileObj) return;
+    if (refPlaying) {
+      refAudio.pause(); refAudio.currentTime = 0; refPlaying = false;
+      refPlayBtn.textContent = 'Play';
+      refF1History = []; refF2History = []; refRmsHistory = [];
+    }
+    await uploadRef(refFileObj);
+  }
+
+  refPlayBtn.addEventListener('click', () => {
+    if (!refAudio) return;
+    if (refPlaying) {
+      refAudio.pause(); refAudio.currentTime = 0; refPlaying = false;
+      refPlayBtn.textContent = 'Play';
+      refF1History = []; refF2History = []; refRmsHistory = [];
+    } else {
+      refAudio.currentTime = 0; refAudio.play();
+      refPlaying = true; refPlayBtn.textContent = 'Stop';
+    }
+  });
+
+  function updateRefHistories() {
+    if (!refPlaying || !refAudio || refFrames.length === 0) return;
+    const idx   = Math.min(Math.round(refAudio.currentTime / (STEP_MS / 1000)), refFrames.length - 1);
+    const start = Math.max(0, idx - HISTORY_LEN + 1);
+    const slice = refFrames.slice(start, idx + 1);
+    refF1History  = slice.map(f => f.f1);
+    refF2History  = slice.map(f => f.f2);
+    refRmsHistory = slice.map(f => f.rms);
+  }
+
+  // ─── Draw: time ───────────────────────────────────────────────────────────────
+  function drawTime() {
+    const W = +tcvs.dataset.lw, H = +tcvs.dataset.lh, PW = W - TPLOT_ML - TPLOT_MR;
+    tctx.clearRect(0, 0, W, H);
+    tctx.textAlign = 'right';
+    [200,400,600,800,1000].forEach(hz => {
+      const y = (1 - norm(hz, F1_MIN, F1_MAX)) * H;
+      tctx.strokeStyle='#171c27'; tctx.lineWidth=1; tctx.setLineDash([2,5]);
+      tctx.beginPath(); tctx.moveTo(TPLOT_ML,y); tctx.lineTo(TPLOT_ML+PW,y); tctx.stroke();
+      tctx.setLineDash([]);
+      tctx.strokeStyle='#ff4c4c'; tctx.lineWidth=1;
+      tctx.beginPath(); tctx.moveTo(TPLOT_ML-4,y); tctx.lineTo(TPLOT_ML,y); tctx.stroke();
+      tctx.fillStyle='#ff4c4c'; tctx.font='10px monospace'; tctx.fillText(hz, TPLOT_ML-7, y+3);
+    });
+    tctx.textAlign = 'left';
+    [500,1000,1500,2000,2500,3000].forEach(hz => {
+      const y = (1 - norm(hz, F2_MIN, F2_MAX)) * H;
+      tctx.strokeStyle='#00d4ff'; tctx.lineWidth=1;
+      tctx.beginPath(); tctx.moveTo(TPLOT_ML+PW,y); tctx.lineTo(TPLOT_ML+PW+4,y); tctx.stroke();
+      tctx.fillStyle='#00d4ff'; tctx.font='10px monospace'; tctx.fillText(hz, TPLOT_ML+PW+7, y+3);
+    });
+    tctx.strokeStyle='#2a2f3a'; tctx.lineWidth=1;
+    tctx.beginPath(); tctx.moveTo(TPLOT_ML,0); tctx.lineTo(TPLOT_ML,H); tctx.stroke();
+    tctx.beginPath(); tctx.moveTo(TPLOT_ML+PW,0); tctx.lineTo(TPLOT_ML+PW,H); tctx.stroke();
+    tctx.save(); tctx.fillStyle='#ff4c4c'; tctx.font='11px monospace'; tctx.textAlign='center';
+    tctx.translate(13,H/2); tctx.rotate(-Math.PI/2); tctx.fillText('F1 (Hz)',0,0); tctx.restore();
+    tctx.save(); tctx.fillStyle='#00d4ff'; tctx.font='11px monospace'; tctx.textAlign='center';
+    tctx.translate(W-13,H/2); tctx.rotate(Math.PI/2); tctx.fillText('F2 (Hz)',0,0); tctx.restore();
+    const drawLine = (data, color, fMin, fMax, alpha) => {
+      if (data.length < 2) return;
+      tctx.save(); tctx.globalAlpha=alpha; tctx.strokeStyle=color; tctx.lineWidth=2;
+      tctx.beginPath();
+      data.forEach((v,i) => {
+        if (v==null) return;
+        const x = TPLOT_ML + (i/HISTORY_LEN)*PW, y = (1-norm(v,fMin,fMax))*H;
+        i===0||data[i-1]==null ? tctx.moveTo(x,y) : tctx.lineTo(x,y);
+      });
+      tctx.stroke(); tctx.restore();
+    };
+    if (refF1History.length > 1) {
+      drawLine(refF1History, REF_F1_COLOR, F1_MIN, F1_MAX, 0.4);
+      drawLine(refF2History, REF_F2_COLOR, F2_MIN, F2_MAX, 0.4);
+    }
+    drawLine(f1History, '#ff4c4c', F1_MIN, F1_MAX, 1);
+    drawLine(f2History, '#00d4ff', F2_MIN, F2_MAX, 1);
+    tctx.textAlign='left'; tctx.font='bold 12px monospace';
+    const lf1=f1History.at(-1), lf2=f2History.at(-1);
+    if (lf1) { tctx.fillStyle='#ff4c4c'; tctx.fillText('F1 '+lf1+' Hz', TPLOT_ML+6, 16); }
+    if (lf2) { tctx.fillStyle='#00d4ff'; tctx.fillText('F2 '+lf2+' Hz', TPLOT_ML+6, 32); }
+  }
+
+  // ─── Draw: RMS ────────────────────────────────────────────────────────────────
+  function drawRms() {
+    const W=+rcvs.dataset.lw, H=+rcvs.dataset.lh, LW=TPLOT_ML, plotW=W-LW-TPLOT_MR;
+    const barW = plotW/HISTORY_LEN;
+    rctx.clearRect(0,0,W,H);
+    rctx.textAlign='right';
+    [0.00001,0.0001,0.001,0.01,0.1,0.5].forEach(val => {
+      const y=(1-logNorm(val))*H;
+      rctx.strokeStyle='#171c27'; rctx.lineWidth=1; rctx.setLineDash([2,4]);
+      rctx.beginPath(); rctx.moveTo(LW,y); rctx.lineTo(LW+plotW,y); rctx.stroke();
+      rctx.setLineDash([]);
+      rctx.fillStyle='#555'; rctx.font='10px monospace';
+      rctx.fillText(val<0.001?val.toExponential(0):val.toString(), LW-7, y+3);
+    });
+    const threshY=(1-logNorm(config.energy_floor))*H;
+    rctx.strokeStyle='#4a90d9'; rctx.lineWidth=1; rctx.setLineDash([5,4]);
+    rctx.beginPath(); rctx.moveTo(LW,threshY); rctx.lineTo(LW+plotW,threshY); rctx.stroke();
     rctx.setLineDash([]);
-    rctx.strokeStyle = "#333"; rctx.lineWidth = 1;
-    rctx.beginPath(); rctx.moveTo(LW - 4, y); rctx.lineTo(LW, y); rctx.stroke();
-    rctx.fillStyle = "#555"; rctx.font = "10px monospace";
-    rctx.fillText(val < 0.001 ? val.toExponential(0) : val.toString(), LW - 7, y + 3);
-  });
-
-  // gate line — reflects the live config.energy_floor value
-  const threshY = (1 - logNorm(config.energy_floor)) * H;
-  rctx.strokeStyle = "#4a90d9"; rctx.lineWidth = 1; rctx.setLineDash([5, 4]);
-  rctx.beginPath(); rctx.moveTo(LW, threshY); rctx.lineTo(LW + plotW, threshY); rctx.stroke();
-  rctx.setLineDash([]);
-  rctx.fillStyle = "#4a90d9"; rctx.font = "9px monospace"; rctx.textAlign = "left";
-  rctx.fillText(`gate ${config.energy_floor.toFixed(3)}`, LW + 4, threshY - 3);
-
-  rctx.strokeStyle = "#2a2f3a"; rctx.lineWidth = 1;
-  rctx.beginPath(); rctx.moveTo(LW, 0); rctx.lineTo(LW, H); rctx.stroke();
-
-  refRmsHistory.forEach((v, i) => {
-    const barH = logNorm(v ?? RMS_MIN) * H;
-    rctx.fillStyle = "rgba(255,153,0,0.22)";
-    rctx.fillRect(LW + i * barW, H - barH, Math.max(barW - 1, 1), barH);
-  });
-
-  rmsHistory.forEach((v, i) => {
-    const level = logNorm(v ?? RMS_MIN), barH = level * H;
-    const gated = (v ?? 0) < config.energy_floor;
-    const t = Math.min(level * 1.5, 1);
-    const r = Math.round(255 * Math.min(1, t * 2)), g = Math.round(255 * Math.min(1, 2 - t * 2));
-    rctx.fillStyle = gated ? "#181c26" : `rgb(${r},${g},30)`;
-    rctx.fillRect(LW + i * barW, H - barH, Math.max(barW - 1, 1), barH);
-  });
-
-  rctx.fillStyle = "#555"; rctx.font = "10px monospace"; rctx.textAlign = "left";
-  rctx.fillText(`RMS ${currentRms.toExponential(2)}`, LW + 6, 12);
-}
-
-// ─── Draw: vowel space ─────────────────────────────────────────────────────────
-function drawVowel() {
-  const W = +vcvs.dataset.lw, H = +vcvs.dataset.lh, PW = W - VML - VMR, PH = H - VMT - VMB;
-  const vx = f2 => VML + (1 - norm(f2, F2_MIN, F2_MAX)) * PW;
-  const vy = f1 => VMT + norm(f1, F1_MIN, F1_MAX) * PH;
-  vctx.clearRect(0, 0, W, H);
-
-  vctx.textAlign = "center";
-  [500, 1000, 1500, 2000, 2500, 3000].forEach(hz => {
-    const x = vx(hz);
-    vctx.strokeStyle = "#171c27"; vctx.lineWidth = 1; vctx.setLineDash([2, 5]);
-    vctx.beginPath(); vctx.moveTo(x, VMT); vctx.lineTo(x, VMT + PH); vctx.stroke();
-    vctx.setLineDash([]);
-    vctx.strokeStyle = "#333"; vctx.lineWidth = 1;
-    vctx.beginPath(); vctx.moveTo(x, VMT - 4); vctx.lineTo(x, VMT); vctx.stroke();
-    vctx.fillStyle = "#667"; vctx.font = "10px monospace";
-    vctx.fillText(hz, x, VMT - 9);
-  });
-
-  vctx.textAlign = "right";
-  [200, 400, 600,  800,  1000].forEach(hz => {
-    const y = vy(hz);
-    vctx.strokeStyle = "#171c27"; vctx.lineWidth = 1; vctx.setLineDash([2, 5]);
-    vctx.beginPath(); vctx.moveTo(VML, y); vctx.lineTo(VML + PW, y); vctx.stroke();
-    vctx.setLineDash([]);
-    vctx.strokeStyle = "#333"; vctx.lineWidth = 1;
-    vctx.beginPath(); vctx.moveTo(VML - 4, y); vctx.lineTo(VML, y); vctx.stroke();
-    vctx.fillStyle = "#667"; vctx.font = "10px monospace";
-    vctx.fillText(hz, VML - 7, y + 3);
-  });
-
-  vctx.strokeStyle = "#2a2f3a"; vctx.lineWidth = 1;
-  vctx.strokeRect(VML, VMT, PW, PH);
-  vctx.fillStyle = "#556"; vctx.font = "11px monospace"; vctx.textAlign = "center";
-  vctx.fillText("← F2 (Hz)", VML + PW / 2, H - 7);
-  vctx.save();
-  vctx.translate(13, VMT + PH / 2); vctx.rotate(-Math.PI / 2);
-  vctx.fillText("F1 (Hz) ↓", 0, 0);
-  vctx.restore();
-  vctx.textAlign = "left";
-
-  [
-    { label: "i", f2: 2400, f1: 280 }, { label: "e", f2: 2100, f1: 420 },
-    { label: "ɛ", f2: 1900, f1: 580 }, { label: "a", f2: 1200, f1: 800 },
-    { label: "ɔ", f2: 800,  f1: 600 }, { label: "o", f2: 700,  f1: 450 },
-    { label: "u", f2: 650,  f1: 300 }, { label: "ə", f2: 1400, f1: 500 },
-    { label: "æ", f2: 1800, f1: 700 },
-  ].forEach(({ label, f1, f2 }) => {
-    const x = vx(f2), y = vy(f1);
-    vctx.fillStyle = "#1e2535";
-    vctx.beginPath(); vctx.arc(x, y, 17, 0, 2 * Math.PI); vctx.fill();
-    vctx.strokeStyle = "#2e3a4a"; vctx.lineWidth = 1; vctx.stroke();
-    vctx.fillStyle = "#556"; vctx.font = "15px serif"; vctx.textAlign = "center";
-    vctx.fillText(label, x, y + 5);
-  });
-
-  refF1History.forEach((f1, i) => {
-    const f2 = refF2History[i];
-    if (f1 == null || f2 == null) return;
-    vctx.fillStyle = `rgba(255,153,0,${(i / refF1History.length) * 0.7})`;
-    vctx.beginPath(); vctx.arc(vx(f2), vy(f1), 4, 0, 2 * Math.PI); vctx.fill();
-  });
-  const rf1 = refF1History.at(-1), rf2 = refF2History.at(-1);
-  if (rf1 != null && rf2 != null) {
-    vctx.fillStyle = REF_DOT_COLOR;
-    vctx.beginPath(); vctx.arc(vx(rf2), vy(rf1), 9, 0, 2 * Math.PI); vctx.fill();
+    rctx.fillStyle='#4a90d9'; rctx.font='9px monospace'; rctx.textAlign='left';
+    rctx.fillText('gate '+config.energy_floor.toFixed(3), LW+4, threshY-3);
+    rctx.strokeStyle='#2a2f3a'; rctx.lineWidth=1;
+    rctx.beginPath(); rctx.moveTo(LW,0); rctx.lineTo(LW,H); rctx.stroke();
+    refRmsHistory.forEach((v,i) => {
+      const barH=logNorm(v??RMS_MIN)*H;
+      rctx.fillStyle='rgba(255,153,0,0.22)';
+      rctx.fillRect(LW+i*barW, H-barH, Math.max(barW-1,1), barH);
+    });
+    rmsHistory.forEach((v,i) => {
+      const level=logNorm(v??RMS_MIN), barH=level*H;
+      const gated=(v??0)<config.energy_floor;
+      const t=Math.min(level*1.5,1);
+      const r=Math.round(255*Math.min(1,t*2)), g2=Math.round(255*Math.min(1,2-t*2));
+      rctx.fillStyle=gated?'#181c26':`rgb(${r},${g2},30)`;
+      rctx.fillRect(LW+i*barW, H-barH, Math.max(barW-1,1), barH);
+    });
+    rctx.fillStyle='#555'; rctx.font='10px monospace'; rctx.textAlign='left';
+    rctx.fillText('RMS '+currentRms.toExponential(2), LW+6, 12);
   }
 
-  trail.forEach(({ f1, f2 }, i) => {
-    if (f1 == null || f2 == null) return;
-    vctx.fillStyle = `rgba(255,210,0,${(i / trail.length) * 0.7})`;
-    vctx.beginPath(); vctx.arc(vx(f2), vy(f1), 4, 0, 2 * Math.PI); vctx.fill();
-  });
-  const lf1 = f1History.at(-1), lf2 = f2History.at(-1);
-  if (lf1 != null && lf2 != null) {
-    vctx.fillStyle = "#ffd700";
-    vctx.beginPath(); vctx.arc(vx(lf2), vy(lf1), 9, 0, 2 * Math.PI); vctx.fill();
+  // ─── Draw: vowel space ────────────────────────────────────────────────────────
+  function drawVowel() {
+    const W=+vcvs.dataset.lw, H=+vcvs.dataset.lh, PW=W-VML-VMR, PH=H-VMT-VMB;
+    const vx = f2 => VML+(1-norm(f2,F2_MIN,F2_MAX))*PW;
+    const vy = f1 => VMT+norm(f1,F1_MIN,F1_MAX)*PH;
+    vctx.clearRect(0,0,W,H);
+    vctx.textAlign='center';
+    [500,1000,1500,2000,2500,3000].forEach(hz => {
+      const x=vx(hz);
+      vctx.strokeStyle='#171c27'; vctx.lineWidth=1; vctx.setLineDash([2,5]);
+      vctx.beginPath(); vctx.moveTo(x,VMT); vctx.lineTo(x,VMT+PH); vctx.stroke();
+      vctx.setLineDash([]);
+      vctx.strokeStyle='#333'; vctx.lineWidth=1;
+      vctx.beginPath(); vctx.moveTo(x,VMT-4); vctx.lineTo(x,VMT); vctx.stroke();
+      vctx.fillStyle='#667'; vctx.font='10px monospace'; vctx.fillText(hz,x,VMT-9);
+    });
+    vctx.textAlign='right';
+    [200,400,600,800,1000].forEach(hz => {
+      const y=vy(hz);
+      vctx.strokeStyle='#171c27'; vctx.lineWidth=1; vctx.setLineDash([2,5]);
+      vctx.beginPath(); vctx.moveTo(VML,y); vctx.lineTo(VML+PW,y); vctx.stroke();
+      vctx.setLineDash([]);
+      vctx.strokeStyle='#333'; vctx.lineWidth=1;
+      vctx.beginPath(); vctx.moveTo(VML-4,y); vctx.lineTo(VML,y); vctx.stroke();
+      vctx.fillStyle='#667'; vctx.font='10px monospace'; vctx.fillText(hz,VML-7,y+3);
+    });
+    vctx.strokeStyle='#2a2f3a'; vctx.lineWidth=1; vctx.strokeRect(VML,VMT,PW,PH);
+    vctx.fillStyle='#556'; vctx.font='11px monospace'; vctx.textAlign='center';
+    vctx.fillText('F2 (Hz)', VML+PW/2, H-7);
+    vctx.save(); vctx.translate(13,VMT+PH/2); vctx.rotate(-Math.PI/2);
+    vctx.fillText('F1 (Hz)', 0, 0); vctx.restore();
+    vctx.textAlign='left';
+    [
+      {label:'i',f2:2400,f1:280},{label:'e',f2:2100,f1:420},{label:'\u025b',f2:1900,f1:580},
+      {label:'a',f2:1200,f1:800},{label:'\u0254',f2:800,f1:600},{label:'o',f2:700,f1:450},
+      {label:'u',f2:650,f1:300},{label:'\u0259',f2:1400,f1:500},{label:'\u00e6',f2:1800,f1:700},
+    ].forEach(({label,f1,f2}) => {
+      const x=vx(f2), y=vy(f1);
+      vctx.fillStyle='#1e2535';
+      vctx.beginPath(); vctx.arc(x,y,17,0,2*Math.PI); vctx.fill();
+      vctx.strokeStyle='#2e3a4a'; vctx.lineWidth=1; vctx.stroke();
+      vctx.fillStyle='#556'; vctx.font='15px serif'; vctx.textAlign='center';
+      vctx.fillText(label,x,y+5);
+    });
+    // Reference trail
+    refF1History.forEach((f1,i) => {
+      const f2=refF2History[i]; if(f1==null||f2==null) return;
+      vctx.fillStyle=`rgba(255,153,0,${(i/refF1History.length)*0.7})`;
+      vctx.beginPath(); vctx.arc(vx(f2),vy(f1),4,0,2*Math.PI); vctx.fill();
+    });
+    const rf1=refF1History.at(-1), rf2=refF2History.at(-1);
+    if (rf1!=null&&rf2!=null) {
+      vctx.fillStyle=REF_DOT_COLOR;
+      vctx.beginPath(); vctx.arc(vx(rf2),vy(rf1),9,0,2*Math.PI); vctx.fill();
+    }
+    // Live trail
+    trail.forEach(({f1,f2},i) => {
+      if(f1==null||f2==null) return;
+      vctx.fillStyle=`rgba(255,210,0,${(i/trail.length)*0.7})`;
+      vctx.beginPath(); vctx.arc(vx(f2),vy(f1),4,0,2*Math.PI); vctx.fill();
+    });
+    const lf1=f1History.at(-1), lf2=f2History.at(-1);
+    if (lf1!=null&&lf2!=null) {
+      vctx.fillStyle='#ffd700';
+      vctx.beginPath(); vctx.arc(vx(lf2),vy(lf1),9,0,2*Math.PI); vctx.fill();
+    }
+    // Reference mean
+    if (refMeanF1!=null&&refMeanF2!=null) {
+      const x=vx(refMeanF2), y=vy(refMeanF1);
+      vctx.strokeStyle='#ff9900'; vctx.lineWidth=1.5;
+      vctx.beginPath(); vctx.arc(x,y,5,0,2*Math.PI); vctx.stroke();
+      vctx.fillStyle='#ff9900'; vctx.font='9px monospace'; vctx.textAlign='center';
+      vctx.fillText(Math.round(refMeanF1)+'x'+Math.round(refMeanF2), x, y+15);
+    }
+    // Live voiced mean
+    if (liveMeanF1!=null&&liveMeanF2!=null) {
+      const x=vx(liveMeanF2), y=vy(liveMeanF1);
+      vctx.strokeStyle='#ffd700'; vctx.lineWidth=1.5;
+      vctx.beginPath(); vctx.arc(x,y,4,0,2*Math.PI); vctx.stroke();
+      vctx.fillStyle='#ffd700'; vctx.font='9px monospace'; vctx.textAlign='center';
+      vctx.fillText(Math.round(liveMeanF1)+'x'+Math.round(liveMeanF2), x, y+15);
+    }
   }
-if (refMeanF1 != null && refMeanF2 != null) {
-  const x = vx(refMeanF2), y = vy(refMeanF1);
-  vctx.fillStyle = "#ff9900";
-  vctx.beginPath(); vctx.arc(x, y, 3, 0, 2 * Math.PI); vctx.fill();
-  vctx.fillStyle = "#ff9900"; vctx.font = "9px monospace"; vctx.textAlign = "center";
-  vctx.fillText(`${Math.round(refMeanF1)}·${Math.round(refMeanF2)}`, x, y + 13);
-}
 
-// live 5s voiced mean — tiny ring
-if (liveMeanF1 != null && liveMeanF2 != null) {
-  const x = vx(liveMeanF2), y = vy(liveMeanF1);
-  vctx.strokeStyle = "#ffd700"; vctx.lineWidth = 1.5;
-  vctx.beginPath(); vctx.arc(x, y, 3, 0, 2 * Math.PI); vctx.stroke();
-  vctx.fillStyle = "#ffd700"; vctx.font = "9px monospace"; vctx.textAlign = "center";
-  vctx.fillText(`${Math.round(liveMeanF1)}·${Math.round(liveMeanF2)}`, x, y + 13);
-}
-}
-
-// ─── Loop ──────────────────────────────────────────────────────────────────────
-function frame() {
-  updateRefHistories();
-  drawTime();
-  drawRms();
-  drawVowel();
+  // ─── Loop ─────────────────────────────────────────────────────────────────────
+  function frame() {
+    updateRefHistories(); drawTime(); drawRms(); drawVowel();
+    requestAnimationFrame(frame);
+  }
   requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
 </script>
 </body>
 </html>
