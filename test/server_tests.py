@@ -2,47 +2,50 @@
 """
 server_tests.py
 ===============
-Regression test suite for analyze_server.py.
+Regression tests for analyze_server.py.
 
-Each endpoint has a set of hardcoded test cases (see CASES at the bottom).
-On the first run, results are saved as reference files.
+On first run, responses are saved as reference files.
 On subsequent runs, results are compared against those references.
 
-Usage
------
-  python tests/server_tests.py              # run all tests (from project root)
-  python tests/server_tests.py analyze      # run /analyze tests only
-  python tests/server_tests.py analyze_file # run /analyze-file tests only
+Usage (from project root, server must be running)
+--------------------------------------------------
+  python tests/server_tests.py                 # run all tests
+  python tests/server_tests.py analyze         # /analyze only
+  python tests/server_tests.py analyze_file
   python tests/server_tests.py analyze_debug
   python tests/server_tests.py ws
-  python tests/server_tests.py --update     # overwrite ALL references with fresh results
-  python tests/server_tests.py --list       # print all test case IDs and exit
+  python tests/server_tests.py --update        # overwrite all references
+  python tests/server_tests.py --list          # list test IDs and exit
 
 Reference files
 ---------------
   tests/references/{endpoint}/{case_id}.json
-  Commit these after verifying they look correct on first run.
+  After first run, inspect and commit these files.
 
 Adding test cases
 -----------------
-  Edit the CASES dict at the bottom of this file.
-  Run once to generate the reference file, inspect it, then commit.
+  Edit CASES at the bottom of this file.
+  First run saves the reference; subsequent runs compare against it.
 
-Tolerance
----------
-  TOLERANCE_HZ = 0  →  exact match (Praat is deterministic on the same machine).
-  Set TOLERANCE_HZ = 5 when comparing results across different OS / Praat versions.
+Audio formats
+-------------
+  .wav — loaded directly.
+  Other formats (.mp3, .aiff, .flac …) — converted via parselmouth if available.
+  The server's /analyze-file endpoint accepts any format natively.
 """
 
 from __future__ import annotations
 
 import argparse
 import asyncio
+import io
 import json
-import math
+import os
+import struct
 import sys
+import tempfile
 import wave
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -50,24 +53,42 @@ from typing import Any
 import numpy as np
 import requests
 
-# Optional: websockets is only needed for /ws tests
 try:
     import websockets
-    _WEBSOCKETS_AVAILABLE = True
+    _HAS_WEBSOCKETS = True
 except ImportError:
-    _WEBSOCKETS_AVAILABLE = False
+    _HAS_WEBSOCKETS = False
+
+try:
+    import parselmouth
+    _HAS_PARSELMOUTH = True
+except ImportError:
+    _HAS_PARSELMOUTH = False
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Global settings
+# Settings
 # ══════════════════════════════════════════════════════════════════════════════
 
-HTTP_BASE      = 'http://localhost:5050'
-WS_URL         = 'ws://localhost:5051'
-TESTS_DIR      = Path(__file__).parent
-REFERENCES_DIR = TESTS_DIR / 'references'
-TOLERANCE_HZ   = 0        # Hz — allowed difference for formant values
-WS_DRAIN_SECS  = 1.5      # seconds to wait for final WebSocket responses after sending
+HTTP_BASE       = 'http://localhost:5050'
+WS_URL          = 'ws://localhost:5051'
+TESTS_DIR       = Path(__file__).parent
+REFERENCES_DIR  = TESTS_DIR / 'references'
+TOLERANCE_HZ    = 0       # Hz — 0 = exact match (Praat is deterministic)
+WS_RECV_TIMEOUT = 0.5     # seconds — recv timeout inside the concurrent loop
+
+
+# Default ConnConfig values — must stay in sync with analyze_server.py
+DEFAULT_CONN_CONFIG = {
+    'max_f':              5000,
+    'n_formants':         5,
+    'window_ms':          25,
+    'pre_emphasis':       50,
+    'back_ceiling':       1800,
+    'back_ceiling_ratio': 0.95,
+    'back_front_ratio':   0.75,
+    'energy_floor':       0.0,
+}
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -75,13 +96,13 @@ WS_DRAIN_SECS  = 1.5      # seconds to wait for final WebSocket responses after 
 # ══════════════════════════════════════════════════════════════════════════════
 
 @dataclass
-class Comparison:
-    """Difference between one value in the current result and the reference."""
+class Diff:
+    """One field that differs between current and reference."""
     field:     str
     current:   Any
     reference: Any
     passed:    bool
-    delta:     float | None = None   # Hz difference for numeric formant values
+    delta_hz:  float | None = None
 
 
 @dataclass
@@ -89,84 +110,116 @@ class TestResult:
     case_id:    str
     endpoint:   str
     passed:     bool
-    is_new_ref: bool = False          # True when there was no reference to compare against
-    error:      str | None = None     # non-None when the request itself failed
-    comparisons: list[Comparison] = field(default_factory=list)
-    payload:    dict = field(default_factory=dict)   # full server response
+    is_new_ref: bool = False
+    error:      str | None = None
+    diffs:      list[Diff] = field(default_factory=list)
+    payload:    dict = field(default_factory=dict)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Audio helpers
+# Audio loading — supports WAV and other formats via parselmouth
 # ══════════════════════════════════════════════════════════════════════════════
 
-def load_wav_as_int16(audio_path: Path) -> tuple[np.ndarray, int]:
+def load_audio_as_int16(audio_path: Path) -> tuple[np.ndarray, int]:
     """
-    Load a WAV file and return (int16_samples, sample_rate).
-    Stereo files are mixed down to mono by averaging channels.
+    Load any audio file as int16 samples + sample rate.
+    Uses Python's wave module for .wav files.
+    Falls back to parselmouth for other formats (.mp3, .aiff, .flac …).
     """
-    with wave.open(str(audio_path), 'rb') as wav_file:
-        sample_rate = wav_file.getframerate()
-        n_channels  = wav_file.getnchannels()
-        n_frames    = wav_file.getnframes()
-        raw_bytes   = wav_file.readframes(n_frames)
+    suffix = audio_path.suffix.lower()
 
-    all_samples = np.frombuffer(raw_bytes, dtype=np.int16)
+    if suffix == '.wav':
+        return _load_wav_as_int16(audio_path)
 
+    if _HAS_PARSELMOUTH:
+        return _load_via_parselmouth_as_int16(audio_path)
+
+    raise RuntimeError(
+        f'Cannot load {audio_path.name}: only .wav is supported without parselmouth. '
+        'Install it with:  pip install praat-parselmouth'
+    )
+
+
+def _load_wav_as_int16(path: Path) -> tuple[np.ndarray, int]:
+    with wave.open(str(path), 'rb') as wf:
+        sample_rate = wf.getframerate()
+        n_channels  = wf.getnchannels()
+        raw_bytes   = wf.readframes(wf.getnframes())
+    samples = np.frombuffer(raw_bytes, dtype=np.int16)
     if n_channels == 2:
-        # Average left and right channels
-        stereo  = all_samples.reshape(-1, 2).astype(np.float32)
-        mono    = ((stereo[:, 0] + stereo[:, 1]) / 2).astype(np.int16)
-        return mono, sample_rate
-
-    return all_samples, sample_rate
+        samples = ((samples[0::2].astype(np.int32) + samples[1::2].astype(np.int32)) // 2
+                   ).astype(np.int16)
+    return samples, sample_rate
 
 
-def split_into_chunks(samples: np.ndarray, chunk_samples: int) -> list[bytes]:
-    """Split a sample array into fixed-size Int16 chunks (as raw bytes)."""
+def _load_via_parselmouth_as_int16(path: Path) -> tuple[np.ndarray, int]:
+    sound       = parselmouth.Sound(str(path))
+    sample_rate = int(sound.sampling_frequency)
+    float_data  = sound.values[0]                           # first channel, float64 in [-1, 1]
+    int16_data  = np.clip(float_data * 32768, -32768, 32767).astype(np.int16)
+    return int16_data, sample_rate
+
+
+def load_as_wav_bytes(audio_path: Path) -> bytes:
+    """
+    Return the file's bytes for HTTP upload.
+    .wav files are read directly; other formats are converted to WAV via parselmouth.
+    """
+    if audio_path.suffix.lower() == '.wav':
+        return audio_path.read_bytes()
+
+    if not _HAS_PARSELMOUTH:
+        raise RuntimeError(f'Cannot convert {audio_path.name} to WAV without parselmouth.')
+
+    sound = parselmouth.Sound(str(audio_path))
+    with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:
+        tmp_path = tmp.name
+    try:
+        sound.save(tmp_path, 'WAV')
+        return Path(tmp_path).read_bytes()
+    finally:
+        os.unlink(tmp_path)
+
+
+def split_into_int16_chunks(samples: np.ndarray, chunk_samples: int) -> list[bytes]:
+    """Split a sample array into fixed-size Int16 chunks as raw bytes."""
     return [
-        samples[start:start + chunk_samples].tobytes()
+        samples[start: start + chunk_samples].tobytes()
         for start in range(0, len(samples), chunk_samples)
     ]
-
-
-def read_wav_bytes(audio_path: Path) -> bytes:
-    """Read a WAV file as raw bytes for HTTP upload."""
-    return audio_path.read_bytes()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Reference file management
 # ══════════════════════════════════════════════════════════════════════════════
 
-def reference_path(endpoint: str, case_id: str) -> Path:
+def _ref_path(endpoint: str, case_id: str) -> Path:
     return REFERENCES_DIR / endpoint / f'{case_id}.json'
 
 
 def load_reference(endpoint: str, case_id: str) -> dict | None:
-    """Return the reference dict, or None if no reference file exists yet."""
-    path = reference_path(endpoint, case_id)
-    if not path.exists():
-        return None
-    with path.open() as f:
-        return json.load(f)
+    path = _ref_path(endpoint, case_id)
+    return json.loads(path.read_text()) if path.exists() else None
 
 
-def save_reference(endpoint: str, case_id: str, data: dict) -> None:
-    """Write *data* as the reference file for this test case."""
-    path = reference_path(endpoint, case_id)
+def save_reference(endpoint: str, case_id: str, record: dict) -> None:
+    path = _ref_path(endpoint, case_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open('w') as f:
-        json.dump(data, f, indent=2)
+    path.write_text(json.dumps(record, indent=2))
 
 
-def build_reference_record(case: dict, endpoint: str, response_payload: dict) -> dict:
-    """Wrap a server response in a record that also stores the test parameters."""
+def build_record(case: dict, endpoint: str, response_payload: dict) -> dict:
+    """
+    Wrap the server response in a record that also stores the full effective
+    config (case overrides merged onto the defaults).
+    """
+    effective_config = {**DEFAULT_CONN_CONFIG, **case.get('config', {})}
     return {
         'meta': {
             'endpoint':  endpoint,
             'case_id':   case['id'],
             'audio':     case.get('audio', ''),
-            'config':    case.get('config', {}),
+            'config':    effective_config,
             'recorded':  datetime.now(timezone.utc).isoformat(),
         },
         'response': response_payload,
@@ -174,343 +227,324 @@ def build_reference_record(case: dict, endpoint: str, response_payload: dict) ->
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Comparison logic
+# Comparison helpers
 # ══════════════════════════════════════════════════════════════════════════════
 
-def compare_formant(field_name: str, current: int | None, reference: int | None) -> Comparison:
-    """Compare a single F1 or F2 value within TOLERANCE_HZ."""
-    if current is None and reference is None:
-        return Comparison(field_name, current, reference, passed=True, delta=0)
-    if current is None or reference is None:
-        return Comparison(field_name, current, reference, passed=False)
-    delta = abs(current - reference)
-    return Comparison(field_name, current, reference, passed=(delta <= TOLERANCE_HZ), delta=delta)
+def _diff_formant(name: str, cur: int | None, ref: int | None) -> Diff:
+    if cur is None and ref is None:
+        return Diff(name, cur, ref, passed=True, delta_hz=0)
+    if cur is None or ref is None:
+        return Diff(name, cur, ref, passed=False)
+    delta = abs(cur - ref)
+    return Diff(name, cur, ref, passed=(delta <= TOLERANCE_HZ), delta_hz=float(delta))
 
 
-def compare_count(field_name: str, current: int, reference: int) -> Comparison:
-    return Comparison(field_name, current, reference, passed=(current == reference))
+def _diff_count(name: str, cur: int, ref: int) -> Diff:
+    return Diff(name, cur, ref, passed=(cur == ref))
 
 
-def compare_float(field_name: str, current: float, reference: float, tolerance: float) -> Comparison:
-    delta = abs(current - reference)
-    return Comparison(field_name, current, reference, passed=(delta <= tolerance), delta=delta)
+def _diff_float(name: str, cur: float, ref: float, tol: float) -> Diff:
+    delta = abs(cur - ref)
+    return Diff(name, cur, ref, passed=(delta <= tol), delta_hz=delta)
 
 
-def aggregate_voiced_frames(frames: list[dict]) -> dict:
-    """Compute aggregate statistics over the voiced frames in a frame list."""
-    voiced = [f for f in frames if f.get('voiced') and f.get('f1') is not None]
-    if not voiced:
-        return {'voiced_count': 0, 'total_count': len(frames),
-                'mean_f1': None, 'mean_f2': None}
+def _is_voiced_ws_frame(frame: dict) -> bool:
+    """WS frames carry an explicit 'voiced' boolean."""
+    return bool(frame.get('voiced'))
+
+
+def _is_voiced_file_frame(frame: dict) -> bool:
+    """/analyze-file frames don't have 'voiced'; f1 not None means voiced."""
+    return frame.get('f1') is not None
+
+
+def _aggregate(frames: list[dict], voiced_predicate) -> dict:
+    voiced = [f for f in frames if voiced_predicate(f) and f.get('f1') is not None]
     return {
-        'voiced_count': len(voiced),
-        'total_count':  len(frames),
-        'mean_f1':      round(sum(f['f1'] for f in voiced) / len(voiced), 1),
-        'mean_f2':      round(sum(f['f2'] for f in voiced) / len(voiced), 1),
+        'total':    len(frames),
+        'voiced':   len(voiced),
+        'mean_f1':  round(sum(f['f1'] for f in voiced) / len(voiced), 1) if voiced else None,
+        'mean_f2':  round(sum(f['f2'] for f in voiced) / len(voiced), 1) if voiced else None,
     }
 
 
-def compare_frame_lists(current_frames: list[dict], reference_frames: list[dict]) -> list[Comparison]:
-    """
-    Compare two frame lists element-by-element.
-    Returns one Comparison per differing frame (voiced, f1, f2).
-    """
-    comparisons: list[Comparison] = []
-    n = max(len(current_frames), len(reference_frames))
+def _diff_frame_lists(cur_frames: list[dict],
+                      ref_frames: list[dict],
+                      voiced_predicate) -> list[Diff]:
+    """Compare two frame lists element-by-element; return only failures."""
+    if len(cur_frames) != len(ref_frames):
+        return [_diff_count('frame_count', len(cur_frames), len(ref_frames))]
 
-    if len(current_frames) != len(reference_frames):
-        comparisons.append(compare_count('frame_count',
-                                         len(current_frames), len(reference_frames)))
-        return comparisons   # length mismatch — don't compare further
+    failures: list[Diff] = []
+    for idx, (cur, ref) in enumerate(zip(cur_frames, ref_frames)):
+        cur_voiced = voiced_predicate(cur)
+        ref_voiced = voiced_predicate(ref)
+        if cur_voiced != ref_voiced:
+            failures.append(Diff(f'frame[{idx}].voiced', cur_voiced, ref_voiced, passed=False))
+        if cur_voiced and ref_voiced:
+            d1 = _diff_formant(f'frame[{idx}].f1', cur.get('f1'), ref.get('f1'))
+            d2 = _diff_formant(f'frame[{idx}].f2', cur.get('f2'), ref.get('f2'))
+            if not d1.passed:
+                failures.append(d1)
+            if not d2.passed:
+                failures.append(d2)
 
-    for i, (cur, ref) in enumerate(zip(current_frames, reference_frames)):
-        prefix = f'frame[{i}]'
-        if cur.get('voiced') != ref.get('voiced'):
-            comparisons.append(Comparison(f'{prefix}.voiced', cur.get('voiced'),
-                                          ref.get('voiced'), passed=False))
-        if cur.get('voiced') and ref.get('voiced'):
-            comparisons.append(compare_formant(f'{prefix}.f1', cur.get('f1'), ref.get('f1')))
-            comparisons.append(compare_formant(f'{prefix}.f2', cur.get('f2'), ref.get('f2')))
-
-    return [c for c in comparisons if not c.passed]   # return only failures
+    return failures
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /analyze tests
+# /analyze
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run_analyze_case(case: dict, update_refs: bool) -> TestResult:
     """
-    POST the audio file to /analyze and compare with the reference.
+    POST the audio to /analyze with window fraction headers.
+    Compares F1 and F2 against the reference.
 
-    Case fields:
-      id            — unique identifier for this test case
-      audio         — path to the WAV file (relative to project root)
-      window_start  — X-Window-Start fraction (default 0.0)
-      window_end    — X-Window-End fraction   (default 1.0)
-      description   — human-readable label
+    Case keys: id, audio, window_start (0.0), window_end (1.0), description
     """
-    audio_path = Path(case['audio'])
     endpoint   = 'analyze'
-
+    audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, passed=False,
-                          error=f'Audio file not found: {audio_path}')
-
-    headers = {
-        'Content-Type':    'audio/wav',
-        'X-Window-Start':  str(case.get('window_start', 0.0)),
-        'X-Window-End':    str(case.get('window_end',   1.0)),
-    }
-
+                          error=f'File not found: {audio_path}')
     try:
-        response = requests.post(f'{HTTP_BASE}/analyze',
-                                 data=read_wav_bytes(audio_path),
-                                 headers=headers, timeout=10)
+        response = requests.post(
+            f'{HTTP_BASE}/analyze',
+            data=load_as_wav_bytes(audio_path),
+            headers={
+                'Content-Type':   'audio/wav',
+                'X-Window-Start': str(case.get('window_start', 0.0)),
+                'X-Window-End':   str(case.get('window_end',   1.0)),
+            },
+            timeout=10,
+        )
         if not response.ok:
             return TestResult(case['id'], endpoint, passed=False,
                               error=f'HTTP {response.status_code}: {response.json().get("error")}')
-        server_response = response.json()
+        server_resp = response.json()
     except Exception as exc:
         return TestResult(case['id'], endpoint, passed=False, error=str(exc))
 
-    record    = build_reference_record(case, endpoint, server_response)
+    record    = build_record(case, endpoint, server_resp)
     reference = load_reference(endpoint, case['id'])
-
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
-        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True,
-                          payload=server_response)
+        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True, payload=server_resp)
 
-    ref_response = reference['response']
-    comparisons  = [
-        compare_formant('f1', server_response.get('f1'), ref_response.get('f1')),
-        compare_formant('f2', server_response.get('f2'), ref_response.get('f2')),
+    ref_resp = reference['response']
+    diffs = [
+        _diff_formant('f1', server_resp.get('f1'), ref_resp.get('f1')),
+        _diff_formant('f2', server_resp.get('f2'), ref_resp.get('f2')),
     ]
-    passed = all(c.passed for c in comparisons)
-    return TestResult(case['id'], endpoint, passed=passed,
-                      comparisons=comparisons, payload=server_response)
+    return TestResult(case['id'], endpoint, passed=all(d.passed for d in diffs),
+                      diffs=diffs, payload=server_resp)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /analyze-file tests
+# /analyze-file
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run_analyze_file_case(case: dict, update_refs: bool) -> TestResult:
     """
-    POST the audio file to /analyze-file and compare with the reference.
+    POST the audio to /analyze-file.
+    Compares voiced frame count, mean F1/F2, and per-frame values.
 
-    Case fields:
-      id          — unique identifier
-      audio       — path to the WAV file
-      config      — ConnConfig overrides dict (default {})
-      description — human-readable label
+    /analyze-file frames use {t, f1, f2, rms} — no 'voiced' key.
+    A frame is considered voiced when f1 is not None.
+
+    Case keys: id, audio, config ({}), description
     """
-    audio_path = Path(case['audio'])
     endpoint   = 'analyze_file'
-
+    audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, passed=False,
-                          error=f'Audio file not found: {audio_path}')
-
+                          error=f'File not found: {audio_path}')
     try:
-        with audio_path.open('rb') as audio_file:
+        with audio_path.open('rb') as fh:
             response = requests.post(
                 f'{HTTP_BASE}/analyze-file',
-                files={'file': (audio_path.name, audio_file, 'audio/wav')},
+                files={'file': (audio_path.name, fh, 'audio/wav')},
                 data={'config': json.dumps(case.get('config', {}))},
-                timeout=30,
+                timeout=60,
             )
         if not response.ok:
             return TestResult(case['id'], endpoint, passed=False,
                               error=f'HTTP {response.status_code}: {response.json().get("error")}')
-        server_response = response.json()
+        server_resp = response.json()
     except Exception as exc:
         return TestResult(case['id'], endpoint, passed=False, error=str(exc))
 
-    record    = build_reference_record(case, endpoint, server_response)
+    record    = build_record(case, endpoint, server_resp)
     reference = load_reference(endpoint, case['id'])
-
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
-        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True,
-                          payload=server_response)
+        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True, payload=server_resp)
 
-    ref_frames  = reference['response'].get('frames', [])
-    cur_frames  = server_response.get('frames', [])
-    cur_stats   = aggregate_voiced_frames(cur_frames)
-    ref_stats   = aggregate_voiced_frames(ref_frames)
+    cur_frames = server_resp.get('frames', [])
+    ref_frames = reference['response'].get('frames', [])
+    cur_stats  = _aggregate(cur_frames, _is_voiced_file_frame)
+    ref_stats  = _aggregate(ref_frames, _is_voiced_file_frame)
 
-    comparisons: list[Comparison] = [
-        compare_count('total_frames',  len(cur_frames),              len(ref_frames)),
-        compare_count('voiced_frames', cur_stats['voiced_count'],    ref_stats['voiced_count']),
-        compare_float('mean_f1', cur_stats['mean_f1'] or 0,
-                      ref_stats['mean_f1'] or 0, TOLERANCE_HZ),
-        compare_float('mean_f2', cur_stats['mean_f2'] or 0,
-                      ref_stats['mean_f2'] or 0, TOLERANCE_HZ),
+    diffs: list[Diff] = [
+        _diff_count('total_frames',  cur_stats['total'],  ref_stats['total']),
+        _diff_count('voiced_frames', cur_stats['voiced'], ref_stats['voiced']),
+        _diff_float('mean_f1', cur_stats['mean_f1'] or 0,
+                    ref_stats['mean_f1'] or 0, TOLERANCE_HZ),
+        _diff_float('mean_f2', cur_stats['mean_f2'] or 0,
+                    ref_stats['mean_f2'] or 0, TOLERANCE_HZ),
     ]
-    # Per-frame comparison (only report failures to keep output concise)
-    frame_failures = compare_frame_lists(cur_frames, ref_frames)
-    comparisons.extend(frame_failures)
+    diffs.extend(_diff_frame_lists(cur_frames, ref_frames, _is_voiced_file_frame))
 
-    passed = all(c.passed for c in comparisons)
-    return TestResult(case['id'], endpoint, passed=passed,
-                      comparisons=comparisons, payload=server_response)
+    return TestResult(case['id'], endpoint, passed=all(d.passed for d in diffs),
+                      diffs=diffs, payload=server_resp)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /analyze-debug tests
+# /analyze-debug
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run_analyze_debug_case(case: dict, update_refs: bool) -> TestResult:
     """
-    POST the audio file to /analyze-debug and compare raw Praat output.
+    POST the audio to /analyze-debug.
+    Compares raw Praat formant values for each config (FRONT, BACK, SCAN).
 
-    Case fields:
-      id            — unique identifier
-      audio         — path to the WAV file
-      window_start  — X-Window-Start fraction (default 0.15)
-      window_end    — X-Window-End fraction   (default 0.85)
-      description   — human-readable label
+    Case keys: id, audio, window_start (0.15), window_end (0.85), description
     """
-    audio_path = Path(case['audio'])
     endpoint   = 'analyze_debug'
-
+    audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, passed=False,
-                          error=f'Audio file not found: {audio_path}')
-
-    headers = {
-        'Content-Type':   'audio/wav',
-        'X-Window-Start': str(case.get('window_start', 0.15)),
-        'X-Window-End':   str(case.get('window_end',   0.85)),
-    }
-
+                          error=f'File not found: {audio_path}')
     try:
-        response = requests.post(f'{HTTP_BASE}/analyze-debug',
-                                 data=read_wav_bytes(audio_path),
-                                 headers=headers, timeout=10)
+        response = requests.post(
+            f'{HTTP_BASE}/analyze-debug',
+            data=load_as_wav_bytes(audio_path),
+            headers={
+                'Content-Type':   'audio/wav',
+                'X-Window-Start': str(case.get('window_start', 0.15)),
+                'X-Window-End':   str(case.get('window_end',   0.85)),
+            },
+            timeout=10,
+        )
         if not response.ok:
             return TestResult(case['id'], endpoint, passed=False,
                               error=f'HTTP {response.status_code}: {response.json().get("error")}')
-        server_response = response.json()
+        server_resp = response.json()
     except Exception as exc:
         return TestResult(case['id'], endpoint, passed=False, error=str(exc))
 
-    record    = build_reference_record(case, endpoint, server_response)
+    record    = build_record(case, endpoint, server_resp)
     reference = load_reference(endpoint, case['id'])
-
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
-        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True,
-                          payload=server_response)
+        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True, payload=server_resp)
 
-    comparisons: list[Comparison] = []
-    ref_configs = reference['response'].get('configs', {})
-    cur_configs = server_response.get('configs', {})
-
-    for config_name, cur_config_result in cur_configs.items():
-        ref_config_result = ref_configs.get(config_name, {})
-        cur_formants = cur_config_result.get('formants', {})
-        ref_formants = ref_config_result.get('formants', {})
-
-        for key in ref_formants:
+    diffs: list[Diff] = []
+    cur_cfgs = server_resp.get('configs', {})
+    ref_cfgs = reference['response'].get('configs', {})
+    for cfg_name, ref_cfg_data in ref_cfgs.items():
+        cur_formants = cur_cfgs.get(cfg_name, {}).get('formants', {})
+        ref_formants = ref_cfg_data.get('formants', {})
+        for key, ref_val in ref_formants.items():
             if key.startswith('F') and not key.startswith('BW'):
-                comparisons.append(compare_formant(
-                    f'{config_name}.{key}',
-                    cur_formants.get(key),
-                    ref_formants.get(key),
-                ))
+                diffs.append(_diff_formant(
+                    f'{cfg_name}.{key}', cur_formants.get(key), ref_val))
 
-    passed = all(c.passed for c in comparisons)
-    return TestResult(case['id'], endpoint, passed=passed,
-                      comparisons=comparisons, payload=server_response)
+    return TestResult(case['id'], endpoint, passed=all(d.passed for d in diffs),
+                      diffs=diffs, payload=server_resp)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /ws tests
+# /ws — concurrent send + receive (avoids TCP deadlock)
 # ══════════════════════════════════════════════════════════════════════════════
 
-async def _stream_audio_over_websocket(
-        audio_path:   Path,
-        chunk_samples: int,
-        config:        dict,
-) -> dict:
+async def _stream_and_collect(audio_path: Path, chunk_samples: int, config: dict) -> dict:
     """
-    Simulate the browser's AudioWorklet streaming behaviour:
-      1. Connect to the WebSocket.
-      2. Send {type:'init', sample_rate} text frame.
-      3. Send optional {type:'config'} text frame.
-      4. Split the audio into Int16 chunks and send each as a binary frame.
-      5. Drain incoming frames until the server goes quiet (WS_DRAIN_SECS).
+    Reproduce exactly what realtime.js _accumulate does:
+      1.  Connect to WS.
+      2.  Send {type:'init', sample_rate} text frame.
+      3.  Send optional {type:'config'} text frame.
+      4.  Send each Int16 chunk as a binary frame.
+      5.  Collect voiced/F1/F2/RMS frames from the server.
 
-    Returns a dict summarising what was sent and received.
+    CRITICAL — send and receive run concurrently.
+    Sending all chunks before receiving causes a TCP deadlock: the client
+    fill its send buffer, the server can't send responses (recv buffer full),
+    both sides block.  asyncio.gather runs the sender and receiver as
+    two concurrent coroutines, exactly as a browser's WebSocket does.
     """
-    samples_int16, sample_rate = load_wav_as_int16(audio_path)
-    audio_chunks = split_into_chunks(samples_int16, chunk_samples)
+    samples_int16, sample_rate = load_audio_as_int16(audio_path)
+    audio_chunks               = split_into_int16_chunks(samples_int16, chunk_samples)
     received_frames: list[dict] = []
+    sending_complete            = asyncio.Event()
 
-    async with websockets.connect(WS_URL) as websocket:
-        # Initialise session
-        await websocket.send(json.dumps({'type': 'init', 'sample_rate': sample_rate}))
+    async with websockets.connect(WS_URL) as ws:
+        # Initialise — must match what realtime.js sends in start()
+        await ws.send(json.dumps({'type': 'init', 'sample_rate': sample_rate}))
         if config:
-            await websocket.send(json.dumps({'type': 'config', **config}))
+            await ws.send(json.dumps({'type': 'config', **config}))
 
-        # Stream audio chunks
-        for chunk_bytes in audio_chunks:
-            await websocket.send(chunk_bytes)
+        async def send_all_chunks() -> None:
+            for chunk_bytes in audio_chunks:
+                await ws.send(chunk_bytes)
+            sending_complete.set()
 
-        # Drain: collect responses until the server goes silent
-        while True:
-            try:
-                raw_message = await asyncio.wait_for(websocket.recv(), timeout=WS_DRAIN_SECS)
-                payload     = json.loads(raw_message)
-                for frame in payload.get('frames', []):
-                    received_frames.append(frame)
-            except asyncio.TimeoutError:
-                break
+        async def receive_all_frames() -> None:
+            """
+            Loop until the server goes quiet after all chunks are sent.
+            Uses a short timeout so the loop stays responsive; only stops
+            when both (a) we are done sending AND (b) recv times out.
+            """
+            while True:
+                try:
+                    raw = await asyncio.wait_for(ws.recv(), timeout=WS_RECV_TIMEOUT)
+                    for frame in json.loads(raw).get('frames', []):
+                        received_frames.append(frame)
+                except asyncio.TimeoutError:
+                    if sending_complete.is_set():
+                        break   # done sending AND server went quiet → finished
+                    # Still sending — keep waiting for responses
 
-    voiced_frames  = [f for f in received_frames if f.get('voiced')]
-    voiced_f1_list = [f['f1'] for f in voiced_frames if f.get('f1') is not None]
-    voiced_f2_list = [f['f2'] for f in voiced_frames if f.get('f2') is not None]
+        await asyncio.gather(send_all_chunks(), receive_all_frames())
+
+    voiced      = [f for f in received_frames if _is_voiced_ws_frame(f)]
+    voiced_f1   = [f['f1'] for f in voiced if f.get('f1') is not None]
+    voiced_f2   = [f['f2'] for f in voiced if f.get('f2') is not None]
 
     return {
-        'chunks_sent':      len(audio_chunks),
-        'samples_sent':     len(samples_int16),
-        'sample_rate':      sample_rate,
-        'chunk_samples':    chunk_samples,
-        'frames_received':  len(received_frames),
-        'voiced_count':     len(voiced_frames),
-        'mean_f1':          round(sum(voiced_f1_list) / len(voiced_f1_list), 1) if voiced_f1_list else None,
-        'mean_f2':          round(sum(voiced_f2_list) / len(voiced_f2_list), 1) if voiced_f2_list else None,
-        'frames':           received_frames,
+        'chunks_sent':     len(audio_chunks),
+        'samples_sent':    len(samples_int16),
+        'sample_rate':     sample_rate,
+        'chunk_samples':   chunk_samples,
+        'frames_received': len(received_frames),
+        'voiced_count':    len(voiced),
+        'mean_f1':         round(sum(voiced_f1) / len(voiced_f1), 1) if voiced_f1 else None,
+        'mean_f2':         round(sum(voiced_f2) / len(voiced_f2), 1) if voiced_f2 else None,
+        'frames':          received_frames,
     }
 
 
 def run_ws_case(case: dict, update_refs: bool) -> TestResult:
     """
-    Stream audio to /ws and compare aggregate statistics and per-frame results.
+    Stream audio to /ws in browser-identical Int16 chunks.
+    Compares frame count, voiced count, mean F1/F2, and per-frame values.
 
-    Case fields:
-      id             — unique identifier
-      audio          — path to the WAV file
-      chunk_samples  — samples per WebSocket binary frame (default 128)
-      config         — ConnConfig overrides to send as {type:'config'} (default {})
-      description    — human-readable label
+    /ws frames carry an explicit 'voiced' boolean (unlike /analyze-file).
+
+    Case keys: id, audio, chunk_samples (128), config ({}), description
     """
-    if not _WEBSOCKETS_AVAILABLE:
+    if not _HAS_WEBSOCKETS:
         return TestResult(case['id'], 'ws', passed=False,
-                          error='websockets package not installed  (pip install websockets)')
+                          error='websockets not installed — pip install websockets')
 
-    audio_path = Path(case['audio'])
     endpoint   = 'ws'
-
+    audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, passed=False,
-                          error=f'Audio file not found: {audio_path}')
-
+                          error=f'File not found: {audio_path}')
     try:
-        streaming_result = asyncio.run(_stream_audio_over_websocket(
+        result = asyncio.run(_stream_and_collect(
             audio_path    = audio_path,
             chunk_samples = case.get('chunk_samples', 128),
             config        = case.get('config', {}),
@@ -518,114 +552,92 @@ def run_ws_case(case: dict, update_refs: bool) -> TestResult:
     except Exception as exc:
         return TestResult(case['id'], endpoint, passed=False, error=str(exc))
 
-    record    = build_reference_record(case, endpoint, streaming_result)
+    record    = build_record(case, endpoint, result)
     reference = load_reference(endpoint, case['id'])
-
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
-        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True,
-                          payload=streaming_result)
+        return TestResult(case['id'], endpoint, passed=True, is_new_ref=True, payload=result)
 
-    ref_result   = reference['response']
-    comparisons: list[Comparison] = [
-        compare_count('chunks_sent',     streaming_result['chunks_sent'],
-                      ref_result['chunks_sent']),
-        compare_count('frames_received', streaming_result['frames_received'],
-                      ref_result['frames_received']),
-        compare_count('voiced_count',    streaming_result['voiced_count'],
-                      ref_result['voiced_count']),
-        compare_float('mean_f1',         streaming_result['mean_f1'] or 0,
-                      ref_result['mean_f1'] or 0, TOLERANCE_HZ),
-        compare_float('mean_f2',         streaming_result['mean_f2'] or 0,
-                      ref_result['mean_f2'] or 0, TOLERANCE_HZ),
+    ref_result = reference['response']
+    diffs: list[Diff] = [
+        _diff_count('chunks_sent',     result['chunks_sent'],     ref_result['chunks_sent']),
+        _diff_count('frames_received', result['frames_received'], ref_result['frames_received']),
+        _diff_count('voiced_count',    result['voiced_count'],    ref_result['voiced_count']),
+        _diff_float('mean_f1', result['mean_f1'] or 0, ref_result['mean_f1'] or 0, TOLERANCE_HZ),
+        _diff_float('mean_f2', result['mean_f2'] or 0, ref_result['mean_f2'] or 0, TOLERANCE_HZ),
     ]
-    frame_failures = compare_frame_lists(streaming_result['frames'], ref_result['frames'])
-    comparisons.extend(frame_failures)
+    diffs.extend(_diff_frame_lists(result['frames'], ref_result['frames'], _is_voiced_ws_frame))
 
-    passed = all(c.passed for c in comparisons)
-    return TestResult(case['id'], endpoint, passed=passed,
-                      comparisons=comparisons, payload=streaming_result)
+    return TestResult(case['id'], endpoint, passed=all(d.passed for d in diffs),
+                      diffs=diffs, payload=result)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Output formatting
 # ══════════════════════════════════════════════════════════════════════════════
 
-PASS_ICON = '✓'
-FAIL_ICON = '✗'
-NEW_ICON  = '★'
-
-def _fmt_val(value: Any) -> str:
-    if value is None:
+def _fv(v: Any) -> str:
+    """Format a value for display."""
+    if v is None:
         return 'null'
-    if isinstance(value, float):
-        return f'{value:.1f}'
-    return str(value)
-
-
-def print_result(result: TestResult) -> None:
-    endpoint_label = result.endpoint.replace('_', '-')
-    case_label     = result.case_id
-
-    if result.error:
-        print(f'  [{endpoint_label}] {case_label} — ERROR')
-        print(f'    {result.error}')
-        return
-
-    if result.is_new_ref:
-        print(f'  [{endpoint_label}] {case_label} — {NEW_ICON} SAVED AS REFERENCE')
-        _print_payload_summary(result.endpoint, result.payload)
-        return
-
-    icon   = PASS_ICON if result.passed else FAIL_ICON
-    status = 'PASS' if result.passed else 'FAIL'
-    print(f'  [{endpoint_label}] {case_label} — {icon} {status}')
-
-    # For passing tests only show summary; for failing tests show each comparison
-    if result.passed:
-        _print_payload_summary(result.endpoint, result.payload)
-    else:
-        for comp in result.comparisons:
-            if not comp.passed:
-                delta_str = f'  Δ={comp.delta:.1f} Hz' if comp.delta is not None else ''
-                print(f'    {FAIL_ICON} {comp.field}: '
-                      f'{_fmt_val(comp.current)} (ref: {_fmt_val(comp.reference)}){delta_str}')
+    if isinstance(v, float):
+        return f'{v:.1f}'
+    return str(v)
 
 
 def _print_payload_summary(endpoint: str, payload: dict) -> None:
-    """Print a one-line summary of the response payload."""
     if endpoint == 'analyze':
-        f1 = payload.get('f1', '?')
-        f2 = payload.get('f2', '?')
-        print(f'    F1={f1} Hz  F2={f2} Hz')
-
+        print(f'      F1={payload.get("f1")} Hz  F2={payload.get("f2")} Hz  '
+              f'dur={payload.get("duration_ms")} ms')
     elif endpoint == 'analyze_file':
-        frames = payload.get('frames', [])
-        stats  = aggregate_voiced_frames(frames)
-        print(f'    {stats["voiced_count"]}/{stats["total_count"]} voiced frames  '
-              f'mean F1={stats["mean_f1"]}  mean F2={stats["mean_f2"]}')
-
+        stats = _aggregate(payload.get('frames', []), _is_voiced_file_frame)
+        print(f'      {stats["voiced"]}/{stats["total"]} voiced  '
+              f'mean F1={_fv(stats["mean_f1"])}  mean F2={_fv(stats["mean_f2"])}')
     elif endpoint == 'analyze_debug':
-        configs = payload.get('configs', {})
-        for cfg_name, cfg_data in configs.items():
-            formants = cfg_data.get('formants', {})
-            f1 = formants.get('F1', '?')
-            f2 = formants.get('F2', '?')
-            print(f'    {cfg_name}: F1={f1}  F2={f2}')
-
+        for name, data in payload.get('configs', {}).items():
+            fm = data.get('formants', {})
+            print(f'      {name}: F1={_fv(fm.get("F1"))}  F2={_fv(fm.get("F2"))}  '
+                  f'BW1={_fv(fm.get("BW1"))}  BW2={_fv(fm.get("BW2"))}')
     elif endpoint == 'ws':
-        print(f'    {payload.get("voiced_count")}/{payload.get("frames_received")} voiced  '
-              f'mean F1={payload.get("mean_f1")}  mean F2={payload.get("mean_f2")}')
+        print(f'      {payload.get("voiced_count")}/{payload.get("frames_received")} voiced  '
+              f'mean F1={_fv(payload.get("mean_f1"))}  mean F2={_fv(payload.get("mean_f2"))}  '
+              f'chunks={payload.get("chunks_sent")}')
+
+
+def print_result(result: TestResult) -> None:
+    ep    = result.endpoint.replace('_', '-')
+    label = result.case_id
+
+    if result.error:
+        print(f'  [{ep}] {label}')
+        print(f'    ✗ ERROR: {result.error}')
+        return
+
+    if result.is_new_ref:
+        print(f'  [{ep}] {label}  ★ SAVED AS REFERENCE')
+        _print_payload_summary(result.endpoint, result.payload)
+        return
+
+    icon   = '✓' if result.passed else '✗'
+    status = 'PASS' if result.passed else 'FAIL'
+    print(f'  [{ep}] {label}  {icon} {status}')
+
+    if result.passed:
+        _print_payload_summary(result.endpoint, result.payload)
+    else:
+        for d in result.diffs:
+            if not d.passed:
+                delta = f'  Δ={d.delta_hz:.1f} Hz' if d.delta_hz is not None else ''
+                print(f'    ✗ {d.field}: {_fv(d.current)}  (ref: {_fv(d.reference)}){delta}')
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Server connectivity check
+# Connectivity check
 # ══════════════════════════════════════════════════════════════════════════════
 
-def check_server_is_running() -> bool:
+def server_is_running() -> bool:
     try:
-        response = requests.get(f'{HTTP_BASE}/ping', timeout=3)
-        return response.ok
+        return requests.get(f'{HTTP_BASE}/ping', timeout=3).ok
     except Exception:
         return False
 
@@ -634,98 +646,37 @@ def check_server_is_running() -> bool:
 # Test cases — edit these to match your audio files
 # ══════════════════════════════════════════════════════════════════════════════
 
-CASES = {
+CASES: dict[str, list[dict]] = {
+
     'analyze': [
-        {
-            'id':           'i_middle_window',
-            'audio':        'lang/me/audio/i.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/i/ close front unrounded — middle 70% of recording',
-        },
-        {
-            'id':           'i_bar_middle_window',
-            'audio':        'lang/me/audio/i_bar.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/ɨ/ close central unrounded',
-        },
-        {
-            'id':           'u_middle_window',
-            'audio':        'lang/me/audio/u.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/u/ close back rounded',
-        },
-        {
-            'id':           'o_middle_window',
-            'audio':        'lang/me/audio/o.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/o/ mid back rounded',
-        },
-        {
-            'id':           'e_open_middle_window',
-            'audio':        'lang/me/audio/e_open.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/ɛ/ open-mid front unrounded',
-        },
-        {
-            'id':           'a_middle_window',
-            'audio':        'lang/me/audio/a.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/a/ open front unrounded',
-        },
+        {'id': 'i',     'audio': 'lang/me/audio/i.wav',      'window_start': 0.15, 'window_end': 0.85, 'description': '/i/ close front'},
+        {'id': 'i_bar', 'audio': 'lang/me/audio/i_bar.wav',  'window_start': 0.15, 'window_end': 0.85, 'description': '/ɨ/ close central'},
+        {'id': 'u',     'audio': 'lang/me/audio/u.wav',      'window_start': 0.15, 'window_end': 0.85, 'description': '/u/ close back'},
+        {'id': 'o',     'audio': 'lang/me/audio/o.wav',      'window_start': 0.15, 'window_end': 0.85, 'description': '/o/ mid back'},
+        {'id': 'e_open','audio': 'lang/me/audio/e_open.wav', 'window_start': 0.15, 'window_end': 0.85, 'description': '/ɛ/ open-mid front'},
+        {'id': 'a',     'audio': 'lang/me/audio/a.wav',      'window_start': 0.15, 'window_end': 0.85, 'description': '/a/ open front'},
     ],
 
     'analyze_file': [
-        {
-            'id':          'i_full_file',
-            'audio':       'lang/me/audio/i.wav',
-            'config':      {},
-            'description': '/i/ whole file — all frames with default config',
-        },
-        {
-            'id':          'u_full_file',
-            'audio':       'lang/me/audio/u.wav',
-            'config':      {},
-            'description': '/u/ whole file — verifies back vowel disambiguation',
-        },
-        {
-            'id':          'a_full_file',
-            'audio':       'lang/me/audio/a.wav',
-            'config':      {},
-            'description': '/a/ whole file',
-        },
+        {'id': 'i',     'audio': 'lang/me/audio/i.wav',     'config': {}, 'description': '/i/ all frames'},
+        {'id': 'u',     'audio': 'lang/me/audio/u.wav',     'config': {}, 'description': '/u/ back vowel disambiguation'},
+        {'id': 'a',     'audio': 'lang/me/audio/a.wav',     'config': {}, 'description': '/a/ open vowel'},
     ],
 
     'analyze_debug': [
-        {
-            'id':           'i_all_configs',
-            'audio':        'lang/me/audio/i.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/i/ — shows FRONT (legacy n=3), BACK (n=2), SCAN (n=5)',
-        },
-        {
-            'id':           'u_all_configs',
-            'audio':        'lang/me/audio/u.wav',
-            'window_start': 0.15,
-            'window_end':   0.85,
-            'description':  '/u/ — verify BACK correctly captures low F2',
-        },
+        {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'window_start': 0.15, 'window_end': 0.85,
+         'description': '/i/ — FRONT skips F1, SCAN finds it'},
+        {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'window_start': 0.15, 'window_end': 0.85,
+         'description': '/u/ — BACK disambiguates low F2'},
     ],
 
     'ws': [
-        {
-            'id':            'i_streaming_128',
-            'audio':         'test/live_speech_short.wav',
-            'chunk_samples': 128,    # matches AudioWorklet chunk size
-            'config':        {},
-            'description':   '/i/ streamed in 128-sample chunks (default browser size)',
-        }
+        {'id': 'i_128',  'audio': 'lang/me/audio/i.wav', 'chunk_samples': 128, 'config': {},
+         'description': '/i/ streamed in 128-sample chunks (AudioWorklet size)'},
+        {'id': 'u_128',  'audio': 'lang/me/audio/u.wav', 'chunk_samples': 128, 'config': {},
+         'description': '/u/ streamed — back vowel via WebSocket'},
+        {'id': 'live_speech',  'audio': 'test/live_speech_short.wav', 'chunk_samples': 128, 'config': {},
+         'description': '/i/ streamed in 512-sample chunks (ScriptProcessor fallback)'},
     ],
 }
 
@@ -734,7 +685,7 @@ CASES = {
 # Main
 # ══════════════════════════════════════════════════════════════════════════════
 
-ENDPOINT_RUNNERS = {
+RUNNERS = {
     'analyze':       run_analyze_case,
     'analyze_file':  run_analyze_file_case,
     'analyze_debug': run_analyze_debug_case,
@@ -744,45 +695,40 @@ ENDPOINT_RUNNERS = {
 
 def main() -> int:
     parser = argparse.ArgumentParser(description='Formant server regression tests')
-    parser.add_argument('endpoints', nargs='*', default=list(ENDPOINT_RUNNERS.keys()),
-                        choices=list(ENDPOINT_RUNNERS.keys()) + [[]],
-                        help='Endpoints to test (default: all)')
-    parser.add_argument('--update',  action='store_true',
-                        help='Overwrite all reference files with current server results')
-    parser.add_argument('--list',    action='store_true',
+    parser.add_argument('endpoints', nargs='*', default=[],
+                        choices=list(RUNNERS.keys()) + [[]])
+    parser.add_argument('--update', action='store_true',
+                        help='Overwrite all reference files')
+    parser.add_argument('--list',   action='store_true',
                         help='List all test case IDs and exit')
     args = parser.parse_args()
 
     if args.list:
-        for endpoint, cases in CASES.items():
-            print(f'\n{endpoint}:')
-            for case in cases:
-                print(f'  {case["id"]:30}  {case["description"]}')
+        for ep, cases in CASES.items():
+            print(f'\n{ep}:')
+            for c in cases:
+                print(f'  {c["id"]:25}  {c["description"]}')
         return 0
 
-    if not check_server_is_running():
-        print('ERROR: Server is not running at', HTTP_BASE)
+    if not server_is_running():
+        print(f'ERROR: server not running at {HTTP_BASE}')
         print('       Start it with:  python analyze_server.py')
         return 1
 
-    endpoints_to_run = args.endpoints or list(ENDPOINT_RUNNERS.keys())
-    total, passed, new_refs, failed = 0, 0, 0, 0
+    endpoints = args.endpoints or list(RUNNERS.keys())
+    total = passed = new_refs = failed = 0
 
-    print(f'\nFormant server tests — tolerance={TOLERANCE_HZ} Hz'
-          + ('  [UPDATE MODE]' if args.update else ''))
-    print('─' * 60)
+    mode = '  [UPDATE MODE]' if args.update else ''
+    print(f'\nFormant server tests — tolerance={TOLERANCE_HZ} Hz{mode}')
+    print('─' * 64)
 
-    for endpoint in endpoints_to_run:
-        runner    = ENDPOINT_RUNNERS[endpoint]
-        test_cases = CASES.get(endpoint, [])
-
-        if not test_cases:
+    for ep in endpoints:
+        cases = CASES.get(ep, [])
+        if not cases:
             continue
-
-        print(f'\n/{endpoint.replace("_", "-")}')
-
-        for case in test_cases:
-            result = runner(case, update_refs=args.update)
+        print(f'\n/{ep.replace("_", "-")}')
+        for case in cases:
+            result = RUNNERS[ep](case, update_refs=args.update)
             print_result(result)
             total += 1
             if result.error:
@@ -794,10 +740,11 @@ def main() -> int:
             else:
                 failed += 1
 
-    print('\n' + '─' * 60)
-    print(f'Results: {passed} passed  {failed} failed  {new_refs} new references  ({total} total)')
+    print('\n' + '─' * 64)
+    print(f'{passed} passed  {failed} failed  {new_refs} new references  '
+          f'({total} total)')
     if new_refs:
-        print('  Inspect the new reference files in tests/references/ and commit them.')
+        print('Inspect tests/references/ and commit the new files.')
 
     return 0 if failed == 0 else 1
 
