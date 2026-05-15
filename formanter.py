@@ -300,10 +300,15 @@ def select_best_formants(
     back_has_result = f1_back is not None and f2_back is not None
     scan_has_result = f1_scan is not None and f2_scan is not None
 
-    back_not_at_ceiling     = f2_back < config.back_ceiling * config.back_ceiling_ratio
-    back_lower_than_scan    = f2_back < f2_scan * config.back_front_ratio
-    prefer_back             = back_has_result and scan_has_result \
-                              and back_not_at_ceiling and back_lower_than_scan
+    # NOTE: the comparisons must be inside the 'and' chain so Python's
+    # short-circuit evaluation skips them when back_has_result is False.
+    # Extracting them into named variables before the chain would evaluate
+    # f2_back < ... even when f2_back is None, raising a TypeError.
+    prefer_back = (
+            back_has_result and scan_has_result
+            and f2_back < config.back_ceiling * config.back_ceiling_ratio
+            and f2_back < f2_scan * config.back_front_ratio
+    )
 
     if prefer_back:
         return f1_back, f2_back
