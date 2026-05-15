@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "endpoint": "ws",
+    "case_id": "u_128",
+    "audio": "lang/me/audio/u.wav",
+    "config": {
+      "max_f": 5000,
+      "n_formants": 5,
+      "window_ms": 25,
+      "pre_emphasis": 50,
+      "back_ceiling": 1800,
+      "back_ceiling_ratio": 0.95,
+      "back_front_ratio": 0.75,
+      "energy_floor": 0.0
+    },
+    "recorded": "2026-05-15T16:34:20.233276+00:00"
+  },
+  "response": {
+    "chunks_sent": 118,
+    "samples_sent": 15000,
+    "original_samples": 3750,
+    "loops_applied": 4,
+    "sample_rate": 44100,
+    "chunk_samples": 128,
+    "frames_received": 22,
+    "voiced_count": 22,
+    "mean_f1": 354.2,
+    "mean_f2": 783.8,
+    "frames": [
+      {
+        "voiced": true,
+        "f1": 325,
+        "f2": 592,
+        "rms": 0.055546,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 314,
+        "f2": 569,
+        "rms": 0.055445,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 277,
+        "f2": 547,
+        "rms": 0.055633,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 503,
+        "f2": 1206,
+        "rms": 0.055723,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 487,
+        "f2": 1965,
+        "rms": 0.055388,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 329,
+        "f2": 567,
+        "rms": 0.05521,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 230,
+        "f2": 543,
+        "rms": 0.054799,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 331,
+        "f2": 584,
+        "rms": 0.055203,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 320,
+        "f2": 578,
+        "rms": 0.055583,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 268,
+        "f2": 549,
+        "rms": 0.05567,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 495,
+        "f2": 2006,
+        "rms": 0.05568,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 468,
+        "f2": 1188,
+        "rms": 0.055427,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 327,
+        "f2": 562,
+        "rms": 0.055211,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 324,
+        "f2": 558,
+        "rms": 0.055047,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 333,
+        "f2": 586,
+        "rms": 0.05495,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 321,
+        "f2": 588,
+        "rms": 0.055268,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 320,
+        "f2": 571,
+        "rms": 0.055711,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 297,
+        "f2": 531,
+        "rms": 0.055659,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 510,
+        "f2": 1219,
+        "rms": 0.055488,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 351,
+        "f2": 589,
+        "rms": 0.055363,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 331,
+        "f2": 575,
+        "rms": 0.054953,
+        "t": 46
+      },
+      {
+        "voiced": true,
+        "f1": 332,
+        "f2": 570,
+        "rms": 0.054981,
+        "t": 46
+      }
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "endpoint": "analyze_file",
+    "case_id": "u",
+    "audio": "lang/me/audio/u.wav",
+    "config": {
+      "max_f": 5000,
+      "n_formants": 5,
+      "window_ms": 25,
+      "pre_emphasis": 50,
+      "back_ceiling": 1800,
+      "back_ceiling_ratio": 0.95,
+      "back_front_ratio": 0.75,
+      "energy_floor": 0.0
+    },
+    "recorded": "2026-05-15T16:27:14.476995+00:00",
+    "loops_applied": 2,
+    "original_samples": 3750
+  },
+  "response": {
+    "duration": 0.17,
+    "frames": [
+      {
+        "f1": 325,
+        "f2": 592,
+        "rms": 0.055546,
+        "t": 0.093
+      },
+      {
+        "f1": 318,
+        "f2": 577,
+        "rms": 0.055594,
+        "t": 0.103
+      },
+      {
+        "f1": 237,
+        "f2": 545,
+        "rms": 0.055319,
+        "t": 0.113
+      },
+      {
+        "f1": 511,
+        "f2": 2019,
+        "rms": 0.055687,
+        "t": 0.123
+      },
+      {
+        "f1": 523,
+        "f2": 1623,
+        "rms": 0.055441,
+        "t": 0.133
+      },
+      {
+        "f1": 360,
+        "f2": 586,
+        "rms": 0.055358,
+        "t": 0.143
+      },
+      {
+        "f1": 329,
+        "f2": 584,
+        "rms": 0.055148,
+        "t": 0.153
+      },
+      {
+        "f1": 268,
+        "f2": 547,
+        "rms": 0.054728,
+        "t": 0.163
+      }
+    ]
+  }
+}
