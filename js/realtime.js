@@ -15,42 +15,34 @@ const TRAIL_DOTS    = 50;     // keep last N voiced frames
 const TRAIL_COLOR   = '#ffd700'; // gold — matches reference style
 
 // Ring buffer config — separates "how often we capture" from "how much we analyze"
-const SP_BUF   = 512;    // ScriptProcessor fires every 512/sr ≈ 11ms (small = responsive)
+const SP_BUF         = 512;    // ScriptProcessor fires every 512/sr ≈ 11ms (small = responsive)
+const DEFAULT_RMS_FLOOR = 0.005; // sent to server as rms_floor; 0 = gate disabled
+const DEFAULT_MEDIAN_N  = 5;     // sent to server as median_n
+const STREAK_MIN        = 1;     // consecutive voiced frames before adding to trail
 // Ring buffer and send timer removed — server now does sliding-window analysis
 
 class RealtimeTracker {
   constructor() {
     this.ws = this.audioCtx = this.workletNode = this.micStream = null;
-    this.trail  = [];
-    this.active = false;
-    this.rafId  = null;
+    this.trail    = [];
+    this.active   = false;
+    this.rafId    = null;
     this.svgGroup = null;
-    this.stats  = { frames:0, voiced:0, start:0 };
-    // Chunks sent directly to server; ring buffer is now server-side
-    // Noise gate state
-    this._gateThreshold  = 0.008;  // RMS threshold; auto-calibrated on start
-    this._gateOpen       = false;
-    this._gateCloseTimer = null;
-    this._calibrating    = false;
-    this._calibSamples   = [];
-    this._calibStart     = 0;
-    // Stability controls
-    this._voicedStreak   = 0;   // consecutive voiced frames; draw only after >= 2
-    this._medianWindow   = [];  // last N voiced {f1,f2} for median smoothing
-    this._MEDIAN_N       = 5;    // faster response, still robust
+    this.stats    = { frames:0, voiced:0, start:0 };
+    // Streak stays client-side (display preference, not analysis)
+    this._voicedStreak = 0;
+    // Most recent frame from server — used for gate indicator in _stats()
+    this._lastFrame    = null;
   }
 
   async start() {
     if (this.active) return;
     await this._openWS();
     await this._openMic();
-    this.active = true;
+    this.active        = true;
     this.stats         = { frames:0, voiced:0, start:Date.now() };
-    // Begin calibration — sample ambient noise for 1.5s before opening gate
-    this._calibrating  = true;
-    this._calibSamples = [];
-    this._calibStart   = Date.now();
-    this._gateOpen     = false;
+    this._voicedStreak = 0;
+    this._lastFrame    = null;
     this._ensureGroup();
     this._raf();
     this._ui(true);
@@ -69,9 +61,11 @@ class RealtimeTracker {
     // Don't _clearGroup() — that destroys the pool elements.
     // Just hide them and null the pool so _ensureGroup recreates on next start.
     if (this._dotPool) this._dotPool.forEach(el => el.setAttribute('opacity','0'));
-    this._dotPool  = null;
-    this.svgGroup  = null;
-    this.trail     = [];
+    this._dotPool      = null;
+    this.svgGroup      = null;
+    this.trail         = [];
+    this._voicedStreak = 0;
+    this._lastFrame    = null;
     this._ui(false);
   }
 
@@ -97,8 +91,14 @@ class RealtimeTracker {
     this.audioCtx = new (window.AudioContext||window.webkitAudioContext)();
     const sr  = this.audioCtx.sampleRate;
     const src = this.audioCtx.createMediaStreamSource(this.micStream);
-    if (this.ws?.readyState===WebSocket.OPEN)
+    if (this.ws?.readyState===WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ type:'init', sample_rate:sr }));
+      this.ws.send(JSON.stringify({
+        type:      'config',
+        rms_floor: DEFAULT_RMS_FLOOR,
+        median_n:  DEFAULT_MEDIAN_N,
+      }));
+    }
 
     // AudioWorklet runs off main thread — no UI jitter
     try {
@@ -122,88 +122,47 @@ class RealtimeTracker {
     }
   }
 
-  // ── Audio chunk handler — calibrate, gate-check, send directly to server ──
-  // Server maintains the ring buffer and does sliding-window analysis every 10ms.
-  // This gives ~87 analyses/sec vs ~30 with the old client-side ring approach.
+  // ── Audio chunk handler — encode and send every chunk directly ──────────────
+  // No client-side gate or calibration. The server applies rms_floor and
+  // handles all analysis (Praat, continuity, median). Client just sends raw audio.
   _accumulate(float32) {
-    // ── Calibration: sample ambient noise for first 1.5s ────────────────────
-    if (this._calibrating) {
-      const level = this._rms(float32);
-      if (level > 0.00001) this._calibSamples.push(level);
-      if (Date.now()-this._calibStart >= 1500 && this._calibSamples.length >= 5) {
-        const sorted = [...this._calibSamples].sort((a,b)=>a-b);
-        const floor  = sorted[Math.floor(sorted.length*0.9)];
-        this._gateThreshold = Math.min(0.06, Math.max(0.004, floor * 3));
-        this._calibrating = false;
-        console.log(`[Gate] floor=${floor.toFixed(5)}  threshold=${this._gateThreshold.toFixed(5)}`);
-      }
-      return;  // don't send during calibration
-    }
-
-    // ── Gate check ───────────────────────────────────────────────────────────
-    const level = this._rms(float32);
-    if (!this._updateGate(level)) return;
-
-    // ── Send chunk directly to server (Int16 wire format) ────────────────────
     if (!this.active || this.ws?.readyState !== WebSocket.OPEN) return;
     const i16 = new Int16Array(float32.length);
-    for (let j=0; j<float32.length; j++)
-      i16[j] = Math.max(-32768, Math.min(32767, Math.round(float32[j]*32768)));
+    for (let j = 0; j < float32.length; j++)
+      i16[j] = Math.max(-32768, Math.min(32767, Math.round(float32[j] * 32768)));
     this.ws.send(i16.buffer);
-  }
-
-  // ── RMS level of a Float32 array ──────────────────────────────────────────
-  _rms(f32) {
-    let s = 0;
-    for (let i=0; i<f32.length; i++) s += f32[i]*f32[i];
-    return Math.sqrt(s/f32.length);
-  }
-
-  // ── Noise gate: open on speech, close 200ms after silence ─────────────────
-  _updateGate(level) {
-    if (level > this._gateThreshold) {
-      if (this._gateCloseTimer) { clearTimeout(this._gateCloseTimer); this._gateCloseTimer=null; }
-      this._gateOpen = true;
-    } else if (this._gateOpen && !this._gateCloseTimer) {
-      // Hold gate open for 200ms after level drops below threshold (hysteresis)
-      this._gateCloseTimer = setTimeout(() => {
-        this._gateOpen = false; this._gateCloseTimer = null;
-        this._voicedStreak = 0;
-        this._medianWindow = [];
-        this.trail = [];   // clear trail so stale history doesn't persist after pause
-        if (this._dotPool) this._dotPool.forEach(el => el.setAttribute('opacity','0'));
-        if (this.ws?.readyState === WebSocket.OPEN)
-          this.ws.send(JSON.stringify({ type: 'reset' }));
-      }, 500);
-    }
-    return this._gateOpen;
   }
 
 
 
   // ── Handle server response ─────────────────────────────────────────────────
+  // f1_median / f2_median are computed server-side (sliding median, median_n frames).
+  // Streak tracking and trail management stay on the client (display preference).
   _msg(data) {
-    const frames = data.frames || (data.voiced!==undefined ? [data] : []);
+    const frames = data.frames || (data.voiced !== undefined ? [data] : []);
     for (const f of frames) {
       this.stats.frames++;
-      if (!f.voiced) { this._voicedStreak=0; continue; }
+      this._lastFrame = f;   // retained for _stats() gate indicator
+
+      if (!f.voiced) {
+        if (this._voicedStreak > 0) {
+          // First silent frame after voiced run — clear stale trail
+          this.trail = [];
+          if (this._dotPool) this._dotPool.forEach(el => el.setAttribute('opacity', '0'));
+        }
+        this._voicedStreak = 0;
+        continue;
+      }
+
       this.stats.voiced++;
       this._voicedStreak++;
-      if (this._voicedStreak < 1) continue;  // respond on first voiced frame
-      this._medianWindow.push({ f1:f.f1, f2:f.f2 });
-      if (this._medianWindow.length > this._MEDIAN_N) this._medianWindow.shift();
-      const mF1 = this._median(this._medianWindow.map(p=>p.f1));
-      const mF2 = this._median(this._medianWindow.map(p=>p.f2));
-      this.trail.push({ f1:mF1, f2:mF2 });
-      //if (this.trail.length > TRAIL_DOTS) this.trail.shift();
-    }
-  }
+      if (this._voicedStreak < STREAK_MIN) continue;
 
-  _median(arr) {
-    if (!arr.length) return 0;
-    const s = [...arr].sort((a,b)=>a-b);
-    const m = Math.floor(s.length/2);
-    return s.length%2 ? s[m] : Math.round((s[m-1]+s[m])/2);
+      // Smoothed values come from the server — no client-side median needed
+      if (f.f1_median == null || f.f2_median == null) continue;
+      this.trail.push({ f1: f.f1_median, f2: f.f2_median });
+      if (this.trail.length > TRAIL_DOTS) this.trail.shift();
+    }
   }
 
   // ── Trail rendering at screen refresh rate ────────────────────────────────
@@ -253,15 +212,16 @@ class RealtimeTracker {
 
   _stats() {
     const el = document.getElementById('rtStats'); if(!el) return;
-    const s = this.stats;
-    const fps  = (s.frames/Math.max(1,(Date.now()-s.start)/1000)).toFixed(1);
-    const pct  = s.frames ? Math.round(s.voiced/s.frames*100) : 0;
-    const r    = this.trail.slice(-5);
-    const f1   = r.length ? Math.round(r.reduce((a,p)=>a+p.f1,0)/r.length) : '—';
-    const f2   = r.length ? Math.round(r.reduce((a,p)=>a+p.f2,0)/r.length) : '—';
-    const gate = this._calibrating ? '⏳ calibrating…'
-        : this._gateOpen   ? '🟢 speech'
-            :                    '🔴 silence';
+    const s   = this.stats;
+    const fps = (s.frames / Math.max(1, (Date.now() - s.start) / 1000)).toFixed(1);
+    const pct = s.frames ? Math.round(s.voiced / s.frames * 100) : 0;
+    const r   = this.trail.slice(-5);
+    const f1  = r.length ? Math.round(r.reduce((a, p) => a + p.f1, 0) / r.length) : '—';
+    const f2  = r.length ? Math.round(r.reduce((a, p) => a + p.f2, 0) / r.length) : '—';
+    // Gate status comes from the server frame (is_above_rms reflects server rms_floor)
+    const gate = !this._lastFrame         ? '⏳ connecting…'
+        : this._lastFrame.is_above_rms ? '🟢 speech'
+            :                           '🔴 silence';
     el.textContent = `${gate}  ·  ${fps} fr/s  ·  ${pct}% voiced  ·  F1 ${f1}  F2 ${f2} Hz`;
   }
 
@@ -584,7 +544,6 @@ async function debugVowel(audioUrl) {
   return data;
 }
 
-
 // ─── Smoothing cross-check utility ───────────────────────────────────────────
 // Feeds a WS reference file through the real RealtimeTracker._msg() pipeline
 // and returns the trail that would appear on screen.
@@ -613,7 +572,7 @@ async function verifySmoothing(referenceUrl) {
     n_input:    frames.length,
     trail:      tracker.trail,             // [{f1, f2}, ...] — what would be drawn
     stats:      tracker.stats,
-    median_n:   tracker._MEDIAN_N,
+    median_n:   DEFAULT_MEDIAN_N,
   };
   console.log('verifySmoothing →', JSON.stringify(result, null, 2));
   return result;
