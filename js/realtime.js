@@ -583,3 +583,38 @@ async function debugVowel(audioUrl) {
   console.log(JSON.stringify(data, null, 2));
   return data;
 }
+
+
+// ─── Smoothing cross-check utility ───────────────────────────────────────────
+// Feeds a WS reference file through the real RealtimeTracker._msg() pipeline
+// and returns the trail that would appear on screen.
+//
+// Use this ONCE before the server-side median migration to capture the
+// JS reference, then compare to Python's compute_smooth_reference() output.
+//
+// Usage (browser console on any page that loads realtime.js):
+//   const t = await verifySmoothing('tests/references/ws/i_128.json');
+//   console.log(JSON.stringify(t.trail));
+//
+// Compare that output to the Python test:
+//   python tests/server_tests.py ws --smooth-check i_128
+//
+async function verifySmoothing(referenceUrl) {
+  const ref     = await fetch(referenceUrl).then(r => r.json());
+  const frames  = ref.response?.frames ?? [];
+  const tracker = new RealtimeTracker();   // no DOM access in constructor or _msg
+
+  for (const frame of frames) {
+    tracker._msg({ frames: [frame] });     // exact same path as live streaming
+  }
+
+  const result = {
+    reference:  referenceUrl,
+    n_input:    frames.length,
+    trail:      tracker.trail,             // [{f1, f2}, ...] — what would be drawn
+    stats:      tracker.stats,
+    median_n:   tracker._MEDIAN_N,
+  };
+  console.log('verifySmoothing →', JSON.stringify(result, null, 2));
+  return result;
+}
