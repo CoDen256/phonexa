@@ -616,6 +616,58 @@ def run_ws_case(case: dict, update_refs: bool) -> TestResult:
     return TestResult(case['id'], endpoint, all(d.passed for d in diffs),
                       diffs=diffs, payload=result)
 
+def compute_smooth_reference(frames: list[dict], median_n: int = 5) -> list[dict]:
+    """
+    Apply sliding median to voiced f1/f2 values.
+    Uses JS Math.round() rounding (always round 0.5 up) to match browser behaviour.
+    """
+    f1w, f2w = [], []
+    result = []
+    for frame in frames:
+        if not frame.get('voiced') or frame.get('f1') is None:
+            result.append({**frame, 'f1_median': None, 'f2_median': None})
+            continue
+        f1w.append(frame['f1']); f2w.append(frame['f2'])
+        if len(f1w) > median_n: f1w.pop(0)
+        if len(f2w) > median_n: f2w.pop(0)
+        result.append({**frame,
+                       'f1_raw': frame['f1'],
+                       'f2_raw': frame['f2'],
+                       'f1': _js_median(f1w),
+                       'f2': _js_median(f2w)})
+    return result
+
+def _js_median(w: list[int]) -> int:
+    s = sorted(w); m = len(s) // 2
+    return s[m] if len(s) % 2 else int((s[m-1] + s[m]) / 2 + 0.5)
+
+
+def run_median_case(case: dict, update_refs: bool):
+    audio_path = Path(case['audio'])
+    with open(audio_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    frames = data["response"]["frames"]
+    trail = compute_smooth_reference(frames)
+    result = {
+        "reference": case['audio'],
+        "n_input": len(frames),
+        "trail": trail
+    }
+    endpoint = "median"
+    record    = build_record(case, endpoint, result)
+    reference = load_reference(endpoint, case['id'])
+    if reference is None or update_refs:
+        save_reference(endpoint, case['id'], record)
+        return TestResult(case['id'], endpoint, True, is_new_ref=True, payload=result)
+
+    diffs: list[Diff] = []
+    diffs.extend(_diff_frame_lists(result['trail'], reference['trail'], lambda x: True))
+    return TestResult(case['id'], endpoint,
+                      passed=all(d.passed for d in diffs),
+                      diffs=diffs,
+                      payload=result,
+                      )
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Output formatting
@@ -727,6 +779,15 @@ CASES: dict[str, list[dict]] = {
         {'id': 'live_speech', 'audio': 'test/live_speech_short.wav', 'chunk_samples': 512, 'config': {},
          'description': '/i/ in 512-sample chunks (ScriptProcessor fallback)'},
     ],
+
+    'median': [
+        {'id': 'i_128', 'audio': 'test/references/ws/i_128.json',
+         'description': '/i/ frame smoothness'},
+        {'id': 'u_128', 'audio': 'test/references/ws/u_128.json' ,
+         'description': '/u/ frame smoothness'},
+        {'id': 'live_speech_short', 'audio': 'test/references/ws/live_speech.json',
+         'description': '/i/ frame smoothness' },
+    ],
 }
 
 
@@ -739,6 +800,7 @@ RUNNERS = {
     'analyze_file':  run_analyze_file_case,
     'analyze_debug': run_analyze_debug_case,
     'ws':            run_ws_case,
+    "median": run_median_case
 }
 
 

@@ -195,7 +195,7 @@ class RealtimeTracker {
       const mF1 = this._median(this._medianWindow.map(p=>p.f1));
       const mF2 = this._median(this._medianWindow.map(p=>p.f2));
       this.trail.push({ f1:mF1, f2:mF2 });
-      if (this.trail.length > TRAIL_DOTS) this.trail.shift();
+      //if (this.trail.length > TRAIL_DOTS) this.trail.shift();
     }
   }
 
