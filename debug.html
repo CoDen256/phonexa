@@ -158,7 +158,8 @@
     back_ceiling:       1800,
     back_ceiling_ratio: 0.95,
     back_front_ratio:   0.75,
-    energy_floor:       0.005,
+    rms_floor:          0.005,
+    median_n:           5,
   };
 
   // ─── Canvas constants ─────────────────────────────────────────────────────────
@@ -223,8 +224,8 @@
     // ratios: slider 70-100 → config 0.70-1.00
     ['s_back_ceiling_ratio', 'v_back_ceiling_ratio', 'back_ceiling_ratio', v => v.toFixed(2), v => v/100,     v => Math.round(v*100)],
     ['s_back_front_ratio',   'v_back_front_ratio',   'back_front_ratio',   v => v.toFixed(2), v => v/100,     v => Math.round(v*100)],
-    // energy_floor: slider 1-60 → config 0.001-0.060
-    ['s_energy_floor',       'v_energy_floor',       'energy_floor',       v => v.toFixed(3), v => v/1000,    v => Math.round(v*1000)],
+    // rms_floor: slider 1-60 → config 0.001-0.060
+    ['s_energy_floor',       'v_energy_floor',       'rms_floor',          v => v.toFixed(3), v => v/1000,    v => Math.round(v*1000)],
   ];
 
   sliders.forEach(([id, vid, key, fmt, toConf, toSlider]) => {
@@ -240,6 +241,7 @@
   });
 
   function sendConfig() {
+    // config includes rms_floor and median_n — server applies both
     if (ws && ws.readyState === WebSocket.OPEN)
       ws.send(JSON.stringify({ type: 'config', ...config }));
     if (refFileObj) {
@@ -263,18 +265,24 @@
       let payload; try { payload = JSON.parse(data); } catch { return; }
       const frames = payload.frames || (payload.voiced !== undefined ? [payload] : []);
       for (const fr of frames) {
-        const f1  = fr.voiced ? fr.f1 : null;
-        const f2  = fr.voiced ? fr.f2 : null;
-        const rms = fr.rms ?? 0;
-        currentRms = rms;
-        f1History.push(f1); f2History.push(f2); rmsHistory.push(rms);
+        // Post-continuity raw values — used for time-series history
+        const f1Raw = fr.voiced ? (fr.f1  ?? null) : null;
+        const f2Raw = fr.voiced ? (fr.f2  ?? null) : null;
+        // Server-side smoothed values — used for trail (what the practice page draws)
+        const f1    = fr.voiced ? (fr.f1_median ?? f1Raw) : null;
+        const f2    = fr.voiced ? (fr.f2_median ?? f2Raw) : null;
+        const rms   = fr.rms ?? 0;
+        currentRms  = rms;
+        f1History.push(f1Raw); f2History.push(f2Raw); rmsHistory.push(rms);
         if (f1History.length  > HISTORY_LEN) f1History.shift();
         if (f2History.length  > HISTORY_LEN) f2History.shift();
         if (rmsHistory.length > HISTORY_LEN) rmsHistory.shift();
+        // Trail on vowel chart uses smoothed values (f1_median/f2_median)
         trail.push({ f1, f2 });
         if (trail.length > TRAIL_LEN) trail.shift();
-        if (f1 != null && f2 != null) {
-          voicedF1Buf.push(f1); voicedF2Buf.push(f2);
+        // Running voiced mean uses raw post-continuity values
+        if (f1Raw != null && f2Raw != null) {
+          voicedF1Buf.push(f1Raw); voicedF2Buf.push(f2Raw);
           if (voicedF1Buf.length > VOICED_WINDOW) voicedF1Buf.shift();
           if (voicedF2Buf.length > VOICED_WINDOW) voicedF2Buf.shift();
           liveMeanF1 = voicedF1Buf.reduce((a,b)=>a+b,0)/voicedF1Buf.length;
@@ -478,12 +486,12 @@
       rctx.fillStyle='#555'; rctx.font='10px monospace';
       rctx.fillText(val<0.001?val.toExponential(0):val.toString(), LW-7, y+3);
     });
-    const threshY=(1-logNorm(config.energy_floor))*H;
+    const threshY=(1-logNorm(config.rms_floor))*H;
     rctx.strokeStyle='#4a90d9'; rctx.lineWidth=1; rctx.setLineDash([5,4]);
     rctx.beginPath(); rctx.moveTo(LW,threshY); rctx.lineTo(LW+plotW,threshY); rctx.stroke();
     rctx.setLineDash([]);
     rctx.fillStyle='#4a90d9'; rctx.font='9px monospace'; rctx.textAlign='left';
-    rctx.fillText('gate '+config.energy_floor.toFixed(3), LW+4, threshY-3);
+    rctx.fillText('gate '+config.rms_floor.toFixed(3), LW+4, threshY-3);
     rctx.strokeStyle='#2a2f3a'; rctx.lineWidth=1;
     rctx.beginPath(); rctx.moveTo(LW,0); rctx.lineTo(LW,H); rctx.stroke();
     refRmsHistory.forEach((v,i) => {
@@ -493,7 +501,7 @@
     });
     rmsHistory.forEach((v,i) => {
       const level=logNorm(v??RMS_MIN), barH=level*H;
-      const gated=(v??0)<config.energy_floor;
+      const gated=(v??0)<config.rms_floor;
       const t=Math.min(level*1.5,1);
       const r=Math.round(255*Math.min(1,t*2)), g2=Math.round(255*Math.min(1,2-t*2));
       rctx.fillStyle=gated?'#181c26':`rgb(${r},${g2},30)`;

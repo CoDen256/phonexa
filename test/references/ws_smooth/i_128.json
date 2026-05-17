@@ -1,0 +1,513 @@
+{
+  "meta": {
+    "endpoint": "ws_smooth",
+    "case_id": "i_128",
+    "audio": "lang/me/audio/i.wav",
+    "config": {
+      "max_f": 5000,
+      "n_formants": 5,
+      "window_ms": 25,
+      "pre_emphasis": 50,
+      "back_ceiling": 1800,
+      "back_ceiling_ratio": 0.95,
+      "back_front_ratio": 0.75,
+      "rms_floor": 0.005,
+      "median_n": 5
+    },
+    "recorded": "2026-05-16T15:14:19.097059+00:00"
+  },
+  "response": {
+    "frames": [
+      {
+        "voiced": true,
+        "f1": 276,
+        "f2": 2381,
+        "f1_median_server": 276,
+        "f2_median_server": 2381,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2381
+      },
+      {
+        "voiced": true,
+        "f1": 276,
+        "f2": 2405,
+        "f1_median_server": 276,
+        "f2_median_server": 2393,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2393
+      },
+      {
+        "voiced": true,
+        "f1": 277,
+        "f2": 2396,
+        "f1_median_server": 276,
+        "f2_median_server": 2396,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2396
+      },
+      {
+        "voiced": true,
+        "f1": 273,
+        "f2": 1635,
+        "f1_median_server": 276,
+        "f2_median_server": 2389,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2389
+      },
+      {
+        "voiced": true,
+        "f1": 276,
+        "f2": 2390,
+        "f1_median_server": 276,
+        "f2_median_server": 2390,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2390
+      },
+      {
+        "voiced": true,
+        "f1": 277,
+        "f2": 2387,
+        "f1_median_server": 276,
+        "f2_median_server": 2390,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2390
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 1517,
+        "f1_median_server": 276,
+        "f2_median_server": 2387,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2387
+      },
+      {
+        "voiced": true,
+        "f1": 273,
+        "f2": 1486,
+        "f1_median_server": 273,
+        "f2_median_server": 1635,
+        "f1_median_ref": 273,
+        "f2_median_ref": 1635
+      },
+      {
+        "voiced": true,
+        "f1": 278,
+        "f2": 2372,
+        "f1_median_server": 276,
+        "f2_median_server": 2372,
+        "f1_median_ref": 276,
+        "f2_median_ref": 2372
+      },
+      {
+        "voiced": true,
+        "f1": 279,
+        "f2": 2356,
+        "f1_median_server": 277,
+        "f2_median_server": 2356,
+        "f1_median_ref": 277,
+        "f2_median_ref": 2356
+      },
+      {
+        "voiced": true,
+        "f1": 281,
+        "f2": 2346,
+        "f1_median_server": 278,
+        "f2_median_server": 2346,
+        "f1_median_ref": 278,
+        "f2_median_ref": 2346
+      },
+      {
+        "voiced": true,
+        "f1": 276,
+        "f2": 1581,
+        "f1_median_server": 278,
+        "f2_median_server": 2346,
+        "f1_median_ref": 278,
+        "f2_median_ref": 2346
+      },
+      {
+        "voiced": true,
+        "f1": 281,
+        "f2": 2355,
+        "f1_median_server": 279,
+        "f2_median_server": 2355,
+        "f1_median_ref": 279,
+        "f2_median_ref": 2355
+      },
+      {
+        "voiced": true,
+        "f1": 276,
+        "f2": 1612,
+        "f1_median_server": 279,
+        "f2_median_server": 2346,
+        "f1_median_ref": 279,
+        "f2_median_ref": 2346
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 1434,
+        "f1_median_server": 276,
+        "f2_median_server": 1612,
+        "f1_median_ref": 276,
+        "f2_median_ref": 1612
+      },
+      {
+        "voiced": true,
+        "f1": 270,
+        "f2": 1578,
+        "f1_median_server": 276,
+        "f2_median_server": 1581,
+        "f1_median_ref": 276,
+        "f2_median_ref": 1581
+      },
+      {
+        "voiced": true,
+        "f1": 266,
+        "f2": 1571,
+        "f1_median_server": 272,
+        "f2_median_server": 1578,
+        "f1_median_ref": 272,
+        "f2_median_ref": 1578
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 2379,
+        "f1_median_server": 272,
+        "f2_median_server": 1578,
+        "f1_median_ref": 272,
+        "f2_median_ref": 1578
+      },
+      {
+        "voiced": true,
+        "f1": 271,
+        "f2": 2378,
+        "f1_median_server": 271,
+        "f2_median_server": 1578,
+        "f1_median_ref": 271,
+        "f2_median_ref": 1578
+      },
+      {
+        "voiced": true,
+        "f1": 270,
+        "f2": 2390,
+        "f1_median_server": 270,
+        "f2_median_server": 2378,
+        "f1_median_ref": 270,
+        "f2_median_ref": 2378
+      },
+      {
+        "voiced": true,
+        "f1": 268,
+        "f2": 2369,
+        "f1_median_server": 270,
+        "f2_median_server": 2378,
+        "f1_median_ref": 270,
+        "f2_median_ref": 2378
+      },
+      {
+        "voiced": true,
+        "f1": 270,
+        "f2": 2355,
+        "f1_median_server": 270,
+        "f2_median_server": 2378,
+        "f1_median_ref": 270,
+        "f2_median_ref": 2378
+      },
+      {
+        "voiced": true,
+        "f1": 262,
+        "f2": 1489,
+        "f1_median_server": 270,
+        "f2_median_server": 2369,
+        "f1_median_ref": 270,
+        "f2_median_ref": 2369
+      },
+      {
+        "voiced": true,
+        "f1": 261,
+        "f2": 1700,
+        "f1_median_server": 268,
+        "f2_median_server": 2355,
+        "f1_median_ref": 268,
+        "f2_median_ref": 2355
+      },
+      {
+        "voiced": true,
+        "f1": 264,
+        "f2": 1585,
+        "f1_median_server": 264,
+        "f2_median_server": 1700,
+        "f1_median_ref": 264,
+        "f2_median_ref": 1700
+      },
+      {
+        "voiced": true,
+        "f1": 266,
+        "f2": 1559,
+        "f1_median_server": 264,
+        "f2_median_server": 1585,
+        "f1_median_ref": 264,
+        "f2_median_ref": 1585
+      },
+      {
+        "voiced": true,
+        "f1": 274,
+        "f2": 2395,
+        "f1_median_server": 264,
+        "f2_median_server": 1585,
+        "f1_median_ref": 264,
+        "f2_median_ref": 1585
+      },
+      {
+        "voiced": true,
+        "f1": 274,
+        "f2": 2373,
+        "f1_median_server": 266,
+        "f2_median_server": 1700,
+        "f1_median_ref": 266,
+        "f2_median_ref": 1700
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 2374,
+        "f1_median_server": 272,
+        "f2_median_server": 2373,
+        "f1_median_ref": 272,
+        "f2_median_ref": 2373
+      },
+      {
+        "voiced": true,
+        "f1": 271,
+        "f2": 2365,
+        "f1_median_server": 272,
+        "f2_median_server": 2373,
+        "f1_median_ref": 272,
+        "f2_median_ref": 2373
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 2380,
+        "f1_median_server": 272,
+        "f2_median_server": 2374,
+        "f1_median_ref": 272,
+        "f2_median_ref": 2374
+      },
+      {
+        "voiced": true,
+        "f1": 274,
+        "f2": 2396,
+        "f1_median_server": 272,
+        "f2_median_server": 2374,
+        "f1_median_ref": 272,
+        "f2_median_ref": 2374
+      },
+      {
+        "voiced": true,
+        "f1": 278,
+        "f2": 2392,
+        "f1_median_server": 272,
+        "f2_median_server": 2380,
+        "f1_median_ref": 272,
+        "f2_median_ref": 2380
+      },
+      {
+        "voiced": true,
+        "f1": 273,
+        "f2": 2384,
+        "f1_median_server": 273,
+        "f2_median_server": 2384,
+        "f1_median_ref": 273,
+        "f2_median_ref": 2384
+      },
+      {
+        "voiced": true,
+        "f1": 270,
+        "f2": 2368,
+        "f1_median_server": 273,
+        "f2_median_server": 2384,
+        "f1_median_ref": 273,
+        "f2_median_ref": 2384
+      },
+      {
+        "voiced": true,
+        "f1": 271,
+        "f2": 2375,
+        "f1_median_server": 273,
+        "f2_median_server": 2384,
+        "f1_median_ref": 273,
+        "f2_median_ref": 2384
+      },
+      {
+        "voiced": true,
+        "f1": 276,
+        "f2": 2425,
+        "f1_median_server": 273,
+        "f2_median_server": 2384,
+        "f1_median_ref": 273,
+        "f2_median_ref": 2384
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 2398,
+        "f1_median_server": 272,
+        "f2_median_server": 2384,
+        "f1_median_ref": 272,
+        "f2_median_ref": 2384
+      },
+      {
+        "voiced": true,
+        "f1": 269,
+        "f2": 2412,
+        "f1_median_server": 271,
+        "f2_median_server": 2398,
+        "f1_median_ref": 271,
+        "f2_median_ref": 2398
+      },
+      {
+        "voiced": true,
+        "f1": 262,
+        "f2": 2415,
+        "f1_median_server": 271,
+        "f2_median_server": 2412,
+        "f1_median_ref": 271,
+        "f2_median_ref": 2412
+      },
+      {
+        "voiced": true,
+        "f1": 262,
+        "f2": 2398,
+        "f1_median_server": 269,
+        "f2_median_server": 2412,
+        "f1_median_ref": 269,
+        "f2_median_ref": 2412
+      },
+      {
+        "voiced": true,
+        "f1": 258,
+        "f2": 2379,
+        "f1_median_server": 262,
+        "f2_median_server": 2398,
+        "f1_median_ref": 262,
+        "f2_median_ref": 2398
+      },
+      {
+        "voiced": true,
+        "f1": 265,
+        "f2": 2351,
+        "f1_median_server": 262,
+        "f2_median_server": 2398,
+        "f1_median_ref": 262,
+        "f2_median_ref": 2398
+      },
+      {
+        "voiced": true,
+        "f1": 273,
+        "f2": 2380,
+        "f1_median_server": 262,
+        "f2_median_server": 2380,
+        "f1_median_ref": 262,
+        "f2_median_ref": 2380
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 2385,
+        "f1_median_server": 265,
+        "f2_median_server": 2380,
+        "f1_median_ref": 265,
+        "f2_median_ref": 2380
+      },
+      {
+        "voiced": true,
+        "f1": 259,
+        "f2": 2376,
+        "f1_median_server": 265,
+        "f2_median_server": 2379,
+        "f1_median_ref": 265,
+        "f2_median_ref": 2379
+      },
+      {
+        "voiced": true,
+        "f1": 260,
+        "f2": 2398,
+        "f1_median_server": 265,
+        "f2_median_server": 2380,
+        "f1_median_ref": 265,
+        "f2_median_ref": 2380
+      },
+      {
+        "voiced": true,
+        "f1": 263,
+        "f2": 2432,
+        "f1_median_server": 263,
+        "f2_median_server": 2385,
+        "f1_median_ref": 263,
+        "f2_median_ref": 2385
+      },
+      {
+        "voiced": true,
+        "f1": 258,
+        "f2": 2387,
+        "f1_median_server": 260,
+        "f2_median_server": 2387,
+        "f1_median_ref": 260,
+        "f2_median_ref": 2387
+      },
+      {
+        "voiced": true,
+        "f1": 259,
+        "f2": 2396,
+        "f1_median_server": 259,
+        "f2_median_server": 2396,
+        "f1_median_ref": 259,
+        "f2_median_ref": 2396
+      },
+      {
+        "voiced": true,
+        "f1": 261,
+        "f2": 2371,
+        "f1_median_server": 260,
+        "f2_median_server": 2396,
+        "f1_median_ref": 260,
+        "f2_median_ref": 2396
+      },
+      {
+        "voiced": true,
+        "f1": 257,
+        "f2": 2337,
+        "f1_median_server": 259,
+        "f2_median_server": 2387,
+        "f1_median_ref": 259,
+        "f2_median_ref": 2387
+      },
+      {
+        "voiced": true,
+        "f1": 261,
+        "f2": 2367,
+        "f1_median_server": 259,
+        "f2_median_server": 2371,
+        "f1_median_ref": 259,
+        "f2_median_ref": 2371
+      },
+      {
+        "voiced": true,
+        "f1": 272,
+        "f2": 2417,
+        "f1_median_server": 261,
+        "f2_median_server": 2371,
+        "f1_median_ref": 261,
+        "f2_median_ref": 2371
+      }
+    ],
+    "median_n": 5,
+    "voiced_count": 54,
+    "mean_f1_median": 270.0,
+    "mean_f2_median": 2238.2
+  }
+}

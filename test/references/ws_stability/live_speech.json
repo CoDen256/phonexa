@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "endpoint": "ws_stability",
+    "case_id": "live_speech",
+    "audio": "test/live_speech.wav",
+    "config": {
+      "max_f": 5000,
+      "n_formants": 5,
+      "window_ms": 25,
+      "pre_emphasis": 50,
+      "back_ceiling": 1800,
+      "back_ceiling_ratio": 0.95,
+      "back_front_ratio": 0.75,
+      "rms_floor": 0.005,
+      "median_n": 5
+    },
+    "recorded": "2026-05-16T15:14:26.569751+00:00"
+  },
+  "response": {
+    "measured_f1": 621,
+    "measured_f2": 1787,
+    "expected_f1": null,
+    "expected_f2": null,
+    "tolerance_hz": 50,
+    "stable_frames": 30,
+    "voiced_smooth": 1928,
+    "stable_slice": [
+      10,
+      40
+    ]
+  }
+}

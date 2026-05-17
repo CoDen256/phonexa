@@ -800,7 +800,7 @@ RUNNERS = {
     'analyze_file':  run_analyze_file_case,
     'analyze_debug': run_analyze_debug_case,
     'ws':            run_ws_case,
-    "median": run_median_case
+    # "median": run_median_case
 }
 
 
