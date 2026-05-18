@@ -3,7 +3,7 @@ analyze_server.py
 =================
 Dual-ceiling Praat formant tracker.
 
-HTTP :5050  —  /ping  /analyze  /analyze-file  /analyze-debug
+HTTP :5050  —  /ping  /analyze  /frames  /analyze-debug
 Stream :5051  —  streaming PCM → rich diagnostic frames
 
 Algorithm (see ``_run_praat_analysis`` for the full pipeline)
@@ -20,7 +20,7 @@ Algorithm (see ``_run_praat_analysis`` for the full pipeline)
 
 WS frame states
 ---------------
-A  below rms_floor  — Praat skipped; only {stream_t_ms, voiced, rms, is_above_rms}
+A  below rms_floor  — Praat skipped; only {t_ms, voiced, rms, is_above_rms}
 B  above rms_floor, no valid formants — all Praat outputs included for diagnostics
 C  voiced — all fields populated including f1_median / f2_median
 
@@ -197,78 +197,103 @@ class FormantAnalysis:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Per-connection streaming session (WS only)
+# Analysis state — shared by /frames and /stream
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Analysis state — shared by /frames and /stream
+# ══════════════════════════════════════════════════════════════════════════════
+
+class AnalysisState:
+    """
+    Continuity correction + median windows for one analysis session.
+    Used by both /frames (one instance per request) and StreamingSession
+    (one instance per WebSocket connection).
+    apply_voiced() is the single call that advances both state machines.
+    """
+
+    def __init__(self, median_n: int = 5) -> None:
+        self.continuity = ConnState()
+        self.median_f1  = deque(maxlen=median_n)
+        self.median_f2  = deque(maxlen=median_n)
+
+    def apply_voiced(self, f1_raw: float, f2_raw: float) -> tuple[int, int, int, int]:
+        """
+        Apply continuity correction then update the median window.
+        Returns (f1, f2, f1_median, f2_median).
+        """
+        f1, f2 = self.continuity.apply_continuity(f1_raw, f2_raw)
+        self.median_f1.append(f1)
+        self.median_f2.append(f2)
+        return f1, f2, _js_median(self.median_f1), _js_median(self.median_f2)
+
+    def resize_median(self, new_n: int) -> None:
+        if self.median_f1.maxlen != new_n:
+            self.median_f1 = deque(self.median_f1, maxlen=new_n)
+            self.median_f2 = deque(self.median_f2, maxlen=new_n)
+
+    def reset(self) -> None:
+        self.continuity.reset()
+        self.median_f1.clear()
+        self.median_f2.clear()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Per-connection streaming session (/stream WebSocket)
 # ══════════════════════════════════════════════════════════════════════════════
 
 class StreamingSession:
     """
     All mutable state for one WebSocket connection.
-
-    Owns the ring buffer, continuity corrector, median windows, and config.
-    ``reset_stream()`` flushes analysis state on a ``{type:'reset'}`` message.
-    ``reinit_stream()`` does a full restart on ``{type:'init'}``.
-    ``update_config()`` resizes the median window when ``median_n`` changes.
+    The ring buffer accumulates incoming chunks; every ANALYSIS_STEP_MS of new
+    audio, analyse_window_to_frame() is called with the ring content and the
+    session's AnalysisState.
     """
 
     def __init__(self) -> None:
-        self.config     = ConnConfig()
+        self.config      = ConnConfig()
         self.sample_rate = 44_100
         self._init_state()
 
     def _init_state(self) -> None:
         self.ring                   = deque(maxlen=RING_BUFFER_SAMPLES)
-        self.continuity             = ConnState()
         self.total_samples_received = 0
-        self.median_f1              = deque(maxlen=self.config.median_n)
-        self.median_f2              = deque(maxlen=self.config.median_n)
+        self.analysis_state         = AnalysisState(self.config.median_n)
 
     def reinit_stream(self, sample_rate: int) -> None:
-        """Full restart: new sample rate + flush all state."""
         self.sample_rate = sample_rate
         self._init_state()
 
     def reset_stream(self) -> None:
-        """Flush analysis state, keep config and sample rate."""
         self.ring.clear()
         self.total_samples_received = 0
-        self.continuity.reset()
-        self.median_f1.clear()
-        self.median_f2.clear()
+        self.analysis_state.reset()
 
     def update_config(self, updates: dict) -> None:
-        """Apply config overrides; resize median windows if median_n changed."""
         old_n = self.config.median_n
         self.config.update_from_dict(updates)
         new_n = self.config.median_n
         if new_n != old_n:
-            self.median_f1 = deque(self.median_f1, maxlen=new_n)
-            self.median_f2 = deque(self.median_f2, maxlen=new_n)
-        self.continuity.reset()  # continuity is per-vowel, not per-config
+            self.analysis_state.resize_median(new_n)
+        self.analysis_state.continuity.reset()
 
     def accept_chunk(self, samples: np.ndarray) -> None:
-        """Add a decoded chunk to the ring buffer and advance the counter."""
         self.ring.extend(samples)
         self.total_samples_received += len(samples)
 
-    def add_voiced_frame(self, f1: int, f2: int) -> tuple[int, int]:
-        """Append post-continuity (f1, f2) to median windows; return medians."""
-        self.median_f1.append(f1)
-        self.median_f2.append(f2)
-        return _js_median(self.median_f1), _js_median(self.median_f2)
-
     @property
-    def stream_t_ms(self) -> int:
-        """Absolute milliseconds since the stream started."""
+    def t_ms(self) -> int:
+        """Milliseconds of audio received since stream started."""
         return round(self.total_samples_received / self.sample_rate * 1000)
 
     @property
     def step_samples(self) -> int:
-        """How many new samples trigger the next analysis."""
         return max(1, int(self.sample_rate * ANALYSIS_STEP_MS / 1000))
 
     @property
     def ring_is_full(self) -> bool:
         return len(self.ring) >= RING_BUFFER_SAMPLES
+
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -473,44 +498,6 @@ def analyze_window(
     return {'voiced': True, 'f1': f1, 'f2': f2, 't_ms': t_ms}
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Whole-file sliding window  (used by /analyze-file)
-# ══════════════════════════════════════════════════════════════════════════════
-
-def analyze_all_windows(file_path: str, config: ConnConfig) -> tuple[list[dict], float]:
-    """Slide a window over an audio file; return (frames, duration_seconds)."""
-    sound       = parselmouth.Sound(file_path)
-    sr          = sound.sampling_frequency
-    all_samples = sound.values[0].astype(np.float64)
-    duration    = sound.duration
-
-    step_samples   = max(1, int(sr * ANALYSIS_STEP_MS / 1000))
-    window_samples = RING_BUFFER_SAMPLES
-    state          = ConnState()
-    frames: list[dict] = []
-
-    for window_end in range(window_samples, len(all_samples) + 1, step_samples):
-        window     = all_samples[window_end - window_samples: window_end]
-        window_rms = round(compute_rms(window), 6)
-        time_sec   = round(window_end / sr, 3)
-
-        if config.rms_floor > 0 and window_rms < config.rms_floor:
-            frames.append({'t': time_sec, 'f1': None, 'f2': None, 'rms': window_rms})
-            continue
-
-        try:
-            result = analyze_window(window, sr, config, state)
-            frames.append({
-                't':   time_sec,
-                'f1':  result['f1'] if result['voiced'] else None,
-                'f2':  result['f2'] if result['voiced'] else None,
-                'rms': window_rms,
-            })
-        except Exception:
-            frames.append({'t': time_sec, 'f1': None, 'f2': None, 'rms': window_rms})
-
-    return frames, round(duration, 3)
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # WS frame builders
@@ -530,11 +517,11 @@ def _nullable_round(value: float | None, ndigits: int = 1) -> float | None:
     return None if value is None else round(value, ndigits)
 
 
-def _build_silent_frame(stream_t_ms: int, rms: float) -> dict:
+def _build_silent_frame(t_ms: int, rms: float) -> dict:
     """State A: below rms_floor — Praat not called."""
     return {
-        'stream_t_ms':             stream_t_ms,
-        'voiced':                  False,
+        't_ms':    t_ms,
+        'voiced': False,
         'rms':                     rms,
         'is_above_rms':            False,
         'sound_duration_ms':       None,
@@ -551,7 +538,7 @@ def _build_silent_frame(stream_t_ms: int, rms: float) -> dict:
 
 
 def _build_analysis_frame(
-        stream_t_ms: int,
+        t_ms: int,
         rms:         float,
         analysis:    FormantAnalysis,
         f1:          int | None,
@@ -562,8 +549,8 @@ def _build_analysis_frame(
 ) -> dict:
     """State B (unvoiced) or State C (voiced): Praat was called."""
     return {
-        'stream_t_ms':             stream_t_ms,
-        'voiced':                  analysis.voiced,
+        't_ms':    t_ms,
+        'voiced': analysis.voiced,
         'rms':                     rms,
         'is_above_rms':            True,
         'sound_duration_ms':       analysis.sound_duration_ms,
@@ -584,6 +571,50 @@ def _build_analysis_frame(
         'f2_median':               f2_median,
         'median_n':                median_n,
     }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Shared analysis pipeline — used by /frames and /stream
+# ══════════════════════════════════════════════════════════════════════════════
+
+def analyse_window_to_frame(
+        window_samples: np.ndarray,
+        sample_rate:    float,
+        t_ms:           int,
+        config:         ConnConfig,
+        state:          AnalysisState,
+) -> dict:
+    """
+    Full analysis pipeline: samples → rich frame dict.
+
+    Shared entry point for both /frames (file) and /stream (WebSocket).
+    Handles all three frame states internally:
+      A  rms < rms_floor  → silent frame, Praat skipped
+      B  Praat ran, no valid formants → diagnostic frame (voiced=false)
+      C  voiced → full frame with continuity + median applied
+    """
+    rms = round(compute_rms(window_samples), 6)
+
+    if config.rms_floor > 0 and rms < config.rms_floor:
+        return _build_silent_frame(t_ms, rms)
+
+    sound    = make_praat_sound(window_samples, sample_rate)
+    analysis = _run_praat_analysis(sound, config)
+
+    f1 = f2 = f1_median = f2_median = None
+    if analysis.voiced:
+        f1, f2, f1_median, f2_median = state.apply_voiced(
+            analysis.f1_raw, analysis.f2_raw
+        )
+
+    return _build_analysis_frame(
+        t_ms      = t_ms,
+        rms       = rms,
+        analysis  = analysis,
+        f1        = f1,        f2        = f2,
+        f1_median = f1_median, f2_median = f2_median,
+        median_n  = config.median_n,
+    )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -624,9 +655,37 @@ def http_analyze():
         return jsonify({'error': str(error)}), 500
 
 
-@app.route('/analyze-file', methods=['POST'])
-def http_analyze_file():
-    """Whole-file frame-by-frame analysis for the debug page's reference audio."""
+@app.route('/frames', methods=['POST'])
+def http_frames():
+    """
+    Whole-file rich frame analysis — the file-equivalent of /stream.
+
+    Slides a RING_BUFFER_SAMPLES window over the audio (or a slice of it)
+    and returns a rich frame per step.  Each frame has the same structure as
+    a /stream frame, enabling shared client-side rendering.
+
+    Request  (multipart/form-data)
+    --------------------------------
+    file          — audio file (any format supported by parselmouth)
+    config        — JSON ConnConfig overrides  (optional)
+    window_start  — slice start, 0.0–1.0       (optional, default 0.0)
+    window_end    — slice end,   0.0–1.0       (optional, default 1.0)
+
+    Response
+    --------
+    {
+      frames:          [{t_ms, voiced, rms, is_above_rms, f1, f2,
+                         f1_median, f2_median, f1_raw, f2_raw, ...}],
+      duration_ms:     float,   full audio duration in ms
+      sliced_from_ms:  float,   slice start position in the full audio
+      sliced_to_ms:    float,   slice end   position in the full audio
+      window_start:    float,
+      window_end:      float,
+    }
+
+    The t_ms field in each frame is milliseconds from the slice start (0 at
+    the first analysed window), consistent with t_ms in /stream frames.
+    """
     uploaded_file = request.files.get('file')
     if not uploaded_file:
         return jsonify({'error': 'No file uploaded'}), 400
@@ -637,12 +696,50 @@ def http_analyze_file():
     except Exception:
         pass
 
+    window_start = float(request.form.get('window_start', 0.0))
+    window_end   = float(request.form.get('window_end',   1.0))
+
     with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:
         uploaded_file.save(tmp.name)
         tmp_path = tmp.name
+
     try:
-        frames, duration = analyze_all_windows(tmp_path, config)
-        return jsonify({'frames': frames, 'duration': duration})
+        sound        = parselmouth.Sound(tmp_path)
+        sample_rate  = sound.sampling_frequency
+        all_samples  = sound.values[0].astype(np.float64)
+        duration_ms  = round(sound.duration * 1000, 1)
+
+        # Apply optional slice
+        n_total      = len(all_samples)
+        slice_start  = int(n_total * window_start)
+        slice_end    = int(n_total * window_end)
+        sliced       = all_samples[slice_start:slice_end]
+        sliced_from_ms = round(window_start * duration_ms, 1)
+        sliced_to_ms   = round(window_end   * duration_ms, 1)
+
+        step_samples   = max(1, int(sample_rate * ANALYSIS_STEP_MS / 1000))
+        window_samples = RING_BUFFER_SAMPLES
+        state          = AnalysisState(config.median_n)
+        frames: list[dict] = []
+
+        for cursor in range(window_samples, len(sliced) + 1, step_samples):
+            window  = sliced[cursor - window_samples: cursor]
+            # t_ms: position from slice start (matches stream t_ms semantics)
+            t_ms    = round(cursor / sample_rate * 1000)
+            try:
+                frame = analyse_window_to_frame(window, sample_rate, t_ms, config, state)
+            except Exception:
+                frame = _build_silent_frame(t_ms, 0.0)
+            frames.append(frame)
+
+        return jsonify({
+            'frames':         frames,
+            'duration_ms':    duration_ms,
+            'sliced_from_ms': sliced_from_ms,
+            'sliced_to_ms':   sliced_to_ms,
+            'window_start':   window_start,
+            'window_end':     window_end,
+        })
     except Exception as error:
         return jsonify({'error': str(error)}), 500
     finally:
@@ -768,41 +865,17 @@ async def stream_handler(websocket) -> None:
             samples_since_last_analysis = 0
 
             window_samples = np.array(session.ring)
-            rms            = round(compute_rms(window_samples), 6)
-            stream_t_ms    = session.stream_t_ms
 
-            # ── State A: below RMS floor — skip Praat ─────────────────────
-            if session.config.rms_floor > 0 and rms < session.config.rms_floor:
-                frame = _build_silent_frame(stream_t_ms, rms)
-                await websocket.send(json.dumps({'frames': [frame]}))
-                continue
-
-            # ── States B / C: run full Praat pipeline ─────────────────────
+            # ── Full pipeline via shared function ──────────────────────────
             try:
-                sound    = make_praat_sound(window_samples, session.sample_rate)
-                analysis = _run_praat_analysis(sound, session.config)
-
-                f1 = f2 = None
-                f1_median = f2_median = None
-
-                if analysis.voiced:
-                    f1, f2 = session.continuity.apply_continuity(
-                        analysis.f1_raw, analysis.f2_raw
-                    )
-                    f1_median, f2_median = session.add_voiced_frame(f1, f2)
-
-                frame = _build_analysis_frame(
-                    stream_t_ms = stream_t_ms,
-                    rms         = rms,
-                    analysis    = analysis,
-                    f1          = f1,
-                    f2          = f2,
-                    f1_median   = f1_median,
-                    f2_median   = f2_median,
-                    median_n    = session.config.median_n,
+                frame = analyse_window_to_frame(
+                    window_samples = window_samples,
+                    sample_rate    = session.sample_rate,
+                    t_ms           = session.t_ms,
+                    config         = session.config,
+                    state          = session.analysis_state,
                 )
                 await websocket.send(json.dumps({'frames': [frame]}))
-
             except Exception as error:
                 await websocket.send(json.dumps({'frames': [], 'error': str(error)}))
 

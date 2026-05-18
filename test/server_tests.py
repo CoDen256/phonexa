@@ -8,7 +8,7 @@ Layers  (ongoing — run after any code change)
 ----------------------------------------------
   python tests/server_tests.py                   all 6 layers
   python tests/server_tests.py analyze           Layer 1 — raw F1/F2 per file
-  python tests/server_tests.py analyze_file      Layer 2 — whole-file frames
+  python tests/server_tests.py frames             Layer 2 — /frames rich frames
   python tests/server_tests.py analyze_debug     Layer 3 — raw Praat per config
   python tests/server_tests.py stream                Layer 4 — per-frame WS raw values
   python tests/server_tests.py stream_median_stability  Layer 5 — stable vowel dot position
@@ -399,26 +399,37 @@ def run_analyze_case(case: dict, update_refs: bool) -> TestResult:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /analyze-file  (Layer 2)
+# /frames  (Layer 2)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run_analyze_file_case(case: dict, update_refs: bool) -> TestResult:
-    """POST audio to /analyze-file; compare voiced count, mean F1/F2, per-frame."""
-    endpoint   = 'analyze_file'
+def run_frames_case(case: dict, update_refs: bool) -> TestResult:
+    """
+    POST audio to /frames; compare rich frames (same structure as /stream).
+
+    Supports optional window_start/window_end slice (0.0–1.0, default full file).
+    Uses DEFAULT_CONN_CONFIG + case overrides so the server gate and median
+    settings are explicit and reproducible.
+
+    Case keys: id, audio, config ({}), window_start (0.0), window_end (1.0)
+    """
+    endpoint   = 'frames'
     audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
 
-    samples, sr = load_audio_as_int16(audio_path)
-    looped, n_loops = loop_samples_to_minimum(samples, RING_BUFFER_SAMPLES + 1)
-    wav_bytes = encode_int16_as_wav(looped, sr) if n_loops > 1 \
-        else load_as_wav_bytes(audio_path)
+    wav_bytes = load_as_wav_bytes(audio_path)
 
     try:
-        resp = requests.post(f'{HTTP_BASE}/analyze-file',
-                             files={'file': ('audio.wav', wav_bytes, 'audio/wav')},
-                             data={'config': json.dumps(case.get('config', {}))},
-                             timeout=60)
+        resp = requests.post(
+            f'{HTTP_BASE}/frames',
+            files={'file': (audio_path.name, wav_bytes, 'audio/wav')},
+            data={
+                'config':       json.dumps({**DEFAULT_CONN_CONFIG, **case.get('config', {})}),
+                'window_start': str(case.get('window_start', 0.0)),
+                'window_end':   str(case.get('window_end',   1.0)),
+            },
+            timeout=60,
+        )
         if not resp.ok:
             return TestResult(case['id'], endpoint, False,
                               error=f'HTTP {resp.status_code}: {resp.json().get("error")}')
@@ -426,24 +437,26 @@ def run_analyze_file_case(case: dict, update_refs: bool) -> TestResult:
     except Exception as exc:
         return TestResult(case['id'], endpoint, False, error=str(exc))
 
-    extra  = {'loops_applied': n_loops}
-    record = build_record(case, endpoint, server_resp, extra)
+    record    = build_record(case, endpoint, server_resp)
     reference = load_reference(endpoint, case['id'])
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
         return TestResult(case['id'], endpoint, True, is_new_ref=True, payload=server_resp)
 
-    cur_f  = server_resp.get('frames', [])
-    ref_f  = reference['response'].get('frames', [])
-    cs, rs = _aggregate(cur_f, _is_voiced_file), _aggregate(ref_f, _is_voiced_file)
+    cur_f = server_resp.get('frames', [])
+    ref_f = reference['response'].get('frames', [])
+    # /frames returns rich frames (voiced bool) — same predicate as /stream
+    cs    = _aggregate(cur_f, _is_voiced_stream)
+    rs    = _aggregate(ref_f, _is_voiced_stream)
+    extra = ['f1_raw', 'f2_raw', 'f1_median', 'f2_median', 'is_above_rms']
 
-    diffs  = [
+    diffs = [
         _diff_count('total_frames',  cs['total'],  rs['total']),
         _diff_count('voiced_frames', cs['voiced'], rs['voiced']),
-        _diff_float('mean_f1', cs['mean_f1'] or 0, rs['mean_f1'] or 0, TOLERANCE_HZ),
-        _diff_float('mean_f2', cs['mean_f2'] or 0, rs['mean_f2'] or 0, TOLERANCE_HZ),
+        _diff_float('mean_f1',       cs['mean_f1'] or 0, rs['mean_f1'] or 0, TOLERANCE_HZ),
+        _diff_float('mean_f2',       cs['mean_f2'] or 0, rs['mean_f2'] or 0, TOLERANCE_HZ),
     ]
-    diffs.extend(_diff_frame_lists(cur_f, ref_f, _is_voiced_file))
+    diffs.extend(_diff_frame_lists(cur_f, ref_f, _is_voiced_stream, extra))
     return TestResult(case['id'], endpoint, all(d.passed for d in diffs),
                       diffs=diffs, payload=server_resp)
 
@@ -944,11 +957,12 @@ def _print_summary(endpoint: str, payload: dict) -> None:
         print(f'    F1={payload.get("f1")} Hz  F2={payload.get("f2")} Hz'
               + _window_tag(payload))
 
-    elif endpoint == 'analyze_file':
-        stats = _aggregate(payload.get('frames', []), _is_voiced_file)
+    elif endpoint == 'frames':
+        stats = _aggregate(payload.get('frames', []), _is_voiced_stream)
+        dur   = payload.get('duration_ms', '?')
         print(f'    {stats["voiced"]}/{stats["total"]} voiced  '
               f'mean F1={_fv(stats["mean_f1"])}  mean F2={_fv(stats["mean_f2"])}'
-              + _loop_tag(payload))
+              f'  dur={_fv(dur)} ms')
 
     elif endpoint == 'analyze_debug':
         print(_window_tag(payload))
@@ -1023,10 +1037,14 @@ CASES: dict[str, list[dict]] = {
         {'id': 'a',      'audio': 'lang/me/audio/a.wav',      'window_start': 0.15, 'window_end': 0.85},
     ],
 
-    'analyze_file': [
-        {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'config': {}},
-        {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'config': {}},
-        {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'config': {}},
+    'frames': [
+        # window_start/end slice the file (0.0–1.0 = full file)
+        {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'config': {},
+         'window_start': 0.0, 'window_end': 1.0},
+        {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'config': {},
+         'window_start': 0.0, 'window_end': 1.0},
+        {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'config': {},
+         'window_start': 0.0, 'window_end': 1.0},
     ],
 
     'analyze_debug': [
@@ -1245,7 +1263,7 @@ def run_stream_compare(endpoints_to_compare: list[str]) -> None:
 
 RUNNERS = {
     'analyze':       run_analyze_case,
-    'analyze_file':  run_analyze_file_case,
+    'frames':         run_frames_case,
     'analyze_debug': run_analyze_debug_case,
     'stream':         run_stream_case,
     'stream_median_stability': run_stream_median_stability_case,

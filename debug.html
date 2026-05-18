@@ -147,7 +147,7 @@
 <script>
   // ─── URLs ─────────────────────────────────────────────────────────────────────
   const STREAM_URL = 'ws://localhost:5051';
-  const API_URL = 'http://localhost:5050/analyze-file';
+  const API_URL = 'http://localhost:5050/frames';
 
   // ─── Config — mirrors DEFAULT_CONN_CFG in analyze_server.py ──────────────────
   const config = {
@@ -367,14 +367,18 @@
     const form = new FormData();
     form.append('file', file);
     form.append('config', JSON.stringify(config));
+    form.append('window_start', '0.0');
+    form.append('window_end',   '1.0');
     try {
       const res  = await fetch(API_URL, { method: 'POST', body: form });
       const data = await res.json();
       if (data.error) { refStatusEl.textContent = 'Error: ' + data.error; return; }
-      refFrames = data.frames; refDuration = data.duration;
-      const valid = refFrames.filter(f => f.f1 != null && f.f2 != null);
-      refMeanF1 = valid.length ? valid.reduce((s,f)=>s+f.f1,0)/valid.length : null;
-      refMeanF2 = valid.length ? valid.reduce((s,f)=>s+f.f2,0)/valid.length : null;
+      refFrames = data.frames; refDuration = (data.duration_ms ?? (data.duration * 1000)) / 1000;
+      const valid = refFrames.filter(f => f.voiced && (f.f1_median ?? f.f1) != null);
+      const vF1 = f => f.f1_median ?? f.f1;
+      const vF2 = f => f.f2_median ?? f.f2;
+      refMeanF1 = valid.length ? valid.reduce((s,f)=>s+vF1(f),0)/valid.length : null;
+      refMeanF2 = valid.length ? valid.reduce((s,f)=>s+vF2(f),0)/valid.length : null;
       refF1History = []; refF2History = []; refRmsHistory = [];
       if (refAudio) { refAudio.pause(); refAudio = null; }
       refAudio = new Audio(URL.createObjectURL(file));
@@ -416,8 +420,9 @@
     const idx   = Math.min(Math.round(refAudio.currentTime / (STEP_MS / 1000)), refFrames.length - 1);
     const start = Math.max(0, idx - HISTORY_LEN + 1);
     const slice = refFrames.slice(start, idx + 1);
-    refF1History  = slice.map(f => f.f1);
-    refF2History  = slice.map(f => f.f2);
+    // Use smoothed values for display (f1_median/f2_median from rich /frames response)
+    refF1History  = slice.map(f => f.f1_median ?? f.f1);
+    refF2History  = slice.map(f => f.f2_median ?? f.f2);
     refRmsHistory = slice.map(f => f.rms);
   }
 
