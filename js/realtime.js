@@ -9,7 +9,7 @@
  *      white noise — Praat's LPC needs periodicity, not noise
  */
 
-const WS_URL   = (location.protocol==='https:'?'wss:':'ws:')+'//localhost:5051';
+const STREAM_URL = (location.protocol==='https:'?'wss:':'ws:')+'//localhost:5051';
 const HTTP_URL = 'http://localhost:5050';
 const TRAIL_DOTS    = 50;     // keep last N voiced frames
 const TRAIL_COLOR   = '#ffd700'; // gold — matches reference style
@@ -37,7 +37,7 @@ class RealtimeTracker {
 
   async start() {
     if (this.active) return;
-    await this._openWS();
+    await this._openStream();
     await this._openMic();
     this.active        = true;
     this.stats         = { frames:0, voiced:0, start:Date.now() };
@@ -70,15 +70,15 @@ class RealtimeTracker {
   }
 
   // ── WebSocket ─────────────────────────────────────────────────────────────
-  _openWS() {
+  _openStream() {
     return new Promise((res,rej)=>{
-      const ws = new WebSocket(WS_URL);
+      const ws = new WebSocket(STREAM_URL);
       ws.binaryType = 'arraybuffer';
-      const t = setTimeout(()=>{ ws.close(); rej(new Error('WS timeout — is server running on :5051?')); }, 3000);
+      const t = setTimeout(()=>{ ws.close(); rej(new Error('Stream timeout — is server running on :5051?')); }, 3000);
       ws.onopen    = ()=>{ clearTimeout(t); this.ws=ws; res(); };
       ws.onmessage = e=>{ try{ this._msg(JSON.parse(e.data)); }catch(_){} };
-      ws.onerror   = err=>{ clearTimeout(t); rej(new Error('WS connection failed — check server')); };
-      ws.onclose   = ()=>{ if(this.active){ console.warn('WS closed'); this.stop(); } };
+      ws.onerror   = err=>{ clearTimeout(t); rej(new Error('Stream connection failed — check server')); };
+      ws.onclose   = ()=>{ if(this.active){ console.warn('Stream closed'); this.stop(); } };
     });
   }
 

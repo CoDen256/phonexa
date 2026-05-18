@@ -46,7 +46,7 @@
 </head>
 <body>
 
-<h2>FORMANT DEBUG &mdash; Our Server (ws://localhost:5051)</h2>
+<h2>FORMANT DEBUG &mdash; Our Server (stream :5051)</h2>
 
 <div class="controls">
   <button id="micBtn">&#9654; Start mic</button>
@@ -146,7 +146,7 @@
 
 <script>
   // ─── URLs ─────────────────────────────────────────────────────────────────────
-  const WS_URL  = 'ws://localhost:5051';
+  const STREAM_URL = 'ws://localhost:5051';
   const API_URL = 'http://localhost:5050/analyze-file';
 
   // ─── Config — mirrors DEFAULT_CONN_CFG in analyze_server.py ──────────────────
@@ -250,11 +250,11 @@
     }
   }
 
-  // ─── WebSocket ────────────────────────────────────────────────────────────────
+  // ─── Stream ────────────────────────────────────────────────────────────────
   let ws, running = false;
 
-  function connectWS() {
-    ws = new WebSocket(WS_URL);
+  function connectStream() {
+    ws = new WebSocket(STREAM_URL);
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => {
       setMicStatus('connected');
@@ -290,7 +290,7 @@
         }
       }
     };
-    ws.onerror = () => setMicStatus('WS error');
+    ws.onerror = () => setMicStatus('stream error');
     ws.onclose = () => { if (running) setMicStatus('disconnected'); };
   }
 
@@ -338,7 +338,7 @@
       running = true;
       document.getElementById('micBtn').textContent = 'Stop mic';
       setMicStatus('connecting...');
-      connectWS();
+      connectStream();
       await startMic();
       setMicStatus('recording...');
     } else {

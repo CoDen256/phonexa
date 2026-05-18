@@ -1,6 +1,6 @@
 {
   "meta": {
-    "endpoint": "ws",
+    "endpoint": "stream",
     "case_id": "i_128",
     "audio": "lang/me/audio/i.wav",
     "config": {
@@ -14,7 +14,7 @@
       "rms_floor": 0,
       "median_n": 5
     },
-    "recorded": "2026-05-18T19:43:25.380221+00:00"
+    "recorded": "2026-05-18T19:55:38.310340+00:00"
   },
   "response": {
     "chunks_sent": 246,

@@ -4,7 +4,7 @@ analyze_server.py
 Dual-ceiling Praat formant tracker.
 
 HTTP :5050  —  /ping  /analyze  /analyze-file  /analyze-debug
-WS   :5051  —  streaming PCM → rich diagnostic frames
+Stream :5051  —  streaming PCM → rich diagnostic frames
 
 Algorithm (see ``_run_praat_analysis`` for the full pipeline)
 --------------------------------------------------------------
@@ -705,9 +705,9 @@ def http_analyze_debug():
 # WebSocket streaming
 # ══════════════════════════════════════════════════════════════════════════════
 
-async def ws_handler(websocket) -> None:
+async def stream_handler(websocket) -> None:
     """
-    Handle one WebSocket connection end-to-end.
+    Handle one stream connection end-to-end.
 
     Audio flow
     ~~~~~~~~~~
@@ -809,23 +809,22 @@ async def ws_handler(websocket) -> None:
     except Exception:
         pass
 
-
 # ══════════════════════════════════════════════════════════════════════════════
 # WebSocket server thread
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _start_websocket_server() -> None:
+def _start_stream_server() -> None:
     import websockets as _websockets
 
     async def _serve_forever():
-        async with _websockets.serve(ws_handler, 'localhost', 5051):
+        async with _websockets.serve(stream_handler, 'localhost', 5051):
             await asyncio.Future()
 
     asyncio.run(_serve_forever())
 
 
-threading.Thread(target=_start_websocket_server, daemon=True).start()
+threading.Thread(target=_start_stream_server, daemon=True).start()
 
 if __name__ == '__main__':
-    print('HTTP :5050   WS :5051')
+    print('HTTP :5050   Stream :5051')
     app.run(host='localhost', port=5050, threaded=True, debug=False)

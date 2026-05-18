@@ -1,8 +1,8 @@
 {
   "meta": {
-    "endpoint": "ws_stability",
-    "case_id": "i",
-    "audio": "lang/me/audio/i.wav",
+    "endpoint": "stream_median_stability",
+    "case_id": "u",
+    "audio": "lang/me/audio/u.wav",
     "config": {
       "max_f": 5000,
       "n_formants": 5,
@@ -14,19 +14,19 @@
       "rms_floor": 0.005,
       "median_n": 5
     },
-    "recorded": "2026-05-18T19:43:28.679718+00:00"
+    "recorded": "2026-05-18T19:55:46.831725+00:00"
   },
   "response": {
-    "measured_f1": 276,
-    "measured_f2": 2390,
-    "expected_f1": 271.48,
-    "expected_f2": 2380.4,
+    "measured_f1": 325,
+    "measured_f2": 578,
+    "expected_f1": 317.03,
+    "expected_f2": 565.81,
     "tolerance_hz": 50,
-    "stable_frames": 5,
-    "voiced_smooth": 54,
+    "stable_frames": 22,
+    "voiced_smooth": 22,
     "stable_fraction": [
       0.0,
-      0.1
+      1.0
     ]
   }
 }

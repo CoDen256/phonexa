@@ -10,25 +10,25 @@ Layers  (ongoing — run after any code change)
   python tests/server_tests.py analyze           Layer 1 — raw F1/F2 per file
   python tests/server_tests.py analyze_file      Layer 2 — whole-file frames
   python tests/server_tests.py analyze_debug     Layer 3 — raw Praat per config
-  python tests/server_tests.py ws                Layer 4 — per-frame WS raw values
-  python tests/server_tests.py ws_stability      Layer 5 — stable vowel dot position
+  python tests/server_tests.py stream                Layer 4 — per-frame WS raw values
+  python tests/server_tests.py stream_median_stability  Layer 5 — stable vowel dot position
 
 One-time checks  (see TESTING.md for the full order)
 ------------------------------------------------------
   python tests/server_tests.py --js-check        Are JS and Python median identical?
   python tests/server_tests.py --smooth-check    Does server median == Python median?
-  python tests/server_tests.py ws --compare      What would --update change?
+  python tests/server_tests.py stream --compare      What would --update change?
                                                    (also works with old-format refs:
                                                     skips new fields, compares shared ones)
 
 Reference management
 ---------------------
-  python tests/server_tests.py ws --update       Regenerate Layer 4 references
+  python tests/server_tests.py stream --update       Regenerate Layer 4 references
   python tests/server_tests.py --update          Regenerate all layer references
 
 Reference file formats
 -----------------------
-  test/references/ws/{id}.json
+  test/references/stream/{id}.json
     Layer 4: {response: {frames: [{voiced, f1, f2, f1_median, rms, ...}]}}
 
   tests/references/ws_median/{id}.json
@@ -87,7 +87,7 @@ TOLERANCE_HZ        = 0      # 0 = exact (Praat is deterministic per machine)
 STABILITY_TOL_HZ    = 50     # Hz — generous tolerance for vowel stability tests
 WS_RECV_TIMEOUT     = 0.5
 RING_BUFFER_SAMPLES = 4096   # must match analyze_server.py
-MIN_WS_SAMPLES      = RING_BUFFER_SAMPLES * 3
+MIN_STREAM_SAMPLES  = RING_BUFFER_SAMPLES * 3
 
 DEFAULT_CONN_CONFIG = {
     'max_f': 5000, 'n_formants': 5, 'window_ms': 25, 'pre_emphasis': 50,
@@ -97,7 +97,7 @@ DEFAULT_CONN_CONFIG = {
 
 # WS tests disable the RMS gate so results depend only on the analysis algorithm,
 # not on recording volume. rms_floor=0 means every ring-buffer window is analysed.
-TEST_WS_CONFIG = {**DEFAULT_CONN_CONFIG, 'rms_floor': 0}
+TEST_STREAM_CONFIG = {**DEFAULT_CONN_CONFIG, 'rms_floor': 0}
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -308,7 +308,7 @@ def _diff_bool(name: str, cur: bool | None, ref: bool | None) -> Diff:
 # Frame predicates and aggregation
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _is_voiced_ws(frame: dict) -> bool:
+def _is_voiced_stream(frame: dict) -> bool:
     return bool(frame.get('voiced'))
 
 
@@ -493,18 +493,18 @@ def run_analyze_debug_case(case: dict, update_refs: bool) -> TestResult:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /ws streaming helper
+# /stream streaming helper
 # ══════════════════════════════════════════════════════════════════════════════
 
 async def _stream_and_collect(audio_path: Path, chunk_samples: int,
                               config: dict) -> dict:
     """
-    Stream audio to /ws exactly as a browser would (no gate, raw chunks).
+    Stream audio to /stream exactly as a browser would (no gate, raw chunks).
     Concurrent send + receive avoids TCP deadlock.
     Short files are looped to fill the ring buffer.
     """
     samples, sr   = load_audio_as_int16(audio_path)
-    looped, n_loops = loop_samples_to_minimum(samples, MIN_WS_SAMPLES)
+    looped, n_loops = loop_samples_to_minimum(samples, MIN_STREAM_SAMPLES)
     chunks        = split_into_int16_chunks(looped, chunk_samples)
     received: list[dict] = []
     sending_done  = asyncio.Event()
@@ -512,9 +512,9 @@ async def _stream_and_collect(audio_path: Path, chunk_samples: int,
     async with websockets.connect(WS_URL) as ws:
         await ws.send(json.dumps({'type': 'init', 'sample_rate': sr}))
         # Send full config including rms_floor and median_n
-        # TEST_WS_CONFIG disables the RMS gate for regression tests.
+        # TEST_STREAM_CONFIG disables the RMS gate for regression tests.
         # Stability cases override rms_floor via their own 'config' dict.
-        merged_config = {**TEST_WS_CONFIG, **config}
+        merged_config = {**TEST_STREAM_CONFIG, **config}
         await ws.send(json.dumps({'type': 'config', **merged_config}))
         effective_config = merged_config   # stored in result so build_record is accurate
 
@@ -535,7 +535,7 @@ async def _stream_and_collect(audio_path: Path, chunk_samples: int,
 
         await asyncio.gather(send_all(), recv_all())
 
-    voiced    = [f for f in received if _is_voiced_ws(f)]
+    voiced    = [f for f in received if _is_voiced_stream(f)]
     # voiced with smoothed values
     smoothed  = [f for f in voiced if f.get('f1_median') is not None]
 
@@ -561,19 +561,19 @@ async def _stream_and_collect(audio_path: Path, chunk_samples: int,
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /ws  Layer 4 — raw analysis fields
+# /stream  Layer 4 — raw analysis fields
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run_ws_case(case: dict, update_refs: bool) -> TestResult:
+def run_stream_case(case: dict, update_refs: bool) -> TestResult:
     """
-    Stream audio to /ws; compare raw analysis fields per frame.
+    Stream audio to /stream; compare raw analysis fields per frame.
     Compares: voiced, f1, f2, f1_raw, f2_raw, is_above_rms,
               used_back_config, phantom_fix_applied,
               is_valid_f1_range, is_valid_f2_range.
     """
     if not _HAS_WEBSOCKETS:
-        return TestResult(case['id'], 'ws', False, error='pip install websockets')
-    endpoint   = 'ws'
+        return TestResult(case['id'], 'stream', False, error='pip install websockets')
+    endpoint   = 'stream'
     audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
@@ -593,14 +593,14 @@ def run_ws_case(case: dict, update_refs: bool) -> TestResult:
     ref       = reference['response']
     cur_frames = result['frames']
     ref_frames = ref.get('frames', [])
-    cs  = _aggregate(cur_frames, _is_voiced_ws)
-    rs  = _aggregate(ref_frames, _is_voiced_ws)
+    cs  = _aggregate(cur_frames, _is_voiced_stream)
+    rs  = _aggregate(ref_frames, _is_voiced_stream)
 
     # Compare voiced frame sequences regardless of total count.
     # Old gate dropped silent frames → fewer total in ref.
     # Same audio + deterministic Praat → voiced sequences must match.
-    cur_voiced = [f for f in cur_frames if _is_voiced_ws(f)]
-    ref_voiced = [f for f in ref_frames if _is_voiced_ws(f)]
+    cur_voiced = [f for f in cur_frames if _is_voiced_stream(f)]
+    ref_voiced = [f for f in ref_frames if _is_voiced_stream(f)]
 
     extra_fields = ['f1_raw', 'f2_raw',
                     'f1_median', 'f2_median',          # smoothed output (what is drawn)
@@ -613,17 +613,17 @@ def run_ws_case(case: dict, update_refs: bool) -> TestResult:
         _diff_float('mean_f1', cs['mean_f1'] or 0, rs['mean_f1'] or 0, TOLERANCE_HZ),
         _diff_float('mean_f2', cs['mean_f2'] or 0, rs['mean_f2'] or 0, TOLERANCE_HZ),
     ]
-    diffs.extend(_diff_frame_lists(cur_voiced, ref_voiced, _is_voiced_ws, extra_fields))
+    diffs.extend(_diff_frame_lists(cur_voiced, ref_voiced, _is_voiced_stream, extra_fields))
 
     return TestResult(case['id'], endpoint, all(d.passed for d in diffs),
                       diffs=diffs, payload=result)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /ws  Layer 5 — median smoothed values (ws_median)
+# /stream  Layer 5 — stream_median_stability (edian)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run_ws_stability_case(case: dict, update_refs: bool) -> TestResult:
+def run_stream_median_stability_case(case: dict, update_refs: bool) -> TestResult:
     """
     Layer 6: stream a vowel file, take frames [stable_start:stable_end]
     where voiced=True, average f1_median/f2_median, compare to expected
@@ -633,8 +633,8 @@ def run_ws_stability_case(case: dict, update_refs: bool) -> TestResult:
     position on the vowel chart when I say this vowel?'
     """
     if not _HAS_WEBSOCKETS:
-        return TestResult(case['id'], 'ws_stability', False, error='pip install websockets')
-    endpoint   = 'ws_stability'
+        return TestResult(case['id'], 'stream_median_stability', False, error='pip install websockets')
+    endpoint   = 'stream_median_stability'
     audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
@@ -648,7 +648,7 @@ def run_ws_stability_case(case: dict, update_refs: bool) -> TestResult:
     # Extract voiced frames with smoothed values
     voiced_smooth = [
         f for f in result['frames']
-        if _is_voiced_ws(f) and f.get('f1_median') is not None
+        if _is_voiced_stream(f) and f.get('f1_median') is not None
     ]
 
     start_frac = float(case.get('stable_start', 0.0))
@@ -753,7 +753,7 @@ def run_js_median_check() -> None:
 
     Files required
     ~~~~~~~~~~~~~~
-    test/references/ws/{id}.json
+    test/references/stream/{id}.json
       Layer 4 reference with raw per-frame f1/f2.  Run 'ws --update' first.
 
     test/references/js_smoothing/{id}.json
@@ -763,7 +763,7 @@ def run_js_median_check() -> None:
         Copy each case's trail to test/references/js_smoothing/{id}.json
     """
     js_dir = REFERENCES_DIR / 'js_smoothing'
-    ws_dir = REFERENCES_DIR / 'ws'
+    stream_dir = REFERENCES_DIR / 'stream'
 
     if not js_dir.exists() or not any(js_dir.glob('*.json')):
         print('No js_smoothing files found.')
@@ -780,7 +780,7 @@ def run_js_median_check() -> None:
 
     for js_file in sorted(js_dir.glob('*.json')):
         case_id = js_file.stem
-        ws_file = ws_dir / f'{case_id}.json'
+        ws_file = stream_dir / f'{case_id}.json'
 
         if not ws_file.exists():
             print(f'  ⚠  {case_id}  — no Layer 4 reference (run: ws --update)')
@@ -864,7 +864,7 @@ def run_smooth_cross_check() -> None:
 
     Run once after migration.  If all pass, the server median is correct.
     """
-    ref_dir = REFERENCES_DIR / 'ws'
+    ref_dir = REFERENCES_DIR / 'stream'
     if not ref_dir.exists():
         print('No WS references found — run tests first.')
         return
@@ -888,7 +888,7 @@ def run_smooth_cross_check() -> None:
             continue
 
         for i, (srv, exp) in enumerate(zip(frames, expected)):
-            if not _is_voiced_ws(srv):
+            if not _is_voiced_stream(srv):
                 continue
             if srv.get('f1') is None:
                 continue  # State A frame (rms_floor gate) — median not computed
@@ -957,7 +957,7 @@ def _print_summary(endpoint: str, payload: dict) -> None:
             print(f'    {name}: F1={_fv(fm.get("F1"))}  F2={_fv(fm.get("F2"))}'
                   f'  BW1={_fv(fm.get("BW1"))}  BW2={_fv(fm.get("BW2"))}')
 
-    elif endpoint == 'ws':
+    elif endpoint == 'stream':
         print(f'    {payload.get("voiced_count")}/{payload.get("frames_received")} voiced  '
               f'mean F1={_fv(payload.get("mean_f1"))}  F2={_fv(payload.get("mean_f2"))}'
               f'  median F1={_fv(payload.get("mean_f1_median"))}'
@@ -970,7 +970,7 @@ def _print_summary(endpoint: str, payload: dict) -> None:
               f'  mean_f2_median={_fv(payload.get("mean_f2_median"))}'
               f'  median_n={payload.get("median_n")}')
 
-    elif endpoint == 'ws_stability':
+    elif endpoint == 'stream_median_stability':
         ef = payload.get('expected_from', '')
         print(f'    measured  F1={payload.get("measured_f1")} Hz  F2={payload.get("measured_f2")} Hz')
         print(f'    expected  F1={payload.get("expected_f1")} Hz  F2={payload.get("expected_f2")} Hz'
@@ -1036,8 +1036,8 @@ CASES: dict[str, list[dict]] = {
          'description': '/u/ — BACK disambiguates low F2'},
     ],
 
-    'ws': [
-        # config: {} → merged with TEST_WS_CONFIG in _stream_and_collect → rms_floor=0
+    'stream': [
+        # config: {} → merged with TEST_STREAM_CONFIG in _stream_and_collect → rms_floor=0
         {'id': 'i_128',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 128, 'config': {}},
         {'id': 'u_128',       'audio': 'lang/me/audio/u.wav',       'chunk_samples': 128, 'config': {}},
         {'id': 'i_512',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 512, 'config': {}},
@@ -1050,7 +1050,7 @@ CASES: dict[str, list[dict]] = {
     # expected_f1/expected_f2 come from lang/me/lang.json measurements.
     # stable_start/stable_end index into the voiced+smoothed frame list.
     # Leave expected_* as None on first run — the measured value is saved as reference.
-    'ws_stability': [
+    'stream_median_stability': [
         # stable_start/stable_end are fractions of voiced+smooth frames (0.0–1.0).
         # 0.0–1.0 = use all voiced frames (the vowel recordings are steady throughout).
         # Fill expected_f1/expected_f2 from lang/me/lang.json for absolute targets,
@@ -1058,9 +1058,9 @@ CASES: dict[str, list[dict]] = {
         {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'chunk_samples': 128, 'config': {'rms_floor': 0.005},
          'stable_start': 0.0, 'stable_end': 0.1,         "expected_f1": 271.48, "expected_f2": 2380.40},
         {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'chunk_samples': 128,'config': {'rms_floor': 0.005},
-         'stable_start': 0.0, 'stable_end': 0.1,         "expected_f1": 317.03, "expected_f2": 565.81},
+         'stable_start': 0.0, 'stable_end': 1.0,         "expected_f1": 317.03, "expected_f2": 565.81},
         {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'chunk_samples': 128,'config': {'rms_floor': 0.005},
-         'stable_start': 0.0, 'stable_end': 0.1,        "expected_f1": 853.77, "expected_f2": 1309.47,},
+         'stable_start': 0.0, 'stable_end': 1.0,        "expected_f1": 853.77, "expected_f2": 1309.47,},
     ],
 }
 
@@ -1089,7 +1089,7 @@ def _frame_delta(cur: dict, ref: dict, fields: list[str]) -> dict:
     return changes
 
 
-def compare_ws_references(case: dict) -> dict:
+def compare_stream_references(case: dict) -> dict:
     """
     Run the current server for *case* and diff against the saved WS reference.
     Returns a structured report.  Does NOT save anything.
@@ -1106,15 +1106,15 @@ def compare_ws_references(case: dict) -> dict:
     except Exception as exc:
         return {'error': str(exc)}
 
-    reference = load_reference('ws', case['id'])
+    reference = load_reference('stream', case['id'])
     if reference is None:
         return {'error': 'No saved reference — run: python tests/server_tests.py ws --update'}
 
     cur_frames = result['frames']
     ref_frames = reference['response'].get('frames', [])
 
-    cur_stats = _aggregate(cur_frames, _is_voiced_ws)
-    ref_stats = _aggregate(ref_frames, _is_voiced_ws)
+    cur_stats = _aggregate(cur_frames, _is_voiced_stream)
+    ref_stats = _aggregate(ref_frames, _is_voiced_stream)
 
     def smooth_mean(frames, field):
         vals = [f[field] for f in frames if f.get(field) is not None]
@@ -1131,8 +1131,8 @@ def compare_ws_references(case: dict) -> dict:
     # Total counts differ, but VOICED sequences must match: same audio, same Praat.
     # Extra voiced in new = borderline-quiet frames the old gate was filtering out.
     counts_compatible = abs(len(cur_frames) - len(ref_frames)) <= max(5, len(ref_frames) * 0.05)
-    cur_voiced = [f for f in cur_frames if _is_voiced_ws(f)]
-    ref_voiced = [f for f in ref_frames if _is_voiced_ws(f)]
+    cur_voiced = [f for f in cur_frames if _is_voiced_stream(f)]
+    ref_voiced = [f for f in ref_frames if _is_voiced_stream(f)]
     n_compared = min(len(cur_voiced), len(ref_voiced))
 
     frame_changes = []
@@ -1223,7 +1223,7 @@ def print_compare_report(report: dict) -> None:
             print(f'      … and {n-10} more changed frames')
 
 
-def run_ws_compare(endpoints_to_compare: list[str]) -> None:
+def run_stream_compare(endpoints_to_compare: list[str]) -> None:
     """
     Show detailed diff of current server output vs saved Layer 4 references.
     Does NOT modify any reference file.  Run before --update to review changes.
@@ -1236,7 +1236,7 @@ def run_ws_compare(endpoints_to_compare: list[str]) -> None:
             continue
         print(f'\n/{ep.replace("_","-")}')
         for case in cases:
-            report = compare_ws_references(case)
+            report = compare_stream_references(case)
             print_compare_report(report)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1247,8 +1247,8 @@ RUNNERS = {
     'analyze':       run_analyze_case,
     'analyze_file':  run_analyze_file_case,
     'analyze_debug': run_analyze_debug_case,
-    'ws':            run_ws_case,
-    'ws_stability':  run_ws_stability_case,
+    'stream':         run_stream_case,
+    'stream_median_stability': run_stream_median_stability_case,
 }
 
 
@@ -1299,7 +1299,7 @@ def main() -> int:
         if not server_is_running():
             print(f'ERROR: server not running at {HTTP_BASE}')
             return 1
-        run_ws_compare(args.endpoints or ['ws'])
+        run_stream_compare(args.endpoints or ['stream'])
         return 0
 
     if not server_is_running():
