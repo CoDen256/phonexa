@@ -724,8 +724,10 @@ CASES: dict[str, list[dict]] = {
          'description': '/i/ in 128-sample chunks (AudioWorklet)'},
         {'id': 'u_128', 'audio': 'lang/me/audio/u.wav', 'chunk_samples': 128, 'config': {},
          'description': '/u/ back vowel via WebSocket'},
-        {'id': 'live_speech', 'audio': 'test/live_speech_short.wav', 'chunk_samples': 512, 'config': {},
-         'description': '/i/ in 512-sample chunks (ScriptProcessor fallback)'},
+        {'id': 'i_512', 'audio': 'lang/me/audio/i.wav', 'chunk_samples': 512, 'config': {},
+         'description': '/i/ in 512-sample chunks (AudioWorklet)'},
+        {'id': 'live_speech', 'audio': 'test/live_speech_short.wav', 'chunk_samples': 128, 'config': {},
+         'description': 'Live speech 128-chunks'},
     ],
 }
 

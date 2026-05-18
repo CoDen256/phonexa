@@ -13,15 +13,15 @@
       "back_front_ratio": 0.75,
       "energy_floor": 0.0
     },
-    "recorded": "2026-05-15T16:34:21.718753+00:00"
+    "recorded": "2026-05-18T14:56:02.181945+00:00"
   },
   "response": {
-    "chunks_sent": 1148,
+    "chunks_sent": 4589,
     "samples_sent": 587266,
     "original_samples": 587266,
     "loops_applied": 1,
     "sample_rate": 44100,
-    "chunk_samples": 512,
+    "chunk_samples": 128,
     "frames_received": 1140,
     "voiced_count": 1108,
     "mean_f1": 695.0,

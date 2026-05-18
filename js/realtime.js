@@ -195,7 +195,7 @@ class RealtimeTracker {
       const mF1 = this._median(this._medianWindow.map(p=>p.f1));
       const mF2 = this._median(this._medianWindow.map(p=>p.f2));
       this.trail.push({ f1:mF1, f2:mF2 });
-      if (this.trail.length > TRAIL_DOTS) this.trail.shift();
+      // if (this.trail.length > TRAIL_DOTS) this.trail.shift();
     }
   }
 
@@ -585,36 +585,71 @@ async function debugVowel(audioUrl) {
 }
 
 
-// ─── Smoothing cross-check utility ───────────────────────────────────────────
-// Feeds a WS reference file through the real RealtimeTracker._msg() pipeline
-// and returns the trail that would appear on screen.
+// ─── Smoothing cross-check utilities ─────────────────────────────────────────
+// Feed WS reference files through the real RealtimeTracker._msg() pipeline
+// and return the trail that would appear on screen.
 //
-// Use this ONCE before the server-side median migration to capture the
-// JS reference, then compare to Python's compute_smooth_reference() output.
+// The server hosts reference files at /test-refs/ws/<id>.json (dev only).
 //
 // Usage (browser console on any page that loads realtime.js):
-//   const t = await verifySmoothing('tests/references/ws/i_128.json');
-//   console.log(JSON.stringify(t.trail));
+//   const t = await verifySmoothing('http://localhost:5050/test-refs/ws/i_128.json');
+//   const all = await verifyAllSmoothing();
 //
-// Compare that output to the Python test:
-//   python tests/server_tests.py ws --smooth-check i_128
-//
-async function verifySmoothing(referenceUrl) {
-  const ref     = await fetch(referenceUrl).then(r => r.json());
-  const frames  = ref.response?.frames ?? [];
-  const tracker = new RealtimeTracker();   // no DOM access in constructor or _msg
+async function verifySmoothing(input) {
+  // Accept either a URL string or a frames array directly
+  let frames, ref_label;
+  if (typeof input === 'string') {
+    const ref = await fetch(input).then(r => r.json());
+    frames    = ref.response?.frames ?? [];
+    ref_label = input.split('/').pop();
+  } else if (Array.isArray(input)) {
+    frames    = input;
+    ref_label = `${frames.length} frames (inline)`;
+  } else {
+    throw new Error('verifySmoothing: pass a URL string or a frames array');
+  }
 
+  const tracker = new RealtimeTracker();   // no DOM access in constructor or _msg
   for (const frame of frames) {
     tracker._msg({ frames: [frame] });     // exact same path as live streaming
   }
 
   const result = {
-    reference:  referenceUrl,
-    n_input:    frames.length,
-    trail:      tracker.trail,             // [{f1, f2}, ...] — what would be drawn
-    stats:      tracker.stats,
-    median_n:   tracker._MEDIAN_N,
+    ref:      ref_label,
+    n_input:  frames.length,
+    trail:    tracker.trail,               // [{f1, f2}, ...] — what would be drawn
+    stats:    tracker.stats,
+    median_n: tracker._MEDIAN_N,
   };
-  console.log('verifySmoothing →', JSON.stringify(result, null, 2));
+  console.log(`verifySmoothing [${ref_label}] trail=${result.trail.length}`,
+      JSON.stringify(result, null, 2));
   return result;
+}
+
+// Run verifySmoothing for every standard WS reference case.
+// Requires the server to be running at baseUrl (serves /test-refs/).
+async function verifyAllSmoothing() {
+  const caseIds = ['i_128', 'u_128', 'i_512', 'live_speech'];
+  const results = {};
+
+  for (const id of caseIds) {
+    const url = `test/references/ws/${id}.json`;
+    try {
+      results[id] = await verifySmoothing(url);
+    } catch (e) {
+      // Reference may not exist yet (live_speech optional)
+      results[id] = { error: e.message };
+      console.warn(`verifyAllSmoothing [${id}]: ${e.message}`);
+    }
+  }
+
+  // Summary table
+  console.log('\nverifyAllSmoothing — trail lengths and mean formants:');
+  for (const [id, r] of Object.entries(results)) {
+    if (r.error) { console.log(`  ${id}: ERROR — ${r.error}`); continue; }
+    const f1s = r.trail.map(p => p.f1), f2s = r.trail.map(p => p.f2);
+    const mean = arr => arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : '—';
+    console.log(`  ${id}: trail=${r.trail.length}  meanF1=${mean(f1s)}  meanF2=${mean(f2s)}`);
+  }
+  return results;
 }

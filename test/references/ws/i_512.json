@@ -1,7 +1,7 @@
 {
   "meta": {
     "endpoint": "ws",
-    "case_id": "i_128",
+    "case_id": "i_512",
     "audio": "lang/me/audio/i.wav",
     "config": {
       "max_f": 5000,
@@ -13,15 +13,15 @@
       "back_front_ratio": 0.75,
       "energy_floor": 0.0
     },
-    "recorded": "2026-05-18T14:55:59.335226+00:00"
+    "recorded": "2026-05-18T14:56:00.466459+00:00"
   },
   "response": {
-    "chunks_sent": 246,
+    "chunks_sent": 62,
     "samples_sent": 31463,
     "original_samples": 31463,
     "loops_applied": 1,
     "sample_rate": 44100,
-    "chunk_samples": 128,
+    "chunk_samples": 512,
     "frames_received": 54,
     "voiced_count": 54,
     "mean_f1": 269.8,
