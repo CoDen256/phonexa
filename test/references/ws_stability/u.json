@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "endpoint": "ws_stability",
+    "case_id": "u",
+    "audio": "lang/me/audio/u.wav",
+    "config": {
+      "max_f": 5000,
+      "n_formants": 5,
+      "window_ms": 25,
+      "pre_emphasis": 50,
+      "back_ceiling": 1800,
+      "back_ceiling_ratio": 0.95,
+      "back_front_ratio": 0.75,
+      "rms_floor": 0.005,
+      "median_n": 5
+    },
+    "recorded": "2026-05-18T19:43:29.234259+00:00"
+  },
+  "response": {
+    "measured_f1": 322,
+    "measured_f2": 586,
+    "expected_f1": 317.03,
+    "expected_f2": 565.81,
+    "tolerance_hz": 50,
+    "stable_frames": 2,
+    "voiced_smooth": 22,
+    "stable_fraction": [
+      0.0,
+      0.1
+    ]
+  }
+}

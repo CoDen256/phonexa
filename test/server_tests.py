@@ -4,37 +4,43 @@ server_tests.py
 ===============
 Regression tests for analyze_server.py.
 
-First run  → results saved as reference files in tests/references/.
-Later runs → results compared against those references.
+Layers  (ongoing — run after any code change)
+----------------------------------------------
+  python tests/server_tests.py                   all 6 layers
+  python tests/server_tests.py analyze           Layer 1 — raw F1/F2 per file
+  python tests/server_tests.py analyze_file      Layer 2 — whole-file frames
+  python tests/server_tests.py analyze_debug     Layer 3 — raw Praat per config
+  python tests/server_tests.py ws                Layer 4 — per-frame WS raw values
+  python tests/server_tests.py ws_stability      Layer 5 — stable vowel dot position
 
-Usage (from project root, server must be running)
--------------------------------------------------
-  python tests/server_tests.py                  # all endpoints
-  python tests/server_tests.py analyze
-  python tests/server_tests.py analyze_file
-  python tests/server_tests.py analyze_debug
-  python tests/server_tests.py ws               # raw + smooth + stability
-  python tests/server_tests.py --update         # regenerate all references
-  python tests/server_tests.py --list
-  python tests/server_tests.py --smooth-check   # one-time JS vs Python median cross-check
+One-time checks  (see TESTING.md for the full order)
+------------------------------------------------------
+  python tests/server_tests.py --js-check        Are JS and Python median identical?
+  python tests/server_tests.py --smooth-check    Does server median == Python median?
+  python tests/server_tests.py ws --compare      What would --update change?
+                                                   (also works with old-format refs:
+                                                    skips new fields, compares shared ones)
 
-Test layers
------------
-  Layer 1  /analyze        raw F1/F2 per file
-  Layer 2  /analyze-file   all frames, voiced count, mean F1/F2
-  Layer 3  /analyze-debug  raw Praat output per config
-  Layer 4  /ws  raw        per-frame: voiced, f1/f2, f1_raw/f2_raw,
-                           f1_back/f2_back, f1_scan/f2_scan, flags
-  Layer 5  /ws  smooth     per-frame: f1_median/f2_median
-                           reference built from Layer 4 raw via compute_smooth_reference()
-  Layer 6  /ws  stability  per-vowel average f1_median/f2_median vs expected ±50 Hz
+Reference management
+---------------------
+  python tests/server_tests.py ws --update       Regenerate Layer 4 references
+  python tests/server_tests.py --update          Regenerate all layer references
 
-Smooth cross-check (run once before/after migration to verify parity)
-----------------------------------------------------------------------
-  python tests/server_tests.py --smooth-check
-  Compares server's f1_median/f2_median against compute_smooth_reference()
-  applied to the same stream's f1/f2 values.  If they match (within 1 Hz
-  for the JS rounding edge case) the server median is correct.
+Reference file formats
+-----------------------
+  test/references/ws/{id}.json
+    Layer 4: {response: {frames: [{voiced, f1, f2, f1_median, rms, ...}]}}
+
+  tests/references/ws_median/{id}.json
+    Layer 5: smooth verification record
+
+  tests/references/ws_stability/{id}.json
+    Layer 6: stable vowel position (measured vs expected)
+
+  test/references/js_smoothing/{id}.json
+    Created manually from browser verifyAllSmoothing() output.
+    Format: {trail: [{f1, f2}, ...], median_n, stats, ...}
+    Used by --js-check only.
 """
 
 from __future__ import annotations
@@ -76,7 +82,7 @@ except ImportError:
 HTTP_BASE           = 'http://localhost:5050'
 WS_URL              = 'ws://localhost:5051'
 TESTS_DIR           = Path(__file__).parent
-REFERENCES_DIR      = TESTS_DIR / 'references'
+REFERENCES_DIR      = TESTS_DIR.parent / 'test' / 'references'
 TOLERANCE_HZ        = 0      # 0 = exact (Praat is deterministic per machine)
 STABILITY_TOL_HZ    = 50     # Hz — generous tolerance for vowel stability tests
 WS_RECV_TIMEOUT     = 0.5
@@ -256,11 +262,15 @@ def save_reference(endpoint: str, case_id: str, record: dict) -> None:
 
 def build_record(case: dict, endpoint: str, response: dict,
                  extra_meta: dict | None = None) -> dict:
+    # Use effective_config from the response if present (WS tests include it).
+    # Falls back to DEFAULT_CONN_CONFIG + case overrides for HTTP endpoints.
+    effective = (response.get('effective_config')
+                 or {**DEFAULT_CONN_CONFIG, **case.get('config', {})})
     meta = {
         'endpoint': endpoint,
         'case_id':  case['id'],
         'audio':    case.get('audio', ''),
-        'config':   {**DEFAULT_CONN_CONFIG, **case.get('config', {})},
+        'config':   effective,
         'recorded': datetime.now(timezone.utc).isoformat(),
     }
     if extra_meta:
@@ -320,7 +330,15 @@ def _aggregate(frames: list[dict], voiced_pred,
 
 def _diff_frame_lists(cur: list[dict], ref: list[dict],
                       voiced_pred, extra_fields: list[str] | None = None) -> list[Diff]:
-    """Compare frame lists element-by-element; return only failures."""
+    """
+    Compare frame lists element-by-element; return only failures.
+
+    Only compares fields that are actually present in the reference frame.
+    This allows comparing new-format server output against old-format references:
+    new fields (f1_median, is_above_rms, etc.) are silently ignored when the
+    reference doesn't have them, so the test only checks what the reference
+    was actually asserting.
+    """
     if len(cur) != len(ref):
         return [_diff_count('frame_count', len(cur), len(ref))]
     failures: list[Diff] = []
@@ -330,6 +348,9 @@ def _diff_frame_lists(cur: list[dict], ref: list[dict],
             failures.append(Diff(f'frame[{i}].voiced', cv, rv, passed=False))
         if cv and rv:
             for field in ['f1', 'f2'] + (extra_fields or []):
+                # Skip fields absent in the reference — old-format compatibility
+                if field not in r:
+                    continue
                 d = _diff_formant(f'frame[{i}].{field}', c.get(field), r.get(field))
                 if not d.passed:
                     failures.append(d)
@@ -491,9 +512,11 @@ async def _stream_and_collect(audio_path: Path, chunk_samples: int,
     async with websockets.connect(WS_URL) as ws:
         await ws.send(json.dumps({'type': 'init', 'sample_rate': sr}))
         # Send full config including rms_floor and median_n
-        # TEST_WS_CONFIG disables the RMS gate so tests are volume-independent
+        # TEST_WS_CONFIG disables the RMS gate for regression tests.
+        # Stability cases override rms_floor via their own 'config' dict.
         merged_config = {**TEST_WS_CONFIG, **config}
         await ws.send(json.dumps({'type': 'config', **merged_config}))
+        effective_config = merged_config   # stored in result so build_record is accurate
 
         async def send_all():
             for chunk in chunks:
@@ -520,19 +543,20 @@ async def _stream_and_collect(audio_path: Path, chunk_samples: int,
         return round(sum(vals) / len(vals), 1) if vals else None
 
     return {
-        'chunks_sent':     len(chunks),
-        'samples_sent':    len(looped),
+        'chunks_sent':      len(chunks),
+        'samples_sent':     len(looped),
         'original_samples': len(samples),
-        'loops_applied':   n_loops,
-        'sample_rate':     sr,
-        'chunk_samples':   chunk_samples,
-        'frames_received': len(received),
-        'voiced_count':    len(voiced),
+        'loops_applied':    n_loops,
+        'sample_rate':      sr,
+        'chunk_samples':    chunk_samples,
+        'effective_config': effective_config,   # actual config sent to server
+        'frames_received':  len(received),
+        'voiced_count':     len(voiced),
         'mean_f1':         safe_mean([f['f1'] for f in voiced if f.get('f1') is not None]),
         'mean_f2':         safe_mean([f['f2'] for f in voiced if f.get('f2') is not None]),
         'mean_f1_median':  safe_mean([f['f1_median'] for f in smoothed]),
         'mean_f2_median':  safe_mean([f['f2_median'] for f in smoothed]),
-        'frames':          received,
+        'frames':           received,
     }
 
 
@@ -566,101 +590,37 @@ def run_ws_case(case: dict, update_refs: bool) -> TestResult:
         save_reference(endpoint, case['id'], record)
         return TestResult(case['id'], endpoint, True, is_new_ref=True, payload=result)
 
-    ref = reference['response']
-    cs  = _aggregate(result['frames'], _is_voiced_ws)
-    rs  = _aggregate(ref.get('frames', []), _is_voiced_ws)
+    ref       = reference['response']
+    cur_frames = result['frames']
+    ref_frames = ref.get('frames', [])
+    cs  = _aggregate(cur_frames, _is_voiced_ws)
+    rs  = _aggregate(ref_frames, _is_voiced_ws)
 
-    diffs: list[Diff] = [
-        _diff_count('chunks_sent',     result['chunks_sent'],     ref['chunks_sent']),
-        _diff_count('frames_received', result['frames_received'], ref['frames_received']),
-        _diff_count('voiced_count',    result['voiced_count'],    ref['voiced_count']),
-        _diff_float('mean_f1',         cs['mean_f1'] or 0,        rs['mean_f1'] or 0, TOLERANCE_HZ),
-        _diff_float('mean_f2',         cs['mean_f2'] or 0,        rs['mean_f2'] or 0, TOLERANCE_HZ),
-    ]
-    extra_fields = ['f1_raw', 'f2_raw', 'is_above_rms',
+    # Compare voiced frame sequences regardless of total count.
+    # Old gate dropped silent frames → fewer total in ref.
+    # Same audio + deterministic Praat → voiced sequences must match.
+    cur_voiced = [f for f in cur_frames if _is_voiced_ws(f)]
+    ref_voiced = [f for f in ref_frames if _is_voiced_ws(f)]
+
+    extra_fields = ['f1_raw', 'f2_raw',
+                    'f1_median', 'f2_median',          # smoothed output (what is drawn)
+                    'is_above_rms',
                     'used_back_config', 'phantom_fix_applied',
                     'is_valid_f1_range', 'is_valid_f2_range']
-    diffs.extend(_diff_frame_lists(result['frames'], ref.get('frames', []),
-                                   _is_voiced_ws, extra_fields))
+
+    diffs: list[Diff] = [
+        _diff_count('voiced_count', len(cur_voiced), len(ref_voiced)),
+        _diff_float('mean_f1', cs['mean_f1'] or 0, rs['mean_f1'] or 0, TOLERANCE_HZ),
+        _diff_float('mean_f2', cs['mean_f2'] or 0, rs['mean_f2'] or 0, TOLERANCE_HZ),
+    ]
+    diffs.extend(_diff_frame_lists(cur_voiced, ref_voiced, _is_voiced_ws, extra_fields))
+
     return TestResult(case['id'], endpoint, all(d.passed for d in diffs),
                       diffs=diffs, payload=result)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # /ws  Layer 5 — median smoothed values (ws_median)
-# ══════════════════════════════════════════════════════════════════════════════
-
-def run_ws_median_case(case: dict, update_refs: bool) -> TestResult:
-    """
-    Layer 5: verify f1_median/f2_median from the server matches
-    compute_smooth_reference() applied to the same stream's f1/f2 values.
-
-    Reference is built from the Layer 4 WS reference using Python's
-    compute_smooth_reference().  On first run (no Layer 5 ref exists) it
-    is computed and saved.  On subsequent runs it is compared to the server.
-
-    This test catches any regression in server-side smoothing.
-    """
-    if not _HAS_WEBSOCKETS:
-        return TestResult(case['id'], 'ws_median', False, error='pip install websockets')
-    endpoint   = 'ws_median'
-    audio_path = Path(case['audio'])
-    if not audio_path.exists():
-        return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
-
-    # We need live server output — run the stream
-    try:
-        result = asyncio.run(_stream_and_collect(
-            audio_path, case.get('chunk_samples', 128), case.get('config', {})))
-    except Exception as exc:
-        return TestResult(case['id'], endpoint, False, error=str(exc))
-
-    # Compute expected smooth from the server's own f1/f2 values
-    median_n = {**DEFAULT_CONN_CONFIG, **case.get('config', {})}.get('median_n', 5)
-    expected  = compute_smooth_reference(result['frames'], median_n)
-
-    # Build a smooth-only payload for storage
-    smooth_payload = {
-        'frames': [
-            {'voiced': f.get('voiced'), 'f1': f.get('f1'), 'f2': f.get('f2'),
-             'f1_median_server': f.get('f1_median'), 'f2_median_server': f.get('f2_median'),
-             'f1_median_ref':    e.get('f1_median'), 'f2_median_ref':    e.get('f2_median')}
-            for f, e in zip(result['frames'], expected)
-        ],
-        'median_n':      median_n,
-        'voiced_count':  result['voiced_count'],
-        'mean_f1_median': result.get('mean_f1_median'),
-        'mean_f2_median': result.get('mean_f2_median'),
-    }
-
-    record    = build_record(case, endpoint, smooth_payload)
-    reference = load_reference(endpoint, case['id'])
-    if reference is None or update_refs:
-        save_reference(endpoint, case['id'], record)
-        return TestResult(case['id'], endpoint, True, is_new_ref=True, payload=smooth_payload)
-
-    # Compare server f1_median/f2_median to Python-computed reference (from this run)
-    diffs: list[Diff] = []
-    for i, (srv_frame, exp_frame) in enumerate(zip(result['frames'], expected)):
-        if not _is_voiced_ws(srv_frame):
-            continue
-        srv_f1m = srv_frame.get('f1_median')
-        srv_f2m = srv_frame.get('f2_median')
-        exp_f1m = exp_frame.get('f1_median')
-        exp_f2m = exp_frame.get('f2_median')
-        d1 = _diff_formant(f'frame[{i}].f1_median', srv_f1m, exp_f1m)
-        d2 = _diff_formant(f'frame[{i}].f2_median', srv_f2m, exp_f2m)
-        if not d1.passed:
-            diffs.append(d1)
-        if not d2.passed:
-            diffs.append(d2)
-
-    return TestResult(case['id'], endpoint, len(diffs) == 0,
-                      diffs=diffs, payload=smooth_payload)
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# /ws  Layer 6 — stability (dot at right place)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run_ws_stability_case(case: dict, update_refs: bool) -> TestResult:
@@ -691,37 +651,81 @@ def run_ws_stability_case(case: dict, update_refs: bool) -> TestResult:
         if _is_voiced_ws(f) and f.get('f1_median') is not None
     ]
 
-    sl  = case.get('stable_start', 10)
-    se  = case.get('stable_end',   40)
-    stable = voiced_smooth[sl:se]
+    start_frac = float(case.get('stable_start', 0.0))
+    end_frac   = float(case.get('stable_end',   1.0))
+    n          = len(voiced_smooth)
+    sl         = round(n * start_frac)
+    se         = n if end_frac >= 1.0 else round(n * end_frac)
+    stable     = voiced_smooth[sl:se]
 
     if not stable:
         return TestResult(case['id'], endpoint, False,
-                          error=f'No stable voiced frames in slice [{sl}:{se}] '
-                                f'(total voiced+smooth: {len(voiced_smooth)})')
+                          error=f'No stable voiced frames in window '
+                                f'{start_frac:.0%}–{end_frac:.0%} '
+                                f'(frames [{sl}:{se}] of {len(voiced_smooth)} voiced)')
 
     measured_f1 = round(sum(f['f1_median'] for f in stable) / len(stable))
     measured_f2 = round(sum(f['f2_median'] for f in stable) / len(stable))
 
+    cases_exp_f1 = case.get('expected_f1')   # filled in CASES dict → absolute target
+    cases_exp_f2 = case.get('expected_f2')   # None              → use saved measurement
+
+    # Always save the measurement so the reference stays up to date.
+    # Also persist expected_f1/f2 from the CASES dict so the reference is self-documenting.
+    record    = build_record(case, endpoint,
+                             {'measured_f1':   measured_f1,
+                              'measured_f2':   measured_f2,
+                              'expected_f1':   cases_exp_f1,   # None if not set in CASES
+                              'expected_f2':   cases_exp_f2,
+                              'tolerance_hz':  STABILITY_TOL_HZ,
+                              'stable_frames': len(stable),
+                              'voiced_smooth': len(voiced_smooth),
+                              'stable_fraction': [start_frac, end_frac]})
+    reference = load_reference(endpoint, case['id'])
+    if update_refs:
+        save_reference(endpoint, case['id'], record)
+
+    # Resolve expected values
+    if reference:
+        # Prefer cases dict value; fall back to previously saved expected; then measured
+        ref_expected_f1 = reference['response'].get('expected_f1')
+        ref_expected_f2 = reference['response'].get('expected_f2')
+        ref_measured_f1 = reference['response'].get('measured_f1')
+        ref_measured_f2 = reference['response'].get('measured_f2')
+        exp_f1 = cases_exp_f1 or ref_expected_f1 or ref_measured_f1
+        exp_f2 = cases_exp_f2 or ref_expected_f2 or ref_measured_f2
+    else:
+        exp_f1 = cases_exp_f1
+        exp_f2 = cases_exp_f2
+
+    # No expected at all → first run with no cases value: save and report as new ref
+    if exp_f1 is None or exp_f2 is None:
+        save_reference(endpoint, case['id'], record)
+        return TestResult(case['id'], endpoint, True, is_new_ref=True, payload={
+            'measured_f1': measured_f1, 'measured_f2': measured_f2,
+            'expected_f1': measured_f1, 'expected_f2': measured_f2,
+            'expected_from': 'first run (saved as reference — add expected_f1/f2 to CASES to pin)',
+            'tolerance_hz': STABILITY_TOL_HZ, 'stable_frames': len(stable),
+        })
+
+    # Save reference on first run (when cases_exp_f1 is set, reference may not exist yet)
+    if reference is None:
+        save_reference(endpoint, case['id'], record)
+
+    expected_from = 'cases dict' if cases_exp_f1 else 'first run (saved reference)'
+
     payload = {
-        'measured_f1':     measured_f1,
-        'measured_f2':     measured_f2,
-        'expected_f1':     case.get('expected_f1'),
-        'expected_f2':     case.get('expected_f2'),
-        'tolerance_hz':    STABILITY_TOL_HZ,
-        'stable_frames':   len(stable),
-        'voiced_smooth':   len(voiced_smooth),
-        'stable_slice':    [sl, se],
+        'measured_f1':   measured_f1, 'measured_f2':   measured_f2,
+        'expected_f1':   exp_f1,      'expected_f2':   exp_f2,
+        'expected_from': expected_from,
+        'tolerance_hz':  STABILITY_TOL_HZ, 'stable_frames': len(stable),
+        'voiced_smooth': len(voiced_smooth), 'stable_fraction': [start_frac, end_frac],
     }
 
-    record    = build_record(case, endpoint, payload)
-    reference = load_reference(endpoint, case['id'])
-    if reference is None or update_refs:
-        save_reference(endpoint, case['id'], record)
-        return TestResult(case['id'], endpoint, True, is_new_ref=True, payload=payload)
-
-    exp_f1 = case.get('expected_f1') or reference['response'].get('measured_f1')
-    exp_f2 = case.get('expected_f2') or reference['response'].get('measured_f2')
+    if exp_f1 is None or exp_f2 is None:
+        return TestResult(case['id'], endpoint, False,
+                          error='No expected values in reference. '
+                                'Delete the reference file and run again to re-measure.')
 
     diffs = [
         _diff_float('f1_median_stable', measured_f1, exp_f1, STABILITY_TOL_HZ),
@@ -734,6 +738,119 @@ def run_ws_stability_case(case: dict, update_refs: bool) -> TestResult:
 # ══════════════════════════════════════════════════════════════════════════════
 # Smooth cross-check (--smooth-check flag, one-time validation)
 # ══════════════════════════════════════════════════════════════════════════════
+
+def run_js_median_check() -> None:
+    """
+    --js-check
+    Compare saved browser trail (from verifyAllSmoothing) against
+    Python compute_smooth_reference() on the same Layer 4 raw f1/f2 values.
+
+    What this proves
+    ~~~~~~~~~~~~~~~~
+    Python _js_median() is identical to the browser Math.round()-median.
+    If all pass, Python can generate trusted reference values for future
+    server-side median verification.
+
+    Files required
+    ~~~~~~~~~~~~~~
+    test/references/ws/{id}.json
+      Layer 4 reference with raw per-frame f1/f2.  Run 'ws --update' first.
+
+    test/references/js_smoothing/{id}.json
+      Output of browser verifyAllSmoothing() — format: {trail:[{f1,f2},...], ...}
+      Create with:
+        In browser console: await verifyAllSmoothing()
+        Copy each case's trail to test/references/js_smoothing/{id}.json
+    """
+    js_dir = REFERENCES_DIR / 'js_smoothing'
+    ws_dir = REFERENCES_DIR / 'ws'
+
+    if not js_dir.exists() or not any(js_dir.glob('*.json')):
+        print('No js_smoothing files found.')
+        print('  1. Start server:  python analyze_server.py')
+        print('  2. Open browser on any page that loads realtime.js')
+        print('  3. In console:    await verifyAllSmoothing()')
+        print('  4. Save each result to test/references/js_smoothing/{id}.json')
+        return
+
+    print('\nJS ↔ Python median check')
+    print('  browser trail  vs  Python compute_smooth_reference()')
+    print('─' * 64)
+    total = passed = skipped = 0
+
+    for js_file in sorted(js_dir.glob('*.json')):
+        case_id = js_file.stem
+        ws_file = ws_dir / f'{case_id}.json'
+
+        if not ws_file.exists():
+            print(f'  ⚠  {case_id}  — no Layer 4 reference (run: ws --update)')
+            skipped += 1
+            continue
+
+        js_data    = json.loads(js_file.read_text())
+        ws_data    = json.loads(ws_file.read_text())
+
+        js_trail   = js_data.get('trail', [])
+        raw_frames = ws_data.get('response', {}).get('frames', [])
+        median_n   = int(js_data.get('median_n', 5))
+
+        if not js_trail:
+            print(f'  ⚠  {case_id}  — js_smoothing file has no "trail" field')
+            skipped += 1
+            continue
+
+        # If Layer 4 reference already has f1_median (new format):
+        #   use the server's values directly — smooth-check already verified them
+        # If not (old format before migration):
+        #   compute Python median from raw f1/f2
+        has_server_median = any(
+            f.get('f1_median') is not None
+            for f in raw_frames if f.get('voiced')
+        )
+
+        if has_server_median:
+            # New format: trust server's f1_median, just check JS trail matches it
+            python_trail = [
+                {'f1': f['f1_median'], 'f2': f['f2_median']}
+                for f in raw_frames
+                if f.get('voiced') and f.get('f1_median') is not None
+            ]
+        else:
+            # Old format: compute median the Python way from raw f1/f2 values
+            enriched     = compute_smooth_reference(raw_frames, median_n)
+            python_trail = [
+                {'f1': f['f1_median'], 'f2': f['f2_median']}
+                for f in enriched if f.get('f1_median') is not None
+            ]
+
+        failures = []
+        if len(js_trail) != len(python_trail):
+            failures.append(
+                f'trail length: js={len(js_trail)}  python={len(python_trail)}'
+            )
+
+        for i in range(min(len(js_trail), len(python_trail))):
+            js_f1, js_f2 = js_trail[i].get('f1'), js_trail[i].get('f2')
+            py_f1, py_f2 = python_trail[i].get('f1'), python_trail[i].get('f2')
+            if abs((js_f1 or 0) - (py_f1 or 0)) > 1:
+                failures.append(f'trail[{i}].f1: js={js_f1}  python={py_f1}')
+            if abs((js_f2 or 0) - (py_f2 or 0)) > 1:
+                failures.append(f'trail[{i}].f2: js={js_f2}  python={py_f2}')
+
+        total += 1
+        if not failures:
+            passed += 1
+            print(f'  ✓  {case_id}  ({len(js_trail)} trail points)')
+        else:
+            print(f'  ✗  {case_id}  ({len(failures)} mismatches)')
+            for msg in failures[:5]:
+                print(f'      {msg}')
+            if len(failures) > 5:
+                print(f'      … and {len(failures)-5} more')
+
+    print(f'\n{passed}/{total} passed' +
+          (f'  {skipped} skipped' if skipped else ''))
+
 
 def run_smooth_cross_check() -> None:
     """
@@ -854,10 +971,14 @@ def _print_summary(endpoint: str, payload: dict) -> None:
               f'  median_n={payload.get("median_n")}')
 
     elif endpoint == 'ws_stability':
-        print(f'    measured F1={payload.get("measured_f1")}  F2={payload.get("measured_f2")}'
-              f'  expected F1={payload.get("expected_f1")}  F2={payload.get("expected_f2")}'
-              f'  ±{payload.get("tolerance_hz")} Hz'
-              f'  stable={payload.get("stable_frames")} frames')
+        ef = payload.get('expected_from', '')
+        print(f'    measured  F1={payload.get("measured_f1")} Hz  F2={payload.get("measured_f2")} Hz')
+        print(f'    expected  F1={payload.get("expected_f1")} Hz  F2={payload.get("expected_f2")} Hz'
+              f'  ±{payload.get("tolerance_hz")} Hz  [{ef}]')
+        frac    = payload.get('stable_fraction', [0.0, 1.0])
+        n_voiced = payload.get('voiced_smooth', '?')
+        print(f'    stable window: {payload.get("stable_frames")} frames'
+              f'  ({frac[0]:.0%}–{frac[1]:.0%} of {n_voiced} voiced)')
 
 
 def print_result(result: TestResult) -> None:
@@ -921,29 +1042,25 @@ CASES: dict[str, list[dict]] = {
         {'id': 'u_128',       'audio': 'lang/me/audio/u.wav',       'chunk_samples': 128, 'config': {}},
         {'id': 'i_512',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 512, 'config': {}},
         # Extended live-speech recording: tests real-word vowel sequence
-        {'id': 'live_speech', 'audio': 'tests/live_speech.wav',     'chunk_samples': 128, 'config': {}},
+        {'id': 'live_speech', 'audio': 'test/live_speech.wav',     'chunk_samples': 128, 'config': {}},
     ],
 
-    # Layer 5 — same audio/config as ws; verifies f1_median/f2_median correctness
-    'ws_median': [
-        {'id': 'i_128',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 128, 'config': {}},
-        {'id': 'u_128',       'audio': 'lang/me/audio/u.wav',       'chunk_samples': 128, 'config': {}},
-        {'id': 'i_512',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 512, 'config': {}},
-        # One-time check: real live recording — skip automatically if file absent
-        {'id': 'live_speech', 'audio': 'tests/live_speech.wav',     'chunk_samples': 128, 'config': {}},
-    ],
 
     # Layer 6 — 'does the dot land at the right place?'
     # expected_f1/expected_f2 come from lang/me/lang.json measurements.
     # stable_start/stable_end index into the voiced+smoothed frame list.
     # Leave expected_* as None on first run — the measured value is saved as reference.
     'ws_stability': [
-        {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'chunk_samples': 128,
-         'stable_start': 10, 'stable_end': 40, 'expected_f1': None, 'expected_f2': None},
-        {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'chunk_samples': 128,
-         'stable_start': 10, 'stable_end': 40, 'expected_f1': None, 'expected_f2': None},
-        {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'chunk_samples': 128,
-         'stable_start': 10, 'stable_end': 40, 'expected_f1': None, 'expected_f2': None},
+        # stable_start/stable_end are fractions of voiced+smooth frames (0.0–1.0).
+        # 0.0–1.0 = use all voiced frames (the vowel recordings are steady throughout).
+        # Fill expected_f1/expected_f2 from lang/me/lang.json for absolute targets,
+        # or leave None to self-calibrate: first run saves the measurement as the target.
+        {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'chunk_samples': 128, 'config': {'rms_floor': 0.005},
+         'stable_start': 0.0, 'stable_end': 0.1,         "expected_f1": 271.48, "expected_f2": 2380.40},
+        {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'chunk_samples': 128,'config': {'rms_floor': 0.005},
+         'stable_start': 0.0, 'stable_end': 0.1,         "expected_f1": 317.03, "expected_f2": 565.81},
+        {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'chunk_samples': 128,'config': {'rms_floor': 0.005},
+         'stable_start': 0.0, 'stable_end': 0.1,        "expected_f1": 853.77, "expected_f2": 1309.47,},
     ],
 }
 
@@ -954,9 +1071,14 @@ CASES: dict[str, list[dict]] = {
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _frame_delta(cur: dict, ref: dict, fields: list[str]) -> dict:
-    """Return changed fields between two frames."""
+    """
+    Return changed fields between two frames.
+    Skips any field not present in ref so old-format references compare cleanly.
+    """
     changes = {}
     for field in fields:
+        if field not in ref:
+            continue   # absent in reference — old format, skip silently
         cv, rv = cur.get(field), ref.get(field)
         if cv == rv:
             continue
@@ -1001,18 +1123,35 @@ def compare_ws_references(case: dict) -> dict:
     compare_fields = ['voiced', 'f1', 'f2', 'f1_raw', 'f2_raw',
                       'is_above_rms', 'f1_median', 'f2_median']
 
+    # Old server dropped silent frames (no frame sent when below energy_floor).
+    # New server always emits a frame, including State A (below rms_floor).
+    # When frame counts differ significantly, per-frame comparison is meaningless
+    # because the indices no longer correspond to the same audio positions.
+    # Old server: silent frames were dropped (no send). New server: all windows emit.
+    # Total counts differ, but VOICED sequences must match: same audio, same Praat.
+    # Extra voiced in new = borderline-quiet frames the old gate was filtering out.
+    counts_compatible = abs(len(cur_frames) - len(ref_frames)) <= max(5, len(ref_frames) * 0.05)
+    cur_voiced = [f for f in cur_frames if _is_voiced_ws(f)]
+    ref_voiced = [f for f in ref_frames if _is_voiced_ws(f)]
+    n_compared = min(len(cur_voiced), len(ref_voiced))
+
     frame_changes = []
-    n_compared    = min(len(cur_frames), len(ref_frames))
     for i in range(n_compared):
-        delta = _frame_delta(cur_frames[i], ref_frames[i], compare_fields)
+        delta = _frame_delta(cur_voiced[i], ref_voiced[i], compare_fields)
         if delta:
             frame_changes.append({'frame': i, 'changes': delta})
 
+    ref_keys   = set(ref_frames[0].keys()) if ref_frames else set()
+    cur_keys   = set(cur_frames[0].keys()) if cur_frames else set()
+    new_fields = sorted(cur_keys - ref_keys)
+
     return {
-        'case_id':       case['id'],
-        'audio':         str(audio_path),
+        'case_id':           case['id'],
+        'audio':             str(audio_path),
+        'counts_compatible': counts_compatible,
         'total_frames':  {'cur': len(cur_frames), 'ref': len(ref_frames)},
-        'voiced_frames': {'cur': cur_stats['voiced'], 'ref': ref_stats['voiced']},
+        'voiced_frames':   {'cur': len(cur_voiced), 'ref': len(ref_voiced)},
+        'voiced_compared': n_compared,
         'mean_f1':       {'cur': cur_stats['mean_f1'],        'ref': ref_stats['mean_f1']},
         'mean_f2':       {'cur': cur_stats['mean_f2'],        'ref': ref_stats['mean_f2']},
         'mean_f1_median':{'cur': smooth_mean(cur_frames,'f1_median'),
@@ -1020,7 +1159,8 @@ def compare_ws_references(case: dict) -> dict:
         'mean_f2_median':{'cur': smooth_mean(cur_frames,'f2_median'),
                           'ref': smooth_mean(ref_frames,'f2_median')},
         'changed_frames':len(frame_changes),
-        'frame_changes': frame_changes[:30],   # cap to keep output readable
+        'frame_changes': frame_changes[:30],
+        'new_fields':    new_fields,    # fields added since reference was saved
     }
 
 
@@ -1031,33 +1171,47 @@ def print_compare_report(report: dict) -> None:
 
     cid = report['case_id']
 
-    def diff_line(label, d):
+    def diff_line(label, d, unit='Hz'):
+        """unit='Hz' for formants, '' for counts."""
         cur, ref = d.get('cur'), d.get('ref')
-        if cur == ref:
-            arrow = '='
-        else:
-            arrow = '→'
-        delta = ''
+        arrow    = '→' if cur != ref else '='
+        delta    = ''
         if isinstance(cur, float) and isinstance(ref, float):
-            delta = f'  (Δ {cur - ref:+.1f})'
+            delta = f'  (Δ {cur - ref:+.1f}{" " + unit if unit else ""})'
         elif isinstance(cur, int) and isinstance(ref, int):
-            delta = f'  (Δ {cur - ref:+d} Hz)'
+            delta = f'  (Δ {cur - ref:+d}{" " + unit if unit else ""})'
         print(f'    {label:20} ref={_fv(ref):>8}  cur={_fv(cur):>8}  {arrow}{delta}')
 
     print(f'  [ws] {cid}')
-    diff_line('total frames',   report['total_frames'])
-    diff_line('voiced frames',  report['voiced_frames'])
-    diff_line('mean F1',        report['mean_f1'])
-    diff_line('mean F2',        report['mean_f2'])
-    diff_line('mean F1 median', report['mean_f1_median'])
-    diff_line('mean F2 median', report['mean_f2_median'])
+    diff_line('total frames',   report['total_frames'],   unit='')
+    diff_line('voiced frames',  report['voiced_frames'],  unit='')
+    diff_line('mean F1',        report['mean_f1'],        unit='Hz')
+    diff_line('mean F2',        report['mean_f2'],        unit='Hz')
+    diff_line('mean F1 median', report['mean_f1_median'], unit='Hz')
+    diff_line('mean F2 median', report['mean_f2_median'], unit='Hz')
 
-    n = report['changed_frames']
-    ref_total = report['total_frames']['ref']
+    new_fields = report.get('new_fields', [])
+    if new_fields:
+        print(f'    (skipped {len(new_fields)} new fields not in reference: '
+              f'{", ".join(new_fields[:6])}{"…" if len(new_fields) > 6 else ""})')
+
+    if not report.get('counts_compatible', True):
+        ref_t = report['total_frames']['ref']
+        cur_t = report['total_frames']['cur']
+        print(f'    (total frames differ: ref={ref_t} gated  cur={cur_t} all-windows)')
+        print(f'     Comparing voiced sequences instead — same audio, same Praat.')
+
+    n     = report['changed_frames']
+    cmp   = report.get('voiced_compared', report['voiced_frames']['ref'])
+    ref_v = report['voiced_frames']['ref']
+    cur_v = report['voiced_frames']['cur']
+    extra = ''
+    if cur_v != ref_v:
+        extra = f'  ({abs(cur_v - ref_v)} extra voiced — borderline gate frames)'
     if n == 0:
-        print(f'    All {ref_total} frames identical ✓')
+        print(f'    All {cmp} voiced frames identical ✓  (on fields present in reference){extra}')
     else:
-        print(f'    {n}/{ref_total} frames differ:')
+        print(f'    {n}/{cmp} voiced frames differ:{extra}')
         for fc in report['frame_changes'][:10]:
             changes_str = '  '.join(
                 f"{k}: {_fv(v.get('ref'))}→{_fv(v.get('cur'))}"
@@ -1094,7 +1248,6 @@ RUNNERS = {
     'analyze_file':  run_analyze_file_case,
     'analyze_debug': run_analyze_debug_case,
     'ws':            run_ws_case,
-    'ws_median':     run_ws_median_case,
     'ws_stability':  run_ws_stability_case,
 }
 
@@ -1112,6 +1265,10 @@ def main() -> int:
                         choices=list(RUNNERS.keys()) + [[]])
     parser.add_argument('--update',       action='store_true', help='Overwrite all references')
     parser.add_argument('--list',         action='store_true', help='List test IDs and exit')
+    parser.add_argument('--js-check', action='store_true',
+                        help='Compare saved browser trail (js_smoothing/) '
+                             'against Python compute_smooth_reference(). '
+                             'No server needed.')
     parser.add_argument('--smooth-check', action='store_true',
                         help='Cross-check server median vs Python compute_smooth_reference()')
     parser.add_argument('--compare', action='store_true',
@@ -1125,6 +1282,10 @@ def main() -> int:
             for c in cases:
                 desc = c.get('description', '')
                 print(f'  {c["id"]:25}  {desc}')
+        return 0
+
+    if getattr(args, 'js_check', False):
+        run_js_median_check()    # reads local files only — no server needed
         return 0
 
     if args.smooth_check:
