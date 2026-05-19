@@ -1,0 +1,82 @@
+
+Calibration — F1/F2 accuracy + stream vs /frames consistency
+────────────────────────────────────────────────────────────────────
+
+  /u/
+  expected  F1 200–500 Hz    F2 400–900 Hz
+    stream:   22 voiced  F1 in-range  90%   F2 in-range  77% ~
+           F2 dist: <600= 17  600-900=  0  900-1500=  3  >1500=  2  mean=784  median=578
+           F2>900: 5 frames  [back=None: 2  phantom_bad: 0  criterion_miss: 3]
+    frames:    8 voiced  F1 in-range  75%   F2 in-range  75% ~
+           F2 dist: <600=  6  600-900=  0  900-1500=  0  >1500=  2  mean=884  median=586
+           F2>900: 2 frames  [back=None: 1  phantom_bad: 0  criterion_miss: 1]
+    cross : mean F1 Δ=5 Hz   mean F2 Δ=100 Hz   ✗ (tol ±50 Hz)
+
+  /u_practice/
+  expected  F1 200–500 Hz    F2 400–900 Hz
+    stream:  427 voiced  F1 in-range  98%   F2 in-range  63% ~
+           F2 dist: <600=140  600-900=132  900-1500=  2  >1500=153  mean=1076  median=662
+           F2>900: 155 frames  [back=None: 135  phantom_bad: 19  criterion_miss: 1]
+    frames:  495 voiced  F1 in-range  99%   F2 in-range  63% ~
+           F2 dist: <600=162  600-900=152  900-1500=  5  >1500=176  mean=1078  median=657
+           F2>900: 181 frames  [back=None: 155  phantom_bad: 24  criterion_miss: 2]
+    cross : mean F1 Δ=3 Hz   mean F2 Δ=2 Hz   ✓ (tol ±50 Hz)
+
+  /o/
+  expected  F1 300–700 Hz    F2 500–1200 Hz
+    stream:   39 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900= 39  900-1500=  0  >1500=  0  mean=805  median=807
+    frames:   45 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900= 45  900-1500=  0  >1500=  0  mean=805  median=805
+    cross : mean F1 Δ=1 Hz   mean F2 Δ=0 Hz   ✓ (tol ±50 Hz)
+
+  /i/
+  expected  F1 150–400 Hz    F2 1800–2900 Hz
+    stream:   54 voiced  F1 in-range 100%   F2 in-range  77% ~
+           F2 dist: <600=  0  600-900=  0  900-1500=  3  >1500= 51  mean=2201  median=2376
+    frames:   63 voiced  F1 in-range 100%   F2 in-range  80% ✓
+           F2 dist: <600=  0  600-900=  0  900-1500=  3  >1500= 60  mean=2222  median=2378
+    cross : mean F1 Δ=1 Hz   mean F2 Δ=21 Hz   ✓ (tol ±50 Hz)
+
+  /i_bar/
+  expected  F1 150–500 Hz    F2 1500–2200 Hz
+    stream:   59 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900=  0  900-1500=  0  >1500= 59  mean=1853  median=1857
+    frames:   68 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900=  0  900-1500=  0  >1500= 68  mean=1853  median=1859
+    cross : mean F1 Δ=0 Hz   mean F2 Δ=0 Hz   ✓ (tol ±50 Hz)
+
+  /e/
+  expected  F1 300–600 Hz    F2 1800–2500 Hz
+    stream:   59 voiced  F1 in-range 100%   F2 in-range  44% ✗
+           F2 dist: <600=  0  600-900=  0  900-1500= 29  >1500= 30  mean=1713  median=1524
+    frames:   68 voiced  F1 in-range 100%   F2 in-range  38% ✗
+           F2 dist: <600=  0  600-900=  0  900-1500= 31  >1500= 37  mean=1663  median=1532
+    cross : mean F1 Δ=1 Hz   mean F2 Δ=50 Hz   ✓ (tol ±50 Hz)
+
+  /e_open/
+  expected  F1 500–700 Hz    F2 1700–2400 Hz
+    stream:   52 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900=  0  900-1500=  0  >1500= 52  mean=1830  median=1820
+    frames:   60 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900=  0  900-1500=  0  >1500= 60  mean=1830  median=1819
+    cross : mean F1 Δ=0 Hz   mean F2 Δ=0 Hz   ✓ (tol ±50 Hz)
+
+  /a/
+  expected  F1 550–950 Hz    F2 1000–2100 Hz
+    stream:   51 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900=  0  900-1500= 51  >1500=  0  mean=1310  median=1310
+    frames:   59 voiced  F1 in-range 100%   F2 in-range 100% ✓
+           F2 dist: <600=  0  600-900=  0  900-1500= 59  >1500=  0  mean=1310  median=1309
+    cross : mean F1 Δ=0 Hz   mean F2 Δ=0 Hz   ✓ (tol ±50 Hz)
+
+  /live_speech/
+  expected  F1 0–1000 Hz    F2 400–2500 Hz
+    stream: 1108 voiced  F1 in-range  94%   F2 in-range  99% ✓
+           F2 dist: <600= 20  600-900= 85  900-1500=214  >1500=789  mean=1635  median=1706
+           F2>2500: 1 frames  [back=None: 0  phantom_bad: 1  criterion_miss: 0]
+    frames: 1299 voiced  F1 in-range  94%   F2 in-range  99% ✓
+           F2 dist: <600= 24  600-900= 97  900-1500=241  >1500=937  mean=1640  median=1710
+           F2>2500: 2 frames  [back=None: 0  phantom_bad: 2  criterion_miss: 0]
+    cross : mean F1 Δ=1 Hz   mean F2 Δ=5 Hz   ✓ (tol ±50 Hz)
+

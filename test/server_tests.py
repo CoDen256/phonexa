@@ -15,6 +15,8 @@ Layers  (ongoing — run after any code change)
 
 One-time checks  (see TESTING.md for the full order)
 ------------------------------------------------------
+  python tests/server_tests.py --calibrate        F1/F2 accuracy + stream vs /frames
+  python tests/server_tests.py --calibrate u_practice  One vowel only
   python tests/server_tests.py --js-check        Are JS and Python median identical?
   python tests/server_tests.py --smooth-check    Does server median == Python median?
   python tests/server_tests.py stream --compare      What would --update change?
@@ -794,6 +796,176 @@ def run_stream_median_stability_case(case: dict, update_refs: bool) -> TestResul
 # Smooth cross-check (--smooth-check flag, one-time validation)
 # ══════════════════════════════════════════════════════════════════════════════
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Calibration — F1/F2 accuracy + stream vs /frames consistency
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Calibration — F1/F2 accuracy + stream vs /frames consistency
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# These tests answer two questions:
+#   1. Are /stream and /frames consistent for the same audio?
+#   2. What fraction of frames land in the expected F1/F2 range per vowel?
+#
+# Usage:
+#   python tests/server_tests.py --calibrate                 # all calibration
+#   python tests/server_tests.py --calibrate u_practice      # one case
+#
+# Reference JSON files are read directly — no live server needed.
+# Cases map a reference file to expected formant ranges.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Expected F1/F2 range for each case_id (inclusive bounds in Hz).
+# Add or tighten these as the algorithm improves.
+VOWEL_EXPECTED: dict[str, dict] = {
+    'u':          {'f1': (200, 500), 'f2': (400,  900)},
+    'u_practice': {'f1': (200, 500), 'f2': (400,  900)},
+    'o':          {'f1': (300, 700), 'f2': (500,  1200)},
+    'i':          {'f1': (150, 400), 'f2': (1800, 2900)},
+    'i_bar':      {'f1': (150, 500), 'f2': (1500, 2200)},
+    'e':          {'f1': (300, 600), 'f2': (1800, 2500)},
+    'e_open':     {'f1': (500, 700), 'f2': (1700, 2400)},
+    'a':          {'f1': (550, 950), 'f2': (1000, 2100)},
+    'live_speech': {'f1': (0, 1000), 'f2': (400, 2500)},
+}
+
+# Tolerance when comparing stream vs /frames mean values
+CROSS_ENDPOINT_TOL_HZ = 50
+
+
+def _load_voiced_frames(ref_path: Path, endpoint: str) -> list[dict]:
+    """Load voiced frames from a saved reference JSON."""
+    if not ref_path.exists():
+        return []
+    data    = json.loads(ref_path.read_text())
+    frames  = data.get('response', {}).get('frames', [])
+    return [f for f in frames if _is_voiced_stream(f)]
+
+
+def _f2_buckets(frames: list[dict]) -> dict:
+    """Count frames per F2 bucket. Key is the label."""
+    f2s = [f.get('f2') or f.get('f2_median', 0) for f in frames]
+    f2s = [v for v in f2s if v]
+    if not f2s:
+        return {}
+    return {
+        '<600':    sum(1 for v in f2s if v < 600),
+        '600-900': sum(1 for v in f2s if 600 <= v < 900),
+        '900-1500':sum(1 for v in f2s if 900 <= v < 1500),
+        '>1500':   sum(1 for v in f2s if v >= 1500),
+        'total':   len(f2s),
+        'mean':    round(sum(f2s) / len(f2s)),
+        'median':  sorted(f2s)[len(f2s) // 2],
+    }
+
+
+def _failure_breakdown(frames: list[dict], f2_max: int) -> dict:
+    """Classify frames where F2 exceeds f2_max into root-cause buckets."""
+    bad = [f for f in frames if (f.get('f2') or 0) > f2_max]
+    return {
+        'total_bad':         len(bad),
+        'back_none':         sum(1 for f in bad if f.get('f2_back') is None
+                                 and not f.get('phantom_fix_applied')),
+        'phantom_bad':       sum(1 for f in bad if f.get('phantom_fix_applied')),
+        'criterion_miss':    sum(1 for f in bad if f.get('f2_back') is not None
+                                 and not f.get('phantom_fix_applied')),
+    }
+
+
+def run_calibration(target_ids: list[str] | None = None) -> None:
+    """
+    Run calibration checks for all VOWEL_EXPECTED entries (or a subset).
+
+    For each case_id that has saved references in both stream/ and frames/
+    directories, reports:
+      • % of voiced frames in expected F1/F2 range
+      • F2 distribution buckets
+      • Root-cause breakdown of out-of-range frames
+      • Consistency between /stream and /frames outputs
+
+    Reads existing reference files — no live server needed.
+    """
+    ids_to_check = target_ids or list(VOWEL_EXPECTED.keys())
+
+    print('\nCalibration — F1/F2 accuracy + stream vs /frames consistency')
+    print('─' * 68)
+
+    for case_id in ids_to_check:
+        if case_id not in VOWEL_EXPECTED:
+            print(f'  ⚠  {case_id}  — no expected values defined in VOWEL_EXPECTED')
+            continue
+
+        exp    = VOWEL_EXPECTED[case_id]
+        f1_lo, f1_hi = exp['f1']
+        f2_lo, f2_hi = exp['f2']
+
+        stream_ref = REFERENCES_DIR / 'stream' / f'{case_id}.json'
+        frames_ref = REFERENCES_DIR / 'frames' / f'{case_id}.json'
+
+        stream_voiced = _load_voiced_frames(stream_ref, 'stream')
+        frames_voiced = _load_voiced_frames(frames_ref, 'frames')
+
+        if not stream_voiced and not frames_voiced:
+            print(f'  ⚠  {case_id}  — no reference files found')
+            print(f'        run: python tests/server_tests.py stream --update')
+            continue
+
+        print(f'\n  /{case_id}/')
+        print(f'  expected  F1 {f1_lo}–{f1_hi} Hz    F2 {f2_lo}–{f2_hi} Hz')
+
+        # ── Per-endpoint accuracy ─────────────────────────────────────────────
+        for label, voiced in [('stream', stream_voiced), ('frames', frames_voiced)]:
+            if not voiced:
+                print(f'    {label:6}: no reference — skipped')
+                continue
+
+            in_f1 = sum(1 for f in voiced if f1_lo <= (f.get('f1') or 0) <= f1_hi)
+            in_f2 = sum(1 for f in voiced if f2_lo <= (f.get('f2') or 0) <= f2_hi)
+            n     = len(voiced)
+            pf1   = 100 * in_f1 // n
+            pf2   = 100 * in_f2 // n
+
+            f2_ok  = '✓' if pf2 >= 80 else '~' if pf2 >= 60 else '✗'
+            bkts   = _f2_buckets(voiced)
+            print(f'    {label:6}: {n:4} voiced  '
+                  f'F1 in-range {pf1:3}%   F2 in-range {pf2:3}% {f2_ok}')
+            print(f'           F2 dist: <600={bkts.get("<600",0):3}  '
+                  f'600-900={bkts.get("600-900",0):3}  '
+                  f'900-1500={bkts.get("900-1500",0):3}  '
+                  f'>1500={bkts.get(">1500",0):3}  '
+                  f'mean={bkts.get("mean","?")}  median={bkts.get("median","?")}')
+
+            # Root-cause breakdown for out-of-range F2
+            bd = _failure_breakdown(voiced, f2_hi)
+            if bd['total_bad'] > 0:
+                print(f'           F2>{f2_hi}: {bd["total_bad"]} frames  '
+                      f'[back=None: {bd["back_none"]}  '
+                      f'phantom_bad: {bd["phantom_bad"]}  '
+                      f'criterion_miss: {bd["criterion_miss"]}]')
+
+        # ── Cross-endpoint consistency ─────────────────────────────────────────
+        if stream_voiced and frames_voiced:
+            sv = _f2_buckets(stream_voiced)
+            fv = _f2_buckets(frames_voiced)
+            f2_diff  = abs((sv.get('mean') or 0) - (fv.get('mean') or 0))
+            f1_sv    = [f.get('f1') or 0 for f in stream_voiced if f.get('f1')]
+            f1_fv    = [f.get('f1') or 0 for f in frames_voiced if f.get('f1')]
+            f1_diff  = abs(
+                (sum(f1_sv)/len(f1_sv) if f1_sv else 0) -
+                (sum(f1_fv)/len(f1_fv) if f1_fv else 0)
+            )
+            consistent = f2_diff <= CROSS_ENDPOINT_TOL_HZ and f1_diff <= CROSS_ENDPOINT_TOL_HZ
+            icon = '✓' if consistent else '✗'
+            print(f'    cross : mean F1 Δ={f1_diff:.0f} Hz   '
+                  f'mean F2 Δ={f2_diff:.0f} Hz   {icon} '
+                  f'(tol ±{CROSS_ENDPOINT_TOL_HZ} Hz)')
+
+    print()
+
+
+
 def run_js_median_check() -> None:
     """
     --js-check
@@ -996,11 +1168,7 @@ def _window_tag(payload: dict) -> str:
 
 def _print_summary(endpoint: str, payload: dict) -> None:
     if endpoint == 'analyze':
-        frames = payload.get("frames", ["?"])
-        if not frames:
-            print("Empty frames")
-            return
-        print(f'    F1={frames[0].get("f1")} Hz  F2={frames[0].get("f2")} Hz'
+        print(f'    F1={payload.get("f1")} Hz  F2={payload.get("f2")} Hz'
               + _window_tag(payload))
 
     elif endpoint == 'frames':
@@ -1088,14 +1256,15 @@ CASES: dict[str, list[dict]] = {
         # omitting both → one-frame mode (full slice = one segment, like old /analyze)
         # single_segment=False → sliding window using segment_samples/step_ms from config defaults
         # single_segment=False is the test default — sliding window analysis
-        {'id': 'i', 'audio': 'lang/me/audio/i.wav',
-         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
-        {'id': 'u', 'audio': 'lang/me/audio/u.wav',
-         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
-        {'id': 'a', 'audio': 'lang/me/audio/a.wav',
-         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
-        {'id': 'u_practice', 'audio': 'test/resources/u_practice.wav',
-         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'i_bar', 'audio': 'lang/me/audio/i_bar.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'e', 'audio': 'lang/me/audio/e.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'e_open', 'audio': 'lang/me/audio/e_open.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'o', 'audio': 'lang/me/audio/o.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'live_speech', 'audio': 'test/resources/live_speech.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'u_practice', 'audio': 'test/resources/u_practice.wav', 'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
     ],
 
     'debug': [
@@ -1107,12 +1276,17 @@ CASES: dict[str, list[dict]] = {
 
     'stream': [
         # config: {} → merged with TEST_STREAM_CONFIG in _stream_and_collect → rms_floor=0
-        {'id': 'i_128',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 128, 'config': {}},
-        {'id': 'u_128',       'audio': 'lang/me/audio/u.wav',       'chunk_samples': 128, 'config': {}},
         {'id': 'i_512',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 512, 'config': {}},
+        {'id': 'i',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 128, 'config': {}},
+        {'id': 'u',       'audio': 'lang/me/audio/u.wav',       'chunk_samples': 128, 'config': {}},
+        {'id': 'a',       'audio': 'lang/me/audio/a.wav',       'chunk_samples': 128, 'config': {}},
+        {'id': 'i_bar', 'audio': 'lang/me/audio/i_bar.wav', 'chunk_samples': 128, 'config': {}},
+        {'id': 'e', 'audio': 'lang/me/audio/e.wav', 'chunk_samples': 128, 'config': {}},
+        {'id': 'e_open', 'audio': 'lang/me/audio/e_open.wav', 'chunk_samples': 128, 'config': {}},
+        {'id': 'o', 'audio': 'lang/me/audio/o.wav', 'chunk_samples': 128, 'config': {}},
         # Extended live-speech recording: tests real-word vowel sequence
-        {'id': 'live_speech', 'audio': 'test/resources/live_speech.wav',     'chunk_samples': 128, 'config': {}},
-        {'id': 'u_practice', 'audio': 'test/resources/u_practice.wav', 'chunk_samples': 128, 'config': {}},
+        {'id': 'live_speech', 'audio': 'test/resources/live_speech.wav', 'chunk_samples': 128, 'config': {}},
+        {'id': 'u_practice',  'audio': 'test/resources/u_practice.wav',  'chunk_samples': 128, 'config': {}},
     ],
 
 
@@ -1436,6 +1610,9 @@ def main() -> int:
                         choices=list(RUNNERS.keys()) + [[]])
     parser.add_argument('--update',       action='store_true', help='Overwrite all references')
     parser.add_argument('--list',         action='store_true', help='List test IDs and exit')
+    parser.add_argument('--calibrate', nargs='*', metavar='CASE_ID',
+                        help='F1/F2 accuracy + stream vs /frames consistency. '
+                             'Omit CASE_ID for all vowels in VOWEL_EXPECTED.')
     parser.add_argument('--js-check', action='store_true',
                         help='Compare saved browser trail (js_smoothing/) '
                              'against Python compute_smooth_reference(). '
@@ -1453,6 +1630,10 @@ def main() -> int:
             for c in cases:
                 desc = c.get('description', '')
                 print(f'  {c["id"]:25}  {desc}')
+        return 0
+
+    if args.calibrate is not None:
+        run_calibration(args.calibrate or None)   # None = all
         return 0
 
     if getattr(args, 'js_check', False):
