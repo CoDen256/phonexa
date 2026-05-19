@@ -366,7 +366,7 @@
     refStatusEl.textContent = 'analyzing...'; refPlayBtn.disabled = true;
     const form = new FormData();
     form.append('file', file);
-    form.append('config', JSON.stringify(config));
+    form.append('config', JSON.stringify({...config, single_segment: false}));
     form.append('slice_start', '0.0');
     form.append('slice_end',   '1.0');
     try {

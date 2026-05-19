@@ -88,18 +88,18 @@ STABILITY_TOL_HZ    = 50     # Hz — generous tolerance for vowel stability tes
 WS_RECV_TIMEOUT     = 0.5
 SEGMENT_SAMPLES = 4096   # must match analyze_server.py
 MIN_STREAM_SAMPLES  = SEGMENT_SAMPLES * 3
-SEGMENT_STEP_MS = 10
 
 DEFAULT_CONN_CONFIG = {
     'max_f': 5000, 'n_formants': 5, 'window_ms': 25, 'pre_emphasis': 50,
     'back_ceiling': 1800, 'back_ceiling_ratio': 0.95, 'back_front_ratio': 0.75,
-    'rms_floor': 0.005, 'median_n': 5,
+    'rms_floor': 0,     'median_n': 5,           # 0 = gate disabled for all algorithm tests
+    'single_segment': False, 'segment_samples': 4096, 'segment_step_ms': 10,
 }
 
 # Stream/frames tests disable the RMS gate so results depend only on the
 # analysis algorithm, not on recording volume.
-TEST_STREAM_CONFIG = {**DEFAULT_CONN_CONFIG, 'rms_floor': 0}
-TEST_FRAMES_CONFIG = {**DEFAULT_CONN_CONFIG, 'rms_floor': 0}
+TEST_STREAM_CONFIG = {**DEFAULT_CONN_CONFIG}   # rms_floor=0 already in DEFAULT
+TEST_FRAMES_CONFIG = {**DEFAULT_CONN_CONFIG}   # rms_floor=0 already in DEFAULT
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -394,7 +394,10 @@ def run_analyze_case(case: dict, update_refs: bool) -> TestResult:
             f'{HTTP_BASE}/frames',
             files={'file': (audio_path.name, wav_bytes, 'audio/wav')},
             data={
-                'config':      json.dumps({**DEFAULT_CONN_CONFIG, **case.get('config', {})}),
+                # single_segment=True: one measurement for the whole trimmed slice
+                'config':      json.dumps({**DEFAULT_CONN_CONFIG,
+                                           'single_segment': True,
+                                           **case.get('config', {})}),
                 'slice_start': str(case.get('slice_start', 0.15)),
                 'slice_end':   str(case.get('slice_end',   0.85)),
             },
@@ -457,12 +460,7 @@ def run_frames_case(case: dict, update_refs: bool) -> TestResult:
             data={
                 # TEST_FRAMES_CONFIG: rms_floor=0 — include all windows for
                 # deterministic algorithm testing (same as TEST_STREAM_CONFIG)
-                'config':       json.dumps({**TEST_FRAMES_CONFIG,
-                                            **case.get('config', {}),
-                                            **({'segment_samples': case['segment_samples']}
-                                               if 'segment_samples' in case else {}),
-                                            **({'segment_step_ms': case['segment_step_ms']}
-                                               if 'segment_step_ms' in case else {})}),
+                'config':       json.dumps({**DEFAULT_CONN_CONFIG, **case.get('config', {}), 'rms_floor': 0}),
                 'slice_start': str(case.get('slice_start', 0.0)),
                 'slice_end':   str(case.get('slice_end',   1.0)),
             },
@@ -475,9 +473,7 @@ def run_frames_case(case: dict, update_refs: bool) -> TestResult:
     except Exception as exc:
         return TestResult(case['id'], endpoint, False, error=str(exc))
 
-    actual_config = {**TEST_FRAMES_CONFIG, **case.get('config', {}),
-                     **({'segment_samples': case['segment_samples']} if 'segment_samples' in case else {}),
-                     **({'segment_step_ms': case['segment_step_ms']} if 'segment_step_ms' in case else {})}
+    actual_config = {**TEST_FRAMES_CONFIG, **case.get('config', {})}
     record    = build_record(case, endpoint, server_resp,
                              extra_meta={'loops_applied': n_loops,
                                          'effective_config': actual_config})
@@ -523,7 +519,7 @@ def run_analyze_debug_case(case: dict, update_refs: bool) -> TestResult:
     try:
         resp = requests.post(f'{HTTP_BASE}/analyze-debug', data=load_as_wav_bytes(audio_path),
                              headers={'Content-Type': 'audio/wav',
-                                      'X-Window-Start': str(ws), 'X-Window-End': str(we)},
+                                      'X-Slice-Start': str(ws), 'X-Window-End': str(we)},
                              timeout=10)
         if not resp.ok:
             return TestResult(case['id'], endpoint, False,
@@ -998,7 +994,11 @@ def _window_tag(payload: dict) -> str:
 
 def _print_summary(endpoint: str, payload: dict) -> None:
     if endpoint == 'analyze':
-        print(f'    F1={payload.get("f1")} Hz  F2={payload.get("f2")} Hz'
+        frames = payload.get("frames", ["?"])
+        if not frames:
+            print("Empty frames")
+            return
+        print(f'    F1={frames[0].get("f1")} Hz  F2={frames[0].get("f2")} Hz'
               + _window_tag(payload))
 
     elif endpoint == 'frames':
@@ -1084,15 +1084,17 @@ CASES: dict[str, list[dict]] = {
     'frames': [
         # segment_samples + segment_step_ms → sliding window mode (multiple frames)
         # omitting both → one-frame mode (full slice = one segment, like old /analyze)
-        {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'config': {},
-         'slice_start': 0.0, 'slice_end': 1.0,
-         'segment_samples': SEGMENT_SAMPLES, 'segment_step_ms': SEGMENT_STEP_MS},
-        {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'config': {},
-         'slice_start': 0.0, 'slice_end': 1.0,
-         'segment_samples': SEGMENT_SAMPLES, 'segment_step_ms': SEGMENT_STEP_MS},
-        {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'config': {},
-         'slice_start': 0.0, 'slice_end': 1.0,
-         'segment_samples': SEGMENT_SAMPLES, 'segment_step_ms': SEGMENT_STEP_MS},
+        # single_segment=False → sliding window using segment_samples/step_ms from config defaults
+        # single_segment=False is the test default — sliding window analysis
+        {'id': 'i', 'audio': 'lang/me/audio/i.wav',
+         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'u', 'audio': 'lang/me/audio/u.wav',
+         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'a', 'audio': 'lang/me/audio/a.wav',
+         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'live_speech', 'audio': 'test/live_speech.wav',
+         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+
     ],
 
     'analyze_debug': [

@@ -12,9 +12,12 @@
       "back_ceiling_ratio": 0.95,
       "back_front_ratio": 0.75,
       "rms_floor": 0.005,
-      "median_n": 5
+      "median_n": 5,
+      "single_segment": false,
+      "segment_samples": 4096,
+      "segment_step_ms": 10
     },
-    "recorded": "2026-05-18T19:55:47.398091+00:00"
+    "recorded": "2026-05-19T15:56:34.386518+00:00"
   },
   "response": {
     "measured_f1": 855,

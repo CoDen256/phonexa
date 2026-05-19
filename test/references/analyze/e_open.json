@@ -11,18 +11,54 @@
       "back_ceiling": 1800,
       "back_ceiling_ratio": 0.95,
       "back_front_ratio": 0.75,
-      "energy_floor": 0.0
+      "rms_floor": 0,
+      "median_n": 5,
+      "single_segment": false,
+      "segment_samples": 4096,
+      "segment_step_ms": 10
     },
-    "recorded": "2026-05-15T16:23:37.350605+00:00",
-    "duration_ms": 692,
-    "window_start": 0.15,
-    "window_end": 0.85,
-    "from_ms": 104,
-    "to_ms": 588
+    "recorded": "2026-05-19T15:56:28.338309+00:00"
   },
   "response": {
-    "duration_ms": 692,
-    "f1": 624,
-    "f2": 1824
+    "audio_duration_ms": 691.8,
+    "frames": [
+      {
+        "f1": 624,
+        "f1_back": null,
+        "f1_median": 624,
+        "f1_raw": 624.5,
+        "f1_scan": 624.5,
+        "f2": 1824,
+        "f2_back": null,
+        "f2_median": 1824,
+        "f2_raw": 1824.1,
+        "f2_scan": 1824.1,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
+        "rms": 0.135348,
+        "segment": {
+          "at": 21355,
+          "at_ms": 484,
+          "duration_ms": 484.2,
+          "index": 0,
+          "is_valid_duration": true,
+          "samples": 21355,
+          "step_ms": 484
+        },
+        "used_back_config": false,
+        "voiced": true
+      }
+    ],
+    "slice": {
+      "duration_ms": 484.2,
+      "end": 0.85,
+      "end_ms": 588.0,
+      "samples": 21355,
+      "start": 0.15,
+      "start_ms": 103.8
+    }
   }
 }

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "endpoint": "analyze_file",
+    "endpoint": "frames",
     "case_id": "u",
     "audio": "lang/me/audio/u.wav",
     "config": {
@@ -11,63 +11,272 @@
       "back_ceiling": 1800,
       "back_ceiling_ratio": 0.95,
       "back_front_ratio": 0.75,
-      "energy_floor": 0.0
+      "rms_floor": 0,
+      "median_n": 5,
+      "single_segment": false,
+      "segment_samples": 4096,
+      "segment_step_ms": 10
     },
-    "recorded": "2026-05-15T16:27:14.476995+00:00",
+    "recorded": "2026-05-19T15:56:28.431189+00:00",
     "loops_applied": 2,
-    "original_samples": 3750
+    "effective_config": {
+      "max_f": 5000,
+      "n_formants": 5,
+      "window_ms": 25,
+      "pre_emphasis": 50,
+      "back_ceiling": 1800,
+      "back_ceiling_ratio": 0.95,
+      "back_front_ratio": 0.75,
+      "rms_floor": 0,
+      "median_n": 5,
+      "single_segment": false,
+      "segment_samples": 4096,
+      "segment_step_ms": 10
+    }
   },
   "response": {
-    "duration": 0.17,
+    "audio_duration_ms": 170.1,
     "frames": [
       {
         "f1": 325,
+        "f1_back": 313.3,
+        "f1_median": 325,
+        "f1_raw": 324.7,
+        "f1_scan": 324.7,
         "f2": 592,
+        "f2_back": 608.1,
+        "f2_median": 592,
+        "f2_raw": 592.4,
+        "f2_scan": 592.4,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.055546,
-        "t": 0.093
+        "segment": {
+          "at": 4096,
+          "at_ms": 93,
+          "duration_ms": 92.9,
+          "index": 0,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": false,
+        "voiced": true
       },
       {
         "f1": 318,
+        "f1_back": 311.2,
+        "f1_median": 322,
+        "f1_raw": 318.4,
+        "f1_scan": 318.4,
         "f2": 577,
+        "f2_back": 606.8,
+        "f2_median": 585,
+        "f2_raw": 576.6,
+        "f2_scan": 576.6,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.055594,
-        "t": 0.103
+        "segment": {
+          "at": 4537,
+          "at_ms": 103,
+          "duration_ms": 92.9,
+          "index": 1,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": false,
+        "voiced": true
       },
       {
         "f1": 237,
+        "f1_back": 307.8,
+        "f1_median": 318,
+        "f1_raw": 236.7,
+        "f1_scan": 236.7,
         "f2": 545,
+        "f2_back": 600.5,
+        "f2_median": 577,
+        "f2_raw": 545.2,
+        "f2_scan": 545.2,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.055319,
-        "t": 0.113
+        "segment": {
+          "at": 4978,
+          "at_ms": 113,
+          "duration_ms": 92.9,
+          "index": 2,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": false,
+        "voiced": true
       },
       {
         "f1": 511,
+        "f1_back": null,
+        "f1_median": 322,
+        "f1_raw": 510.7,
+        "f1_scan": 510.7,
         "f2": 2019,
+        "f2_back": null,
+        "f2_median": 585,
+        "f2_raw": 2018.9,
+        "f2_scan": 2018.9,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.055687,
-        "t": 0.123
+        "segment": {
+          "at": 5419,
+          "at_ms": 123,
+          "duration_ms": 92.9,
+          "index": 3,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": false,
+        "voiced": true
       },
       {
         "f1": 523,
+        "f1_back": 496.8,
+        "f1_median": 325,
+        "f1_raw": 523.4,
+        "f1_scan": 523.4,
         "f2": 1623,
+        "f2_back": 1219.2,
+        "f2_median": 592,
+        "f2_raw": 1622.8,
+        "f2_scan": 1622.8,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.055441,
-        "t": 0.133
+        "segment": {
+          "at": 5860,
+          "at_ms": 133,
+          "duration_ms": 92.9,
+          "index": 4,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": false,
+        "voiced": true
       },
       {
         "f1": 360,
+        "f1_back": 360.1,
+        "f1_median": 360,
+        "f1_raw": 360.1,
+        "f1_scan": 513.5,
         "f2": 586,
+        "f2_back": 585.8,
+        "f2_median": 586,
+        "f2_raw": 585.8,
+        "f2_scan": 2567.9,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.055358,
-        "t": 0.143
+        "segment": {
+          "at": 6301,
+          "at_ms": 143,
+          "duration_ms": 92.9,
+          "index": 5,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": true,
+        "voiced": true
       },
       {
         "f1": 329,
+        "f1_back": 317.1,
+        "f1_median": 360,
+        "f1_raw": 329.3,
+        "f1_scan": 329.3,
         "f2": 584,
+        "f2_back": 610.4,
+        "f2_median": 586,
+        "f2_raw": 583.9,
+        "f2_scan": 583.9,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.055148,
-        "t": 0.153
+        "segment": {
+          "at": 6742,
+          "at_ms": 153,
+          "duration_ms": 92.9,
+          "index": 6,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": false,
+        "voiced": true
       },
       {
         "f1": 268,
+        "f1_back": 328.4,
+        "f1_median": 360,
+        "f1_raw": 268.4,
+        "f1_scan": 268.4,
         "f2": 547,
+        "f2_back": 608.7,
+        "f2_median": 586,
+        "f2_raw": 546.8,
+        "f2_scan": 546.8,
+        "is_above_rms": true,
+        "is_valid_f1_range": true,
+        "is_valid_f2_range": true,
+        "median_n": 5,
+        "phantom_fix_applied": false,
         "rms": 0.054728,
-        "t": 0.163
+        "segment": {
+          "at": 7183,
+          "at_ms": 163,
+          "duration_ms": 92.9,
+          "index": 7,
+          "is_valid_duration": true,
+          "samples": 4096,
+          "step_ms": 10
+        },
+        "used_back_config": false,
+        "voiced": true
       }
-    ]
+    ],
+    "slice": {
+      "duration_ms": 170.1,
+      "end": 1.0,
+      "end_ms": 170.1,
+      "samples": 7500,
+      "start": 0.0,
+      "start_ms": 0.0
+    }
   }
 }

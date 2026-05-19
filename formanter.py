@@ -99,15 +99,24 @@ class ConnConfig:
     # ── Energy gate ──────────────────────────────────────────────────────────
     rms_floor: float = 0.005   # RMS threshold; 0 = gate disabled
 
-    # ── Smoothing (WS only) ──────────────────────────────────────────────────
+    # ── Smoothing ────────────────────────────────────────────────────────────
     median_n: int = 5
+
+    # ── Segment layout (/frames only) ────────────────────────────────────────
+    single_segment:  bool = True   # True = whole slice → one frame
+    segment_samples: int  = 4096   # window size when single_segment=False
+    segment_step_ms: int  = 10     # step in ms when single_segment=False
 
     def update_from_dict(self, updates: dict) -> None:
         """Apply *updates*, coercing each value to the field's declared type."""
         for name, value in updates.items():
             if hasattr(self, name):
                 try:
-                    setattr(self, name, type(getattr(self, name))(value))
+                    current = getattr(self, name)
+                    if isinstance(current, bool):
+                        setattr(self, name, bool(value))
+                    else:
+                        setattr(self, name, type(current)(value))
                 except (TypeError, ValueError):
                     pass
 
@@ -194,6 +203,17 @@ class FormantAnalysis:
 
     # Final summary (continuity and median applied by callers)
     voiced: bool = False
+
+
+@dataclass
+class SegmentInfo:
+    """Positional and size metadata for one analysis segment."""
+    at_ms:       int
+    at:          int
+    index:       int
+    samples:     int
+    duration_ms: float
+    step_ms:     int
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -527,24 +547,16 @@ def _nullable_round(value: float | None, ndigits: int = 1) -> float | None:
     return None if value is None else round(value, ndigits)
 
 
-def _build_silent_frame(
-        segment_at_ms:       int,
-        segment_at:          int,
-        segment_index:       int,
-        segment_samples:     int,
-        segment_duration_ms: float,
-        step_ms:             int,
-        rms:                 float,
-) -> dict:
+def _build_silent_frame(seg: SegmentInfo, rms: float) -> dict:
     """State A: below rms_floor — Praat not called."""
     return {
         'segment': {
-            'at_ms':       segment_at_ms,
-            'at':          segment_at,
-            'index':       segment_index,
-            'samples':     segment_samples,
-            'duration_ms': segment_duration_ms,
-            'step_ms':     step_ms,
+            'at_ms':       seg.at_ms,
+            'at':          seg.at,
+            'index':       seg.index,
+            'samples':     seg.samples,
+            'duration_ms': seg.duration_ms,
+            'step_ms':     seg.step_ms,
         },
         'voiced':       False,
         'rms':          rms,
@@ -553,29 +565,19 @@ def _build_silent_frame(
 
 
 def _build_analysis_frame(
-        segment_at_ms:       int,
-        segment_at:          int,
-        segment_index:       int,
-        segment_samples:     int,
-        segment_duration_ms: float,
-        step_ms:             int,
-        rms:                 float,
-        analysis:            FormantAnalysis,
-        f1:                  int | None,
-        f2:                  int | None,
-        f1_median:           int | None,
-        f2_median:           int | None,
-        median_n:            int,
+        seg: SegmentInfo, rms: float, analysis: FormantAnalysis,
+        f1: int | None, f2: int | None, f1_median: int | None,
+        f2_median: int | None, median_n: int,
 ) -> dict:
     """State B (unvoiced) or State C (voiced): Praat was called."""
     return {
         'segment': {
-            'at_ms':            segment_at_ms,
-            'at':               segment_at,
-            'index':            segment_index,
-            'samples':          segment_samples,
-            'duration_ms':      segment_duration_ms,
-            'step_ms':          step_ms,
+            'at_ms':            seg.at_ms,
+            'at':               seg.at,
+            'index':            seg.index,
+            'samples':          seg.samples,
+            'duration_ms':      seg.duration_ms,
+            'step_ms':          seg.step_ms,
             'is_valid_duration': analysis.is_valid_sound_duration,
         },
         'voiced':               analysis.voiced,
@@ -591,11 +593,8 @@ def _build_analysis_frame(
         'f2_raw':               _nullable_round(analysis.f2_raw),
         'is_valid_f1_range':    analysis.is_valid_f1_range,
         'is_valid_f2_range':    analysis.is_valid_f2_range,
-        'f1':                   f1,
-        'f2':                   f2,
-        'f1_median':            f1_median,
-        'f2_median':            f2_median,
-        'median_n':             median_n,
+        'f1': f1, 'f2': f2, 'f1_median': f1_median,
+        'f2_median': f2_median, 'median_n': median_n,
     }
 
 
@@ -604,54 +603,24 @@ def _build_analysis_frame(
 # ══════════════════════════════════════════════════════════════════════════════
 
 def analyse_segment_to_frame(
-        segment:        np.ndarray,
-        sample_rate:    float,
-        segment_at_ms:  int,
-        segment_at:     int,
-        segment_index:  int,
-        step_ms:        int,
-        config:         ConnConfig,
-        state:          AnalysisState,
+        segment: np.ndarray, sample_rate: float,
+        seg: SegmentInfo, config: ConnConfig, state: AnalysisState,
 ) -> dict:
-    """
-    Full analysis pipeline: audio segment (samples array) → rich frame dict.
-
-    Shared entry point for both /frames (file) and /stream (WebSocket).
-    step_ms is stored in segment.step_ms for self-description:
-      /stream: always SEGMENT_STEP_MS (10 ms)
-      /frames: configured step, or segment duration for one-frame mode
-    """
-    n_samples           = len(segment)
-    segment_duration_ms = round(n_samples / sample_rate * 1000, 1)
+    """Full analysis pipeline: audio segment → rich frame dict."""
     rms = round(compute_rms(segment), 6)
-
     if config.rms_floor > 0 and rms < config.rms_floor:
-        return _build_silent_frame(
-            segment_at_ms, segment_at, segment_index,
-            n_samples, segment_duration_ms, step_ms, rms
-        )
-
+        return _build_silent_frame(seg, rms)
     sound    = make_praat_sound(segment, sample_rate)
     analysis = _run_praat_analysis(sound, config)
-
     f1 = f2 = f1_median = f2_median = None
     if analysis.voiced:
         f1, f2, f1_median, f2_median = state.apply_voiced(
             analysis.f1_raw, analysis.f2_raw
         )
-
     return _build_analysis_frame(
-        segment_at_ms       = segment_at_ms,
-        segment_at          = segment_at,
-        segment_index       = segment_index,
-        segment_samples     = n_samples,
-        segment_duration_ms = segment_duration_ms,
-        step_ms             = step_ms,
-        rms                 = rms,
-        analysis            = analysis,
-        f1                  = f1,        f2        = f2,
-        f1_median           = f1_median, f2_median = f2_median,
-        median_n            = config.median_n,
+        seg=seg, rms=rms, analysis=analysis,
+        f1=f1, f2=f2, f1_median=f1_median, f2_median=f2_median,
+        median_n=config.median_n,
     )
 
 
@@ -706,8 +675,6 @@ def http_frames():
     except Exception:
         config_dict = {}
     sample_rate_hint    = int(config_dict.pop('sample_rate',    44_100))
-    cfg_segment_samples = config_dict.pop('segment_samples', None)  # None = full slice
-    cfg_segment_step_ms = config_dict.pop('segment_step_ms', None)  # None = one step
     config = ConnConfig()
     config.update_from_dict(config_dict)
 
@@ -727,40 +694,32 @@ def http_frames():
         slice_end_ms    = round(slice_end   * audio_duration_ms, 1)
         slice_samples   = len(sliced)
 
-        # segment_samples: explicit or full slice (one-frame mode, equivalent of old /analyze)
-        seg_n = int(cfg_segment_samples) if cfg_segment_samples else slice_samples
-        # segment_step: explicit or equal to segment size (exactly one window → one frame)
-        if cfg_segment_step_ms is not None:
-            seg_step = max(1, round(sample_rate * int(cfg_segment_step_ms) / 1000))
-            step_ms  = int(cfg_segment_step_ms)
+        # single_segment=True: whole slice → one frame. False: sliding window
+        if config.single_segment:
+            seg_n = slice_samples; seg_step = slice_samples
+            step_ms = round(slice_samples / sample_rate * 1000)
         else:
-            seg_step = seg_n
-            step_ms  = round(seg_n / sample_rate * 1000)
-
-        state       = AnalysisState(config.median_n)
+            seg_n = config.segment_samples
+            seg_step = max(1, round(sample_rate * config.segment_step_ms / 1000))
+            step_ms  = config.segment_step_ms
+        state = AnalysisState(config.median_n)
         frames: list[dict] = []
         segment_idx = 0
-
         for cursor in range(seg_n, slice_samples + 1, seg_step):
-            seg       = sliced[cursor - seg_n: cursor]
-            seg_at_ms = round(cursor / sample_rate * 1000)
-            seg_at    = cursor
+            audio_seg = sliced[cursor - seg_n: cursor]
+            seg_info  = SegmentInfo(
+                at_ms=round(cursor / sample_rate * 1000), at=cursor,
+                index=segment_idx, samples=seg_n,
+                duration_ms=round(seg_n / sample_rate * 1000, 1),
+                step_ms=step_ms,
+            )
             try:
                 frame = analyse_segment_to_frame(
-                    segment       = seg,
-                    sample_rate   = sample_rate,
-                    segment_at_ms = seg_at_ms,
-                    segment_at    = seg_at,
-                    segment_index = segment_idx,
-                    step_ms       = step_ms,
-                    config        = config,
-                    state         = state,
+                    segment=audio_seg, sample_rate=sample_rate,
+                    seg=seg_info, config=config, state=state,
                 )
             except Exception:
-                frame = _build_silent_frame(
-                    seg_at_ms, seg_at, segment_idx, seg_n,
-                    round(seg_n / sample_rate * 1000, 1), step_ms, 0.0
-                )
+                frame = _build_silent_frame(seg_info, 0.0)
             frames.append(frame)
             segment_idx += 1
 
@@ -898,19 +857,18 @@ async def stream_handler(websocket) -> None:
                 continue
             samples_since_last_analysis = 0
 
-            seg = np.array(session.ring)
-
-            # ── Full pipeline via shared function ──────────────────────────
+            audio_seg = np.array(session.ring)
+            n         = len(audio_seg)
+            seg_info  = SegmentInfo(
+                at_ms=session.segment_at_ms, at=session.total_samples_received,
+                index=session.segment_index, samples=n,
+                duration_ms=round(n / session.sample_rate * 1000, 1),
+                step_ms=SEGMENT_STEP_MS,
+            )
             try:
                 frame = analyse_segment_to_frame(
-                    segment       = seg,
-                    sample_rate   = session.sample_rate,
-                    segment_at_ms = session.segment_at_ms,
-                    segment_at    = session.total_samples_received,
-                    segment_index = session.segment_index,
-                    step_ms       = SEGMENT_STEP_MS,
-                    config        = session.config,
-                    state         = session.analysis_state,
+                    segment=audio_seg, sample_rate=session.sample_rate,
+                    seg=seg_info, config=session.config, state=session.analysis_state,
                 )
                 session.segment_index += 1
                 await websocket.send(json.dumps({'frames': [frame]}))

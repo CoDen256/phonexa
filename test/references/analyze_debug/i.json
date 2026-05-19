@@ -11,9 +11,13 @@
       "back_ceiling": 1800,
       "back_ceiling_ratio": 0.95,
       "back_front_ratio": 0.75,
-      "energy_floor": 0.0
+      "rms_floor": 0,
+      "median_n": 5,
+      "single_segment": false,
+      "segment_samples": 4096,
+      "segment_step_ms": 10
     },
-    "recorded": "2026-05-15T16:32:52.182926+00:00",
+    "recorded": "2026-05-19T16:07:44.592146+00:00",
     "duration_ms": 713,
     "window_start": 0.15,
     "window_end": 0.85,
