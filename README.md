@@ -133,6 +133,10 @@ ideas:
   - f1/f2 and slice of audio + params? ceiling fq and window size, formants?, how measured
 - first use is always the representative isolated sound if possible
 - chart can display:
-  - staticly premeasured f1/f2
-  - staticly custom measurement
-  - dynamic trail of speech
+  - single mean f1/f2 of a slice
+  - single mean f1/f2 of a custom slice
+  - dynamic trail of speech / custom slice of speech
+
+- fix practice.js
+refactor http_analyze_debug, rename it to /debug. It accepts the same thing as /frames: raw audio or a file, also has slice_start and slice_end config parameter, supplied as extra config, not via headers, don't change anything else, it shouldn't use our shared fuctions, just let it be hardcoded as is with all the bandwidth and other stuff. Also update it in the server tests, rename to debug
+Rename also analyze test to "single-frame" everywhere, it will use the same named directory "single-frame"

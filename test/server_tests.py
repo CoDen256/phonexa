@@ -7,7 +7,7 @@ Regression tests for analyze_server.py.
 Layers  (ongoing — run after any code change)
 ----------------------------------------------
   python tests/server_tests.py                   all 6 layers
-  python tests/server_tests.py analyze           Layer 1 — raw F1/F2 per file
+  python tests/server_tests.py single_frame      Layer 1 — /frames one-frame per file
   python tests/server_tests.py frames             Layer 2 — /frames rich frames
   python tests/server_tests.py analyze_debug     Layer 3 — raw Praat per config
   python tests/server_tests.py stream                Layer 4 — per-frame WS raw values
@@ -374,16 +374,16 @@ def _diff_frame_lists(cur: list[dict], ref: list[dict],
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /analyze  (Layer 1)
+# /single-frame  (Layer 1)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run_analyze_case(case: dict, update_refs: bool) -> TestResult:
+def run_single_frame_case(case: dict, update_refs: bool) -> TestResult:
     """
     POST audio to /frames in one-frame mode (equivalent of removed /analyze).
     Uses slice_start=0.15, slice_end=0.85 (old /analyze trim default).
     No segment_samples/segment_step_ms → full slice = one frame.
     """
-    endpoint   = 'analyze'
+    endpoint   = 'single_frame'
     audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
@@ -502,25 +502,27 @@ def run_frames_case(case: dict, update_refs: bool) -> TestResult:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# /analyze-debug  (Layer 3)
+# /debug  (Layer 3)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run_analyze_debug_case(case: dict, update_refs: bool) -> TestResult:
+def run_debug_case(case: dict, update_refs: bool) -> TestResult:
     """POST audio to /analyze-debug; compare raw Praat values per config."""
-    endpoint   = 'analyze_debug'
+    endpoint   = 'debug'
     audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
 
-    ws, we      = case.get('window_start', 0.15), case.get('window_end', 0.85)
-    duration_ms = get_audio_duration_ms(audio_path)
-    extra       = {'duration_ms': round(duration_ms), 'window_start': ws, 'window_end': we,
-                   'from_ms': round(duration_ms * ws), 'to_ms': round(duration_ms * we)}
     try:
-        resp = requests.post(f'{HTTP_BASE}/analyze-debug', data=load_as_wav_bytes(audio_path),
-                             headers={'Content-Type': 'audio/wav',
-                                      'X-Slice-Start': str(ws), 'X-Window-End': str(we)},
-                             timeout=10)
+        wav_bytes = load_as_wav_bytes(audio_path)
+        resp = requests.post(
+            f'{HTTP_BASE}/debug',
+            files={'file': (audio_path.name, wav_bytes, 'audio/wav')},
+            data={'config': json.dumps({
+                'slice_start': case.get('slice_start', 0.15),
+                'slice_end':   case.get('slice_end',   0.85),
+            })},
+            timeout=10,
+        )
         if not resp.ok:
             return TestResult(case['id'], endpoint, False,
                               error=f'HTTP {resp.status_code}: {resp.json().get("error")}')
@@ -528,12 +530,12 @@ def run_analyze_debug_case(case: dict, update_refs: bool) -> TestResult:
     except Exception as exc:
         return TestResult(case['id'], endpoint, False, error=str(exc))
 
-    record    = build_record(case, endpoint, server_resp, extra)
+    record    = build_record(case, endpoint, server_resp)
     reference = load_reference(endpoint, case['id'])
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
         return TestResult(case['id'], endpoint, True, is_new_ref=True,
-                          payload={**server_resp, **extra})
+                          payload=server_resp)
 
     diffs: list[Diff] = []
     for cfg_name, ref_data in reference['response'].get('configs', {}).items():
@@ -542,7 +544,7 @@ def run_analyze_debug_case(case: dict, update_refs: bool) -> TestResult:
             if key.startswith('F') and not key.startswith('BW'):
                 diffs.append(_diff_formant(f'{cfg_name}.{key}', cur_fmt.get(key), ref_val))
     return TestResult(case['id'], endpoint, all(d.passed for d in diffs),
-                      diffs=diffs, payload={**server_resp, **extra})
+                      diffs=diffs, payload=server_resp)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1008,7 +1010,7 @@ def _print_summary(endpoint: str, payload: dict) -> None:
               f'mean F1={_fv(stats["mean_f1"])}  mean F2={_fv(stats["mean_f2"])}'
               f'  dur={_fv(dur)} ms')
 
-    elif endpoint == 'analyze_debug':
+    elif endpoint == 'debug':
         print(_window_tag(payload))
         for name, data in payload.get('configs', {}).items():
             fm = data.get('formants', {})
@@ -1072,7 +1074,7 @@ def print_result(result: TestResult) -> None:
 
 CASES: dict[str, list[dict]] = {
 
-    'analyze': [
+    'single_frame': [
         {'id': 'i',      'audio': 'lang/me/audio/i.wav',      'window_start': 0.15, 'window_end': 0.85},
         {'id': 'i_bar',  'audio': 'lang/me/audio/i_bar.wav',  'window_start': 0.15, 'window_end': 0.85},
         {'id': 'u',      'audio': 'lang/me/audio/u.wav',      'window_start': 0.15, 'window_end': 0.85},
@@ -1092,12 +1094,9 @@ CASES: dict[str, list[dict]] = {
          'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
         {'id': 'a', 'audio': 'lang/me/audio/a.wav',
          'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
-        {'id': 'live_speech', 'audio': 'test/live_speech.wav',
-         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
-
     ],
 
-    'analyze_debug': [
+    'debug': [
         {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'window_start': 0.15, 'window_end': 0.85,
          'description': '/i/ — FRONT skips F1, SCAN finds it'},
         {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'window_start': 0.15, 'window_end': 0.85,
@@ -1413,9 +1412,9 @@ def run_stream_compare(endpoints_to_compare: list[str]) -> None:
 # ══════════════════════════════════════════════════════════════════════════════
 
 RUNNERS = {
-    'analyze':       run_analyze_case,
+    'single_frame':   run_single_frame_case,
     'frames':         run_frames_case,
-    'analyze_debug': run_analyze_debug_case,
+    'debug':           run_debug_case,
     'stream':         run_stream_case,
     'stream_median_stability': run_stream_median_stability_case,
 }

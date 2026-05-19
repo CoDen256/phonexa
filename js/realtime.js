@@ -309,13 +309,15 @@ function playSynthBuffer({buffer}) {
 
 async function analyzeSynthBuffer({buffer, sampleRate}) {
   const wav  = encodeWAV(buffer.getChannelData(0), sampleRate);
-  const resp = await fetch(`${HTTP_URL}/analyze`,{
-    method:'POST',
-    headers:{'Content-Type':'audio/wav','X-Window-Start':'0.1','X-Window-End':'0.9'},
-    body:wav,
-  });
-  if (!resp.ok) throw new Error((await resp.json()).error||resp.status);
-  return resp.json();
+  const form = new FormData();
+  form.append('file', wav, 'audio.wav');
+  form.append('config', JSON.stringify({single_segment: true, slice_start: 0.1, slice_end: 0.9}));
+  const resp = await fetch(`${HTTP_URL}/frames`, {method: 'POST', body: form});
+  if (!resp.ok) throw new Error((await resp.json()).error || resp.status);
+  const data = await resp.json();
+  const frame = data.frames?.[0];
+  if (!frame) throw new Error('No frames returned');
+  return frame;   // callers use frame.f1, frame.f2
 }
 
 async function testSyntheticVowel(tF1, tF2, opts={}) {
@@ -458,20 +460,20 @@ async function verifyFromIpaAudio(langKey, opts={}) {
         await new Promise(res=>setTimeout(res, Math.min(2000, audioBuf.duration*1000+300)));
       }
 
-      // Encode as WAV and send to server
-      const wav  = encodeWAV(float32, audioBuf.sampleRate);
-      const sResp = await fetch(`${HTTP_URL}/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type':'audio/wav', 'X-Window-Start':'0.15', 'X-Window-End':'0.85' },
-        body: wav,
-      });
+      // Encode as WAV and send to /frames for single-frame analysis
+      const wav   = encodeWAV(float32, audioBuf.sampleRate);
+      const form  = new FormData();
+      form.append('file', wav, 'audio.wav');
+      form.append('config', JSON.stringify({single_segment: true, slice_start: 0.15, slice_end: 0.85}));
+      const sResp = await fetch(`${HTTP_URL}/frames`, {method: 'POST', body: form});
 
       if (!sResp.ok) {
         const err = await sResp.json();
         console.warn(`  /${v.ipa}/ — server error: ${err.error}`);
         continue;
       }
-      const measured = await sResp.json();
+      const sData   = await sResp.json();
+      const measured = sData.frames?.[0] ?? {};
 
       const eF1  = measured.f1 - v.f1, eF2 = measured.f2 - v.f2;
       const pF1  = Math.abs(eF1/v.f1*100), pF2 = Math.abs(eF2/v.f2*100);
@@ -526,7 +528,7 @@ async function verifyFromIpaAudio(langKey, opts={}) {
 }
 
 // ─── Debug helper — paste in browser console ─────────────────────────────────
-// debugVowel('lang/me/audio/i.wav')  →  shows raw Praat formant values
+// debugVowel('lang/me/audio/i.wav')  →  shows raw Praat values from /debug
 async function debugVowel(audioUrl) {
   const resp = await fetch(audioUrl);
   const ab   = await resp.arrayBuffer();
@@ -534,11 +536,10 @@ async function debugVowel(audioUrl) {
   const buf  = await ctx.decodeAudioData(ab);
   ctx.close();
   const wav  = encodeWAV(buf.getChannelData(0), buf.sampleRate);
-  const r    = await fetch(`${HTTP_URL}/analyze-debug`, {
-    method: 'POST',
-    headers: { 'Content-Type':'audio/wav', 'X-Window-Start':'0.15', 'X-Window-End':'0.85' },
-    body: wav,
-  });
+  const form = new FormData();
+  form.append('file', wav, 'audio.wav');
+  form.append('config', JSON.stringify({slice_start: 0.15, slice_end: 0.85}));
+  const r    = await fetch(`${HTTP_URL}/debug`, {method: 'POST', body: form});
   const data = await r.json();
   console.log(JSON.stringify(data, null, 2));
   return data;

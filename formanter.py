@@ -3,7 +3,7 @@ analyze_server.py
 =================
 Dual-ceiling Praat formant tracker.
 
-HTTP :5050  —  /ping  /frames  /analyze-debug
+HTTP :5050  —  /ping  /frames  /debug
 Stream :5051  —  streaming PCM → rich diagnostic frames
 
 Algorithm (see ``_run_praat_analysis`` for the full pipeline)
@@ -739,17 +739,34 @@ def http_frames():
         return jsonify({'error': str(error)}), 500
 
 
-@app.route('/analyze-debug', methods=['POST'])
-def http_analyze_debug():
-    """Diagnostic endpoint — raw Praat output from FRONT, BACK, SCAN configs."""
-    if not request.data:
-        return jsonify({'error': 'No audio data'}), 400
+@app.route('/debug', methods=['POST'])
+def http_debug():
+    """
+    Diagnostic endpoint — raw Praat output from FRONT, BACK, SCAN configs.
 
-    audio_samples, sample_rate = parse_wav_or_pcm(request.data)
-    slice_start, slice_end     = read_slice_fraction_headers(request)
-    analysis_samples           = trim_to_slice_fraction(audio_samples, slice_start, slice_end)
+    Accepts the same multipart input as /frames:
+      file        — audio file or raw int16 PCM
+      config      — JSON with optional slice_start (default 0.15)
+                    and slice_end (default 0.85) as extra keys
+
+    Intentionally does NOT use the shared analysis pipeline — all Praat calls
+    are explicit so the raw diagnostic output is always visible.
+    """
+    uploaded_file = request.files.get('file')
+    if not uploaded_file:
+        return jsonify({'error': 'No file uploaded'}), 400
 
     try:
+        config_dict = json.loads(request.form.get('config', '{}'))
+    except Exception:
+        config_dict = {}
+    sample_rate_hint = int(config_dict.pop('sample_rate', 44_100))
+    slice_start      = float(config_dict.pop('slice_start', 0.15))
+    slice_end        = float(config_dict.pop('slice_end',   0.85))
+
+    try:
+        audio_samples, sample_rate = decode_audio(uploaded_file, sample_rate_hint)
+        analysis_samples           = trim_to_slice_fraction(audio_samples, slice_start, slice_end)
         sound       = make_praat_sound(analysis_samples, sample_rate)
         midpoint    = sound.duration / 2
         default_cfg = ConnConfig()
@@ -774,8 +791,8 @@ def http_analyze_debug():
                     values[f'F{pole}']  = None if math.isnan(freq) else round(freq, 1)
                     values[f'BW{pole}'] = bw_val
                 configs_out[name] = {
-                    'ceiling': burg_kwargs['maximum_formant'],
-                    'n':       burg_kwargs['max_number_of_formants'],
+                    'ceiling':  burg_kwargs['maximum_formant'],
+                    'n':        burg_kwargs['max_number_of_formants'],
                     'formants': values,
                 }
             except Exception as error:
@@ -785,11 +802,12 @@ def http_analyze_debug():
             'sample_rate':   sample_rate,
             'duration_ms':   round(len(analysis_samples) / sample_rate * 1000),
             'analysis_t_ms': round(midpoint * 1000),
+            'slice_start':   slice_start,
+            'slice_end':     slice_end,
             'configs':       configs_out,
         })
     except Exception as error:
         return jsonify({'error': str(error)}), 500
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # WebSocket streaming

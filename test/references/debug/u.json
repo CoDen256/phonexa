@@ -1,6 +1,6 @@
 {
   "meta": {
-    "endpoint": "analyze_debug",
+    "endpoint": "debug",
     "case_id": "u",
     "audio": "lang/me/audio/u.wav",
     "config": {
@@ -17,12 +17,7 @@
       "segment_samples": 4096,
       "segment_step_ms": 10
     },
-    "recorded": "2026-05-19T16:07:44.596367+00:00",
-    "duration_ms": 85,
-    "window_start": 0.15,
-    "window_end": 0.85,
-    "from_ms": 13,
-    "to_ms": 72
+    "recorded": "2026-05-19T19:32:06.214929+00:00"
   },
   "response": {
     "analysis_t_ms": 30,
@@ -73,6 +68,8 @@
       }
     },
     "duration_ms": 60,
-    "sample_rate": 44100
+    "sample_rate": 44100,
+    "slice_end": 0.85,
+    "slice_start": 0.15
   }
 }

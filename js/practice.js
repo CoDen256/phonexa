@@ -16,9 +16,8 @@
  * playback and animates the cursor on the waveform.
  *
  * Server: expects analyze_server.py running on localhost:5050.
- * The browser sends a WAV slice (already trimmed to the selected window)
- * with X-Window-Start:0 / X-Window-End:1 so the server analyses the
- * whole clip. The server returns {f1, f2, duration_ms}.
+ * Audio is sent as multipart/form-data to /frames with single_segment:true
+ * (whole uploaded audio = one segment). Returns frames[0].f1 / frames[0].f2.
  *
  * Dependencies: utils.js (encodeWAV), index.html globals
  *   (LANGS, passesFilters, renderFormant, playUrl, playUrlAtRate,
@@ -157,7 +156,7 @@ async function loadRefAudio(url, lang){
     document.getElementById('refAnalyse').disabled=false;
     if(refVowelMeta?.v?.f1){
       document.getElementById('refFormants').innerHTML=
-        `Specified: F1 <b>${refVowelMeta.v.f1}</b> · F2 <b>${refVowelMeta.v.f2}</b> Hz`;
+          `Specified: F1 <b>${refVowelMeta.v.f1}</b> · F2 <b>${refVowelMeta.v.f2}</b> Hz`;
     }
     requestAnimationFrame(drawRefWave);
   }catch(e){
@@ -173,13 +172,7 @@ document.getElementById('refAnalyse').addEventListener('click', async()=>{
   try{
     const s=Math.floor(refStart*refSamples.length), e=Math.floor(refEnd*refSamples.length);
     const blob=encodeWAV(refSamples.slice(s,e),refSampleRate);
-    const resp=await fetch(SERVER+'/analyze',{
-      method:'POST', body:blob,
-      headers:{'Content-Type':'audio/wav','X-Window-Start':'0','X-Window-End':'1'},
-      signal:AbortSignal.timeout(10000),
-    });
-    if(!resp.ok) throw new Error(await resp.text());
-    const data=await resp.json();
+    const data=await analyzeWav(blob, AbortSignal.timeout(10000));
     refAnalyzed={f1:data.f1,f2:data.f2};
     // Store in analyzedFormants for mode toggle
     if(refVowelMeta){
@@ -189,7 +182,7 @@ document.getElementById('refAnalyse').addEventListener('click', async()=>{
     const v=refVowelMeta?.v;
     const specHtml=v?.f1?`Specified: F1 <b>${v.f1}</b> · F2 <b>${v.f2}</b> Hz<br>`:'';
     document.getElementById('refFormants').innerHTML=
-      specHtml+`Analyzed: F1 <b>${data.f1.toFixed(0)}</b> · F2 <b>${data.f2.toFixed(0)}</b> Hz`;
+        specHtml+`Analyzed: F1 <b>${data.f1.toFixed(0)}</b> · F2 <b>${data.f2.toFixed(0)}</b> Hz`;
     document.getElementById('tabFormant').click();
     renderFormant();
   }catch(e){
@@ -217,6 +210,21 @@ document.getElementById('ppClose').addEventListener('click',()=>{
   document.body.classList.remove('practice-open');
   updateHint();
 });
+
+// ── Server analysis helper ─────────────────────────────────────────────────────
+// Sends a pre-sliced WAV blob to /frames for single-frame formant analysis.
+// The client already trims the selection; single_segment:true analyses the whole clip.
+async function analyzeWav(wavBlob, signal) {
+  const form = new FormData();
+  form.append('file', wavBlob, 'audio.wav');
+  form.append('config', JSON.stringify({single_segment: true}));
+  const resp = await fetch(SERVER + '/frames', {method: 'POST', body: form, signal});
+  if (!resp.ok) throw new Error(await resp.text());
+  const data  = await resp.json();
+  const frame = data.frames?.[0];
+  if (!frame?.voiced) throw new Error('No voiced speech detected');
+  return frame;   // caller uses frame.f1, frame.f2
+}
 
 // ── WAV encoder ───────────────────────────────────────────────────────────────
 function encodeWAV(samples, sampleRate){
@@ -308,37 +316,10 @@ document.getElementById('ppAnalyse').addEventListener('click', async()=>{
   try{
     const s=Math.floor(waveStart*recSamples.length), e=Math.floor(waveEnd*recSamples.length);
     const slicedBlob=encodeWAV(recSamples.slice(s,e),recSampleRate);
-    const resp=await fetch(SERVER+'/analyze',{
-      method:'POST', body:slicedBlob,
-      headers:{'Content-Type':'audio/wav','X-Window-Start':'0','X-Window-End':'1'},
-      signal:AbortSignal.timeout(10000),
-    });
-    if(!resp.ok) throw new Error(await resp.text());
-    const data=await resp.json();
+    const data=await analyzeWav(slicedBlob, AbortSignal.timeout(10000));
     recordedVowel={f1:data.f1,f2:data.f2};
     document.getElementById('ppFormants').innerHTML=`F1 <b>${data.f1.toFixed(0)}</b> F2 <b>${data.f2.toFixed(0)}</b> Hz`;
     document.getElementById('tabFormant').click(); renderFormant();
   }catch(e){document.getElementById('ppFormants').textContent='Error: '+e.message;}
   btn.textContent='⚡'; btn.disabled=false;
 });
-
-
-
-
-
-// ── WAV encoder ───────────────────────────────────────────────────────────────
-function encodeWAV(samples, sampleRate){
-  const buf=new ArrayBuffer(44+samples.length*2);
-  const v=new DataView(buf);
-  const ws=(off,str)=>{for(let i=0;i<str.length;i++)v.setUint8(off+i,str.charCodeAt(i));};
-  ws(0,'RIFF'); v.setUint32(4,36+samples.length*2,true); ws(8,'WAVE');
-  ws(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
-  v.setUint32(24,sampleRate,true); v.setUint32(28,sampleRate*2,true);
-  v.setUint16(32,2,true); v.setUint16(34,16,true);
-  ws(36,'data'); v.setUint32(40,samples.length*2,true);
-  for(let i=0,off=44;i<samples.length;i++,off+=2){
-    const s=Math.max(-1,Math.min(1,samples[i]));
-    v.setInt16(off,s<0?s*0x8000:s*0x7FFF,true);
-  }
-  return new Blob([buf],{type:'audio/wav'});
-}
