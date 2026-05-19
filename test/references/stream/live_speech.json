@@ -2,7 +2,7 @@
   "meta": {
     "endpoint": "stream",
     "case_id": "live_speech",
-    "audio": "test/live_speech.wav",
+    "audio": "test/resources/live_speech.wav",
     "config": {
       "max_f": 5000,
       "n_formants": 5,
@@ -17,7 +17,7 @@
       "segment_samples": 4096,
       "segment_step_ms": 10
     },
-    "recorded": "2026-05-19T15:56:32.673250+00:00"
+    "recorded": "2026-05-19T19:56:40.271369+00:00"
   },
   "response": {
     "chunks_sent": 4589,

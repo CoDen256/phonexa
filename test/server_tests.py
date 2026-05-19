@@ -1094,6 +1094,8 @@ CASES: dict[str, list[dict]] = {
          'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
         {'id': 'a', 'audio': 'lang/me/audio/a.wav',
          'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
+        {'id': 'u_practice', 'audio': 'test/resources/u_practice.wav',
+         'config': {}, 'slice_start': 0.0, 'slice_end': 1.0},
     ],
 
     'debug': [
@@ -1109,7 +1111,8 @@ CASES: dict[str, list[dict]] = {
         {'id': 'u_128',       'audio': 'lang/me/audio/u.wav',       'chunk_samples': 128, 'config': {}},
         {'id': 'i_512',       'audio': 'lang/me/audio/i.wav',       'chunk_samples': 512, 'config': {}},
         # Extended live-speech recording: tests real-word vowel sequence
-        {'id': 'live_speech', 'audio': 'test/live_speech.wav',     'chunk_samples': 128, 'config': {}},
+        {'id': 'live_speech', 'audio': 'test/resources/live_speech.wav',     'chunk_samples': 128, 'config': {}},
+        {'id': 'u_practice', 'audio': 'test/resources/u_practice.wav', 'chunk_samples': 128, 'config': {}},
     ],
 
 
