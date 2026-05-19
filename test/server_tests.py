@@ -86,8 +86,9 @@ REFERENCES_DIR      = TESTS_DIR.parent / 'test' / 'references'
 TOLERANCE_HZ        = 0      # 0 = exact (Praat is deterministic per machine)
 STABILITY_TOL_HZ    = 50     # Hz — generous tolerance for vowel stability tests
 WS_RECV_TIMEOUT     = 0.5
-RING_BUFFER_SAMPLES = 4096   # must match analyze_server.py
-MIN_STREAM_SAMPLES  = RING_BUFFER_SAMPLES * 3
+SEGMENT_SAMPLES = 4096   # must match analyze_server.py
+MIN_STREAM_SAMPLES  = SEGMENT_SAMPLES * 3
+SEGMENT_STEP_MS = 10
 
 DEFAULT_CONN_CONFIG = {
     'max_f': 5000, 'n_formants': 5, 'window_ms': 25, 'pre_emphasis': 50,
@@ -95,9 +96,10 @@ DEFAULT_CONN_CONFIG = {
     'rms_floor': 0.005, 'median_n': 5,
 }
 
-# WS tests disable the RMS gate so results depend only on the analysis algorithm,
-# not on recording volume. rms_floor=0 means every ring-buffer window is analysed.
+# Stream/frames tests disable the RMS gate so results depend only on the
+# analysis algorithm, not on recording volume.
 TEST_STREAM_CONFIG = {**DEFAULT_CONN_CONFIG, 'rms_floor': 0}
+TEST_FRAMES_CONFIG = {**DEFAULT_CONN_CONFIG, 'rms_floor': 0}
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -264,8 +266,14 @@ def build_record(case: dict, endpoint: str, response: dict,
                  extra_meta: dict | None = None) -> dict:
     # Use effective_config from the response if present (WS tests include it).
     # Falls back to DEFAULT_CONN_CONFIG + case overrides for HTTP endpoints.
-    effective = (response.get('effective_config')
-                 or {**DEFAULT_CONN_CONFIG, **case.get('config', {})})
+    # Priority: 1) explicitly passed in extra_meta (HTTP endpoints that can't
+    # echo it back), 2) returned by server (WS _stream_and_collect adds it),
+    # 3) fallback to DEFAULT_CONN_CONFIG + case overrides
+    effective = (
+            (extra_meta or {}).get('effective_config')
+            or response.get('effective_config')
+            or {**DEFAULT_CONN_CONFIG, **case.get('config', {})}
+    )
     meta = {
         'endpoint': endpoint,
         'case_id':  case['id'],
@@ -316,6 +324,14 @@ def _is_voiced_file(frame: dict) -> bool:
     return frame.get('f1') is not None
 
 
+def _is_voiced_frames(frame: dict) -> bool:
+    """Adaptive predicate for /frames. Handles both new rich (voiced bool) and
+    old thin (/analyze-file) format (f1 is not None). Lets run_frames_case
+    compare against old references without regenerating them."""
+    return bool(frame['voiced']) if 'voiced' in frame else frame.get('f1') is not None
+
+
+
 def _aggregate(frames: list[dict], voiced_pred,
                f1_field: str = 'f1', f2_field: str = 'f2') -> dict:
     voiced = [f for f in frames
@@ -362,21 +378,28 @@ def _diff_frame_lists(cur: list[dict], ref: list[dict],
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run_analyze_case(case: dict, update_refs: bool) -> TestResult:
-    """POST audio to /analyze; compare F1, F2."""
-    endpoint     = 'analyze'
-    audio_path   = Path(case['audio'])
+    """
+    POST audio to /frames in one-frame mode (equivalent of removed /analyze).
+    Uses slice_start=0.15, slice_end=0.85 (old /analyze trim default).
+    No segment_samples/segment_step_ms → full slice = one frame.
+    """
+    endpoint   = 'analyze'
+    audio_path = Path(case['audio'])
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
 
-    ws, we       = case.get('window_start', 0.0), case.get('window_end', 1.0)
-    duration_ms  = get_audio_duration_ms(audio_path)
-    extra        = {'duration_ms': round(duration_ms), 'window_start': ws, 'window_end': we,
-                    'from_ms': round(duration_ms * ws), 'to_ms': round(duration_ms * we)}
+    wav_bytes = load_as_wav_bytes(audio_path)
     try:
-        resp = requests.post(f'{HTTP_BASE}/analyze', data=load_as_wav_bytes(audio_path),
-                             headers={'Content-Type': 'audio/wav',
-                                      'X-Window-Start': str(ws), 'X-Window-End': str(we)},
-                             timeout=10)
+        resp = requests.post(
+            f'{HTTP_BASE}/frames',
+            files={'file': (audio_path.name, wav_bytes, 'audio/wav')},
+            data={
+                'config':      json.dumps({**DEFAULT_CONN_CONFIG, **case.get('config', {})}),
+                'slice_start': str(case.get('slice_start', 0.15)),
+                'slice_end':   str(case.get('slice_end',   0.85)),
+            },
+            timeout=30,
+        )
         if not resp.ok:
             return TestResult(case['id'], endpoint, False,
                               error=f'HTTP {resp.status_code}: {resp.json().get("error")}')
@@ -384,18 +407,22 @@ def run_analyze_case(case: dict, update_refs: bool) -> TestResult:
     except Exception as exc:
         return TestResult(case['id'], endpoint, False, error=str(exc))
 
-    record    = build_record(case, endpoint, server_resp, extra)
+    frames  = server_resp.get('frames', [])
+    frame   = frames[0] if frames else {}
+    f1, f2  = round(frame.get('f1') or 0), round(frame.get('f2') or 0)
+
+    record    = build_record(case, endpoint, server_resp)
     reference = load_reference(endpoint, case['id'])
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
-        return TestResult(case['id'], endpoint, True, is_new_ref=True,
-                          payload={**server_resp, **extra})
+        return TestResult(case['id'], endpoint, True, is_new_ref=True, payload=server_resp)
 
-    ref = reference['response']
-    diffs = [_diff_formant('f1', server_resp.get('f1'), ref.get('f1')),
-             _diff_formant('f2', server_resp.get('f2'), ref.get('f2'))]
+    ref_frames = reference['response'].get('frames', [])
+    ref_frame  = ref_frames[0] if ref_frames else reference['response']
+    diffs = [_diff_formant('f1', f1, round(ref_frame.get('f1') or 0)),
+             _diff_formant('f2', f2, round(ref_frame.get('f2') or 0))]
     return TestResult(case['id'], endpoint, all(d.passed for d in diffs),
-                      diffs=diffs, payload={**server_resp, **extra})
+                      diffs=diffs, payload=server_resp)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -417,16 +444,27 @@ def run_frames_case(case: dict, update_refs: bool) -> TestResult:
     if not audio_path.exists():
         return TestResult(case['id'], endpoint, False, error=f'File not found: {audio_path}')
 
-    wav_bytes = load_as_wav_bytes(audio_path)
+    # Loop short files so the sliding window produces at least one frame.
+    # (same fix as stream tests: files shorter than ~93 ms produce no frames)
+    samples, sr = load_audio_as_int16(audio_path)
+    looped, n_loops = loop_samples_to_minimum(samples, SEGMENT_SAMPLES + 1)
+    wav_bytes = encode_int16_as_wav(looped, sr) if n_loops > 1                 else load_as_wav_bytes(audio_path)
 
     try:
         resp = requests.post(
             f'{HTTP_BASE}/frames',
-            files={'file': (audio_path.name, wav_bytes, 'audio/wav')},
+            files={'file': ('audio.wav', wav_bytes, 'audio/wav')},
             data={
-                'config':       json.dumps({**DEFAULT_CONN_CONFIG, **case.get('config', {})}),
-                'window_start': str(case.get('window_start', 0.0)),
-                'window_end':   str(case.get('window_end',   1.0)),
+                # TEST_FRAMES_CONFIG: rms_floor=0 — include all windows for
+                # deterministic algorithm testing (same as TEST_STREAM_CONFIG)
+                'config':       json.dumps({**TEST_FRAMES_CONFIG,
+                                            **case.get('config', {}),
+                                            **({'segment_samples': case['segment_samples']}
+                                               if 'segment_samples' in case else {}),
+                                            **({'segment_step_ms': case['segment_step_ms']}
+                                               if 'segment_step_ms' in case else {})}),
+                'slice_start': str(case.get('slice_start', 0.0)),
+                'slice_end':   str(case.get('slice_end',   1.0)),
             },
             timeout=60,
         )
@@ -437,7 +475,12 @@ def run_frames_case(case: dict, update_refs: bool) -> TestResult:
     except Exception as exc:
         return TestResult(case['id'], endpoint, False, error=str(exc))
 
-    record    = build_record(case, endpoint, server_resp)
+    actual_config = {**TEST_FRAMES_CONFIG, **case.get('config', {}),
+                     **({'segment_samples': case['segment_samples']} if 'segment_samples' in case else {}),
+                     **({'segment_step_ms': case['segment_step_ms']} if 'segment_step_ms' in case else {})}
+    record    = build_record(case, endpoint, server_resp,
+                             extra_meta={'loops_applied': n_loops,
+                                         'effective_config': actual_config})
     reference = load_reference(endpoint, case['id'])
     if reference is None or update_refs:
         save_reference(endpoint, case['id'], record)
@@ -446,8 +489,9 @@ def run_frames_case(case: dict, update_refs: bool) -> TestResult:
     cur_f = server_resp.get('frames', [])
     ref_f = reference['response'].get('frames', [])
     # /frames returns rich frames (voiced bool) — same predicate as /stream
-    cs    = _aggregate(cur_f, _is_voiced_stream)
-    rs    = _aggregate(ref_f, _is_voiced_stream)
+    # _is_voiced_frames: handles both rich (voiced bool) and old thin (f1 not None)
+    cs    = _aggregate(cur_f, _is_voiced_frames)
+    rs    = _aggregate(ref_f, _is_voiced_frames)
     extra = ['f1_raw', 'f2_raw', 'f1_median', 'f2_median', 'is_above_rms']
 
     diffs = [
@@ -456,7 +500,7 @@ def run_frames_case(case: dict, update_refs: bool) -> TestResult:
         _diff_float('mean_f1',       cs['mean_f1'] or 0, rs['mean_f1'] or 0, TOLERANCE_HZ),
         _diff_float('mean_f2',       cs['mean_f2'] or 0, rs['mean_f2'] or 0, TOLERANCE_HZ),
     ]
-    diffs.extend(_diff_frame_lists(cur_f, ref_f, _is_voiced_stream, extra))
+    diffs.extend(_diff_frame_lists(cur_f, ref_f, _is_voiced_frames, extra))
     return TestResult(case['id'], endpoint, all(d.passed for d in diffs),
                       diffs=diffs, payload=server_resp)
 
@@ -767,7 +811,7 @@ def run_js_median_check() -> None:
     Files required
     ~~~~~~~~~~~~~~
     test/references/stream/{id}.json
-      Layer 4 reference with raw per-frame f1/f2.  Run 'ws --update' first.
+      Layer 4 reference with raw per-frame f1/f2.  Run 'stream --update' first.
 
     test/references/js_smoothing/{id}.json
       Output of browser verifyAllSmoothing() — format: {trail:[{f1,f2},...], ...}
@@ -796,7 +840,7 @@ def run_js_median_check() -> None:
         ws_file = stream_dir / f'{case_id}.json'
 
         if not ws_file.exists():
-            print(f'  ⚠  {case_id}  — no Layer 4 reference (run: ws --update)')
+            print(f'  ⚠  {case_id}  — no Layer 4 reference (run: stream --update)')
             skipped += 1
             continue
 
@@ -897,7 +941,7 @@ def run_smooth_cross_check() -> None:
         # Skip if this reference was saved before migration (no f1_median)
         has_server_median = any(f.get('f1_median') is not None for f in frames)
         if not has_server_median:
-            print(f'  ⚠  {ref_file.stem}  (old format — no f1_median, run ws --update first)')
+            print(f'  ⚠  {ref_file.stem}  (old format — no f1_median, run stream --update first)')
             continue
 
         for i, (srv, exp) in enumerate(zip(frames, expected)):
@@ -959,7 +1003,7 @@ def _print_summary(endpoint: str, payload: dict) -> None:
 
     elif endpoint == 'frames':
         stats = _aggregate(payload.get('frames', []), _is_voiced_stream)
-        dur   = payload.get('duration_ms', '?')
+        dur   = payload.get('audio_duration_ms', '?')
         print(f'    {stats["voiced"]}/{stats["total"]} voiced  '
               f'mean F1={_fv(stats["mean_f1"])}  mean F2={_fv(stats["mean_f2"])}'
               f'  dur={_fv(dur)} ms')
@@ -1038,13 +1082,17 @@ CASES: dict[str, list[dict]] = {
     ],
 
     'frames': [
-        # window_start/end slice the file (0.0–1.0 = full file)
+        # segment_samples + segment_step_ms → sliding window mode (multiple frames)
+        # omitting both → one-frame mode (full slice = one segment, like old /analyze)
         {'id': 'i', 'audio': 'lang/me/audio/i.wav', 'config': {},
-         'window_start': 0.0, 'window_end': 1.0},
+         'slice_start': 0.0, 'slice_end': 1.0,
+         'segment_samples': SEGMENT_SAMPLES, 'segment_step_ms': SEGMENT_STEP_MS},
         {'id': 'u', 'audio': 'lang/me/audio/u.wav', 'config': {},
-         'window_start': 0.0, 'window_end': 1.0},
+         'slice_start': 0.0, 'slice_end': 1.0,
+         'segment_samples': SEGMENT_SAMPLES, 'segment_step_ms': SEGMENT_STEP_MS},
         {'id': 'a', 'audio': 'lang/me/audio/a.wav', 'config': {},
-         'window_start': 0.0, 'window_end': 1.0},
+         'slice_start': 0.0, 'slice_end': 1.0,
+         'segment_samples': SEGMENT_SAMPLES, 'segment_step_ms': SEGMENT_STEP_MS},
     ],
 
     'analyze_debug': [
@@ -1126,7 +1174,7 @@ def compare_stream_references(case: dict) -> dict:
 
     reference = load_reference('stream', case['id'])
     if reference is None:
-        return {'error': 'No saved reference — run: python tests/server_tests.py ws --update'}
+        return {'error': 'No saved reference — run: python tests/server_tests.py stream --update'}
 
     cur_frames = result['frames']
     ref_frames = reference['response'].get('frames', [])
@@ -1164,6 +1212,7 @@ def compare_stream_references(case: dict) -> dict:
     new_fields = sorted(cur_keys - ref_keys)
 
     return {
+        'endpoint':          'stream',
         'case_id':           case['id'],
         'audio':             str(audio_path),
         'counts_compatible': counts_compatible,
@@ -1200,7 +1249,7 @@ def print_compare_report(report: dict) -> None:
             delta = f'  (Δ {cur - ref:+d}{" " + unit if unit else ""})'
         print(f'    {label:20} ref={_fv(ref):>8}  cur={_fv(cur):>8}  {arrow}{delta}')
 
-    print(f'  [ws] {cid}')
+    print(f'  [{report.get("endpoint", "stream")}] {cid}')
     diff_line('total frames',   report['total_frames'],   unit='')
     diff_line('voiced frames',  report['voiced_frames'],  unit='')
     diff_line('mean F1',        report['mean_f1'],        unit='Hz')
@@ -1225,7 +1274,13 @@ def print_compare_report(report: dict) -> None:
     cur_v = report['voiced_frames']['cur']
     extra = ''
     if cur_v != ref_v:
-        extra = f'  ({abs(cur_v - ref_v)} extra voiced — borderline gate frames)'
+        diff  = abs(cur_v - ref_v)
+        # /frames always uses rms_floor=0 so count differences mean
+        # the file content or looping changed, not gate borderline frames
+        if report.get('endpoint') == 'frames':
+            extra = f'  ({diff} frames differ — regenerate with frames --update)'
+        else:
+            extra = f'  ({diff} extra voiced — borderline gate frames)'
     if n == 0:
         print(f'    All {cmp} voiced frames identical ✓  (on fields present in reference){extra}')
     else:
@@ -1241,6 +1296,97 @@ def print_compare_report(report: dict) -> None:
             print(f'      … and {n-10} more changed frames')
 
 
+def compare_frames_references(case: dict) -> dict:
+    """
+    Fetch /frames for *case* and diff against the saved frames reference.
+    HTTP-based equivalent of compare_stream_references for the /frames endpoint.
+    """
+    audio_path = Path(case['audio'])
+    if not audio_path.exists():
+        return {'error': f'Audio file not found: {audio_path}'}
+    # Loop short files — same reason as run_frames_case:
+    # files shorter than one ring buffer (~93 ms) produce no frames.
+    samples, sr   = load_audio_as_int16(audio_path)
+    looped, _     = loop_samples_to_minimum(samples, SEGMENT_SAMPLES + 1)
+    wav_bytes     = encode_int16_as_wav(looped, sr) if len(looped) != len(samples)                     else load_as_wav_bytes(audio_path)
+
+    try:
+        resp = requests.post(
+            f'{HTTP_BASE}/frames',
+            files={'file': ('audio.wav', wav_bytes, 'audio/wav')},
+            data={
+                # rms_floor=0: include all frames so the comparison
+                # is complete regardless of recording volume, matching
+                # how TEST_STREAM_CONFIG works for stream --compare.
+                'config':       json.dumps({**DEFAULT_CONN_CONFIG,
+                                            **case.get('config', {}),
+                                            'rms_floor': 0,
+                                            **({'segment_samples': case['segment_samples']}
+                                               if 'segment_samples' in case else {}),
+                                            **({'segment_step_ms': case['segment_step_ms']}
+                                               if 'segment_step_ms' in case else {})}),
+                'slice_start': str(case.get('slice_start', 0.0)),
+                'slice_end':   str(case.get('slice_end',   1.0)),
+            },
+            timeout=60,
+        )
+        if not resp.ok:
+            return {'error': f'HTTP {resp.status_code}: {resp.json().get("error")}'}
+        result = resp.json()
+    except Exception as exc:
+        return {'error': str(exc)}
+
+    reference = load_reference('frames', case['id'])
+    if reference is None:
+        return {'error': 'No saved reference — run: python tests/server_tests.py frames --update'}
+
+    cur_frames = result.get('frames', [])
+    ref_frames = reference['response'].get('frames', [])
+
+    cur_stats = _aggregate(cur_frames, _is_voiced_frames)
+    ref_stats = _aggregate(ref_frames, _is_voiced_frames)
+
+    def smooth_mean(frames, field):
+        vals = [f[field] for f in frames if f.get(field) is not None]
+        return round(sum(vals) / len(vals), 1) if vals else None
+
+    compare_fields = ['voiced', 'f1', 'f2', 'f1_raw', 'f2_raw',
+                      'is_above_rms', 'f1_median', 'f2_median']
+
+    cur_voiced = [f for f in cur_frames if _is_voiced_frames(f)]
+    ref_voiced = [f for f in ref_frames if _is_voiced_frames(f)]
+    n_compared = min(len(cur_voiced), len(ref_voiced))
+
+    frame_changes = []
+    for i in range(n_compared):
+        delta = _frame_delta(cur_voiced[i], ref_voiced[i], compare_fields)
+        if delta:
+            frame_changes.append({'frame': i, 'changes': delta})
+
+    ref_keys   = set(ref_frames[0].keys()) if ref_frames else set()
+    cur_keys   = set(cur_frames[0].keys()) if cur_frames else set()
+    new_fields = sorted(cur_keys - ref_keys)
+
+    return {
+        'endpoint':      'frames',
+        'case_id':       case['id'],
+        'audio':         str(audio_path),
+        'total_frames':  {'cur': len(cur_frames),  'ref': len(ref_frames)},
+        'voiced_frames': {'cur': len(cur_voiced),  'ref': len(ref_voiced)},
+        'voiced_compared': n_compared,
+        'mean_f1':       {'cur': cur_stats['mean_f1'],          'ref': ref_stats['mean_f1']},
+        'mean_f2':       {'cur': cur_stats['mean_f2'],          'ref': ref_stats['mean_f2']},
+        'mean_f1_median':{'cur': smooth_mean(cur_frames, 'f1_median'),
+                          'ref': smooth_mean(ref_frames, 'f1_median')},
+        'mean_f2_median':{'cur': smooth_mean(cur_frames, 'f2_median'),
+                          'ref': smooth_mean(ref_frames, 'f2_median')},
+        'changed_frames': len(frame_changes),
+        'frame_changes':  frame_changes[:30],
+        'new_fields':     new_fields,
+        'counts_compatible': True,
+    }
+
+
 def run_stream_compare(endpoints_to_compare: list[str]) -> None:
     """
     Show detailed diff of current server output vs saved Layer 4 references.
@@ -1254,7 +1400,10 @@ def run_stream_compare(endpoints_to_compare: list[str]) -> None:
             continue
         print(f'\n/{ep.replace("_","-")}')
         for case in cases:
-            report = compare_stream_references(case)
+            if ep == 'frames':
+                report = compare_frames_references(case)
+            else:
+                report = compare_stream_references(case)
             print_compare_report(report)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1290,7 +1439,7 @@ def main() -> int:
     parser.add_argument('--smooth-check', action='store_true',
                         help='Cross-check server median vs Python compute_smooth_reference()')
     parser.add_argument('--compare', action='store_true',
-                        help='Show detailed diff of current server vs saved Layer 4 references'
+                        help='Show detailed diff of current server vs saved references (no files changed).'
                              ' (no files changed). Run before --update to review what changes.')
     args = parser.parse_args()
 

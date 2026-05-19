@@ -548,7 +548,7 @@ async function debugVowel(audioUrl) {
 // Feed WS reference files through the real RealtimeTracker._msg() pipeline
 // and return the trail that would appear on screen.
 //
-// The server hosts reference files at /test-refs/ws/<id>.json (dev only).
+// The server hosts reference files at /test-refs/stream/<id>.json (dev only).
 //
 // Usage (browser console on any page that loads realtime.js):
 //   const t = await verifySmoothing('http://localhost:5050/test-refs/ws/i_128.json');
@@ -559,7 +559,19 @@ async function verifySmoothing(input) {
   let frames, ref_label;
   if (typeof input === 'string') {
     const ref = await fetch(input).then(r => r.json());
-    frames    = ref.response?.frames ?? [];
+    // Layer 4 stream reference:  ref.response.frames  — full server frames
+    // Pre-migration JS capture: ref.trail          — trail points {f1, f2}
+    // verifySmoothing only processes full frames (needs voiced + f1_median)
+    if (ref.response?.frames) {
+      frames = ref.response.frames;
+    } else if (ref.trail) {
+      throw new Error(
+          'This file is a verifySmoothing output (trail points only). ' +
+          'Pass a Layer 4 WS reference instead: test-refs/stream/{id}.json'
+      );
+    } else {
+      frames = [];
+    }
     ref_label = input.split('/').pop();
   } else if (Array.isArray(input)) {
     frames    = input;
@@ -587,12 +599,12 @@ async function verifySmoothing(input) {
 
 // Run verifySmoothing for every standard WS reference case.
 // Requires the server to be running at baseUrl (serves /test-refs/).
-async function verifyAllSmoothing() {
+async function verifyAllSmoothing(baseUrl = 'http://localhost:5050') {
   const caseIds = ['i_128', 'u_128', 'i_512', 'live_speech'];
   const results = {};
 
   for (const id of caseIds) {
-    const url = `test/references/ws/${id}.json`;
+    const url = `${baseUrl}/test-refs/stream/${id}.json`;
     try {
       results[id] = await verifySmoothing(url);
     } catch (e) {

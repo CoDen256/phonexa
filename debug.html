@@ -367,13 +367,13 @@
     const form = new FormData();
     form.append('file', file);
     form.append('config', JSON.stringify(config));
-    form.append('window_start', '0.0');
-    form.append('window_end',   '1.0');
+    form.append('slice_start', '0.0');
+    form.append('slice_end',   '1.0');
     try {
       const res  = await fetch(API_URL, { method: 'POST', body: form });
       const data = await res.json();
       if (data.error) { refStatusEl.textContent = 'Error: ' + data.error; return; }
-      refFrames = data.frames; refDuration = (data.duration_ms ?? (data.duration * 1000)) / 1000;
+      refFrames = data.frames; refDuration = (data.audio_duration_ms ?? data.duration_ms ?? (data.duration * 1000)) / 1000;
       const valid = refFrames.filter(f => f.voiced && (f.f1_median ?? f.f1) != null);
       const vF1 = f => f.f1_median ?? f.f1;
       const vF2 = f => f.f2_median ?? f.f2;
