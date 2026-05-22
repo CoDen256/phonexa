@@ -16,34 +16,29 @@ function pulse(svgId, x, y, color) {
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
 const tip=document.getElementById('tip');
 function showTip(e,v,lang) {
-  const ws=v.words||[];
-  const wordsHtml=ws.length
-    ? `<div class="tip-words">${ws.map(w=>`<span class="tip-word-chip">${w.text||''}</span>`).join('')}</div>`
-    : '';
   const roundType=`${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}`;
+  const sym=v.symbols?.[0]??'?';
   tip.innerHTML=`
-    <div class="tip-ipa" style="color:${lang.color}">${v.ipa}</div>
+    <div class="tip-ipa" style="color:${lang.color}">${sym}</div>
     <div class="tip-lang" style="color:${lang.color}">${lang.label}</div>
     <div class="tip-desc">${v.desc}</div>
     <div class="tip-meta">${roundType}</div>
     ${v.f1?`<div class="tip-f">F1 <span>${v.f1} Hz</span> · F2 <span>${v.f2} Hz</span></div>`:''}
-    ${wordsHtml}
   `;
   tip.style.display='block'; moveTip(e);
 }
 function showClusterTip(e, members) {
   const rows = members.map(({lang,v}) => {
-    const ws = (v.words||[]).map(w=>`<span class="tip-word-chip">${w.text||''}</span>`).join('');
+    const sym=v.symbols?.[0]??'?';
     const freq = v.f1 ? `<span class="tip-f" style="margin-top:2px">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</span>` : '';
     const roundType=`${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}`;
     return `<div class="ctip-row">
-      <span class="tip-ipa" style="color:${lang.color};font-size:1.3rem;line-height:1">${v.ipa}</span>
+      <span class="tip-ipa" style="color:${lang.color};font-size:1.3rem;line-height:1">${sym}</span>
       <span class="ctip-info">
         <span class="tip-lang" style="color:${lang.color};display:block">${lang.label}</span>
         <span class="tip-desc">${v.desc}</span>
         <span class="tip-meta">${roundType}</span>
         ${freq}
-        ${ws ? `<span class="tip-words" style="margin-top:3px;padding-top:3px">${ws}</span>` : ''}
       </span>
     </div>`;
   }).join('');
@@ -67,8 +62,9 @@ function showPicker(cx, cy, group, svgId, dx, dy) {
   document.getElementById('pickerItems').innerHTML='';
   for (const {lk,lang,v} of group) {
     const btn=document.createElement('button'); btn.className='picker-btn';
-    btn.innerHTML=`<span class="picker-ipa" style="color:${lang.color}">${v.ipa}</span><span class="picker-info"><span class="picker-lang" style="color:${lang.color}">${lang.label}</span><span class="picker-desc">${v.desc}</span></span>`;
-    btn.addEventListener('click',()=>{ hidePicker(); playUrl(v.ipaAudio); pulse(svgId,dx,dy,lang.color); onVowelClicked(v,lang,lk); });
+    const sym=v.symbols?.[0]??'?';
+    btn.innerHTML=`<span class="picker-ipa" style="color:${lang.color}">${sym}</span><span class="picker-info"><span class="picker-lang" style="color:${lang.color}">${lang.label}</span><span class="picker-desc">${v.desc}</span></span>`;
+    btn.addEventListener('click',()=>{ hidePicker(); playUrl(v.audio); pulse(svgId,dx,dy,lang.color); onVowelClicked(v,lang,lk); });
     document.getElementById('pickerItems').appendChild(btn);
   }
   picker.style.display='block';

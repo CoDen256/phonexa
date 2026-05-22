@@ -49,7 +49,7 @@ function passesFilters(lk, v) {
     }
     if (!passes) return false;
   }
-  if (filters.ipaBase.size   > 0 && !filters.ipaBase.has(getBase(v.ipa)))                 return false;
+  if (filters.ipaBase.size   > 0 && !filters.ipaBase.has(getBase(v.symbols?.[0] ?? ''))) return false;
   return true;
 }
 function countShown() {

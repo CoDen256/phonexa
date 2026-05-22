@@ -4,619 +4,295 @@
   "color": "#67e8f9",
   "vowels": [
     {
-      "ipa": "iː",
-      "h": 0.02,
-      "b": 0.045,
-      "rounded": false,
+      "symbols": ["iː"],
+      "heightBackness": [0.02, 0.045],
       "type": "long",
-      "desc": "Close front unroundedin",
+      "rounded": false,
+      "desc": "Close front unrounded",
       "f1": 274,
       "f2": 2083,
-      "ipaAudio": "lang/no/audio/auto/i_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "d<b>e</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/No-de.ogg/No-de.ogg.mp3"
-        },
-        {
-          "text": "sk<b>i</b>ve",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/36/LL-Q9043_%28nor%29-Telaneo-skive.wav/LL-Q9043_%28nor%29-Telaneo-skive.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɪ",
-      "h": 0.02,
-      "b": 0.045,
-      "rounded": false,
+      "symbols": ["ɪ"],
+      "heightBackness": [0.02, 0.045],
       "type": "short",
+      "rounded": false,
       "desc": "Near-close near-front unrounded",
       "f1": 272,
       "f2": 2090,
-      "ipaAudio": "lang/no/audio/mjolnir/i/i_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
-      "words": [
-        {
-          "text": "<b>i</b>kke",
-          "audio": "lang/no/audio/mjolnir/i/ikke.mp3"
-        },
-        {
-          "text": "sk<b>i</b>lle",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/LL-Q9043_%28nor%29-Telaneo-skille.wav/LL-Q9043_%28nor%29-Telaneo-skille.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "yː",
-      "h": 0.02,
-      "b": 0.12,
-      "rounded": true,
+      "symbols": ["yː"],
+      "heightBackness": [0.02, 0.12],
       "type": "long",
+      "rounded": true,
       "desc": "Close front rounded (protruded)",
       "f1": 231,
       "f2": 2091,
-      "ipaAudio": "lang/no/audio/auto/y_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
-      "words": [
-        {
-          "text": "sk<b>y</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/50/LL-Q9043_%28nor%29-Telaneo-sky.wav/LL-Q9043_%28nor%29-Telaneo-sky.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ʏ",
-      "h": 0.02,
-      "b": 0.2,
-      "rounded": true,
+      "symbols": ["ʏ"],
+      "heightBackness": [0.02, 0.2],
       "type": "short",
+      "rounded": true,
       "desc": "Near-close near-front rounded (protruded)",
       "f1": 270,
       "f2": 1810,
-      "ipaAudio": "lang/no/audio/mjolnir/y/y_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
-      "words": [
-        {
-          "text": "unnsk<b>y</b>ld",
-          "audio": "lang/no/audio/mjolnir/y/unnskyld.mp3"
-        },
-        {
-          "text": "n<b>y</b>tt",
-          "audio": "lang/no/audio/mjolnir/y/nytt.mp3"
-        },
-        {
-          "text": "<b>y</b>ndi",
-          "audio": "lang/no/audio/dict/yndi.mp3"
-        },
-        {
-          "text": "<b>y</b>ndi",
-          "audio": "lang/no/audio/yndi.mp3"
-        },
-        {
-          "text": "sk<b>y</b>dd",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/LL-Q9043_%28nor%29-Telaneo-skydd.wav/LL-Q9043_%28nor%29-Telaneo-skydd.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ʉː",
-      "h": 0.02,
-      "b": 0.34,
-      "rounded": true,
+      "symbols": ["ʉː"],
+      "heightBackness": [0.02, 0.34],
       "type": "long",
+      "rounded": true,
       "desc": "Close central rounded",
       "f1": 239,
       "f2": 1509,
-      "ipaAudio": "lang/no/audio/auto/u_bar_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
-      "words": [
-        {
-          "text": "sj<b>u</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b2/LL-Q9043_%28nor%29-Telaneo-sju.wav/LL-Q9043_%28nor%29-Telaneo-sju.wav.mp3"
-        },
-        {
-          "text": "aj<b>ou</b>rføre",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/Nb-ajourf%C3%B8re.ogg/Nb-ajourf%C3%B8re.ogg.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ʉ",
-      "h": 0.02,
-      "b": 0.5,
-      "rounded": true,
+      "symbols": ["ʉ"],
+      "heightBackness": [0.02, 0.5],
       "type": "short",
+      "rounded": true,
       "desc": "Close central rounded",
       "f1": 266,
       "f2": 1337,
-      "ipaAudio": "lang/no/audio/mjolnir/ue/ue_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
-      "words": [
-        {
-          "text": "h<b>u</b>n",
-          "audio": "lang/no/audio/mjolnir/ue/hun.mp3"
-        },
-        {
-          "text": "k<b>u</b>nne",
-          "audio": "lang/no/audio/mjolnir/ue/kunne.mp3"
-        },
-        {
-          "text": "<b>u</b>nnskyld",
-          "audio": "lang/no/audio/mjolnir/ue/unnskyld.mp3"
-        },
-        {
-          "text": "<b>u</b>ll",
-          "audio": "lang/no/audio/dict/ull.mp3"
-        },
-        {
-          "text": "sk<b>u</b>ffe",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/LL-Q9043_%28nor%29-Telaneo-skuffe.wav/LL-Q9043_%28nor%29-Telaneo-skuffe.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "uː",
-      "h": 0.02,
-      "b": 0.98,
-      "rounded": true,
+      "symbols": ["uː"],
+      "heightBackness": [0.02, 0.98],
       "type": "long",
+      "rounded": true,
       "desc": "Close back rounded",
       "f1": 250,
       "f2": 567,
-      "ipaAudio": "lang/no/audio/auto/u_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
-      "words": [
-        {
-          "text": "sk<b>o</b>g",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/01/LL-Q9043_%28nor%29-Telaneo-skog.wav/LL-Q9043_%28nor%29-Telaneo-skog.wav.mp3"
-        },
-        {
-          "text": "f<b>o</b>r",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ʊ",
-      "h": 0.02,
-      "b": 0.98,
-      "rounded": true,
+      "symbols": ["ʊ"],
+      "heightBackness": [0.02, 0.98],
       "type": "short",
+      "rounded": true,
       "desc": "Near-close near-back rounded",
       "f1": 287,
       "f2": 685,
-      "ipaAudio": "lang/no/audio/mjolnir/u/u_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
-      "words": [
-        {
-          "text": "s<b>u</b>kker",
-          "audio": "lang/no/audio/mjolnir/u/sukker.mp3"
-        },
-        {
-          "text": "hv<b>o</b>r",
-          "audio": "lang/no/audio/mjolnir/u/hvor.mp3"
-        },
-        {
-          "text": "r<b>o</b>m",
-          "audio": "lang/no/audio/mjolnir/u/rom.mp3"
-        },
-        {
-          "text": "b<b>u</b>kk",
-          "audio": "lang/no/audio/mjolnir/u/bukk.mp3"
-        },
-        {
-          "text": "f<b>o</b>rdi",
-          "audio": "lang/no/audio/mjolnir/u/fordi.mp3"
-        },
-        {
-          "text": "l<b>o</b>ff",
-          "audio": "lang/no/audio/dict/loff.mp3"
-        },
-        {
-          "text": "j<b>ou</b>rnal",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/No-journal.ogg/No-journal.ogg.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "eː",
-      "h": 0.34,
-      "b": 0.05,
-      "rounded": false,
+      "symbols": ["eː"],
+      "heightBackness": [0.34, 0.05],
       "type": "long",
+      "rounded": false,
       "desc": "Close-mid front unrounded",
       "f1": 376,
       "f2": 2006,
-      "ipaAudio": "lang/no/audio/auto/e_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "skj<b>e</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/LL-Q9043_%28nor%29-Telaneo-skje.wav/LL-Q9043_%28nor%29-Telaneo-skje.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɛ",
-      "h": 0.5,
-      "b": 0,
-      "rounded": false,
+      "symbols": ["ɛ"],
+      "heightBackness": [0.5, 0],
       "type": "short",
+      "rounded": false,
       "desc": "Open-mid front unrounded",
       "f1": 465,
       "f2": 1730,
-      "ipaAudio": "lang/no/audio/mjolnir/e/e_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "<b>e</b>tter",
-          "audio": "lang/no/audio/mjolnir/e/etter.mp3"
-        },
-        {
-          "text": "m<b>e</b>nn",
-          "audio": "lang/no/audio/mjolnir/e/menn.mp3"
-        },
-        {
-          "text": "skj<b>e</b>ll",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/LL-Q9043_%28nor%29-Telaneo-skjell.wav/LL-Q9043_%28nor%29-Telaneo-skjell.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "øː",
-      "h": 0.34,
-      "b": 0.5,
-      "rounded": true,
+      "symbols": ["øː"],
+      "heightBackness": [0.34, 0.5],
       "type": "long",
+      "rounded": true,
       "desc": "Close-mid front rounded",
       "f1": 337,
       "f2": 1254,
-      "ipaAudio": "lang/no/audio/auto/oe_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
-      "words": [
-        {
-          "text": "sj<b>ø</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1b/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɘ",
-      "h": 0.41,
-      "b": 0.5,
+      "symbols": ["ɘ"],
+      "heightBackness": [0.41, 0.5],
+      "type": "variable",
       "rounded": false,
       "desc": "Close-mid central unrounded",
       "f1": null,
       "f2": null,
-      "ipaAudio": "lang/no/audio/mjolnir/er/er.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
-      "words": [
-        {
-          "text": "jent<b>er</b>",
-          "audio": "lang/no/audio/mjolnir/er/jenter.mp3"
-        },
-        {
-          "text": "skriv<b>er</b>",
-          "audio": "lang/no/audio/mjolnir/er/skriver.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "œ",
-      "h": 0.41,
-      "b": 0.5,
-      "rounded": true,
+      "symbols": ["œ"],
+      "heightBackness": [0.41, 0.5],
       "type": "short",
+      "rounded": true,
       "desc": "Open-mid front rounded",
       "f1": 400,
       "f2": 1326,
-      "ipaAudio": "lang/no/audio/mjolnir/oe/oe_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
-      "words": [
-        {
-          "text": "f<b>ø</b>dt",
-          "audio": "lang/no/audio/mjolnir/oe/foedt.mp3"
-        },
-        {
-          "text": "skj<b>ø</b>nner",
-          "audio": "lang/no/audio/mjolnir/oe/skjoenner.mp3"
-        },
-        {
-          "text": "<b>ø</b>st",
-          "audio": "lang/no/audio/dict/oest.mp3"
-        },
-        {
-          "text": "skj<b>ø</b>nne",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5e/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ə",
-      "h": 0.5,
-      "b": 0.5,
-      "rounded": false,
+      "symbols": ["ə"],
+      "heightBackness": [0.5, 0.5],
       "type": "short",
+      "rounded": false,
       "desc": "Mid central (Schwa)",
       "f1": 433,
       "f2": 1334,
-      "ipaAudio": "lang/no/audio/mjolnir/schwa/schwa.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
-      "words": [
-        {
-          "text": "bar<b>e</b>",
-          "audio": "lang/no/audio/mjolnir/schwa/bare.mp3"
-        },
-        {
-          "text": "dett<b>e</b>",
-          "audio": "lang/no/audio/mjolnir/schwa/dette.mp3"
-        },
-        {
-          "text": "kryss<b>e</b>",
-          "audio": "lang/no/audio/dict/krysse.mp3"
-        },
-        {
-          "text": "b<b>e</b>rik<b>e</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/LL-Q9043_%28nor%29-Telaneo-berike.wav/LL-Q9043_%28nor%29-Telaneo-berike.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "oː",
-      "h": 0.349,
-      "b": 0.98,
-      "rounded": true,
+      "symbols": ["oː"],
+      "heightBackness": [0.349, 0.98],
       "type": "long",
+      "rounded": true,
       "desc": "Close-mid back rounded",
       "f1": 341,
       "f2": 671,
-      "ipaAudio": "lang/no/audio/auto/o_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
-      "words": [
-        {
-          "text": "sl<b>å</b>",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5.wav/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɔ",
-      "h": 0.38,
-      "b": 0.96,
-      "rounded": true,
+      "symbols": ["ɔ"],
+      "heightBackness": [0.38, 0.96],
       "type": "short",
+      "rounded": true,
       "desc": "Open-mid back rounded",
       "f1": 360,
       "f2": 778,
-      "ipaAudio": "lang/no/audio/mjolnir/o/o_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
-      "words": [
-        {
-          "text": "f<b>o</b>r",
-          "audio": "lang/no/audio/mjolnir/o/for.mp3"
-        },
-        {
-          "text": "s<b>o</b>m",
-          "audio": "lang/no/audio/mjolnir/o/som.mp3"
-        },
-        {
-          "text": "j<b>o</b>bb",
-          "audio": "lang/no/audio/mjolnir/o/jobb.mp3"
-        },
-        {
-          "text": "<b>å</b>tte",
-          "audio": "lang/no/audio/mjolnir/o/aatte.mp3"
-        },
-        {
-          "text": "<b>o</b>g",
-          "audio": "lang/no/audio/dict/og.mp3"
-        },
-        {
-          "text": "skj<b>o</b>ld",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2d/LL-Q9043_%28nor%29-Telaneo-skjold.wav/LL-Q9043_%28nor%29-Telaneo-skjold.wav.mp3"
-        },
-        {
-          "text": "sl<b>å</b>ss",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɑ",
-      "h": 0.98,
-      "b": 0.94,
-      "rounded": false,
+      "symbols": ["ɑ"],
+      "heightBackness": [0.98, 0.94],
       "type": "short",
+      "rounded": false,
       "desc": "Open back unrounded",
       "f1": 602,
       "f2": 1000,
-      "ipaAudio": "lang/no/audio/mjolnir/a/a_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
-      "words": [
-        {
-          "text": "<b>a</b>lle",
-          "audio": "lang/no/audio/mjolnir/a/alle.mp3"
-        },
-        {
-          "text": "<b>a</b>v",
-          "audio": "lang/no/audio/dict/av.mp3"
-        },
-        {
-          "text": "h<b>a</b>gle",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/38/LL-Q9043_%28nor%29-Telaneo-hagle.wav/LL-Q9043_%28nor%29-Telaneo-hagle.wav.mp3"
-        },
-        {
-          "text": "p<b>e</b>nsjonist",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɑː",
-      "h": 0.98,
-      "b": 0.99,
-      "rounded": false,
+      "symbols": ["ɑː"],
+      "heightBackness": [0.98, 0.99],
       "type": "long",
+      "rounded": false,
       "desc": "Open back unrounded",
       "f1": 620,
       "f2": 924,
-      "ipaAudio": "lang/no/audio/auto/a_back_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
-      "words": [
-        {
-          "text": "d<b>a</b>g",
-          "audio": "lang/no/audio/mjolnir/a/dag.mp3"
-        },
-        {
-          "text": "h<b>a</b>le",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/LL-Q9043_%28nor%29-Telaneo-hale.wav/LL-Q9043_%28nor%29-Telaneo-hale.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "æ",
-      "h": 0.98,
-      "b": 0.25,
-      "rounded": false,
+      "symbols": ["æ"],
+      "heightBackness": [0.98, 0.25],
       "type": "short",
+      "rounded": false,
       "desc": "Near-open front unrounded",
       "f1": 695,
       "f2": 1353,
-      "ipaAudio": "lang/no/audio/mjolnir/ae/ae_short.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "v<b>æ</b>rt",
-          "audio": "lang/no/audio/mjolnir/ae/vaert.mp3"
-        },
-        {
-          "text": "<b>æ</b>sj",
-          "audio": "lang/no/audio/dict/aesj.mp3"
-        },
-        {
-          "text": "kj<b>e</b>rring",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/LL-Q9043_%28nor%29-Telaneo-kjerring.wav/LL-Q9043_%28nor%29-Telaneo-kjerring.wav.mp3"
-        },
-        {
-          "text": "kr<b>a</b>sj",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Telaneo-krasj.wav/LL-Q9043_%28nor%29-Telaneo-krasj.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "æː",
-      "h": 0.98,
-      "b": 0.02,
-      "rounded": false,
+      "symbols": ["æː"],
+      "heightBackness": [0.98, 0.02],
       "type": "long",
+      "rounded": false,
       "desc": "Near-open front unrounded",
       "f1": 778,
       "f2": 1360,
-      "ipaAudio": "lang/no/audio/mjolnir/ae/ae_long.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "<b>æ</b>",
-          "audio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ"
-        },
-        {
-          "text": "l<b>æ</b>rer",
-          "audio": "lang/no/audio/mjolnir/ae/laerer.mp3"
-        },
-        {
-          "text": "kj<b>e</b>rning",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Nb-kjerning.ogg/Nb-kjerning.ogg.mp3"
-        },
-        {
-          "text": "<b>æ</b>rlig",
-          "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav.mp3"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "æʉ",
-      "h": 0.98,
-      "b": 0.25,
-      "h2": 0.165,
-      "b2": 0.3413,
+      "symbols": ["æʉ"],
+      "heightBackness": [0.98, 0.25],
+      "type": "diphthong",
       "rounded": false,
       "desc": "Diphtong æ (○ unrounded) → ʉ (⊙ rounded)",
-      "type": "diphthong",
       "f1": null,
       "f2": null,
-      "ipaAudio": "lang/no/audio/mjolnir/aeue/sau.mp3",
+      "audio": null,
       "wikiUrl": "",
-      "words": [
-        {
-          "text": "s<b>au</b>",
-          "audio": "lang/no/audio/mjolnir/aeue/sau.mp3"
-        },
-        {
-          "text": "t<b>au</b>",
-          "audio": "lang/no/audio/mjolnir/aeue/tau.mp3"
-        },
-        {
-          "text": "<b>Eu</b>ropa",
-          "audio": "lang/no/audio/mjolnir/aeue/europa.mp3"
-        }
-      ]
+      "target": {
+        "heightBackness": [0.165, 0.3413],
+        "rounded": true,
+        "f1": 266,
+        "f2": 1337
+      }
     },
     {
-      "ipa": "æɪ",
-      "h": 0.98,
-      "b": 0.25,
-      "h2": 0.167,
-      "b2": 0.1,
+      "symbols": ["æɪ"],
+      "heightBackness": [0.98, 0.25],
+      "type": "diphthong",
       "rounded": false,
       "desc": "Diphtong æ (○ unrounded) → ɪ (○ unrounded)",
-      "type": "diphthong",
       "f1": null,
       "f2": null,
-      "ipaAudio": "lang/no/audio/mjolnir/aei/hei.mp3",
+      "audio": null,
       "wikiUrl": "",
-      "words": [
-        {
-          "text": "h<b>ei</b>",
-          "audio": "lang/no/audio/mjolnir/aei/hei.mp3"
-        },
-        {
-          "text": "n<b>ei</b>",
-          "audio": "lang/no/audio/mjolnir/aei/nei.mp3"
-        },
-        {
-          "text": "b<b>ei</b>n",
-          "audio": "lang/no/audio/mjolnir/aei/bein.mp3"
-        }
-      ]
+      "target": {
+        "heightBackness": [0.167, 0.1],
+        "rounded": false,
+        "f1": 272,
+        "f2": 2090
+      }
     },
     {
-      "ipa": "œʏ",
-      "h": 0.41,
-      "b": 0.5,
-      "h2": 0.167,
-      "b2": 0.1,
+      "symbols": ["œʏ"],
+      "heightBackness": [0.41, 0.5],
+      "type": "diphthong",
       "rounded": true,
       "desc": "Diphtong œ (⊙ rounded) → ʏ (⊙ rounded)",
-      "type": "diphthong",
       "f1": null,
       "f2": null,
-      "ipaAudio": "lang/no/audio/mjolnir/oey/goey.mp3",
+      "audio": null,
       "wikiUrl": "",
-      "words": [
-        {
-          "text": "g<b>øy</b>",
-          "audio": "lang/no/audio/mjolnir/oey/goey.mp3"
-        },
-        {
-          "text": "<b>øy</b>e",
-          "audio": "lang/no/audio/mjolnir/oey/oeye.mp3"
-        },
-        {
-          "text": "h<b>øy</b>re",
-          "audio": "lang/no/audio/mjolnir/oey/hoeyre.mp3"
-        }
-      ]
+      "target": {
+        "heightBackness": [0.167, 0.1],
+        "rounded": true,
+        "f1": 270,
+        "f2": 1810
+      }
     }
   ]
 }

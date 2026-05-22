@@ -1,0 +1,554 @@
+[
+  {
+    "text": "i",
+    "audio": "lang/ru/audio/auto/i.mp3",
+    "phonemic": "/i/",
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "мир",
+    "audio": "lang/ru/audio/easy/mir.mp3",
+    "phonemic": "/mʲir/",
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɪ",
+    "audio": "lang/ru/audio/forvo/perehod.mp3",
+    "phonemic": "/ɪ/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "его",
+    "audio": "lang/ru/audio/easy/ego.mp3",
+    "phonemic": "/jɪˈvo/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "переход",
+    "audio": "lang/ru/audio/forvo/perehod.mp3",
+    "phonemic": "/pʲɪrʲɪˈxot/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʊ",
+    "audio": "lang/ru/audio/easy/uje.mp3",
+    "phonemic": "/ʊ/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "уже",
+    "audio": "lang/ru/audio/easy/uje.mp3",
+    "phonemic": "/ʊˈʐɛ/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "тупая",
+    "audio": null,
+    "phonemic": "/tʊˈpajə/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "сразу",
+    "audio": "lang/ru/audio/easy/srazu.mp3",
+    "phonemic": "/ˈsrazʊ/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [4, 5],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɨ",
+    "audio": "lang/ru/audio/auto/i_bar.mp3",
+    "phonemic": "/ɨ/",
+    "tokens": [
+      {
+        "symbol": "ɨ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "был",
+    "audio": "lang/ru/audio/easy/byl.mp3",
+    "phonemic": "/bɨl/",
+    "tokens": [
+      {
+        "symbol": "ɨ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʉ",
+    "audio": "lang/ru/audio/rufe/yu.mp3",
+    "phonemic": "/ʉ/",
+    "tokens": [
+      {
+        "symbol": "ʉ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ю",
+    "audio": "lang/ru/audio/rufe/yu.mp3",
+    "phonemic": "/jʉ/",
+    "tokens": [
+      {
+        "symbol": "ʉ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "свою",
+    "audio": "lang/ru/audio/easy/svou.mp3",
+    "phonemic": "/svɐˈjʉ/",
+    "tokens": [
+      {
+        "symbol": "ʉ",
+        "position": [3, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "u",
+    "audio": "lang/ru/audio/auto/u.mp3",
+    "phonemic": "/u/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ему",
+    "audio": "lang/ru/audio/easy/emu.mp3",
+    "phonemic": "/jɪˈmu/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [2, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "туп",
+    "audio": null,
+    "phonemic": "/tup/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "e",
+    "audio": "lang/ru/audio/rufe/ye.mp3",
+    "phonemic": "/e/",
+    "tokens": [
+      {
+        "symbol": "e",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "е",
+    "audio": "lang/ru/audio/rufe/ye.mp3",
+    "phonemic": "/je/",
+    "tokens": [
+      {
+        "symbol": "e",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "месте",
+    "audio": "lang/ru/audio/forvo/meste.mp3",
+    "phonemic": "/ˈmʲestʲɪ/",
+    "tokens": [
+      {
+        "symbol": "e",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɵ",
+    "audio": "lang/ru/audio/rufe/yo.mp3",
+    "phonemic": "/ɵ/",
+    "tokens": [
+      {
+        "symbol": "ɵ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ё",
+    "audio": "lang/ru/audio/rufe/yo.mp3",
+    "phonemic": "/jo/",
+    "tokens": [
+      {
+        "symbol": "ɵ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "моё",
+    "audio": "lang/ru/audio/easy/moe.mp3",
+    "phonemic": "/mɐˈjo/",
+    "tokens": [
+      {
+        "symbol": "ɵ",
+        "position": [2, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "живёт",
+    "audio": "lang/ru/audio/easy/jivet.mp3",
+    "phonemic": "/ʐɨˈvot/",
+    "tokens": [
+      {
+        "symbol": "ɵ",
+        "position": [3, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ə",
+    "audio": "lang/ru/audio/easy/mira.mp3",
+    "phonemic": "/ə/",
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "мира",
+    "audio": "lang/ru/audio/easy/mira.mp3",
+    "phonemic": "/ˈmʲirə/",
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [3, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "этому",
+    "audio": "lang/ru/audio/easy/etomu.mp3",
+    "phonemic": "/ˈetəmʊ/",
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [2, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "одновременно",
+    "audio": "lang/ru/audio/easy/odnovremenno.mp3",
+    "phonemic": "/ɐdnəvrʲɪˈmʲenə/",
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [11, 12],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "o",
+    "audio": "lang/ru/audio/auto/o.mp3",
+    "phonemic": "/o/",
+    "tokens": [
+      {
+        "symbol": "o",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "тот",
+    "audio": "lang/ru/audio/easy/tot.mp3",
+    "phonemic": "/tot/",
+    "tokens": [
+      {
+        "symbol": "o",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɛ",
+    "audio": "lang/ru/audio/auto/e_open.mp3",
+    "phonemic": "/ɛ/",
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "этот",
+    "audio": "lang/ru/audio/easy/etot.mp3",
+    "phonemic": "/ˈetət/",
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʌ",
+    "audio": "lang/ru/audio/forvo/ona.mp3",
+    "phonemic": "/ʌ/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "она",
+    "audio": "lang/ru/audio/forvo/ona.mp3",
+    "phonemic": "/ɐˈna/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "хотел",
+    "audio": "lang/ru/audio/easy/hotel.mp3",
+    "phonemic": "/xɐˈtʲel/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "стояла",
+    "audio": "lang/ru/audio/easy/stoyala.mp3",
+    "phonemic": "/stɐˈjalə/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [2, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "голова",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/da/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg.mp3",
+    "phonemic": "/ɡələˈva/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [3, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "a",
+    "audio": "lang/ru/audio/rufe/a_mine.wav",
+    "phonemic": "/a/",
+    "tokens": [
+      {
+        "symbol": "a",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "нами",
+    "audio": "lang/ru/audio/easy/nami.mp3",
+    "phonemic": "/ˈnamʲɪ/",
+    "tokens": [
+      {
+        "symbol": "a",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɑ",
+    "audio": "lang/ru/audio/auto/a_back.ogg",
+    "phonemic": "/ɑ/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "палка",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Ru-%D0%BF%D0%B0%D0%BB%D0%BA%D0%B0.ogg",
+    "phonemic": "/ˈpalkə/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "кал",
+    "audio": "lang/ru/audio/forvo/kal.mp3",
+    "phonemic": "/kal/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "æ",
+    "audio": "lang/ru/audio/rufe/ya.mp3",
+    "phonemic": "/æ/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "я",
+    "audio": "lang/ru/audio/rufe/ya.mp3",
+    "phonemic": null,
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "части",
+    "audio": "lang/ru/audio/easy/chasti.mp3",
+    "phonemic": "/ˈtʃastʲɪ/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "пять",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg.mp3",
+    "phonemic": "/pʲatʲ/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  }
+]

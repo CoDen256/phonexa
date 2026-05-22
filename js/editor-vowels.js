@@ -46,7 +46,7 @@ function renderVowelCards(){
     delBtn.className='vc-del-btn'; delBtn.title='Delete vowel'; delBtn.textContent='\u2715';
     delBtn.addEventListener('click',e=>{
       e.stopPropagation();
-      if(!confirm(`Delete vowel "${v.ipa}"?`))return;
+      if(!confirm(`Delete vowel "${v.symbols?.[0]}"?`))return;
       state.langDraft.vowels.splice(i,1);
       if(state.vowelIdx===i)closeVowelEditor();
       else if(state.vowelIdx>i)state.vowelIdx--;
@@ -55,23 +55,15 @@ function renderVowelCards(){
     card.appendChild(delBtn);
 
     // Card body
-    const ws=v.words||[];
-    let wordsHtml='';
-    if(ws.length){
-      wordsHtml+='<div class="vc-words-label">Examples</div><div class="vc-words">';
-      ws.forEach(w=>{const ha=!!w.audio;wordsHtml+=`<span class="vc-word ${ha?'has-audio':'no-audio'}" data-audio="${w.audio||''}">${ha?'<span class="pi">\u25ba</span>':''}${w.text||''}</span>`;});
-      wordsHtml+='</div>';
-    }
+    const sym=v.symbols?.[0]||'?';
     const body=document.createElement('div');
     body.innerHTML=`
-      <div class="vc-ipa" style="color:${c}">${v.ipa||'?'}</div>
+      <div class="vc-ipa" style="color:${c}">${sym}</div>
       <div class="vc-desc">${v.desc||''}</div>
       <div class="vc-round" style="color:${c}70">${v.rounded?'\u2299 Rounded':'\u25cb Unrounded'} \u00b7 ${v.type||'short'}</div>
-      ${v.f1?`<div class="vc-formants">F1 <span>${v.f1}</span> \u00b7 F2 <span>${v.f2}</span> Hz</div>`:''}
-      ${wordsHtml}`;
+      ${v.f1?`<div class="vc-formants">F1 <span>${v.f1}</span> \u00b7 F2 <span>${v.f2}</span> Hz</div>`:''}`;
     card.appendChild(body);
-    card.querySelectorAll('.vc-word.has-audio').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();localPlay(btn.dataset.audio);}));
-    card.addEventListener('click',()=>{localPlay(v.ipaAudio);openVowelEditor(i);});
+    card.addEventListener('click',()=>{localPlay(v.audio);openVowelEditor(i);});
     grid.appendChild(card);
   });
 }

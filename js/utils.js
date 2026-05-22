@@ -31,7 +31,7 @@ function ipaW(ipa,fs) { let w=0; for(const c of ipa) w+=c==='ː'?0.36:0.65; retu
  * Requires type==='diphthong' AND both target coords h2/b2 to be non-null.
  * Vowels missing h2/b2 are treated as monophthongs until set in the editor.
  */
-function isDiph(v){ return v.type==='diphthong' && v.h2!=null && v.b2!=null; }
+function isDiph(v){ return v.type==='diphthong' && v.target?.heightBackness != null; }
 
 /**
  * Convert a client-space mouse position to SVG coordinate space.

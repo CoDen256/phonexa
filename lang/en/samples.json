@@ -1,0 +1,782 @@
+[
+  {
+    "text": "i",
+    "audio": "lang/en/audio/ipa/green.mp3",
+    "phonemic": "/iː/",
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "green",
+    "audio": "lang/en/audio/ipa/green_word.mp3",
+    "phonemic": "/ɡriːn/",
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [2, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "heed",
+    "audio": "lang/en/audio/h95/heed.wav",
+    "phonemic": "/hiːd/",
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "feet",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-feet.ogg",
+    "phonemic": "/fiːt/",
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "seen",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-seen.ogg",
+    "phonemic": "/siːn/",
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɪ",
+    "audio": "lang/en/audio/ipa/pink.mp3",
+    "phonemic": "/ɪ/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "pink",
+    "audio": "lang/en/audio/ipa/pink_word.mp3",
+    "phonemic": "/pɪŋk/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "hid",
+    "audio": "lang/en/audio/h95/hid.wav",
+    "phonemic": "/hɪd/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "kit",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-kit.ogg",
+    "phonemic": "/kɪt/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "bit",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bit.ogg",
+    "phonemic": "/bɪt/",
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɛ",
+    "audio": "lang/en/audio/ipa/red.mp3",
+    "phonemic": "/ɛ/",
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "red",
+    "audio": "lang/en/audio/ipa/red_word.mp3",
+    "phonemic": "/rɛd/",
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "head",
+    "audio": "lang/en/audio/h95/head.wav",
+    "phonemic": "/hɛd/",
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "dress",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-dress.ogg",
+    "phonemic": "/drɛs/",
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [2, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "bed",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bed.ogg",
+    "phonemic": "/bɛd/",
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "æ",
+    "audio": "lang/en/audio/ipa/sand.mp3",
+    "phonemic": "/æ/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "sand",
+    "audio": "lang/en/audio/ipa/sand_word.mp3",
+    "phonemic": "/sænd/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "had",
+    "audio": "lang/en/audio/h95/had.wav",
+    "phonemic": "/hæd/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "trap",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-trap.ogg",
+    "phonemic": "/træp/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [2, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "cat",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-cat.ogg",
+    "phonemic": "/kæt/",
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɑ",
+    "audio": "lang/en/audio/ipa/coffee.mp3",
+    "phonemic": "/ɑ/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "coffee",
+    "audio": "lang/en/audio/ipa/coffee_word.mp3",
+    "phonemic": "/ˈkɑfi/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "hod",
+    "audio": "lang/en/audio/h95/hod.wav",
+    "phonemic": "/hɑd/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "father",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-father.ogg",
+    "phonemic": "/ˈfɑðər/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "palm",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-palm.ogg",
+    "phonemic": "/pɑm/",
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɔ",
+    "audio": "lang/en/audio/ipa/mauve.mp3",
+    "phonemic": "/ɔ/",
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "mauve",
+    "audio": "lang/en/audio/ipa/mauve_word.mp3",
+    "phonemic": "/mɔv/",
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "hawed",
+    "audio": "lang/en/audio/h95/hawed.wav",
+    "phonemic": "/hɔd/",
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [1, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "thought",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-thought.ogg",
+    "phonemic": "/θɔt/",
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [2, 6],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "claw",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-claw.ogg",
+    "phonemic": "/klɔ/",
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [2, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʊ",
+    "audio": "lang/en/audio/ipa/wood.mp3",
+    "phonemic": "/ʊ/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "wood",
+    "audio": "lang/en/audio/ipa/wood_word.mp3",
+    "phonemic": "/wʊd/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "hood",
+    "audio": "lang/en/audio/h95/hood.wav",
+    "phonemic": "/hʊd/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "foot",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-foot.ogg",
+    "phonemic": "/fʊt/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "put",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-put.ogg",
+    "phonemic": "/pʊt/",
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "u",
+    "audio": "lang/en/audio/ipa/blue.mp3",
+    "phonemic": "/uː/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "blue",
+    "audio": "lang/en/audio/ipa/blue_word.mp3",
+    "phonemic": "/bluː/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [2, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "who'd",
+    "audio": "lang/en/audio/h95/whod.wav",
+    "phonemic": "/huːd/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [2, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "goose",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-goose.ogg",
+    "phonemic": "/ɡuːs/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "food",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-food.ogg",
+    "phonemic": "/fuːd/",
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʌ",
+    "audio": "lang/en/audio/sa/strut.mp3",
+    "phonemic": "/ʌ/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "cut",
+    "audio": "lang/en/audio/sa/cut_word.mp3",
+    "phonemic": "/kʌt/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "hud",
+    "audio": "lang/en/audio/h95/hud.wav",
+    "phonemic": "/hʌd/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "strut",
+    "audio": "https://dictionary.cambridge.org/media/english/us_pron/s/str/strut/strut.mp3",
+    "phonemic": "/stɹʌt/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [3, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "bus",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bus.ogg",
+    "phonemic": "/bʌs/",
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ə",
+    "audio": "lang/en/audio/ipa/dust.mp3",
+    "phonemic": "/ə/",
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "dust",
+    "audio": "lang/en/audio/ipa/dust_word.mp3",
+    "phonemic": "/dəst/",
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "about",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-about.ogg",
+    "phonemic": "/əˈbaʊt/",
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɝ",
+    "audio": "lang/en/audio/ipa/purple.mp3",
+    "phonemic": "/ɝː/",
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "purple",
+    "audio": "lang/en/audio/ipa/purple_word.mp3",
+    "phonemic": "/ˈpɜːrpəl/",
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "heard",
+    "audio": "lang/en/audio/h95/heard.wav",
+    "phonemic": "/hɜːrd/",
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "nurse",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-nurse.ogg",
+    "phonemic": "/nɜːrs/",
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "bird",
+    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bird.ogg",
+    "phonemic": "/bɜːrd/",
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "eɪ",
+    "audio": "lang/en/audio/ipa/ei.mp3",
+    "phonemic": "/eɪ/",
+    "tokens": [
+      {
+        "symbol": "eɪ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "jade",
+    "audio": "lang/en/audio/ipa/jade_word.mp3",
+    "phonemic": "/dʒeɪd/",
+    "tokens": [
+      {
+        "symbol": "eɪ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "hayed",
+    "audio": "lang/en/audio/h95/hayed.wav",
+    "phonemic": "/heɪd/",
+    "tokens": [
+      {
+        "symbol": "eɪ",
+        "position": [1, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "oʊ",
+    "audio": "lang/en/audio/ipa/gold.mp3",
+    "phonemic": "/oʊ/",
+    "tokens": [
+      {
+        "symbol": "oʊ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "gold",
+    "audio": "lang/en/audio/ipa/gold_word.mp3",
+    "phonemic": "/ɡoʊld/",
+    "tokens": [
+      {
+        "symbol": "oʊ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "hoed",
+    "audio": "lang/en/audio/h95/hoed.wav",
+    "phonemic": "/hoʊd/",
+    "tokens": [
+      {
+        "symbol": "oʊ",
+        "position": [1, 3],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "aɪ",
+    "audio": "lang/en/audio/ipa/ai.mp3",
+    "phonemic": "/aɪ/",
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "lime",
+    "audio": "lang/en/audio/ipa/lime.mp3",
+    "phonemic": "/laɪm/",
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [1, 2],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "aʊ",
+    "audio": "lang/en/audio/ipa/au.mp3",
+    "phonemic": "/aʊ/",
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "brown",
+    "audio": "lang/en/audio/ipa/brown.mp3",
+    "phonemic": "/braʊn/",
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [2, 4],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɔɪ",
+    "audio": "lang/en/audio/ipa/oi.mp3",
+    "phonemic": "/ɔɪ/",
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [0, 1],
+        "analysis": null
+      }
+    ]
+  },
+  {
+    "text": "turquoise",
+    "audio": "lang/en/audio/ipa/turquoise.mp3",
+    "phonemic": "/ˈtɜːrkwɔɪz/",
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [4, 7],
+        "analysis": null
+      }
+    ]
+  }
+]

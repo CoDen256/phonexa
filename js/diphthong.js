@@ -127,11 +127,11 @@ function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, lk, svgId) {
   // Label — always full color, independent of arrow state
   const SIDE=13, mx=(x1+x2)/2, my=(y1+y2)/2, FS=17;
   const lx=mx+uy*SIDE, ly=my-ux*SIDE;
-  arrowL.appendChild($t(v.ipa,{x:lx,y:ly,dy:'0.36em','text-anchor':'middle','font-size':FS,
+  arrowL.appendChild($t(v.symbols?.[0]??'?',{x:lx,y:ly,dy:'0.36em','text-anchor':'middle','font-size':FS,
     fill:color,opacity:0.95,'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
     style:'pointer-events:none;user-select:none;filter:drop-shadow(0 0 4px rgba(20,30,46,1)) drop-shadow(0 0 8px rgba(20,30,46,0.9))'}));
   // Hit area — hover highlights arrow to full solid, mouseleave reverts
-  const stateKey=`${lk}::${v.ipa}`;
+  const stateKey=`${lk}::${v.symbols?.[0]??''}`;
   if(!_diphState[stateKey]) _diphState[stateKey]={lastClick:0,slowed:false};
   const hit=$s('line',{x1,y1,x2,y2,stroke:'transparent','stroke-width':22,cursor:'pointer'});
   hit.addEventListener('mouseenter',e=>{
@@ -152,7 +152,7 @@ function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, lk, svgId) {
     if(now-st.lastClick>5000) st.slowed=false;
     else st.slowed=!st.slowed;
     st.lastClick=now;
-    playUrlAtRate(v.ipaAudio, st.slowed?0.5:1.0);
+    playUrlAtRate(v.audio, st.slowed?0.5:1.0);
     onVowelClicked(v,lang,lk);
     pulseDiphthong(svgId,x1,y1,x2,y2,color);
   });

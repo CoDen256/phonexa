@@ -126,17 +126,17 @@ function playRefSelection(){
 // ── Vowel click hook (fires when a vowel is clicked anywhere on the chart) ────
 function onVowelClicked(v, lang, lk){
   if(!document.getElementById('practicePanel').classList.contains('open'))return;
-  if(!v.ipaAudio)return;
+  if(!v.audio)return;
   refVowelMeta={v,lang,lk};
   refAnalyzed=null;
-  document.getElementById('refColTitle').textContent=`Reference: ${lang.label} /${v.ipa}/`;
+  document.getElementById('refColTitle').textContent=`Reference: ${lang.label} /${v.symbols?.[0]}/`;
   document.getElementById('refStatus').textContent='Loading audio…';
   document.getElementById('refPlay').disabled=true;
   document.getElementById('refAnalyse').disabled=true;
   document.getElementById('refFormants').innerHTML='';
   document.getElementById('refWaveCanvas').style.display='none';
   document.getElementById('refWaveInfo').style.display='none';
-  loadRefAudio(v.ipaAudio, lang);
+  loadRefAudio(v.audio, lang);
 }
 
 async function loadRefAudio(url, lang){
@@ -176,7 +176,7 @@ document.getElementById('refAnalyse').addEventListener('click', async()=>{
     refAnalyzed={f1:data.f1,f2:data.f2};
     // Store in analyzedFormants for mode toggle
     if(refVowelMeta){
-      const key=`${refVowelMeta.lk}::${refVowelMeta.v.ipa}`;
+      const key=`${refVowelMeta.lk}::${refVowelMeta.v.symbols?.[0]}`;
       analyzedFormants[key]={f1:data.f1,f2:data.f2};
     }
     const v=refVowelMeta?.v;

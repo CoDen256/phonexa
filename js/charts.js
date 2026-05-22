@@ -63,19 +63,20 @@ function buildVowels(svg, getPos, svgId, showArrows=false) {
 
     for (const {lk,lang,v,dx,dy} of members) {
       const ic=lk==='cardinal', lyr=ic?cardL:langL;
+      const sym=v.symbols?.[0]??'?';
       const FS=22, GAP=5, PAD=4;
       const lx=v.rounded?dx+DOT_R+GAP:dx-DOT_R-GAP;
-      const anch=v.rounded?'start':'end', tw=ipaW(v.ipa,FS);
+      const anch=v.rounded?'start':'end', tw=ipaW(sym,FS);
       const hx=(v.rounded?lx:lx-tw)-PAD, hy=dy-FS*0.40-PAD;
       const lg=$s('g',{style:'cursor:pointer'});
       lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
-      lg.appendChild($t(v.ipa,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
+      lg.appendChild($t(sym,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
         fill:lang.color,opacity:ic?0.98:0.78,
         'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{playUrl(v.ipaAudio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
+      lg.addEventListener('click',()=>{playUrl(v.audio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
       dotL.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
     }
@@ -94,18 +95,18 @@ function buildVowels(svg, getPos, svgId, showArrows=false) {
       const {lk,lang,v,dx,dy}=members[0];
       dg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       dg.addEventListener('mousemove',moveTip); dg.addEventListener('mouseleave',hideTip);
-      dg.addEventListener('click',()=>{playUrl(v.ipaAudio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
+      dg.addEventListener('click',()=>{playUrl(v.audio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       let tm=false;
       dg.addEventListener('touchstart',e=>{tm=false;e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
       dg.addEventListener('touchmove', e=>{tm=true;moveTip(e.touches[0]);},{passive:false});
-      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playUrl(v.ipaAudio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
+      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playUrl(v.audio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
     }
     dotL.appendChild(dg);
   }
 
   // ── Step 4: render diphthong arrows (IPA chart only) ─────────────────────────
   for (const {lk,lang,v,dx,dy} of diphs) {
-    const tp=getPos({...v,h:v.h2,b:v.b2});
+    const tp=v.target?.heightBackness?getPos({heightBackness:v.target.heightBackness}):null;
     if (tp) renderDiph(arrowL, dotL, dx, dy, tp.x, tp.y, v, lang, lk, svgId);
   }
 }
@@ -130,7 +131,7 @@ function renderIpa() {
     const p=trapPos(0,b);
     svg.appendChild($t(l,{x:p.x,y:p.y-28,'text-anchor':'middle','font-size':13,fill:'#6a8298','font-family':'system-ui,sans-serif'}));
   }
-  buildVowels(svg, v=>trapPos(v.h,v.b), 'chartIpa', true);
+  buildVowels(svg, v=>trapPos(v.heightBackness[0],v.heightBackness[1]), 'chartIpa', true);
 }
 
 // ─── Formant Plot ─────────────────────────────────────────────────────────────
@@ -166,7 +167,7 @@ function renderFormant() {
   for(const[lk,lang]of Object.entries(LANGS)){
     for(const v of lang.vowels){
       if(!passesFilters(lk,v))continue;
-      const an=analyzedFormants[`${lk}::${v.ipa}`]; if(!an)continue;
+      const an=analyzedFormants[`${lk}::${v.symbols?.[0]}`]; if(!an)continue;
       const{x:ax,y:ay}=formantPos(an.f1,an.f2);
       if(v.f1&&v.f2){
         const{x:jx,y:jy}=formantPos(v.f1,v.f2);
@@ -212,7 +213,7 @@ document.getElementById('tabFormant').addEventListener('click',()=>{
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 function updateCount() {
   document.getElementById('sbCount').innerHTML =
-    `<b>${countShown()}</b> of ${totalVowels()} vowels shown`;
+      `<b>${countShown()}</b> of ${totalVowels()} vowels shown`;
 }
 
 function buildSidebar() {
@@ -264,7 +265,7 @@ function buildSidebar() {
   // Collect which base symbols actually exist in current loaded languages
   const existingBases=new Set();
   for (const lang of Object.values(LANGS))
-    for (const v of lang.vowels) existingBases.add(getBase(v.ipa));
+    for (const v of lang.vowels) existingBases.add(getBase(v.symbols?.[0]??''));
 
   body.appendChild(section('IPA Base', filters.ipaBase, grid=>{
     for (const base of IPA_BASE_ORDER) if (existingBases.has(base)) grid.appendChild(ipaChip(base));
@@ -291,43 +292,29 @@ function renderDetail() {
     sec.innerHTML='<div class="detail-empty">No vowels match the current filters</div>';
     return;
   }
-  all.sort((a,b)=>{ const dh=a.v.h-b.v.h; return Math.abs(dh)>.001?dh:a.v.b-b.v.b; });
+  all.sort((a,b)=>{ const dh=a.v.heightBackness[0]-b.v.heightBackness[0]; return Math.abs(dh)>.001?dh:a.v.heightBackness[1]-b.v.heightBackness[1]; });
   const grid=document.createElement('div'); grid.className='detail-cards-row';
 
   for (const {lk,lang,v} of all) {
     const c=lang.color;
-    const tPos=trapPos(v.h,v.b);
+    const tPos=trapPos(v.heightBackness[0],v.heightBackness[1]);
     const fPos=v.f1&&v.f2?formantPos(v.f1,v.f2):null;
+    const sym=v.symbols?.[0]??'?';
     const card=document.createElement('div');
     card.className='dcard'; card.style.borderColor=c;
-
-    let wordsHtml='';
-    if (v.words && v.words.length > 0) {
-      wordsHtml='<div class="dcard-words-label">Examples</div><div class="dcard-words">';
-      for (const w of v.words) {
-        const ha=!!w.audio;
-        wordsHtml+=`<button class="word-btn ${ha?'has-audio':'no-audio'}" data-audio="${w.audio||''}">${ha?'<span class="pi">▶</span>':''}${w.text}</button>`;
-      }
-      wordsHtml+='</div>';
-    }
-
     card.innerHTML=`
-      <div class="dcard-ipa" style="color:${c}">${v.ipa}</div>
+      <div class="dcard-ipa" style="color:${c}">${sym}</div>
       <div class="dcard-sublang" style="color:${c}bb">${lang.label}</div>
       <div class="dcard-desc">${v.desc}</div>
       <div class="dcard-round" style="color:${c}88">${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}</div>
       ${v.f1?`<div class="dcard-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>`:''}
-      ${wordsHtml}
       <div class="dcard-actions">
         <button class="dcard-btn dcard-play">▶ Sound</button>
         ${v.wikiUrl?`<a class="dcard-btn" href="${v.wikiUrl}" target="_blank" rel="noopener">Wiki ↗</a>`:''}
       </div>`;
 
-    card.querySelectorAll('.word-btn.has-audio').forEach(btn=>{
-      btn.addEventListener('click',()=>playUrl(btn.dataset.audio));
-    });
     card.querySelector('.dcard-play').addEventListener('click',()=>{
-      playUrl(v.ipaAudio);
+      playUrl(v.audio);
       pulse('chartIpa',tPos.x,tPos.y,c);
       if(fPos) pulse('chartFormant',fPos.x,fPos.y,c);
     });

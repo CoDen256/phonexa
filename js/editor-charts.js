@@ -62,11 +62,11 @@ function drawCardinalDots(svg, posFn, validFn){
     if(validFn&&!validFn(cv))return;
     const{x,y}=posFn(cv);
     svg.appendChild($s('circle',{cx:x,cy:y,r:3.5,fill:'#4a6888'}));
-    svg.appendChild($t(cv.ipa,{x:x+(cv.rounded?5:-5),y,dy:'0.35em','text-anchor':cv.rounded?'start':'end','font-size':7,fill:'#4a6888','font-family':'Georgia,serif',style:'pointer-events:none'}));
+    svg.appendChild($t(cv.symbols?.[0]??'?',{x:x+(cv.rounded?5:-5),y,dy:'0.35em','text-anchor':cv.rounded?'start':'end','font-size':7,fill:'#4a6888','font-family':'Georgia,serif',style:'pointer-events:none'}));
   });
 }
 
-function isDiph(v){ return v.type==='diphthong' && v.h2!=null && v.b2!=null; }
+function isDiph(v){ return v.type==='diphthong' && v.target?.heightBackness != null; }
 
 function drawDiphArrow(layer, x1, y1, x2, y2, v, c, isAct, onClickFn=null){
   const dist=Math.hypot(x2-x1,y2-y1); if(dist<3)return;
@@ -81,7 +81,7 @@ function drawDiphArrow(layer, x1, y1, x2, y2, v, c, isAct, onClickFn=null){
   // Label beside arrow (perpendicular offset)
   const SIDE=isAct?12:9, mx=(x1+x2)/2, my=(y1+y2)/2, FS=isAct?14:11;
   const lx=mx+uy*SIDE, ly=my-ux*SIDE;
-  layer.appendChild($t(v.ipa||'?',{x:lx,y:ly,dy:'0.36em','text-anchor':'middle','font-size':FS,
+  layer.appendChild($t(v.symbols?.[0]||'?',{x:lx,y:ly,dy:'0.36em','text-anchor':'middle','font-size':FS,
     fill:c,opacity:isAct?0.95:0.7,'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
     style:'pointer-events:none;user-select:none;filter:drop-shadow(0 0 4px rgba(20,30,46,1)) drop-shadow(0 0 7px rgba(20,30,46,0.8))'}));
   // Hit area (always present, clickable for editing)
@@ -100,7 +100,7 @@ function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, showArrows
       if(!isDiph(v))return;
       if(validFn&&!validFn(v))return;
       const sp=posFn(v); if(!sp)return;
-      const tp=posFn({...v,h:v.h2,b:v.b2}); if(!tp)return;
+      const tp=posFn({heightBackness:v.target.heightBackness}); if(!tp)return;
       const isAct=i===activeIdx;
       drawDiphArrow(arrowL,sp.x,sp.y,tp.x,tp.y,v,c,isAct, e=>{e.stopPropagation();openVowelEditor(i);});
       // Hollow target dot
@@ -141,15 +141,16 @@ function drawVowelsOnChart(svg, vowels, activeIdx, c, posFn, validFn, showArrows
     const lx=v.rounded?x+dotR+GAP:x-dotR-GAP;
     const anchor=v.rounded?'start':'end';
     const g=$s('g',{style:'cursor:pointer'});
-    const tw=(v.ipa||'').length*FS*0.6;
+    const sym=v.symbols?.[0]||'?';
+    const tw=sym.length*FS*0.6;
     g.appendChild($s('rect',{x:(v.rounded?lx:lx-tw)-4,y:y-FS*0.5-4,width:tw+8,height:FS+8,rx:4,fill:'transparent'}));
-    const lbl=$t(v.ipa||'?',{x:lx,y,dy:'0.36em','text-anchor':anchor,'font-size':FS,fill:isAct?'#ffffff':c,opacity:isAct?1:0.82,'font-family':"Georgia,'Noto Serif',serif",'font-weight':isAct?'bold':'normal',style:`filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));user-select:none`});
+    const lbl=$t(sym,{x:lx,y,dy:'0.36em','text-anchor':anchor,'font-size':FS,fill:isAct?'#ffffff':c,opacity:isAct?1:0.82,'font-family':"Georgia,'Noto Serif',serif",'font-weight':isAct?'bold':'normal',style:`filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));user-select:none`});
     if(isAct)lbl.style.filter=`drop-shadow(0 0 5px ${c}) drop-shadow(0 1px 2px rgba(0,0,0,.5))`;
     g.appendChild(lbl);
     g.addEventListener('click',e=>{e.stopPropagation();openVowelEditor(i);});
-    g.addEventListener('mouseenter',e=>{const tip=document.getElementById('chartTip');tip.textContent=`${v.ipa} — ${v.desc||''}`;tip.style.display='block';tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';});
-    g.addEventListener('mousemove',e=>{const tip=document.getElementById('chartTip');tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';});
-    g.addEventListener('mouseleave',()=>document.getElementById('chartTip').style.display='none');
+    g.addEventListener('mouseenter',e=>{const tip=document.getElementById('chartTip');if(!tip)return;tip.textContent=`${v.symbols?.[0]||'?'} — ${v.desc||''}`;tip.style.display='block';tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';});
+    g.addEventListener('mousemove',e=>{const tip=document.getElementById('chartTip');if(tip){tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';}});
+    g.addEventListener('mouseleave',()=>{const tip=document.getElementById('chartTip');if(tip)tip.style.display='none';});
     labelLayer.appendChild(g);
   });
 }
@@ -160,14 +161,14 @@ function renderLangIpa(){
   if(!svg)return;
   while(svg.firstChild)svg.removeChild(svg.firstChild);
   drawGridIpa(svg);
-  drawCardinalDots(svg,cv=>ltPos(+cv.h||0,+cv.b||0));
+  drawCardinalDots(svg,cv=>ltPos(+(cv.heightBackness?.[0])||0,+(cv.heightBackness?.[1])||0));
   const vowels=[...(state.langDraft?.vowels||[])];
   const activeIdx=state.vowelIdx;
   // If editing, show draft in place of the original
   if(state.vowelDraft!==null&&activeIdx>=0) vowels[activeIdx]=state.vowelDraft;
   else if(state.vowelDraft!==null&&activeIdx<0) vowels.push(state.vowelDraft);
   const c=state.langDraft?.color||'#7eb8f7';
-  drawVowelsOnChart(svg,vowels,activeIdx<0?vowels.length-1:activeIdx,c,v=>ltPos(+v.h||0,+v.b||0),null,true);
+  drawVowelsOnChart(svg,vowels,activeIdx<0?vowels.length-1:activeIdx,c,v=>ltPos(+(v.heightBackness?.[0])||0,+(v.heightBackness?.[1])||0),null,true);
 }
 
 // ─── Render language formant chart ────────────────────────────────────────────
@@ -187,6 +188,6 @@ function renderLangFormant(){
   else if(state.vowelDraft!==null&&activeIdx<0) vowels.push(state.vowelDraft);
   const c=state.langDraft?.color||'#7eb8f7';
   drawVowelsOnChart(svg,vowels,activeIdx<0?vowels.length-1:activeIdx,c,
-    v=>{const f1=+v.f1,f2=+v.f2;if(!f1||!f2)return null;return lfPos(f1,f2);},
-    v=>!!(v.f1&&v.f2));
+      v=>{const f1=+v.f1,f2=+v.f2;if(!f1||!f2)return null;return lfPos(f1,f2);},
+      v=>!!(v.f1&&v.f2));
 }

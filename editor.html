@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IPA Language Editor</title>
-<link rel="stylesheet" href="css/editor.css">
-<link rel="stylesheet" href="css/index.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPA Language Editor</title>
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
 
@@ -14,7 +14,6 @@
   <h1>Language Editor</h1>
 </div>
 
-<!-- Horizontal language tabs -->
 <div class="lang-tab-bar" id="langTabBar">
   <div id="langTabs" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap"></div>
   <button class="btn btn-secondary btn-sm" id="newLangBtn" type="button">+ New</button>
@@ -26,12 +25,9 @@
   <span class="unsaved-note" id="unsavedNote" style="display:none">● unsaved</span>
 </div>
 
-<!-- Editor body: main column (chart + vowel list) | editor pane -->
 <div class="editor-body">
 
-  <!-- Left: chart + vowel cards below -->
   <div class="main-col">
-    <!-- Chart tabs + SVGs -->
     <div class="chart-section">
       <div class="view-tabs" style="padding:6px 10px 0;display:flex;align-items:flex-end;gap:2px">
         <button class="view-tab active" id="tabIpa" type="button">IPA Chart</button>
@@ -52,7 +48,6 @@
       <p class="chart-hint" id="chartHint">Select a language to start editing</p>
     </div>
 
-    <!-- Vowel cards (below chart, as before) -->
     <div class="vowel-section" id="vowelSection" style="display:none">
       <div class="section-head">
         <span class="section-title" id="sectionTitle">Vowels</span>
@@ -62,11 +57,9 @@
     </div>
   </div>
 
-  <!-- Drag handle for resizing the editor pane -->
   <div class="resize-handle" id="resizeHandle"></div>
-  <!-- Right: language meta + vowel editor form -->
+
   <div class="editor-pane" id="editorPane">
-    <!-- Lang metadata (always visible when language selected) -->
     <div class="lang-meta-form" id="langMetaForm" style="display:none">
       <div class="field"><label>Key <span style="font-weight:400;opacity:.6;font-size:.58rem">(folder name · a-z 0-9 -)</span></label><input type="text" id="fKey" placeholder="e.g. en" pattern="[a-z0-9_-]+"></div>
       <div class="field" style="margin-top:4px"><label>Label</label><input type="text" id="fLabel"></div>
@@ -75,25 +68,21 @@
         <input type="color" id="fColor">
       </div>
     </div>
-    <!-- Inline vowel editor (shown when a vowel is being edited) -->
     <div id="veInline" class="ve-inline" style="display:none"></div>
     <div class="editor-pane-hint" id="editorPaneHint">Select a vowel on the chart or card to edit</div>
   </div>
 
 </div>
 
-<!-- Required by tooltip.js + picker system -->
 <div id="vowelPicker"><div class="picker-title">Choose vowel</div><div id="pickerItems"></div></div>
 <div id="tip" class="tip"></div>
 <div class="toast" id="toast"></div>
 
-<!-- Shared chart rendering stack -->
 <script src="js/utils.js"></script>
 <script src="js/geometry.js"></script>
 <script src="js/tooltip.js"></script>
 <script src="js/diphthong.js"></script>
 <script src="js/charts.js"></script>
-<!-- Editor modules -->
 <script src="js/editor-geometry.js"></script>
 <script src="js/editor-storage.js"></script>
 <script src="js/editor-vowels.js"></script>
@@ -101,143 +90,157 @@
 <script src="js/editor-form.js"></script>
 
 <script>
-// ─── State ────────────────────────────────────────────────────────────────────
-const state = {
-  langs:{}, selKey:null, langDraft:null,
-  vowelIdx:null, vowelDraft:null,
-  dirHandle:null, unsaved:false, chartTab:'ipa',
-  pickingMode: null,  // null | 'ipa' | 'ipa-target' | 'formant'
-  showCardinals: false,
-  showOtherVowels: true,
-  langSources: {},    // key → 'builtin' | 'folder' | 'new'
-  langOrder: [],      // display/save order of language keys
-  langDisabled: new Set(), // keys excluded from index.json (disabled)
-};
-function clone(o) { return JSON.parse(JSON.stringify(o)); }
-function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }
-
-// ─── Overrides for shared chart scripts ───────────────────────────────────────
-var LANGS = {};
-var refAnalyzed = null, refVowelMeta = null;
-// recordedVowel + analyzedFormants already declared in charts.js
-function passesFilters(lk, v) { return true; }
-function isCompareMode() { return false; }
-function playUrl(url) { if (!url) return; new Audio(url).play().catch(()=>{}); }
-
-// Clicking a vowel on the chart opens it for editing
-function onVowelClicked(v, lang, lk) {
-  if (lk === 'cardinal') return;
-  if (!state.langDraft) return;
-  if (state.pickingMode) return; // pick mode intercepts at SVG level
-  // Use findIndex for robust matching (draft substitution can break ===)
-  const idx = (state.langDraft.vowels || []).findIndex(
-    w => w === v || (w.ipa === v.ipa && Math.abs((w.h||0)-(v.h||0)) < 0.01 && Math.abs((w.b||0)-(v.b||0)) < 0.01)
-  );
-  if (idx < 0) return;
-  // Auto-save current draft before switching — only mark unsaved if something actually changed
-  if (state.vowelIdx !== null && state.vowelDraft !== null && state.vowelDraft.ipa) {
-    const original = state.vowelIdx >= 0 ? state.langDraft.vowels?.[state.vowelIdx] : null;
-    const changed = !original || JSON.stringify(original) !== JSON.stringify(state.vowelDraft);
-    if (state.vowelIdx < 0) (state.langDraft.vowels = state.langDraft.vowels||[]).push(state.vowelDraft);
-    else state.langDraft.vowels[state.vowelIdx] = state.vowelDraft;
-    if (changed) markUnsaved();
-  }
-  openVowelEditor(idx);
-}
-
-// ─── Coordinate inverses ──────────────────────────────────────────────────────
-function trapToHB(px, py) {
-  const h = Math.max(0, Math.min(1, (py-TRAP.TL.y)/(TRAP.BL.y-TRAP.TL.y)));
-  const fX = TRAP.TL.x + h*(TRAP.BL.x-TRAP.TL.x);
-  return { h:+h.toFixed(4), b:+Math.max(0,Math.min(1,(px-fX)/(TRAP.TR.x-fX))).toFixed(4) };
-}
-function posToFormant(px, py) {
-  return {
-    f2: Math.round(Math.max(F2MIN, Math.min(F2MAX, F2MAX-(px-FP.x0)/(FP.x1-FP.x0)*(F2MAX-F2MIN)))),
-    f1: Math.round(Math.max(F1MIN, Math.min(F1MAX, F1MIN+(py-FP.y0)/(FP.y1-FP.y0)*(F1MAX-F1MIN)))),
+  // ─── State ────────────────────────────────────────────────────────────────────
+  const state = {
+    langs:{}, selKey:null, langDraft:null,
+    vowelIdx:null, vowelDraft:null,
+    dirHandle:null, unsaved:false, chartTab:'ipa',
+    pickingMode: null,  // null | 'ipa' | 'ipa-target' | 'formant'
+    showCardinals: false,
+    showOtherVowels: true,
+    langSources: {},
+    langOrder: [],
+    langDisabled: new Set(),
   };
-}
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }
 
-// ─── Pick mode: direct SVG click listener (no overlay z-order issues) ─────────
-function attachPickListeners() {
-  [['chartIpa', ['ipa','ipa-target']], ['chartFormant', ['formant']]].forEach(([id, modes]) => {
-    const svg = document.getElementById(id); if (!svg) return;
-    // Remove previous handler cleanly
-    if (svg._pickHandler) { svg.removeEventListener('click', svg._pickHandler); svg._pickHandler = null; }
-    // Add transparent background rect so empty SVG areas capture clicks
-    if (!svg.querySelector('.pick-bg')) {
-      const [vx,vy,vw,vh]=svg.getAttribute('viewBox').split(' ').map(Number);
-      const bg = $s('rect',{x:vx,y:vy,width:vw,height:vh,fill:'transparent','pointer-events':'all',class:'pick-bg'});
-      svg.insertBefore(bg, svg.firstChild);
+  // ─── Overrides for shared chart scripts ───────────────────────────────────────
+  var LANGS = {};
+  var refAnalyzed = null, refVowelMeta = null;
+  function passesFilters(lk, v) { return true; }
+  function isCompareMode() { return false; }
+  function playUrl(url) { if (!url) return; new Audio(url).play().catch(()=>{}); }
+
+  // Clicking a vowel on the chart opens it for editing
+  function onVowelClicked(v, lang, lk) {
+    if (lk === 'cardinal') return;
+    if (!state.langDraft) return;
+    if (state.pickingMode) return;
+    const idx = (state.langDraft.vowels || []).findIndex(w =>
+            w === v ||
+            (
+                    w.symbols?.[0] === v.symbols?.[0] &&
+                    Math.abs((w.heightBackness?.[0]??0) - (v.heightBackness?.[0]??0)) < 0.01 &&
+                    Math.abs((w.heightBackness?.[1]??0) - (v.heightBackness?.[1]??0)) < 0.01
+            )
+    );
+    if (idx < 0) return;
+    if (state.vowelIdx !== null && state.vowelDraft !== null && state.vowelDraft.symbols?.[0]) {
+      const original = state.vowelIdx >= 0 ? state.langDraft.vowels?.[state.vowelIdx] : null;
+      const changed = !original || JSON.stringify(original) !== JSON.stringify(state.vowelDraft);
+      if (state.vowelIdx < 0) (state.langDraft.vowels = state.langDraft.vowels||[]).push(state.vowelDraft);
+      else state.langDraft.vowels[state.vowelIdx] = state.vowelDraft;
+      if (changed) markUnsaved();
     }
-    const active = state.pickingMode && state.vowelDraft && modes.includes(state.pickingMode);
-    svg.style.cursor = active ? 'crosshair' : '';
-    if (!active) return;
-    // Named handler stored on svg so it can be properly removed
-    const handler = e => {
-      const pt = svgPt(svg, e.clientX, e.clientY);
-      if (state.pickingMode === 'ipa') {
-        const {h,b} = trapToHB(pt.x,pt.y); state.vowelDraft.h=h; state.vowelDraft.b=b;
-      } else if (state.pickingMode === 'ipa-target') {
-        const {h,b} = trapToHB(pt.x,pt.y); state.vowelDraft.h2=h; state.vowelDraft.b2=b;
-      } else if (state.pickingMode === 'formant') {
-        const {f1,f2} = posToFormant(pt.x,pt.y); state.vowelDraft.f1=f1; state.vowelDraft.f2=f2;
-      }
-      state.pickingMode = null;
-      svg.style.cursor = '';
-      svg.removeEventListener('click', handler);
-      svg._pickHandler = null;
-      syncCoordsToForm(); renderEditorAll(); renderVowelCards();
+    openVowelEditor(idx);
+  }
+
+  // ─── Coordinate inverses ──────────────────────────────────────────────────────
+  function trapToHB(px, py) {
+    const h = Math.max(0, Math.min(1, (py-TRAP.TL.y)/(TRAP.BL.y-TRAP.TL.y)));
+    const fX = TRAP.TL.x + h*(TRAP.BL.x-TRAP.TL.x);
+    return { h:+h.toFixed(4), b:+Math.max(0,Math.min(1,(px-fX)/(TRAP.TR.x-fX))).toFixed(4) };
+  }
+  function posToFormant(px, py) {
+    return {
+      f2: Math.round(Math.max(F2MIN, Math.min(F2MAX, F2MAX-(px-FP.x0)/(FP.x1-FP.x0)*(F2MAX-F2MIN)))),
+      f1: Math.round(Math.max(F1MIN, Math.min(F1MAX, F1MIN+(py-FP.y0)/(FP.y1-FP.y0)*(F1MAX-F1MIN)))),
     };
-    svg._pickHandler = handler;
-    svg.addEventListener('click', handler);
-  });
-}
-
-// ─── Main render function ─────────────────────────────────────────────────────
-function renderEditorAll() {
-  // Populate LANGS from draft + cardinal
-  Object.keys(LANGS).forEach(k => delete LANGS[k]);
-  if (state.showCardinals && state.langs?.cardinal) LANGS.cardinal = state.langs.cardinal;
-  if (state.langDraft?.key) {
-    let vowels = [...(state.langDraft.vowels || [])];
-    if (state.vowelIdx !== null && state.vowelDraft !== null) {
-      if (state.vowelIdx < 0) vowels.push(state.vowelDraft);
-      else vowels[state.vowelIdx] = state.vowelDraft;
-    }
-    // Solo mode: only show the vowel currently being edited
-    if (!state.showOtherVowels && state.vowelIdx !== null) {
-      const activeIdx = state.vowelIdx < 0 ? vowels.length - 1 : state.vowelIdx;
-      vowels = vowels[activeIdx] ? [vowels[activeIdx]] : [];
-    }
-    LANGS[state.langDraft.key] = {...state.langDraft, vowels};
   }
 
-  renderIpa();
-  renderFormant();
-  attachPickListeners();
+  // ─── Pick mode: SVG click listener ───────────────────────────────────────────
+  function attachPickListeners() {
+    [['chartIpa', ['ipa','ipa-target']], ['chartFormant', ['formant']]].forEach(([id, modes]) => {
+      const svg = document.getElementById(id); if (!svg) return;
+      if (svg._pickHandler) { svg.removeEventListener('click', svg._pickHandler); svg._pickHandler = null; }
+      if (!svg.querySelector('.pick-bg')) {
+        const [vx,vy,vw,vh]=svg.getAttribute('viewBox').split(' ').map(Number);
+        const bg = $s('rect',{x:vx,y:vy,width:vw,height:vh,fill:'transparent','pointer-events':'all',class:'pick-bg'});
+        svg.insertBefore(bg, svg.firstChild);
+      }
+      const active = state.pickingMode && state.vowelDraft && modes.includes(state.pickingMode);
+      svg.style.cursor = active ? 'crosshair' : '';
+      if (!active) return;
 
-  // Chart hint
-  const hint = document.getElementById('chartHint');
-  if (hint) {
-    const msgs = {ipa:'Click chart to set position', 'ipa-target':'Click chart to set target position', formant:'Click formant chart to set F1/F2'};
-    if (state.pickingMode && msgs[state.pickingMode]) hint.textContent = msgs[state.pickingMode];
-    else hint.innerHTML = state.langDraft ? 'Click a vowel to edit · <b>Pick</b> buttons set chart position' : 'Select a language to start editing';
+      const handler = e => {
+        const pt = svgPt(svg, e.clientX, e.clientY);
+        if (state.pickingMode === 'ipa') {
+          const {h,b} = trapToHB(pt.x, pt.y);
+          state.vowelDraft.heightBackness = [h, b];
+
+        } else if (state.pickingMode === 'ipa-target') {
+          const {h,b} = trapToHB(pt.x, pt.y);
+          if (!state.vowelDraft.target) {
+            state.vowelDraft.target = {heightBackness:[h,b], rounded:state.vowelDraft.rounded, f1:null, f2:null};
+          } else {
+            state.vowelDraft.target.heightBackness = [h, b];
+          }
+
+        } else if (state.pickingMode === 'formant') {
+          const {f1,f2} = posToFormant(pt.x, pt.y);
+          state.vowelDraft.f1 = f1;
+          state.vowelDraft.f2 = f2;
+        }
+
+        state.pickingMode = null;
+        svg.style.cursor = '';
+        svg.removeEventListener('click', handler);
+        svg._pickHandler = null;
+        syncCoordsToForm();
+        renderEditorAll();
+        renderVowelCards();
+      };
+      svg._pickHandler = handler;
+      svg.addEventListener('click', handler);
+    });
   }
 
-  // Editor pane hint
-  const ph = document.getElementById('editorPaneHint');
-  if (ph) ph.style.display = state.vowelIdx === null ? 'block' : 'none';
-}
+  // ─── Main render ──────────────────────────────────────────────────────────────
+  function renderEditorAll() {
+    Object.keys(LANGS).forEach(k => delete LANGS[k]);
+
+    if (state.showCardinals && state.langs?.cardinal)
+      LANGS.cardinal = state.langs.cardinal;
+
+    if (state.langDraft?.key) {
+      let vowels = [...(state.langDraft.vowels || [])];
+      if (state.vowelIdx !== null && state.vowelDraft !== null) {
+        if (state.vowelIdx < 0) vowels.push(state.vowelDraft);
+        else vowels[state.vowelIdx] = state.vowelDraft;
+      }
+      if (!state.showOtherVowels && state.vowelIdx !== null) {
+        const activeIdx = state.vowelIdx < 0 ? vowels.length - 1 : state.vowelIdx;
+        vowels = vowels[activeIdx] ? [vowels[activeIdx]] : [];
+      }
+      LANGS[state.langDraft.key] = {...state.langDraft, vowels};
+    }
+
+    renderIpa();
+    renderFormant();
+    attachPickListeners();
+
+    const hint = document.getElementById('chartHint');
+    if (hint) {
+      const msgs = {ipa:'Click chart to set position','ipa-target':'Click chart to set target position',formant:'Click formant chart to set F1/F2'};
+      if (state.pickingMode && msgs[state.pickingMode]) hint.textContent = msgs[state.pickingMode];
+      else hint.innerHTML = state.langDraft
+              ? 'Click a vowel to edit · <b>Pick</b> buttons set chart position'
+              : 'Select a language to start editing';
+    }
+
+    const ph = document.getElementById('editorPaneHint');
+    if (ph) ph.style.display = state.vowelIdx === null ? 'block' : 'none';
+  }
 </script>
 <script>
-async function init() {
-  initEditorUI();
-  await tryRestoreHandle();
-  await loadLanguages();
-  renderEditorAll(); // show skeleton charts even before language is selected
-}
-init();
+  async function init() {
+    initEditorUI();
+    await tryRestoreHandle();
+    await loadLanguages();
+    renderEditorAll();
+  }
+  init();
 </script>
 </body>
 </html>

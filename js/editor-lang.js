@@ -6,16 +6,16 @@ async function loadLanguages(){
     const idx=await fetch(`lang/index.json?t=${Date.now()}`).then(r=>r.json());
     const names=(idx.languages||[]).filter(n=>!n.startsWith('_'));
     await Promise.all(names.map(name=>
-      fetch(`lang/${name}/lang.json?t=${Date.now()}`)
-        .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
-        .then(d=>{
-          if(d&&d.key&&!state.langSources[d.key]){
-            state.langs[d.key]=d;
-            state.langSources[d.key]='builtin';
-            if(!state.langOrder.includes(d.key)) state.langOrder.push(d.key);
-          }
-        })
-        .catch(e=>console.warn(`Skip ${name}:`,e.message))
+        fetch(`lang/${name}/lang.json?t=${Date.now()}`)
+            .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+            .then(d=>{
+              if(d&&d.key&&!state.langSources[d.key]){
+                state.langs[d.key]=d;
+                state.langSources[d.key]='builtin';
+                if(!state.langOrder.includes(d.key)) state.langOrder.push(d.key);
+              }
+            })
+            .catch(e=>console.warn(`Skip ${name}:`,e.message))
     ));
   }catch(e){console.error('Failed to load index',e);}
   renderLangList();
@@ -45,7 +45,7 @@ function renderLangList(){
     btn.style.color=isActive&&!isDisabled?lang.color:'';
     btn.textContent=(lang.label||key)+(isDisabled?' (off)':'');
     btn.title=isDisabled?'Disabled — excluded from index.json. Use ↩ to re-enable.'
-      :src==='builtin'?'Built-in — editable, use Save As to export':'';
+        :src==='builtin'?'Built-in — editable, use Save As to export':'';
     btn.addEventListener('click',()=>selectLang(key));
 
     if(isDisabled){
@@ -236,12 +236,14 @@ function refreshCharts(){
 
 // ─── Sync coordinate form inputs from draft ───────────────────────────────────
 function syncCoordsToForm(){
-  if(state.vowelDraft===null)return;
-  const map={veH:'h',veB:'b',veF1:'f1',veF2:'f2',veH2:'h2',veB2:'b2'};
-  for(const[id,key]of Object.entries(map)){
-    const el=document.getElementById(id);
-    if(el) el.value=state.vowelDraft[key]??'';
-  }
+  if(!state.vowelDraft)return;
+  const v=state.vowelDraft, g=id=>document.getElementById(id);
+  if(g('veH'))  g('veH').value  = v.heightBackness?.[0]??'';
+  if(g('veB'))  g('veB').value  = v.heightBackness?.[1]??'';
+  if(g('veF1')) g('veF1').value = v.f1??'';
+  if(g('veF2')) g('veF2').value = v.f2??'';
+  if(g('veH2')) g('veH2').value = v.target?.heightBackness?.[0]??'';
+  if(g('veB2')) g('veB2').value = v.target?.heightBackness?.[1]??'';
 }
 
 // ─── Open vowel editor ────────────────────────────────────────────────────────
@@ -249,7 +251,7 @@ function openVowelEditor(idx){
   state.vowelIdx=idx;
   state.pickingMode=null;
   const existing=(idx>=0&&state.langDraft?.vowels)?state.langDraft.vowels[idx]:null;
-  state.vowelDraft=existing?clone(existing):{ipa:'',h:0.5,b:0.5,h2:null,b2:null,rounded:false,desc:'',type:'short',f1:null,f2:null,ipaAudio:'',wikiUrl:'',words:[]};
+  state.vowelDraft=existing?clone(existing):{symbols:[''],heightBackness:[0.5,0.5],rounded:false,desc:'',type:'short',f1:null,f2:null,audio:null,wikiUrl:'',target:null};
   const ve=document.getElementById('veInline');
   if(ve){ve.style.display='block';buildInlineForm();}
   const st=document.getElementById('soloToggle'); if(st) st.style.display='';

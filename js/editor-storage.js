@@ -80,7 +80,7 @@ async function writeIndex(handle,keys){
 function flushCurrentDraft(){
   if(!state.langDraft)return;
   // Flush open vowel editor into the lang draft
-  if(state.vowelIdx!==null&&state.vowelDraft&&state.vowelDraft.ipa){
+  if(state.vowelIdx!==null&&state.vowelDraft&&state.vowelDraft.symbols?.[0]){
     if(state.vowelIdx<0)(state.langDraft.vowels=state.langDraft.vowels||[]).push(state.vowelDraft);
     else state.langDraft.vowels[state.vowelIdx]=state.vowelDraft;
   }

@@ -4,434 +4,221 @@
   "color": "#93c5fd",
   "vowels": [
     {
-      "ipa": "i",
-      "h": 0.03,
-      "b": 0.02,
-      "rounded": false,
+      "symbols": ["i"],
+      "heightBackness": [0.03, 0.02],
       "type": "variable",
+      "rounded": false,
       "desc": "Close front unrounded",
       "f1": 343,
       "f2": 2322,
-      "ipaAudio": "lang/en/audio/ipa/green.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "gr<b>ee</b>n",
-          "audio": "lang/en/audio/ipa/green_word.mp3"
-        },
-        {
-          "text": "h<b>ee</b>d",
-          "audio": "lang/en/audio/h95/heed.wav"
-        },
-        {
-          "text": "f<b>ee</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-feet.ogg"
-        },
-        {
-          "text": "s<b>ee</b>n",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-seen.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɪ",
-      "h": 0.25,
-      "b": 0.2,
-      "rounded": false,
+      "symbols": ["ɪ"],
+      "heightBackness": [0.25, 0.2],
       "type": "variable",
+      "rounded": false,
       "desc": "Near-close near-front unrounded",
       "f1": 429,
       "f2": 2033,
-      "ipaAudio": "lang/en/audio/ipa/pink.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
-      "words": [
-        {
-          "text": "p<b>i</b>nk",
-          "audio": "lang/en/audio/ipa/pink_word.mp3"
-        },
-        {
-          "text": "h<b>i</b>d",
-          "audio": "lang/en/audio/h95/hid.wav"
-        },
-        {
-          "text": "k<b>i</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-kit.ogg"
-        },
-        {
-          "text": "b<b>i</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bit.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɛ",
-      "h": 0.6,
-      "b": 0.04,
-      "rounded": false,
+      "symbols": ["ɛ"],
+      "heightBackness": [0.6, 0.04],
       "type": "variable",
+      "rounded": false,
       "desc": "Open-mid front unrounded",
       "f1": 588,
       "f2": 1802,
-      "ipaAudio": "lang/en/audio/ipa/red.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "r<b>e</b>d",
-          "audio": "lang/en/audio/ipa/red_word.mp3"
-        },
-        {
-          "text": "h<b>ea</b>d",
-          "audio": "lang/en/audio/h95/head.wav"
-        },
-        {
-          "text": "dr<b>e</b>ss",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-dress.ogg"
-        },
-        {
-          "text": "b<b>e</b>d",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bed.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "æ",
-      "h": 0.833,
-      "b": 0.02,
-      "rounded": false,
+      "symbols": ["æ"],
+      "heightBackness": [0.833, 0.02],
       "type": "variable",
+      "rounded": false,
       "desc": "Near-open front unrounded",
       "f1": 591,
       "f2": 1930,
-      "ipaAudio": "lang/en/audio/ipa/sand.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "s<b>a</b>nd",
-          "audio": "lang/en/audio/ipa/sand_word.mp3"
-        },
-        {
-          "text": "h<b>a</b>d",
-          "audio": "lang/en/audio/h95/had.wav"
-        },
-        {
-          "text": "tr<b>a</b>p",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-trap.ogg"
-        },
-        {
-          "text": "c<b>a</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-cat.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɑ",
-      "h": 0.97,
-      "b": 0.9,
-      "rounded": false,
+      "symbols": ["ɑ"],
+      "heightBackness": [0.97, 0.9],
       "type": "variable",
+      "rounded": false,
       "desc": "Open back unrounded",
       "f1": 756,
       "f2": 1308,
-      "ipaAudio": "lang/en/audio/ipa/coffee.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
-      "words": [
-        {
-          "text": "c<b>o</b>ffee",
-          "audio": "lang/en/audio/ipa/coffee_word.mp3"
-        },
-        {
-          "text": "h<b>o</b>d",
-          "audio": "lang/en/audio/h95/hod.wav"
-        },
-        {
-          "text": "f<b>a</b>ther",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-father.ogg"
-        },
-        {
-          "text": "p<b>a</b>lm",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-palm.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɔ",
-      "h": 0.71,
-      "b": 0.96,
-      "rounded": true,
+      "symbols": ["ɔ"],
+      "heightBackness": [0.71, 0.96],
       "type": "variable",
+      "rounded": true,
       "desc": "Open-mid back rounded",
       "f1": 656,
       "f2": 1023,
-      "ipaAudio": "lang/en/audio/ipa/mauve.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
-      "words": [
-        {
-          "text": "m<b>au</b>ve",
-          "audio": "lang/en/audio/ipa/mauve_word.mp3"
-        },
-        {
-          "text": "h<b>awe</b>d",
-          "audio": "lang/en/audio/h95/hawed.wav"
-        },
-        {
-          "text": "th<b>ough</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-thought.ogg"
-        },
-        {
-          "text": "cl<b>aw</b>",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-claw.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ʊ",
-      "h": 0.25,
-      "b": 0.77,
-      "rounded": true,
+      "symbols": ["ʊ"],
+      "heightBackness": [0.25, 0.77],
       "type": "variable",
+      "rounded": true,
       "desc": "Near-close near-back rounded",
       "f1": 469,
       "f2": 1122,
-      "ipaAudio": "lang/en/audio/ipa/wood.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
-      "words": [
-        {
-          "text": "w<b>oo</b>d",
-          "audio": "lang/en/audio/ipa/wood_word.mp3"
-        },
-        {
-          "text": "h<b>oo</b>d",
-          "audio": "lang/en/audio/h95/hood.wav"
-        },
-        {
-          "text": "f<b>oo</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-foot.ogg"
-        },
-        {
-          "text": "p<b>u</b>t",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-put.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "u",
-      "h": 0.04,
-      "b": 0.89,
-      "rounded": true,
+      "symbols": ["u"],
+      "heightBackness": [0.04, 0.89],
       "type": "variable",
+      "rounded": true,
       "desc": "Close back rounded",
       "f1": 380,
       "f2": 992,
-      "ipaAudio": "lang/en/audio/ipa/blue.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
-      "words": [
-        {
-          "text": "bl<b>ue</b>",
-          "audio": "lang/en/audio/ipa/blue_word.mp3"
-        },
-        {
-          "text": "wh<b>o'</b>d",
-          "audio": "lang/en/audio/h95/whod.wav"
-        },
-        {
-          "text": "g<b>oo</b>se",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-goose.ogg"
-        },
-        {
-          "text": "f<b>oo</b>d",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-food.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ʌ",
-      "h": 0.73,
-      "b": 0.62,
-      "rounded": false,
+      "symbols": ["ʌ"],
+      "heightBackness": [0.73, 0.62],
       "type": "variable",
+      "rounded": false,
       "desc": "Open-mid back unrounded",
       "f1": 621,
       "f2": 1181,
-      "ipaAudio": "lang/en/audio/sa/strut.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_unrounded_vowel",
-      "words": [
-        {
-          "text": "c<b>u</b>t",
-          "audio": "lang/en/audio/sa/cut_word.mp3"
-        },
-        {
-          "text": "h<b>u</b>d",
-          "audio": "lang/en/audio/h95/hud.wav"
-        },
-        {
-          "text": "str<b>u</b>t",
-          "audio": "https://dictionary.cambridge.org/media/english/us_pron/s/str/strut/strut.mp3"
-        },
-        {
-          "text": "b<b>u</b>s",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bus.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ə",
-      "h": 0.5,
-      "b": 0.5,
-      "rounded": false,
+      "symbols": ["ə"],
+      "heightBackness": [0.5, 0.5],
       "type": "short",
+      "rounded": false,
       "desc": "Mid central (schwa)",
       "f1": 0,
       "f2": 0,
-      "ipaAudio": "lang/en/audio/ipa/dust.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
-      "words": [
-        {
-          "text": "d<b>u</b>st",
-          "audio": "lang/en/audio/ipa/dust_word.mp3"
-        },
-        {
-          "text": "<b>a</b>bout",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-about.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "ɝ",
-      "h": 0.47,
-      "b": 0.5,
-      "rounded": false,
+      "symbols": ["ɝ", "ɛː"],
+      "heightBackness": [0.47, 0.5],
       "type": "long",
-      "desc": "Open-mid central unrounded ɛː",
+      "rounded": false,
+      "desc": "Open-mid central unrounded",
       "f1": 475,
       "f2": 1379,
-      "ipaAudio": "lang/en/audio/ipa/purple.mp3",
+      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_unrounded_vowel",
-      "words": [
-        {
-          "text": "p<b>ur</b>ple",
-          "audio": "lang/en/audio/ipa/purple_word.mp3"
-        },
-        {
-          "text": "h<b>ea</b>rd",
-          "audio": "lang/en/audio/h95/heard.wav"
-        },
-        {
-          "text": "n<b>ur</b>se",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-nurse.ogg"
-        },
-        {
-          "text": "b<b>ir</b>d",
-          "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bird.ogg"
-        }
-      ]
+      "target": null
     },
     {
-      "ipa": "eɪ",
-      "h": 0.4,
-      "b": 0.02,
-      "rounded": false,
+      "symbols": ["eɪ"],
+      "heightBackness": [0.4, 0.02],
       "type": "diphthong",
-      "desc": "Diphtong  e (⊙ rounded) →  ɪ (○ unrounded)",
+      "rounded": false,
+      "desc": "Diphthong e → ɪ",
       "f1": 476,
       "f2": 2089,
-      "ipaAudio": "lang/en/audio/ipa/ei.mp3",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
-      "words": [
-        {
-          "text": "j<b>a</b>de",
-          "audio": "lang/en/audio/ipa/jade_word.mp3"
-        },
-        {
-          "text": "h<b>aye</b>d",
-          "audio": "lang/en/audio/h95/hayed.wav"
-        }
-      ],
-      "h2": 0.25,
-      "b2": 0.2
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [0.25, 0.2],
+        "rounded": false,
+        "f1": 429,
+        "f2": 2033
+      }
     },
     {
-      "ipa": "oʊ",
-      "h": 0.44,
-      "b": 0.9,
-      "rounded": true,
+      "symbols": ["oʊ"],
+      "heightBackness": [0.44, 0.9],
       "type": "diphthong",
-      "desc": "Diphtong o (⊙ rounded) → ʊ (⊙ rounded)",
+      "rounded": true,
+      "desc": "Diphthong o → ʊ",
       "f1": 498,
       "f2": 910,
-      "ipaAudio": "lang/en/audio/ipa/gold.mp3",
-      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
-      "words": [
-        {
-          "text": "g<b>o</b>ld",
-          "audio": "lang/en/audio/ipa/gold_word.mp3"
-        },
-        {
-          "text": "h<b>oe</b>d",
-          "audio": "lang/en/audio/h95/hoed.wav"
-        }
-      ],
-      "h2": 0.25,
-      "b2": 0.77
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [0.25, 0.77],
+        "rounded": true,
+        "f1": 469,
+        "f2": 1122
+      }
     },
     {
-      "ipa": "aɪ",
-      "h": 0.97,
-      "b": 0.2,
-      "h2": 0.25,
-      "b2": 0.2,
-      "rounded": false,
-      "desc": "Diphtong a (○ unrounded) → ɪ (○ unrounded)",
+      "symbols": ["aɪ"],
+      "heightBackness": [0.97, 0.2],
       "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphthong a → ɪ",
       "f1": null,
       "f2": null,
-      "ipaAudio": "lang/en/audio/ipa/ai.mp3",
+      "audio": null,
       "wikiUrl": "",
-      "words": [
-        {
-          "text": "l<b>i</b>me",
-          "audio": "lang/en/audio/ipa/lime.mp3"
-        }
-      ]
+      "target": {
+        "heightBackness": [0.25, 0.2],
+        "rounded": false,
+        "f1": 429,
+        "f2": 2033
+      }
     },
     {
-      "ipa": "aʊ",
-      "h": 0.97,
-      "b": 0.2,
-      "h2": 0.25,
-      "b2": 0.77,
-      "rounded": false,
-      "desc": "Diphtong a (○ unrounded) → ʊ (⊙ rounded)",
+      "symbols": ["aʊ"],
+      "heightBackness": [0.97, 0.2],
       "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphthong a → ʊ",
       "f1": null,
       "f2": null,
-      "ipaAudio": "lang/en/audio/ipa/au.mp3",
+      "audio": null,
       "wikiUrl": "",
-      "words": [
-        {
-          "text": "br<b>ow</b>n",
-          "audio": "lang/en/audio/ipa/brown.mp3"
-        }
-      ]
+      "target": {
+        "heightBackness": [0.25, 0.77],
+        "rounded": true,
+        "f1": 469,
+        "f2": 1122
+      }
     },
     {
-      "ipa": "ɔɪ",
-      "h": 0.71,
-      "b": 0.96,
-      "h2": 0.25,
-      "b2": 0.2,
-      "rounded": false,
-      "desc": "Diphtong  ɔ (⊙ rounded) →  ɪ (○ unrounded)",
+      "symbols": ["ɔɪ"],
+      "heightBackness": [0.71, 0.96],
       "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphthong ɔ → ɪ",
       "f1": null,
       "f2": null,
-      "ipaAudio": "lang/en/audio/ipa/oi.mp3",
+      "audio": null,
       "wikiUrl": "",
-      "words": [
-        {
-          "text": "turq<b>uoi</b>se",
-          "audio": "lang/en/audio/ipa/turquoise.mp3"
-        }
-      ]
+      "target": {
+        "heightBackness": [0.25, 0.2],
+        "rounded": false,
+        "f1": 429,
+        "f2": 2033
+      }
     }
   ]
 }

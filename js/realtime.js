@@ -358,9 +358,9 @@ async function runVerificationSuite(opts={}) {
   console.log(`\n═══ Verification Suite: ${phase} ═══`);
   const rows=[];
   for (const c of CARDINALS) {
-    console.log(`  /${c.ipa}/  F1=${c.f1}  F2=${c.f2}`);
+    console.log(`  /${c.symbols?.[0]}/  F1=${c.f1}  F2=${c.f2}`);
     const r = await testSyntheticVowel(c.f1,c.f2,{play,quiet:true});
-    if (r) rows.push({ipa:c.ipa,...r});
+    if (r) rows.push({ipa:c.symbols?.[0],...r});
     if (play) await new Promise(res=>setTimeout(res,300));
     await new Promise(res=>setTimeout(res,80));
   }
@@ -426,7 +426,7 @@ async function verifyFromIpaAudio(langKey, opts={}) {
   const lang = LANGS[langKey];
   if (!lang) { console.error(`Language "${langKey}" not loaded`); return null; }
 
-  const vowels = (lang.vowels||[]).filter(v=>v.ipaAudio && v.f1 && v.f2);
+  const vowels = (lang.vowels||[]).filter(v=>v.audio && v.f1 && v.f2);
   if (!vowels.length) { console.error('No vowels with both ipaAudio and f1/f2 in', langKey); return null; }
 
   const phase = `Real-speech (${lang.label||langKey} IPA audio)`;
@@ -437,11 +437,11 @@ async function verifyFromIpaAudio(langKey, opts={}) {
 
   const rows = [];
   for (const v of vowels) {
-    if (!quiet) console.log(`  /${v.ipa}/ …`);
+    if (!quiet) console.log(`  /${v.symbols?.[0]}/ …`);
     try {
       // Fetch and decode the audio file
-      const resp = await fetch(v.ipaAudio);
-      if (!resp.ok) { console.warn(`  /${v.ipa}/ — fetch failed (${resp.status})`); continue; }
+      const resp = await fetch(v.audio);
+      if (!resp.ok) { console.warn(`  /${v.symbols?.[0]}/ — fetch failed (${resp.status})`); continue; }
       const arrayBuf = await resp.arrayBuffer();
       const ctx      = new (window.AudioContext||window.webkitAudioContext)();
       const audioBuf = await ctx.decodeAudioData(arrayBuf);
@@ -469,7 +469,7 @@ async function verifyFromIpaAudio(langKey, opts={}) {
 
       if (!sResp.ok) {
         const err = await sResp.json();
-        console.warn(`  /${v.ipa}/ — server error: ${err.error}`);
+        console.warn(`  /${v.symbols?.[0]}/ — server error: ${err.error}`);
         continue;
       }
       const sData   = await sResp.json();
@@ -481,16 +481,16 @@ async function verifyFromIpaAudio(langKey, opts={}) {
       const gF2  = pF2<8?'PASS':pF2<15?'WARN':'FAIL';
       const overall = gF1==='FAIL'||gF2==='FAIL'?'FAIL':gF1==='WARN'||gF2==='WARN'?'WARN':'PASS';
       rows.push({
-        ipa: v.ipa, desc: (v.desc||'').slice(0,28),
+        ipa: v.symbols?.[0], desc: (v.desc||'').slice(0,28),
         expected:{f1:v.f1,f2:v.f2}, measured:{f1:measured.f1,f2:measured.f2},
         error:{f1:eF1,f2:eF2}, errorPct:{f1:pF1.toFixed(1),f2:pF2.toFixed(1)},
         grade:{f1:gF1,f2:gF2,overall},
       });
       if (!quiet) {
         const s=g=>g==='PASS'?'✓':g==='WARN'?'~':'✗';
-        console.log(`  /${v.ipa}/ F1: ${s(gF1)} ${v.f1}→${measured.f1} (${eF1>=0?'+':''}${eF1}Hz ${pF1.toFixed(1)}%)  F2: ${s(gF2)} ${v.f2}→${measured.f2} (${eF2>=0?'+':''}${eF2}Hz ${pF2.toFixed(1)}%) [${overall}]`);
+        console.log(`  /${v.symbols?.[0]}/ F1: ${s(gF1)} ${v.f1}→${measured.f1} (${eF1>=0?'+':''}${eF1}Hz ${pF1.toFixed(1)}%)  F2: ${s(gF2)} ${v.f2}→${measured.f2} (${eF2>=0?'+':''}${eF2}Hz ${pF2.toFixed(1)}%) [${overall}]`);
       }
-    } catch(e) { console.warn(`  /${v.ipa}/ — error: ${e.message}`); }
+    } catch(e) { console.warn(`  /${v.symbols?.[0]}/ — error: ${e.message}`); }
     await new Promise(res=>setTimeout(res, 100));
   }
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IPA Vowel Chart</title>
-<link rel="stylesheet" href="css/index.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPA Vowel Chart</title>
+  <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
 
@@ -43,7 +43,7 @@
       </div>
       <div class="pp-status" id="ppStatus">Record a vowel</div>
       <canvas id="waveCanvas" height="36"
-        style="display:none;width:100%;border-radius:4px;margin-top:3px;cursor:col-resize;touch-action:none"></canvas>
+              style="display:none;width:100%;border-radius:4px;margin-top:3px;cursor:col-resize;touch-action:none"></canvas>
       <div id="waveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
     </div>
     <!-- ── Right: Reference vowel ── -->
@@ -56,7 +56,7 @@
       </div>
       <div class="pp-status" id="refStatus">Click a vowel on the chart</div>
       <canvas id="refWaveCanvas" height="36"
-        style="display:none;width:100%;border-radius:4px;margin-top:3px;cursor:col-resize;touch-action:none"></canvas>
+              style="display:none;width:100%;border-radius:4px;margin-top:3px;cursor:col-resize;touch-action:none"></canvas>
       <div id="refWaveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
     </div>
   </div>
@@ -68,42 +68,42 @@
 </div>
 
 <div id="app">
-<div class="page-layout">
-  <div class="chart-row">
-    <div class="chart-col">
-      <div class="view-tabs">
-        <button class="view-tab active" id="tabIpa"     type="button">IPA Chart</button>
-        <button class="view-tab"        id="tabFormant" type="button">Formant Plot</button>
+  <div class="page-layout">
+    <div class="chart-row">
+      <div class="chart-col">
+        <div class="view-tabs">
+          <button class="view-tab active" id="tabIpa"     type="button">IPA Chart</button>
+          <button class="view-tab"        id="tabFormant" type="button">Formant Plot</button>
+        </div>
+        <div class="chart-panel active" id="panelIpa">
+          <div class="chart-wrap">
+            <svg class="chart-svg" id="chartIpa" viewBox="0 0 1200 720"></svg>
+          </div>
+          <div class="legend">
+            <b>·</b> exact position &nbsp;|&nbsp; left = unrounded &nbsp;|&nbsp; right = rounded &nbsp;|&nbsp; shared dot → click to pick
+          </div>
+        </div>
+        <div class="chart-panel" id="panelFormant">
+          <div class="chart-wrap">
+            <svg class="chart-svg" id="chartFormant" viewBox="0 0 1200 720"></svg>
+          </div>
+          <div class="legend">
+            X: <b>F2 (Hz)</b> high→left (front) &nbsp;|&nbsp; Y: <b>F1 (Hz)</b> high→bottom (open)
+          </div>
+        </div>
       </div>
-      <div class="chart-panel active" id="panelIpa">
-        <div class="chart-wrap">
-          <svg class="chart-svg" id="chartIpa" viewBox="0 0 1200 720"></svg>
+      <aside class="sidebar">
+        <div class="sb-header">
+          <span class="sb-header-title">Filters</span>
+          <button class="sb-clear-btn" id="clearAllFilters">Clear all</button>
         </div>
-        <div class="legend">
-          <b>·</b> exact position &nbsp;|&nbsp; left = unrounded &nbsp;|&nbsp; right = rounded &nbsp;|&nbsp; shared dot → click to pick
-        </div>
-      </div>
-      <div class="chart-panel" id="panelFormant">
-        <div class="chart-wrap">
-          <svg class="chart-svg" id="chartFormant" viewBox="0 0 1200 720"></svg>
-        </div>
-        <div class="legend">
-          X: <b>F2 (Hz)</b> high→left (front) &nbsp;|&nbsp; Y: <b>F1 (Hz)</b> high→bottom (open)
-        </div>
-      </div>
+        <div class="sb-count" id="sbCount"></div>
+        <div class="sb-divider"></div>
+        <div class="sb-body" id="sidebarBody"></div>
+      </aside>
     </div>
-    <aside class="sidebar">
-      <div class="sb-header">
-        <span class="sb-header-title">Filters</span>
-        <button class="sb-clear-btn" id="clearAllFilters">Clear all</button>
-      </div>
-      <div class="sb-count" id="sbCount"></div>
-      <div class="sb-divider"></div>
-      <div class="sb-body" id="sidebarBody"></div>
-    </aside>
+    <div class="detail-section" id="detailSection"></div>
   </div>
-  <div class="detail-section" id="detailSection"></div>
-</div>
 </div>
 
 <div id="vowelPicker">
@@ -123,52 +123,52 @@
 <script src="js/practice.js"></script>
 <script src="js/realtime.js"></script>
 <script>
-// Wire Live button
-document.getElementById('ppLive')?.addEventListener('click', toggleLive);
+  // Wire Live button
+  document.getElementById('ppLive')?.addEventListener('click', toggleLive);
 </script>
 <script>
-function init() {
-  if (!Object.keys(LANGS).length) {
-    console.warn('No languages loaded — check lang/index.json and lang/*/lang.json');
-  }
-  document.getElementById('loading').style.display = 'none';
-  buildSidebar();
-  renderAll();
-}
-
-// ─── Reload button ────────────────────────────────────────────────────────────
-document.getElementById('reloadBtn').addEventListener('click', async () => {
-  const btn  = document.getElementById('reloadBtn');
-  const icon = btn.querySelector('.reload-icon');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-
-  // Clear existing language data
-  for (const key of Object.keys(LANGS)) delete LANGS[key];
-
-  try {
-    // Add cache-busting param so browsers re-fetch even if cached
-    const ts  = Date.now();
-    const idx = await fetch(`lang/index.json?t=${ts}`).then(r => r.json());
-    const names = (idx.languages || []).filter(n => !n.startsWith('_'));
-
-    await Promise.all(
-      names.map(name =>
-        fetch(`lang/${name}/lang.json?t=${ts}`)
-          .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-          .then(data => { if (data && data.key) LANGS[data.key] = data; })
-          .catch(e => console.warn(`Skipped lang/${name}:`, e.message))
-      )
-    );
-  } catch (e) {
-    console.error('Reload failed:', e);
+  function init() {
+    if (!Object.keys(LANGS).length) {
+      console.warn('No languages loaded — check lang/index.json and lang/*/lang.json');
+    }
+    document.getElementById('loading').style.display = 'none';
+    buildSidebar();
+    renderAll();
   }
 
-  btn.classList.remove('spinning');
-  btn.disabled = false;
-  buildSidebar();
-  renderAll();
-});
+  // ─── Reload button ────────────────────────────────────────────────────────────
+  document.getElementById('reloadBtn').addEventListener('click', async () => {
+    const btn  = document.getElementById('reloadBtn');
+    const icon = btn.querySelector('.reload-icon');
+    btn.classList.add('spinning');
+    btn.disabled = true;
+
+    // Clear existing language data
+    for (const key of Object.keys(LANGS)) delete LANGS[key];
+
+    try {
+      // Add cache-busting param so browsers re-fetch even if cached
+      const ts  = Date.now();
+      const idx = await fetch(`lang/index.json?t=${ts}`).then(r => r.json());
+      const names = (idx.languages || []).filter(n => !n.startsWith('_'));
+
+      await Promise.all(
+              names.map(name =>
+                      fetch(`lang/${name}/lang.json?t=${ts}`)
+                              .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+                              .then(data => { if (data && data.key) LANGS[data.key] = data; })
+                              .catch(e => console.warn(`Skipped lang/${name}:`, e.message))
+              )
+      );
+    } catch (e) {
+      console.error('Reload failed:', e);
+    }
+
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+    buildSidebar();
+    renderAll();
+  });
 </script>
 
 </body>

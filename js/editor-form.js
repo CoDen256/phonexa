@@ -10,7 +10,7 @@ function buildInlineForm(){
   // Header
   const hdr=document.createElement('div');
   hdr.className='ve-inline-header';
-  hdr.innerHTML=`<span class="ve-inline-title" id="veTitle">${state.vowelIdx<0?'New Vowel':'Edit: '+v.ipa}</span>`;
+  hdr.innerHTML=`<span class="ve-inline-title" id="veTitle">${state.vowelIdx<0?'New Vowel':'Edit: '+(v.symbols?.[0]||'')}</span>`;
   const cancelBtn=document.createElement('button'); cancelBtn.className='btn btn-secondary btn-sm'; cancelBtn.textContent='Cancel'; cancelBtn.type='button';
   const applyBtn=document.createElement('button'); applyBtn.className='btn btn-primary btn-sm'; applyBtn.textContent='Apply'; applyBtn.type='button';
   hdr.appendChild(cancelBtn); hdr.appendChild(applyBtn);
@@ -21,7 +21,8 @@ function buildInlineForm(){
   // IPA picker
   const ipaSection=document.createElement('div'); ipaSection.className='ipa-section';
   const ipaLeft=document.createElement('div'); ipaLeft.className='ipa-left';
-  ipaLeft.innerHTML=`<div class="ipa-preview" id="ipaPreview" style="color:${c}">${v.ipa||'?'}</div><div class="ipa-field-wrap"><label>Symbol</label><input class="ipa-text" type="text" id="ipaInput" value="${v.ipa||''}"></div>`;
+  const _sym=v.symbols?.[0]||'';
+  ipaLeft.innerHTML=`<div class="ipa-preview" id="ipaPreview" style="color:${c}">${_sym||'?'}</div><div class="ipa-field-wrap"><label>Symbol</label><input class="ipa-text" type="text" id="ipaInput" value="${_sym}"></div>`;
   const ipaBox=document.createElement('div'); ipaBox.className='ipa-picker-box';
   ipaBox.innerHTML=`<div class="ipa-picker-title">Click to insert</div><div class="ipa-grid" id="ipaGrid"></div><div class="ipa-mods-row" id="ipaMods"></div>`;
   ipaSection.appendChild(ipaLeft); ipaSection.appendChild(ipaBox);
@@ -29,9 +30,9 @@ function buildInlineForm(){
 
   const ipaInput=sec.querySelector('#ipaInput');
   ipaInput.addEventListener('input',()=>{
-    v.ipa=ipaInput.value;
-    document.getElementById('ipaPreview').textContent=v.ipa||'?';
-    document.getElementById('veTitle').textContent=state.vowelIdx<0?'New Vowel':'Edit: '+v.ipa;
+    v.symbols=[ipaInput.value];
+    document.getElementById('ipaPreview').textContent=v.symbols[0]||'?';
+    document.getElementById('veTitle').textContent=state.vowelIdx<0?'New Vowel':'Edit: '+v.symbols[0];
     refreshCharts(); renderVowelCards();
   });
   buildIpaPicker(ipaBox.querySelector('#ipaGrid'),ipaBox.querySelector('#ipaMods'),ipaInput,v,c);
@@ -54,8 +55,8 @@ function buildInlineForm(){
   metaRow.querySelector('#fDesc').addEventListener('input',e=>{v.desc=e.target.value;renderVowelCards();});
   metaRow.querySelector('#fType').addEventListener('change',e=>{
     v.type=e.target.value;
-    if(v.type!=='diphthong'){delete v.h2;delete v.b2;}
-    else if(v.h2==null){v.h2=v.h;v.b2=v.b;}
+    if(v.type!=='diphthong'){v.target=null;}
+    else if(!v.target){v.target={heightBackness:[...(v.heightBackness||[0.5,0.5])],rounded:v.rounded,f1:null,f2:null};}
     state.clickTarget='start';
     buildInlineForm(); renderVowelCards(); refreshCharts();
   });
@@ -65,22 +66,22 @@ function buildInlineForm(){
   const diph=v.type==='diphthong';
   const coordsRow=document.createElement('div'); coordsRow.className='ve-coords';
   coordsRow.innerHTML=`
-    <div class="field"><label>h (0=Close · 1=Open)</label><input type="number" id="veH" min="0" max="1" step="0.001" value="${v.h??0.5}"></div>
-    <div class="field"><label>b (0=Front · 1=Back)</label><input type="number" id="veB" min="0" max="1" step="0.001" value="${v.b??0.5}"></div>
+    <div class="field"><label>Height (0=Close · 1=Open)</label><input type="number" id="veH" min="0" max="1" step="0.001" value="${v.heightBackness?.[0]??0.5}"></div>
+    <div class="field"><label>Backness (0=Front · 1=Back)</label><input type="number" id="veB" min="0" max="1" step="0.001" value="${v.heightBackness?.[1]??0.5}"></div>
     <button class="btn btn-secondary btn-sm" id="pickIpa" type="button" style="align-self:flex-end">📍 Pick on IPA chart</button>
-    ${diph?`<div class="field"><label>h Target</label><input type="number" id="veH2" min="0" max="1" step="0.001" value="${v.h2??v.h??0.5}"></div>
-    <div class="field"><label>b Target</label><input type="number" id="veB2" min="0" max="1" step="0.001" value="${v.b2??v.b??0.5}"></div>
-    <button class="btn btn-secondary btn-sm" id="pickIpaTarget" type="button" style="align-self:flex-end">📍 Pick target on IPA chart</button>`:''}
+    ${diph?`<div class="field"><label>Target height</label><input type="number" id="veH2" min="0" max="1" step="0.001" value="${v.target?.heightBackness?.[0]??v.heightBackness?.[0]??0.5}"></div>
+    <div class="field"><label>Target backness</label><input type="number" id="veB2" min="0" max="1" step="0.001" value="${v.target?.heightBackness?.[1]??v.heightBackness?.[1]??0.5}"></div>
+    <button class="btn btn-secondary btn-sm" id="pickIpaTarget" type="button" style="align-self:flex-end">📍 Pick target on IPA</button>`:''}
     <div class="field"><label>F1 (Hz)</label><input type="number" id="veF1" min="${F1MIN}" max="${F1MAX}" step="1" value="${v.f1||''}"></div>
     <div class="field"><label>F2 (Hz)</label><input type="number" id="veF2" min="${F2MIN}" max="${F2MAX}" step="1" value="${v.f2||''}"></div>
     <button class="btn btn-secondary btn-sm" id="pickFormant" type="button" style="align-self:flex-end">📍 Pick on formant</button>
   `;
   sec.appendChild(coordsRow);
-  coordsRow.querySelector('#veH').addEventListener('input',e=>{v.h=+e.target.value;refreshCharts();});
-  coordsRow.querySelector('#veB').addEventListener('input',e=>{v.b=+e.target.value;refreshCharts();});
+  coordsRow.querySelector('#veH').addEventListener('input',e=>{v.heightBackness=[+e.target.value,v.heightBackness?.[1]??0.5];refreshCharts();});
+  coordsRow.querySelector('#veB').addEventListener('input',e=>{v.heightBackness=[v.heightBackness?.[0]??0.5,+e.target.value];refreshCharts();});
   if(diph){
-    coordsRow.querySelector('#veH2').addEventListener('input',e=>{v.h2=+e.target.value;refreshCharts();});
-    coordsRow.querySelector('#veB2').addEventListener('input',e=>{v.b2=+e.target.value;refreshCharts();});
+    coordsRow.querySelector('#veH2').addEventListener('input',e=>{if(!v.target)v.target={heightBackness:[0.5,0.5],rounded:false,f1:null,f2:null};v.target.heightBackness=[+e.target.value,v.target.heightBackness?.[1]??0.5];refreshCharts();});
+    coordsRow.querySelector('#veB2').addEventListener('input',e=>{if(!v.target)v.target={heightBackness:[0.5,0.5],rounded:false,f1:null,f2:null};v.target.heightBackness=[v.target.heightBackness?.[0]??0.5,+e.target.value];refreshCharts();});
     coordsRow.querySelector('#pickIpaTarget').addEventListener('click',()=>{
       state.pickingMode='ipa-target';
       document.getElementById('tabIpa').click();
@@ -101,9 +102,9 @@ function buildInlineForm(){
   });
   // Audio + wiki
   const urlRow=document.createElement('div'); urlRow.className='ve-meta';
-  urlRow.innerHTML=`<div class="field"><label>IPA Audio URL</label><input type="url" id="fIpaAudio" value="${v.ipaAudio||''}" placeholder="https://..."></div><div class="field"><label>Wikipedia URL</label><input type="url" id="fWiki" value="${v.wikiUrl||''}" placeholder="https://en.wikipedia.org/..."></div>`;
+  urlRow.innerHTML=`<div class="field"><label>Audio URL</label><input type="url" id="fAudio" value="${v.audio||''}" placeholder="https://… or lang/…/audio/…"></div><div class="field"><label>Wikipedia URL</label><input type="url" id="fWiki" value="${v.wikiUrl||''}" placeholder="https://en.wikipedia.org/..."></div>`;
   sec.appendChild(urlRow);
-  urlRow.querySelector('#fIpaAudio').addEventListener('input',e=>v.ipaAudio=e.target.value);
+  urlRow.querySelector('#fAudio').addEventListener('input',e=>{v.audio=e.target.value||null;});
   urlRow.querySelector('#fWiki').addEventListener('input',e=>v.wikiUrl=e.target.value);
 
   // Words
@@ -120,12 +121,12 @@ function buildInlineForm(){
 
 function applyVowel(){
   if(!state.vowelDraft)return;
-  if(!state.vowelDraft.ipa?.trim()){toast('IPA symbol is required');return;}
+  if(!state.vowelDraft.symbols?.[0]?.trim()){toast('IPA symbol is required');return;}
   if(!state.langDraft.vowels)state.langDraft.vowels=[];
   if(state.vowelIdx<0)state.langDraft.vowels.push(state.vowelDraft);
   else state.langDraft.vowels[state.vowelIdx]=state.vowelDraft;
   markUnsaved();
-  const applied=state.vowelDraft.ipa;
+  const applied=state.vowelDraft.symbols[0];
   closeVowelEditor();
   updateSectionTitle();
   toast(`Vowel "${applied}" applied`);
@@ -169,9 +170,9 @@ function buildIpaPicker(grid,modsRow,inputEl,v,color){
         if(!ch){const sp=document.createElement('span');sp.className='ipa-ch';sp.style.cursor='default';cell.appendChild(sp);return;}
         const btn=document.createElement('span'); btn.className='ipa-ch'; btn.textContent=ch; btn.title=ch;
         btn.addEventListener('click',()=>{
-          inputEl.value+=ch; v.ipa=inputEl.value;
-          document.getElementById('ipaPreview').textContent=v.ipa||'?';
-          document.getElementById('veTitle').textContent=(state.vowelIdx<0?'New Vowel':'Edit: ')+v.ipa;
+          inputEl.value+=ch; v.symbols=[inputEl.value];
+          document.getElementById('ipaPreview').textContent=v.symbols[0]||'?';
+          document.getElementById('veTitle').textContent=(state.vowelIdx<0?'New Vowel':'Edit: ')+v.symbols[0];
           refreshCharts(); renderVowelCards();
         });
         cell.appendChild(btn);
@@ -186,8 +187,8 @@ function buildIpaPicker(grid,modsRow,inputEl,v,color){
     btn.addEventListener('click',()=>{
       const pos=inputEl.selectionStart??inputEl.value.length;
       inputEl.value=inputEl.value.slice(0,pos)+mod.ch+inputEl.value.slice(pos);
-      v.ipa=inputEl.value;
-      document.getElementById('ipaPreview').textContent=v.ipa||'?';
+      v.symbols=[inputEl.value];
+      document.getElementById('ipaPreview').textContent=v.symbols[0]||'?';
       refreshCharts(); renderVowelCards();
     });
     modsRow.appendChild(btn);

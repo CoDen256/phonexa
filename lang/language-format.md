@@ -1,6 +1,7 @@
 # Language Format
 
-Language data lives in `lang/{key}/lang.json`. The chart discovers languages via `lang/index.json`.
+Language data lives in `lang/{key}/lang.json`. Samples live in `lang/{key}/samples.json`.
+The chart discovers languages via `lang/index.json`.
 
 ---
 
@@ -23,7 +24,7 @@ Folder names starting with `_` are skipped (useful for `_template`, draft langua
 ```json
 {
   "key":    "en",
-  "label":  "English",
+  "label":  "English (GA)",
   "color":  "#60a5fa",
   "vowels": [ ]
 }
@@ -42,43 +43,33 @@ Folder names starting with `_` are skipped (useful for `_template`, draft langua
 
 ```json
 {
-  "ipa":      "iː",
-  "h":        0.03,
-  "b":        0.04,
-  "rounded":  false,
-  "type":     "long",
-  "desc":     "Close front unrounded (long)",
-  "f1":       270,
-  "f2":       2290,
-  "ipaAudio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Close_front_unrounded_vowel.ogg",
-  "wikiUrl":  "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
-  "words": [
-    { "text": "f<b>ee</b>t", "audio": "https://…/En-us-feet.ogg" },
-    { "text": "s<b>ee</b>n", "audio": null }
-  ]
+  "symbols":        ["iː", "i"],
+  "heightBackness": [0.03, 0.04],
+  "type":           "long",
+  "rounded":        false,
+  "desc":           "Close front unrounded (long)",
+  "f1":             270,
+  "f2":             2290,
+  "audio":          null,
+  "wikiUrl":        "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+  "target":         null
 }
 ```
 
-### Position fields
+### Fields
 
-| Field | Type   | Required | Description |
-|-------|--------|----------|-------------|
-| `h`   | float  | yes      | Height on IPA trapezoid. `0` = Close (top), `1` = Open (bottom) |
-| `b`   | float  | yes      | Backness on IPA trapezoid. `0` = Front (left), `1` = Back (right) |
-| `f1`  | number | no       | First formant in Hz. Required to appear on the formant plot |
-| `f2`  | number | no       | Second formant in Hz. Required to appear on the formant plot |
-
-### Descriptor fields
-
-| Field      | Type    | Required | Description |
-|------------|---------|----------|-------------|
-| `ipa`      | string  | yes      | IPA symbol(s) displayed on chart and in tooltips |
-| `rounded`  | boolean | yes      | Lip rounding. Determines label placement: rounded → right of dot, unrounded → left |
-| `type`     | string  | yes      | See **Vowel types** below |
-| `desc`     | string  | no       | Articulatory description shown in tooltip |
-| `ipaAudio` | string  | no       | URL to audio of the isolated vowel sound |
-| `wikiUrl`  | string  | no       | Wikipedia link (unused in UI currently, stored for reference) |
-| `words`    | array   | no       | Example words. `text` supports inline HTML (`<b>` for the vowel portion). `audio` can be `null` |
+| Field            | Type         | Required | Description |
+|------------------|--------------|----------|-------------|
+| `symbols`        | string[]     | yes      | IPA symbol(s). First element is the canonical symbol used as identifier and displayed on chart. Subsequent elements are alternative notations |
+| `heightBackness` | `[h, b]`     | yes      | Position on IPA trapezoid. `h`: `0` = Close (top), `1` = Open (bottom). `b`: `0` = Front (left), `1` = Back (right) |
+| `type`           | string       | yes      | See **Vowel types** below |
+| `rounded`        | boolean      | yes      | Lip rounding of this vowel. Determines label placement: rounded → right of dot, unrounded → left |
+| `desc`           | string       | no       | Articulatory description shown in tooltip |
+| `f1`             | number/null  | no       | Average first formant in Hz across all tokens. `null` if not measured yet |
+| `f2`             | number/null  | no       | Average second formant in Hz across all tokens. `null` if not measured yet |
+| `audio`          | string/null  | no       | URL or path to audio representing the average/canonical realisation — either synthesized from `f1`/`f2` or a curated human recording. If `null`, the UI synthesizes from `f1`/`f2` when the formant chart is open. Clicking the vowel plays the first token from `samples.json` instead |
+| `wikiUrl`        | string       | no       | Wikipedia link (stored for reference, unused in UI currently) |
+| `target`         | object/null  | yes      | `null` for monophthongs. For diphthongs, see **Diphthong target** below |
 
 ### Vowel types
 
@@ -95,47 +86,39 @@ The `type` field controls both rendering and filter behaviour. It is **always ex
 
 ## Vowel object — diphthong
 
-Diphthongs are monophthongs with two additional fields for the **target position** on the IPA trapezoid. The formant values (`f1`, `f2`) represent the source position only.
+A diphthong is a vowel with `"type": "diphthong"` and a `target` object describing the endpoint of the glide. The top-level `heightBackness`, `rounded`, `f1`, and `f2` fields describe the **source** (start) of the glide.
 
 ```json
 {
-  "ipa":  "eɪ",
-  "h":    0.30,
-  "b":    0.04,
-  "h2":   0.20,
-  "b2":   0.18,
-  "type": "diphthong",
-  "rounded": false,
-  "desc": "Close-mid front unrounded → near-close near-front (diphthong)",
-  "f1":   430,
-  "f2":   2090,
-  "ipaAudio": "https://…",
-  "words": [ { "text": "f<b>a</b>ce", "audio": "https://…" } ]
+  "symbols":        ["eɪ"],
+  "heightBackness": [0.40, 0.02],
+  "type":           "diphthong",
+  "rounded":        false,
+  "desc":           "Diphthong e → ɪ",
+  "f1":             476,
+  "f2":             2089,
+  "audio":          null,
+  "wikiUrl":        "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
+  "target": {
+    "heightBackness": [0.25, 0.20],
+    "rounded":        false,
+    "f1":             429,
+    "f2":             2033
+  }
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `h`, `b`   | Source position on the IPA trapezoid |
-| `h2`, `b2` | Target position. Both required for diphthong arrow to render |
+### Diphthong target fields
 
-On the **IPA chart**: rendered as a straight arrow from `(h,b)` to `(h2,b2)` with the IPA label placed beside the midpoint.  
-On the **formant plot**: rendered as a regular dot at `(f1, f2)` — only the source position is plotted.
+| Field                    | Type        | Description |
+|--------------------------|-------------|-------------|
+| `target.heightBackness`  | `[h, b]`    | Position of the glide endpoint on the IPA trapezoid |
+| `target.rounded`         | boolean     | Lip rounding of the target vowel (may differ from the source) |
+| `target.f1`              | number/null | Average F1 of the target vowel in Hz. `null` if not measured |
+| `target.f2`              | number/null | Average F2 of the target vowel in Hz. `null` if not measured |
 
----
-
-## Local audio files
-
-Audio URLs can point to local files instead of remote URLs. Paths are relative to `index.html`:
-
-```json
-"ipaAudio": "lang/en/audio/vowels/ii-long.ogg",
-"audio":    "lang/en/audio/words/feet.ogg"
-```
-
-Supported formats: `.ogg`, `.mp3`, `.wav` (browser-dependent; Ogg Vorbis works in all modern browsers).
-
-Files must be served over HTTP(S) — `file://` URLs block audio due to CORS restrictions. Use any static file server (e.g. `python3 -m http.server`).
+On the **IPA chart**: rendered as an arrow from `heightBackness` to `target.heightBackness` with the IPA label beside the midpoint.  
+On the **formant plot**: rendered as a dot at `(f1, f2)` — the source position only.
 
 ---
 
@@ -145,8 +128,92 @@ The cardinal language behaves like any other language but is treated as a refere
 - Always loaded, regardless of the language filter
 - Rendered in a muted style (lower opacity, smaller dots) beneath language vowels
 - Shown as small reference dots in the language editor charts
+- Has `audio` populated with canonical Wikipedia recordings; no `samples.json`
 
-The 23 standard cardinal vowels cover the full IPA vowel space and provide a stable reference frame for comparing languages.
+---
+
+## `lang/{key}/samples.json`
+
+A flat array of sample objects. Each sample is a word, phrase, or isolated vowel recording
+in which one or more vowel tokens are identified.
+
+The **first sample** whose token matches a vowel's `symbols[0]` is the representative
+isolated recording and is what plays when the user clicks that vowel on the chart.
+
+```json
+[
+  {
+    "text":     "feet",
+    "audio":    "lang/en/audio/words/feet.ogg",
+    "phonemic": "/fiːt/",
+    "tokens": [
+      {
+        "symbol":   "i",
+        "position": [1, 3],
+        "analysis": {
+          "slice":        [80, 320],
+          "f1":           265,
+          "f2":           2310,
+          "ceiling":      5500,
+          "preEmphasis":  50,
+          "maxFormants":  5,
+          "windowLength": 25
+        }
+      }
+    ]
+  }
+]
+```
+
+### Sample fields
+
+| Field      | Type        | Required | Description |
+|------------|-------------|----------|-------------|
+| `text`     | string      | yes      | Plain text of the sample (no HTML markup). For isolated vowel recordings this is the IPA symbol itself |
+| `audio`    | string/null | no       | URL or path to audio of this sample |
+| `phonemic` | string/null | no       | Phonemic transcription in `/.../` notation. Set for isolated vowel samples (`/i/`, `/uː/`); `null` for word samples that haven't been transcribed |
+| `tokens`   | array       | yes      | List of vowel tokens identified in this sample |
+
+### Token fields
+
+| Field      | Type           | Required | Description |
+|------------|----------------|----------|-------------|
+| `symbol`   | string         | yes      | IPA symbol of the vowel; must match `symbols[0]` of a vowel in `lang.json` |
+| `position` | `[start, end]` | yes      | Start (inclusive) and end (exclusive) character indices in `text` where this token appears. Used by the UI to highlight the vowel portion |
+| `analysis` | object/null    | no       | Acoustic analysis for this token. `null` if not yet measured |
+
+### Analysis fields
+
+| Field          | Type           | Description |
+|----------------|----------------|-------------|
+| `slice`        | `[start, end]` | Start and end of the token in milliseconds within the sample's `audio` |
+| `f1`           | number         | Measured first formant frequency (Hz) for this token |
+| `f2`           | number         | Measured second formant frequency (Hz) for this token |
+| `ceiling`      | number         | Max formant ceiling used in Praat analysis (Hz). Corresponds to `ConnConfig.max_f` |
+| `preEmphasis`  | number         | Pre-emphasis frequency used (Hz). Corresponds to `ConnConfig.pre_emphasis` |
+| `maxFormants`  | number         | Maximum number of formants requested from Praat. Corresponds to `ConnConfig.n_formants` |
+| `windowLength` | number         | Praat analysis window length (ms). Corresponds to `ConnConfig.window_ms` |
+
+---
+
+## Relationship between `f1`/`f2` in lang.json and analysis in samples.json
+
+- `lang.json` `f1`/`f2` — **average** formant values across all or representative tokens. Used for chart positioning and synthesis. Filled in manually or computed from token analyses.
+- `samples.json` token `analysis.f1`/`analysis.f2` — **measured** formant values for that specific token in that specific recording, with the exact analysis parameters recorded. Source of truth for individual realisations.
+
+---
+
+## Local audio files
+
+Audio URLs can point to local files instead of remote URLs. Paths are relative to `index.html`:
+
+```json
+"audio": "lang/en/audio/words/feet.ogg"
+```
+
+Supported formats: `.ogg`, `.mp3`, `.wav` (browser-dependent; Ogg Vorbis works in all modern browsers).
+
+Files must be served over HTTP(S) — `file://` URLs block audio due to CORS restrictions.
 
 ---
 
@@ -154,7 +221,6 @@ The 23 standard cardinal vowels cover the full IPA vowel space and provide a sta
 
 1. Create a folder: `lang/{key}/`
 2. Copy `lang/_template/lang.json` and fill in your vowels
-3. Add `"{key}"` to the `languages` array in `lang/index.json`
-4. Click **Reload languages** in the chart, or use the editor
-
-The editor can create and save all of this directly — connect a folder via **📁 Connect lang/ folder**, then use **+ New Language**.
+3. Optionally create `lang/{key}/samples.json` with token examples
+4. Add `"{key}"` to the `languages` array in `lang/index.json`
+5. Click **Reload languages** in the chart, or use the editor
