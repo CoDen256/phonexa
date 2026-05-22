@@ -11,6 +11,7 @@ A browser-only interactive IPA vowel chart with multi-language support, a langua
 - Support clicking vowels to play audio; diphthongs shown as animated arrows
 - Provide a language editor to create/edit language JSON files in-browser with file-system access
 - Allow recording your own voice, comparing it to reference vowels, and analysing F1/F2 formants via a local Python server
+- Stream microphone audio in real time to the server and receive per-frame formant estimates
 
 ---
 
@@ -125,6 +126,7 @@ Same as monophthong, plus `h2`/`b2` for the target position on the IPA trapezoid
 <script src="js/diphthong.js"></script>     <!-- depends on: $s $t playUrlAtRate LANGS -->
 <script src="js/charts.js"></script>        <!-- depends on: everything above -->
 <script src="js/practice.js"></script>      <!-- depends on: charts.js, LANGS, filters -->
+<script src="js/realtime.js"></script>      <!-- depends on: utils.js, practice.js -->
 <script>/* sidebar chips, renderDetail, init, reload button */</script>
 ```
 
@@ -187,10 +189,10 @@ The core rendering function called by both `renderIpa` and `renderFormant`.
 2. **Separate** diphthongs (IPA chart only, when `showArrows=true`) from monophthongs
 3. **Cluster** monophthongs: greedy proximity grouping, radius = `PROX=22px`. Any vowels whose SVG positions are within 22px share a cluster
 4. **Render clusters**:
-   - Each vowel in a cluster gets its own `r=3` dot at exact position
-   - Label goes left (unrounded) or right (rounded) of its dot
-   - Single-vowel cluster: clicking dot/label plays sound + fires `pulse()`
-   - Multi-vowel cluster: small dashed indicator ring; hovering shows `showClusterTip()`; clicking shows picker
+    - Each vowel in a cluster gets its own `r=3` dot at exact position
+    - Label goes left (unrounded) or right (rounded) of its dot
+    - Single-vowel cluster: clicking dot/label plays sound + fires `pulse()`
+    - Multi-vowel cluster: small dashed indicator ring; hovering shows `showClusterTip()`; clicking shows picker
 5. **Render diphthongs** (IPA chart): calls `renderDiph()` from `diphthong.js`
 
 Layers (SVG render order, back to front): `arrowL` → `langL` → `cardL` → `dotL`
@@ -340,54 +342,440 @@ Called from every vowel click handler in `buildVowels` (alongside `playUrl`). If
 4. Draws ref waveform, shows ref waveform canvas, enables Analyse button
 5. Displays JSON-specified F1/F2 if available
 
-### Server communication
+### Server communication — `analyzeWav(wavBlob, signal)`
 
-Both user and reference analysis send a WAV slice with `X-Window-Start:0, X-Window-End:1` — the slice IS the selected portion, so the server analyses the whole clip.
+Single helper used by both the user-recording and reference-vowel analyse buttons:
 
 ```js
-const sliceBlob = encodeWAV(samples.slice(s, e), sampleRate);
-fetch(SERVER + '/analyze', {
-  method: 'POST', body: sliceBlob,
-  headers: { 'Content-Type': 'audio/wav', 'X-Window-Start': '0', 'X-Window-End': '1' }
-});
+async function analyzeWav(wavBlob, signal) {
+  const form = new FormData();
+  form.append('file', wavBlob, 'audio.wav');
+  form.append('config', JSON.stringify({ single_segment: true }));
+  const resp  = await fetch(SERVER + '/frames', { method: 'POST', body: form, signal });
+  const data  = await resp.json();
+  const frame = data.frames?.[0];
+  if (!frame?.voiced) throw new Error('No voiced speech detected');
+  return frame;   // caller reads frame.f1, frame.f2
+}
 ```
+
+The client pre-slices the waveform to the selected window before calling `analyzeWav`, so `single_segment: true` instructs the server to treat the whole uploaded clip as one analysis segment (no slice fractions needed).
 
 ### `encodeWAV(samples, sampleRate)`
 
-Pure JS WAV encoder. Writes a 44-byte RIFF/WAVE/fmt/data header then 16-bit signed PCM samples. Always mono. Output: `Blob` with `type:'audio/wav'`.
+Pure JS WAV encoder. Writes a 44-byte RIFF/WAVE/fmt/data header then 16-bit signed PCM samples. Always mono. Output: `Blob` with `type:'audio/wav'`. Lives in `js/utils.js` and is shared with `realtime.js`.
+
+---
+
+## js/realtime.js — Real-time Streaming
+
+### Constants
+
+```js
+const HTTP_URL   = 'http://localhost:5050';
+const STREAM_URL = 'ws://localhost:5051';
+```
+
+### WebSocket streaming — `_openStream()` / `analyzeSynthBuffer()`
+
+`_openStream()` opens a persistent WebSocket to `:5051`. On connection it sends `{type:'init', sample_rate}` and then binary int16 PCM chunks at 128 samples per message.
+
+`analyzeSynthBuffer({buffer, sampleRate})` — encodes a synthesised `AudioBuffer` as WAV and POSTs it to `/frames` with `single_segment: true` and `slice_start: 0.1, slice_end: 0.9` (trim 10% from each end):
+
+```js
+const form = new FormData();
+form.append('file', wav, 'audio.wav');
+form.append('config', JSON.stringify({
+  single_segment: true, slice_start: 0.1, slice_end: 0.9
+}));
+const resp  = await fetch(`${HTTP_URL}/frames`, { method: 'POST', body: form });
+const frame = (await resp.json()).frames?.[0];
+```
+
+### `verifyFromIpaAudio(audio)`
+
+Fetches a language's IPA audio file, decodes it, and posts to `/frames` with `slice_start: 0.15, slice_end: 0.85` to compare the measured F1/F2 against the JSON-declared values. Uses `FormData` multipart:
+
+```js
+const form = new FormData();
+form.append('file', wav, 'audio.wav');
+form.append('config', JSON.stringify({
+  single_segment: true, slice_start: 0.15, slice_end: 0.85
+}));
+const sData   = await fetch(`${HTTP_URL}/frames`, { method: 'POST', body: form }).then(r => r.json());
+const measured = sData.frames?.[0] ?? {};
+```
+
+### `debugVowel(url)`
+
+Posts audio to `/debug` and logs the raw three-config Praat output to the console:
+
+```js
+const form = new FormData();
+form.append('file', wav, 'audio.wav');
+form.append('config', JSON.stringify({ slice_start: 0.15, slice_end: 0.85 }));
+const r = await fetch(`${HTTP_URL}/debug`, { method: 'POST', body: form });
+```
 
 ---
 
 ## analyze_server.py — Local Formant Analysis Server
 
-Flask server on `http://localhost:5050`. Must be started manually by the user.
-
-### Endpoints
-
-**`GET /ping`** — returns `{"ok": true}`. Used by the browser to check if the server is running before showing "✓ Server connected".
-
-**`POST /analyze`**  
-- Body: raw WAV bytes (`Content-Type: audio/wav`)
-- Headers: `X-Window-Start` (float, fraction 0–1), `X-Window-End` (float, fraction 0–1)
-- Writes body to a temp file, loads with `parselmouth.Sound`
-- Runs "To Formant (burg)" with ceiling 5500 Hz (female default)
-- Calls "Get mean" on formants 1 and 2 over the specified window
-- Checks for NaN (no formant detected) → returns 400
-- Returns: `{"f1": 320.1, "f2": 2180.4, "duration_ms": 450.0, "window_ms": [148.5, 301.5]}`
-
-### Error conditions → 400
-
-- No audio data in body
-- Audio too short (< 50ms)
-- Window start ≥ window end after clamping
-- Praat returns NaN (no formants detected — try a different window)
-
-### Setup
+Flask HTTP server on `:5050` and a `websockets` server on `:5051`. Start with:
 
 ```bash
-pip install flask flask-cors parselmouth
+pip install flask flask-cors parselmouth numpy websockets
 python analyze_server.py
 ```
+
+Both servers share the same analysis pipeline (`analyse_segment_to_frame`). The HTTP server handles file-based one-shot or sliding-window requests; the WebSocket server handles continuous microphone streaming.
+
+### Key constants
+
+```python
+SEGMENT_SAMPLES = 4096   # ring buffer / default window — ~93 ms at 44 100 Hz
+SEGMENT_STEP_MS = 10     # ms between analyses in the stream
+F1_VALID_RANGE  = (80,  1200)
+F2_VALID_RANGE  = (400, 3200)
+```
+
+---
+
+### `ConnConfig` — All tunable analysis parameters
+
+```python
+@dataclass
+class ConnConfig:
+    # SCAN (primary — wide ceiling, many poles)
+    max_f:        float = 5000    # Praat maximum_formant
+    n_formants:   int   = 5       # Praat max_number_of_formants
+    window_ms:    float = 25      # Praat window_length
+    pre_emphasis: float = 50      # Praat pre_emphasis_from
+
+    # BACK (back-vowel disambiguation — narrow ceiling, 2 poles)
+    back_ceiling:       float = 1800   # Praat maximum_formant for BACK pass
+    back_ceiling_ratio: float = 0.95   # BACK wins only if F2_back < ceiling × ratio
+    back_front_ratio:   float = 0.75   # BACK wins only if F2_back < F2_scan × ratio
+    back_hard_max:      float = 850    # absolute cap — blocks BACK for /e/ spurious poles
+    back_max_bw:        float = 300    # max bandwidth for BACK F2 — rejects ghost poles
+
+    # Energy gate
+    rms_floor: float = 0.005   # skip Praat below this RMS; 0 = disabled
+
+    # Sliding median (stream only)
+    median_n: int = 5
+
+    # Segment layout (HTTP /frames only)
+    single_segment:  bool = True    # True  = whole slice is one segment → one frame
+    segment_samples: int  = 4096    # window size in samples (when single_segment=False)
+    segment_step_ms: int  = 10      # step between windows in ms (when single_segment=False)
+```
+
+`update_from_dict(d)` applies a dict of overrides, coercing each value to the field's declared type. Booleans use `bool(value)` to avoid `bool('false') == True`. Sent live by the stream client as `{type:'config', …}` messages.
+
+---
+
+### `SegmentInfo` — Positional DTO
+
+Passed through the full analysis pipeline instead of six positional arguments:
+
+```python
+@dataclass
+class SegmentInfo:
+    at_ms:       int    # end position in ms from slice/stream start
+    at:          int    # end position in samples
+    index:       int    # sequential index within the slice/stream
+    samples:     int    # number of samples in this segment
+    duration_ms: float  # = samples / sample_rate × 1000
+    step_ms:     int    # step between consecutive segments in ms
+```
+
+---
+
+### HTTP endpoints (`Flask`, `:5050`)
+
+---
+
+#### `GET /ping`
+
+Returns `{"ok": true}`. Used by the browser to check server connectivity before showing "✓ Server connected".
+
+---
+
+#### `POST /frames`
+
+The primary analysis endpoint. Accepts a multipart form body:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `file` | file upload | Audio data — any format parselmouth supports (WAV, MP3, FLAC, OGG) **or** raw int16 PCM (detected by magic bytes; anything not starting with a known audio container header is treated as PCM) |
+| `config` | JSON string | All `ConnConfig` fields plus `sample_rate` (int, default 44100, used only for raw PCM) |
+| `slice_start` | float form field | Start fraction of the audio to analyse (default `0.0`) |
+| `slice_end` | float form field | End fraction (default `1.0`) |
+
+**Segment mode** (controlled by `single_segment` in `config`):
+
+| `single_segment` | Behaviour |
+|-----------------|-----------|
+| `true` (default) | The entire slice is one segment → exactly one frame returned. Equivalent to the former `/analyze` endpoint. Use when the client has already trimmed the audio to the desired window. |
+| `false` | Sliding window: `segment_samples`-wide window steps by `segment_step_ms` across the slice → multiple frames returned. Use for timeline visualisation. |
+
+**Response:**
+
+```json
+{
+  "audio_duration_ms": 676.8,
+  "slice": {
+    "start": 0.15, "end": 0.85,
+    "start_ms": 101.5, "end_ms": 575.3,
+    "duration_ms": 473.8, "samples": 20892
+  },
+  "frames": [ /* array of frame objects */ ]
+}
+```
+
+**Frame object** (one per analysis window):
+
+```json
+{
+  "segment": {
+    "at_ms": 575,       "at": 20892,
+    "index": 0,         "samples": 20892,
+    "duration_ms": 473.8, "step_ms": 473,
+    "is_valid_duration": true
+  },
+  "voiced": true,
+  "rms": 0.055,
+  "is_above_rms": true,
+  "f1": 325,            "f2": 592,
+  "f1_median": 325,     "f2_median": 592,
+  "f1_raw": 325,        "f2_raw": 592,
+  "f1_back": 591.2,     "f2_back": 591.2,
+  "f1_scan": 325.4,     "f2_scan": 2744.1,
+  "used_back_config": true,
+  "phantom_fix_applied": false,
+  "is_valid_f1_range": true,
+  "is_valid_f2_range": true,
+  "median_n": 5
+}
+```
+
+For a `rms < rms_floor` (silent) frame, only `segment`, `voiced: false`, `rms`, and `is_above_rms: false` are present.
+
+---
+
+#### `POST /debug`
+
+Raw Praat diagnostic endpoint. Same multipart input as `/frames` (`file` + `config`). `slice_start` / `slice_end` are extra keys inside `config` (default 0.15 / 0.85). Does **not** use the shared analysis pipeline — all three Praat configurations are called explicitly so intermediate values are fully visible.
+
+**Response:**
+
+```json
+{
+  "sample_rate": 44100,
+  "duration_ms": 474,
+  "analysis_t_ms": 237,
+  "slice_start": 0.15,
+  "slice_end": 0.85,
+  "configs": {
+    "FRONT": { "ceiling": 5500, "n": 5, "formants": {"F1": 310.2, "BW1": 62.1, "F2": 2388.5, "BW2": 184.3, ...} },
+    "BACK":  { "ceiling": 1800, "n": 2, "formants": {"F1": 312.0, "BW1": 59.8, "F2": 591.4,  "BW2": 71.2} },
+    "SCAN":  { "ceiling": 5000, "n": 5, "formants": {"F1": 310.5, "BW1": 61.0, "F2": 2744.1, "BW2": 220.9, ...} }
+  }
+}
+```
+
+---
+
+### WebSocket stream server (`websockets`, `:5051`)
+
+Handles one persistent connection per client. The client sends 128-sample int16 binary chunks continuously; the server accumulates them in a 4096-sample ring buffer and emits a frame JSON message every `SEGMENT_STEP_MS` (10 ms) of new audio.
+
+**Control messages (client → server, JSON text):**
+
+| Message | Effect |
+|---------|--------|
+| `{"type":"init", "sample_rate": 44100}` | Full restart: new session, flush ring buffer and analysis state |
+| `{"type":"reset"}` | Flush analysis state (continuity + median), keep config and ring buffer |
+| `{"type":"config", "rms_floor": 0.005, …}` | Live-update any `ConnConfig` field; takes effect on the next analysis |
+
+**Frame output (server → client, JSON text):**
+
+Same structure as the `/frames` frame object, with the following differences:
+- `segment.step_ms` is always `SEGMENT_STEP_MS` (10)
+- `f1_median` / `f2_median` are populated using the server-side sliding median of `median_n` frames
+- The stream always uses `SEGMENT_SAMPLES = 4096` and cannot be resized after init
+
+**Frame states:**
+
+| State | Condition | Fields present |
+|-------|-----------|---------------|
+| A — silent | `rms < rms_floor` | `segment`, `voiced: false`, `rms`, `is_above_rms: false` |
+| B — unvoiced | Praat ran, no valid formants | All fields; `voiced: false`, formant fields `null` |
+| C — voiced | Valid F1/F2 found | All fields; `voiced: true`, `f1`/`f2`/`f1_median`/`f2_median` populated |
+
+---
+
+### Audio loading — `decode_audio(audio_data, sample_rate_hint)`
+
+Accepts either bytes or a Flask file upload object. Detection by magic bytes:
+
+| Magic bytes | Format | Decoding |
+|-------------|--------|----------|
+| `RIFF` | WAV | temp file → `parselmouth.Sound` |
+| `FORM` | AIFF | temp file → `parselmouth.Sound` |
+| `fLaC` | FLAC | temp file → `parselmouth.Sound` |
+| `OggS` | OGG | temp file → `parselmouth.Sound` |
+| `ID3` / `\xff\xfb` | MP3 | temp file → `parselmouth.Sound` |
+| anything else | raw int16 PCM | `np.frombuffer(..., dtype=np.int16) / 32768.0`; sample rate from `sample_rate_hint` |
+
+---
+
+### Formant analysis pipeline
+
+Every frame — whether from `/frames` or `/stream` — passes through `analyse_segment_to_frame(segment, sample_rate, seg, config, state)`.
+
+#### Step 1 — Energy gate
+
+```
+RMS(segment) < config.rms_floor  →  return silent frame A (skip Praat)
+```
+
+#### Step 2 — Dual-ceiling Praat LPC
+
+Two `to_formant_burg()` calls on the same audio segment:
+
+| Config | `max_number_of_formants` | `maximum_formant` | Purpose |
+|--------|--------------------------|-------------------|---------|
+| BACK   | 2 | `back_ceiling` (1800 Hz) | Back-vowel disambiguation: with only 2 poles and a narrow ceiling, Praat reliably finds F1 + a low F2 for /u/, /o/ etc. |
+| SCAN   | `n_formants` (5) | `max_f` (5000 Hz) | General-purpose: handles all vowels; correct for front vowels but confuses F3 for F2 in back vowels |
+
+#### Step 3 — `select_best_formants(f1_back, f2_back, f1_scan, f2_scan, config)`
+
+BACK wins (its F2 is used) when **all** of:
+1. Both BACK and SCAN returned results
+2. `f2_back < back_ceiling × back_ceiling_ratio` — F2 is well below the ceiling (not a ceiling artefact)
+3. `f2_back < f2_scan × back_front_ratio` — F2 is substantially lower than SCAN's (back vowel pattern)
+4. `f2_back < back_hard_max` — absolute cap; blocks spurious ~900 Hz poles for /e/
+
+If BACK doesn't win: SCAN is used. If SCAN also failed: BACK is used as a last resort. If both failed: `(None, None)` — frame B.
+
+#### Step 4 — `fix_phantom_resonance(f1, f2, sound, config, f2_back)`
+
+Corrects a phantom LPC pole that appears between F1 and the real F2 for close front vowels (/i/, /y/).
+
+**Suppress entirely** if `f2_back` is in 350–1000 Hz (BACK already found a credible F2; the selected value is likely correct).
+
+**Standard phantom condition** — fires when `f1 < 350 Hz AND f2/f1 < 1.7`:
+Re-scans with more poles and returns the first candidate `> f1 × 2.0` within `F2_VALID_RANGE`.
+
+**Back-vowel rescue** — fires when `f2_back is None AND f1 < 350 AND f2 > 2600`:
+The pattern of low F1, no BACK result, and very high SCAN F2 indicates SCAN labelled /u/'s F3 as F2. Retries with a narrow-ceiling LPC (`back_ceiling × 0.65`) to isolate F1 (~300 Hz) and F2 (~600 Hz).
+
+#### Step 5 — Validity checks
+
+```
+is_valid_f1_range = F1_VALID_RANGE[0] <= f1_raw <= F1_VALID_RANGE[1]
+is_valid_f2_range = F2_VALID_RANGE[0] <= f2_raw <= F2_VALID_RANGE[1]
+voiced            = both ranges valid
+```
+
+#### Step 6 — `AnalysisState.apply_voiced(f1_raw, f2_raw)` (continuity + median)
+
+Only for voiced frames:
+
+1. **Continuity** (`ConnState`): if `f1_new > f2_prev` or `f2_new < f1_prev`, the tracks have crossed — swap F1/F2 to maintain continuity
+2. **Sliding median** (`deque` of `median_n` values per formant): JS-style rounding (`math.floor(x + 0.5)`) to match the browser-side smoothing
+
+Returns `(f1, f2, f1_median, f2_median)` as rounded integers.
+
+---
+
+## tests/server_tests.py — Regression and Calibration Test Suite
+
+```bash
+# Run a test layer
+python tests/server_tests.py single_frame           # Layer 1 — /frames one-frame mode
+python tests/server_tests.py frames                 # Layer 2 — /frames sliding window
+python tests/server_tests.py debug                  # Layer 3 — /debug raw Praat
+python tests/server_tests.py stream                 # Layer 4 — /stream per-frame
+python tests/server_tests.py stream_median_stability # Layer 5 — stable vowel position
+
+# Update saved references
+python tests/server_tests.py stream --update
+
+# Compare current output against saved references
+python tests/server_tests.py compare
+
+# Calibration: F1/F2 accuracy + stream vs /frames consistency
+python tests/server_tests.py --calibrate              # all VOWEL_EXPECTED entries
+python tests/server_tests.py --calibrate u_practice   # one case
+```
+
+### Test layers
+
+| Layer | Command | What it tests |
+|-------|---------|--------------|
+| 1 | `single_frame` | `/frames` with `single_segment: true`; checks `f1`/`f2` within tolerance against saved reference |
+| 2 | `frames` | `/frames` with `single_segment: false` (sliding window); checks per-frame formant values |
+| 3 | `debug` | `/debug` raw Praat output; checks FRONT/BACK/SCAN pole values |
+| 4 | `stream` | WebSocket stream; checks per-frame `f1`, `f1_median`, `rms`, `voiced`, flags |
+| 5 | `stream_median_stability` | Steady-state vowel recording; checks that the median dot stays within ±50 Hz of expected position |
+
+### Calibration layer (`--calibrate`)
+
+Reads saved reference JSON files from `test/references/stream/` and `test/references/frames/` without running a live server. For each `case_id` in `VOWEL_EXPECTED`:
+
+- **Per-endpoint accuracy**: count voiced frames where F1 and F2 fall within `VOWEL_EXPECTED[id]` ranges; display as percentage with `✓` / `~` / `✗`
+- **F2 distribution**: bucket counts (`<600`, `600–900`, `900–1500`, `>1500`) plus mean and median
+- **Root-cause breakdown** of out-of-range frames:
+    - `back_none` — BACK config returned `None`, SCAN picked wrong value
+    - `phantom_bad` — phantom fix fired and returned wrong pole
+    - `criterion_miss` — BACK had a value but selection criterion didn't choose it
+- **Cross-endpoint consistency**: mean F1/F2 Δ between `/stream` and `/frames` references; pass if both Δ ≤ `CROSS_ENDPOINT_TOL_HZ` (50 Hz)
+
+```python
+VOWEL_EXPECTED = {
+    'u':          {'f1': (200, 500), 'f2': (400,  900)},
+    'u_practice': {'f1': (200, 500), 'f2': (400,  900)},
+    'i':          {'f1': (150, 400), 'f2': (1800, 2900)},
+    'a':          {'f1': (550, 950), 'f2': (1000, 2100)},
+    ...
+}
+```
+
+### Reference files
+
+```
+test/references/
+  single_frame/   {case_id}.json
+  frames/         {case_id}.json
+  debug/          {case_id}.json
+  stream/         {case_id}.json
+  stream_median_stability/  {case_id}.json
+
+test/resources/
+  live_speech.wav
+  u_practice.wav
+  lang/me/audio/i.wav
+  lang/me/audio/u.wav
+  ...
+```
+
+### Test config defaults
+
+```python
+DEFAULT_CONN_CONFIG = {
+    'max_f': 5000, 'n_formants': 5, 'window_ms': 25, 'pre_emphasis': 50,
+    'back_ceiling': 1200, 'back_ceiling_ratio': 0.95, 'back_front_ratio': 0.75,
+    'back_hard_max': 850,
+    'rms_floor': 0,      # gate disabled — every window analysed
+    'median_n': 5,
+    'single_segment': False, 'segment_samples': 4096, 'segment_step_ms': 10,
+}
+```
+
+`rms_floor: 0` ensures all audio windows are analysed regardless of recording volume, giving deterministic results for regression testing. `single_segment: False` is the test default so `frames` cases produce multiple frames; `single_frame` cases explicitly override to `single_segment: True`.
 
 ---
 
@@ -451,8 +839,8 @@ Sections:
 1. **Header** — title ("Edit: /eɪ/" or "New Vowel"), Apply + Cancel buttons
 2. **IPA preview + text input + picker grid** — clicking a glyph appends it to the IPA field; modifier buttons (ː ʲ etc.) insert at cursor position
 3. **Description + Type dropdown + Rounded checkbox**
-   - Type: `short | long | diphthong | variable`
-   - When `diphthong`, h2/b2 fields appear for target position
+    - Type: `short | long | diphthong | variable`
+    - When `diphthong`, h2/b2 fields appear for target position
 4. **Coordinate inputs** — h, b, F1, F2 (as number inputs; chart clicks also update these)
 5. **Audio URL + Wikipedia URL** — free-text URL inputs
 6. **Words list** — each word: text (with HTML bold markup), audio URL, delete button; Add word button
@@ -542,9 +930,9 @@ encodeWAV(samples, sampleRate)   // Float32Array → Blob (audio/wav), mono, 16-
 - **Languages**: `filters.languages.has(lk)`, or empty = all pass
 - **Roundness**: `filters.roundness.has('rounded'|'unrounded')`, or empty = all pass
 - **Length**: multi-chip logic (see table in Data Format section):
-  - `variable` vowels pass whenever Long or Short chip is active
-  - Long/Short/Variable chips each have specific show/hide rules
-  - Diphthong chip shows ONLY diphthongs; Monophthong chip shows everything except diphthongs
+    - `variable` vowels pass whenever Long or Short chip is active
+    - Long/Short/Variable chips each have specific show/hide rules
+    - Diphthong chip shows ONLY diphthongs; Monophthong chip shows everything except diphthongs
 - **IPA Base**: `filters.ipaBase.has(getBase(v.ipa))`. `getBase` strips modifiers (ː etc.) and returns the first character
 
 ---
@@ -620,4 +1008,12 @@ Reload button re-runs `loadLanguages()` with a fresh timestamp. The editor has i
 
 **Practice panel requires HTTPS** — `navigator.mediaDevices.getUserMedia` is only available in secure contexts (HTTPS or localhost). Plain HTTP deployments will get a "Mic error" on the record button.
 
-**analyze_server.py is local only** — the server runs on `localhost:5050` and is started manually. The HTML checks `/ping` on panel open. CORS is restricted to localhost origins.
+**Multipart form data for all server requests** — all HTTP analysis endpoints (`/frames`, `/debug`) accept `multipart/form-data` with a `file` field and a `config` JSON field. Audio format is detected from magic bytes (WAV/AIFF/FLAC/OGG/MP3 → parselmouth; anything else → raw int16 PCM). This unifies file and raw-PCM inputs and keeps all parameters in one place.
+
+**Single-segment mode is the HTTP default** — `ConnConfig.single_segment = True`. Sending a pre-trimmed WAV with no config override yields exactly one frame for the whole clip — the common case for practice panel and IPA audio verification. Sliding-window mode requires explicitly setting `single_segment: false`.
+
+**Dual-ceiling formant analysis** — every segment is analysed by two independent Praat LPC passes (SCAN: wide ceiling/many poles; BACK: narrow ceiling/2 poles). The selection criterion prefers BACK when its F2 is below the ceiling threshold and substantially lower than SCAN's, correcting F3-as-F2 confusion for back vowels. A post-selection phantom-resonance fix handles the complementary error for close front vowels.
+
+**`SegmentInfo` DTO** — positional metadata (`at_ms`, `at`, `index`, `samples`, `duration_ms`, `step_ms`) for one analysis window is bundled into a single dataclass and passed through the pipeline, avoiding long positional argument lists and making the frame output self-describing.
+
+**Shared pipeline for HTTP and WebSocket** — `analyse_segment_to_frame(segment, sample_rate, seg, config, state)` is the single entry point used by both `/frames` and the WebSocket stream handler. The only difference is how the segment is obtained (sliced from file vs accumulated in a ring buffer) and whether continuity/median state persists across calls.

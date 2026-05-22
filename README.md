@@ -24,9 +24,16 @@ A browser-only interactive IPA vowel chart with multi-language support, a langua
 - Record your own pronunciation via microphone
 - Waveform displayed with two draggable handles to select the analysis window
 - Compare: when the panel is open and a recording exists, clicking any vowel plays the reference then your recording
-- Send the selected audio slice to a local Python server (`analyze_server.py`) to extract F1/F2 formants
+- Send the selected audio slice to a local Python server (`analyze_server.py`) via multipart `POST /frames` to extract F1/F2 formants
 - "You" dot plotted on the formant chart at your analysed position
 - Load any reference vowel's audio, select a window, analyse it — "Ref⚡" dot plotted alongside the JSON-specified position
+
+### Real-time streaming (`js/realtime.js`)
+- Streams microphone audio to the server over WebSocket (`:5051`) in 128-sample int16 chunks
+- Server accumulates a 4096-sample ring buffer (~93 ms) and analyses every 10 ms of new audio
+- Returns per-frame diagnostics: F1/F2 with continuity correction and sliding median, RMS, voiced flag, intermediate Praat values
+- `verifyFromIpaAudio(audio)` — fetches a language's IPA audio file and measures F1/F2 via `/frames` to compare against the JSON-declared values
+- `debugVowel(url)` — posts audio to `/debug` and logs raw Praat output from all three analysis configurations
 
 ### Language editor (`editor.html`)
 - Select or create languages from a sidebar list
@@ -84,11 +91,14 @@ When the practice panel is open and a recording exists, `isCompareMode()` return
 | `renderIpa`, `renderFormant` | `js/charts.js` | Draw grids, call `buildVowels`, overlay analyzed + recorded dots |
 | `buildSidebar`, `renderDetail` | `js/charts.js` | Filter UI and per-language detail cards |
 | `renderDiph`, `pulseDiphthong` | `js/diphthong.js` | Diphthong arrow + click animation |
-| Practice panel | `js/practice.js` | Recording, waveform, analysis, comparison |
+| Practice panel | `js/practice.js` | Recording, waveform, single-frame analysis via `/frames`, comparison |
+| Real-time streaming | `js/realtime.js` | WebSocket stream to `:5051`, IPA verification, debug |
 | Editor chart helpers | `js/editor-charts.js` | Grid drawing, cardinal dots, diphthong arrows, vowel overlay for editor |
 | Editor vowel cards | `js/editor-vowels.js` | Vowel card list in the editor overview |
 | Editor core | `editor.html` inline | State, language CRUD, inline vowel form, IPA picker, file save |
-| Formant analysis | `analyze_server.py` | Flask; receives WAV slice, returns F1/F2 via parselmouth/Praat |
+| HTTP analysis server | `analyze_server.py` | Flask on `:5050`; `/frames`, `/debug` — WAV/PCM → F1/F2 via parselmouth |
+| WebSocket stream server | `analyze_server.py` | `websockets` on `:5051`; streaming int16 PCM → real-time formant frames |
+| Test suite | `tests/server_tests.py` | Regression, accuracy and cross-endpoint consistency tests |
 
 ---
 
@@ -108,22 +118,24 @@ When the practice panel is open and a recording exists, `isCompareMode()` return
 
 **Practice panel requires HTTPS.** `getUserMedia` is only available in secure contexts. Plain HTTP deployments must either use HTTPS or add the origin to Chrome's insecure-origins allowlist.
 
-**Analysis sends a pre-sliced WAV, not window headers.** Earlier designs sent the full recording plus `X-Window-Start/End` fraction headers. The current approach slices `Float32Array` in JS and sends only the selected portion with `X-Window-Start:0, X-Window-End:1`. This keeps the server logic simple and makes the selection the source of truth.
+**Analysis uses multipart form data, not raw body + headers.** Audio is sent to `/frames` as `multipart/form-data` with a `file` field (WAV or raw int16 PCM, detected by magic bytes) and a `config` JSON field. Slice fractions and all analysis parameters travel in the config object — no custom headers. The client pre-slices the waveform selection before upload, so `single_segment: true` is used (whole clip = one analysis).
 
+**Single server for both HTTP and WebSocket.** `analyze_server.py` runs a Flask HTTP server on `:5050` and an independent `websockets` server on `:5051`. Both share the same analysis pipeline (`analyse_segment_to_frame`).
 
+**Dual-ceiling formant selection.** Every segment is analysed twice by Praat: once with a wide 5000 Hz ceiling (SCAN) and once with a narrow 1800 Hz ceiling (BACK). BACK wins when its F2 is below the ceiling threshold and substantially lower than SCAN's — this corrects the common F3-as-F2 confusion for back vowels. A phantom-resonance fix handles the complementary error for close front vowels.
 
 # TODOS
 
-- changing slider automatically updates F1/F2
-- create separate f1/f2 for actual sounds and averages, display separately, filter option? and frequencies per word. 
-- add frequency checker when editing of the vowels
+- add: changing slider automatically updates F1/F2
+- add: create separate f1/f2 for actual sounds and averages, display separately, filter option? and frequencies per word.
+- add frequency checker when editing the vowels
 - bug: selecting left part of sound slider sometimes locks itc
-- monothong / diphtong in a separate filter, not in vowel length
-- other possible IPA symbols 
-- fix removal and enabling of the langs. e.g. when i want completely remove a lang i can't
-ideas:
-- real time formants update?
+- fix: monothong / diphtong in a separate filter, not in vowel length
+- add: other possible IPA symbols for each vowel
+- bug: removal and enabling of the langs. e.g. when i want completely remove a lang i can't
 
+
+  ideas:
 
 - each vowel comes with average, not tied to an audio, can be generated?
 - each vowel has uses/words/phrases/letters/examples, each has
@@ -136,7 +148,3 @@ ideas:
   - single mean f1/f2 of a slice
   - single mean f1/f2 of a custom slice
   - dynamic trail of speech / custom slice of speech
-
-- fix practice.js
-refactor http_analyze_debug, rename it to /debug. It accepts the same thing as /frames: raw audio or a file, also has slice_start and slice_end config parameter, supplied as extra config, not via headers, don't change anything else, it shouldn't use our shared fuctions, just let it be hardcoded as is with all the bandwidth and other stuff. Also update it in the server tests, rename to debug
-Rename also analyze test to "single-frame" everywhere, it will use the same named directory "single-frame"
