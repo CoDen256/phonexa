@@ -6,6 +6,33 @@
   <title>IPA Language Editor</title>
   <link rel="stylesheet" href="css/editor.css">
   <link rel="stylesheet" href="css/index.css">
+  <style>
+    /* ── Vowels/Samples tab switcher ───────────────────────────────────────────── */
+    .section-tabs-bar { display:flex; gap:2px; padding:6px 10px 0; border-bottom:1px solid var(--border); margin-bottom:0; }
+    .section-tab-btn  { padding:5px 12px; border-radius:6px 6px 0 0; font-size:.72rem; font-weight:700; cursor:pointer; border:1px solid var(--border); border-bottom:none; background:var(--surface); color:var(--muted); transition:background .15s,color .15s; }
+    .section-tab-btn.active { background:#253850; color:#7eb8f7; border-color:#7eb8f7; }
+
+    /* ── Sample cards ──────────────────────────────────────────────────────────── */
+    .sample-card { position:relative; background:var(--card); border:2px solid var(--border); border-radius:10px; padding:10px 36px 10px 12px; cursor:pointer; transition:border-color .12s; margin-bottom:6px; }
+    .sample-card:hover { border-color:#3a5878; }
+    .sample-card.active { }
+    .sc-text     { font-size:.88rem; font-family:Georgia,'Noto Serif',serif; color:#d8e8f4; }
+    .sc-phonemic { font-size:.7rem; color:var(--muted); font-style:italic; margin-top:2px; }
+    .sc-tokens   { display:flex; flex-wrap:wrap; gap:3px; margin-top:4px; }
+    .sc-token-chip { font-size:.65rem; padding:1px 6px; border-radius:10px; border:1px solid #2e4560; color:#7eb8f7; font-family:Georgia,serif; }
+
+    /* ── Token rows ────────────────────────────────────────────────────────────── */
+    .token-row       { background:#0d1a28; border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:6px; }
+    .token-row.active { }
+    .tok-sym-sel     { background:var(--input,#1a2e48); border:1px solid var(--border); border-radius:5px; color:#d8e8f4; padding:3px 6px; font-size:.82rem; font-family:Georgia,serif; min-width:50px; outline:none; cursor:pointer; }
+    .tok-analysis    { font-size:.65rem; font-family:monospace; padding:2px 6px; border-radius:4px; }
+    .tok-analysis.ok { color:#34d399; background:#34d39911; }
+    .tok-analysis.pending { color:#4a6888; }
+
+    /* ── Waveform ───────────────────────────────────────────────────────────────── */
+    .waveform-wrap { position:relative; width:100%; height:64px; background:#0d1a28; border:1px solid #1e3048; border-radius:6px; overflow:hidden; cursor:col-resize; user-select:none; }
+    #seWaveCanvas  { display:block; width:100%; height:100%; }
+  </style>
 </head>
 <body>
 
@@ -48,12 +75,27 @@
       <p class="chart-hint" id="chartHint">Select a language to start editing</p>
     </div>
 
-    <div class="vowel-section" id="vowelSection" style="display:none">
-      <div class="section-head">
-        <span class="section-title" id="sectionTitle">Vowels</span>
-        <button class="btn btn-secondary btn-sm" id="addVowelBtn" type="button">+ Add Vowel</button>
+    <div class="content-section" id="contentSection" style="display:none">
+      <div class="section-tabs-bar">
+        <button class="section-tab-btn active" id="tabVowelsList" type="button">Vowels</button>
+        <button class="section-tab-btn" id="tabSamplesList" type="button">Samples</button>
       </div>
-      <div class="vowel-cards" id="vowelCards"></div>
+      <!-- Vowels panel -->
+      <div id="vowelPanel">
+        <div class="section-head">
+          <span class="section-title" id="sectionTitle">Vowels</span>
+          <button class="btn btn-secondary btn-sm" id="addVowelBtn" type="button">+ Add Vowel</button>
+        </div>
+        <div class="vowel-cards" id="vowelCards"></div>
+      </div>
+      <!-- Samples panel -->
+      <div id="samplesPanel" style="display:none">
+        <div class="section-head">
+          <span class="section-title" id="samplesSectionTitle">Samples</span>
+          <button class="btn btn-secondary btn-sm" id="addSampleBtn" type="button">+ Add Sample</button>
+        </div>
+        <div class="sample-list" id="sampleList"></div>
+      </div>
     </div>
   </div>
 
@@ -71,6 +113,7 @@
       </div>
     </div>
     <div id="veInline" class="ve-inline" style="display:none"></div>
+    <div id="seInline" class="ve-inline" style="display:none"></div>
     <div class="editor-pane-hint" id="editorPaneHint">Select a vowel on the chart or card to edit</div>
   </div>
 
@@ -90,6 +133,7 @@
 <script src="js/editor-storage.js"></script>
 <script src="js/editor-vowels.js"></script>
 <script src="js/editor-lang.js"></script>
+<script src="js/editor-samples.js"></script>
 <script src="js/editor-form.js"></script>
 
 <script>
@@ -104,6 +148,12 @@
     langSources: {},
     langOrder: [],
     langDisabled: new Set(),
+    // Samples
+    langSamples:  {},     // key → samples array (all loaded langs)
+    samplesDraft: [],     // current lang samples (mutable draft)
+    sampleIdx:    null,   // null | -1 (new) | 0..n
+    sampleDraft:  null,   // edited sample copy
+    samplesTab:   false,  // true = samples panel active
   };
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }

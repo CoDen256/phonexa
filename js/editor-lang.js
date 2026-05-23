@@ -8,11 +8,16 @@ async function loadLanguages(){
     await Promise.all(names.map(name=>
         fetch(`lang/${name}/lang.json?t=${Date.now()}`)
             .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
-            .then(d=>{
+            .then(async d=>{
               if(d&&d.key&&!state.langSources[d.key]){
                 state.langs[d.key]=d;
                 state.langSources[d.key]='builtin';
                 if(!state.langOrder.includes(d.key)) state.langOrder.push(d.key);
+                // Try loading samples.json for this language
+                try{
+                  const sData=await fetch(`lang/${name}/samples.json?t=${Date.now()}`).then(r=>r.ok?r.json():[]);
+                  state.langSamples[d.key]=sData;
+                }catch(e){ state.langSamples[d.key]=[]; }
               }
             })
             .catch(e=>console.warn(`Skip ${name}:`,e.message))
@@ -49,31 +54,50 @@ function renderLangList(){
     btn.addEventListener('click',()=>selectLang(key));
 
     if(isDisabled){
+      // ↩ Re-enable button — always visible when disabled
       const enBtn=document.createElement('button');
-      enBtn.type='button'; enBtn.className='lang-tab-enable'; enBtn.textContent='↩'; enBtn.title='Re-enable';
+      enBtn.type='button'; enBtn.className='lang-tab-enable'; enBtn.textContent='↩'; enBtn.title='Re-enable (add back to index.json)';
       enBtn.addEventListener('click',e=>{e.stopPropagation();enableLang(key);});
-      wrap.appendChild(btn); wrap.appendChild(enBtn);
-      // Permanently delete from folder
-      if(src==='folder'&&state.dirHandle){
-        const delBtn=document.createElement('button');
-        delBtn.type='button'; delBtn.className='lang-tab-del'; delBtn.textContent='🗑'; delBtn.title='Delete from folder permanently';
-        delBtn.addEventListener('click',async e=>{
-          e.stopPropagation();
-          if(!confirm(`Permanently delete "${lang.label||key}" from folder?`))return;
-          await deleteLangFromFolder(key);
-          delete state.langs[key]; delete state.langSources[key];
-          const oi=state.langOrder.indexOf(key); if(oi!==-1)state.langOrder.splice(oi,1);
-          state.langDisabled.delete(key);
-          if(state.selKey===key){state.selKey=null;state.langDraft=null;state.vowelIdx=null;state.vowelDraft=null;}
-          renderLangList(); renderEditorAll(); markUnsaved();
-        });
-        wrap.appendChild(delBtn);
-      }
+      // 🗑 Delete button — always visible when disabled
+      const delBtn=document.createElement('button');
+      const canDeleteFromDisk=src==='folder'&&!!state.dirHandle;
+      delBtn.type='button'; delBtn.className='lang-tab-del'; delBtn.textContent='🗑';
+      delBtn.title=canDeleteFromDisk?'Delete from folder permanently':'Remove from editor (not on disk)';
+      delBtn.addEventListener('click',async e=>{
+        e.stopPropagation();
+        const label=lang.label||key;
+        const msg=canDeleteFromDisk
+            ?`Permanently delete "${label}" from folder? This cannot be undone.`
+            :`Remove "${label}" from editor? (No folder connected — nothing deleted from disk.)`;
+        if(!confirm(msg))return;
+        if(canDeleteFromDisk) await deleteLangFromFolder(key);
+        delete state.langs[key]; delete state.langSources[key];
+        const oi=state.langOrder.indexOf(key); if(oi!==-1)state.langOrder.splice(oi,1);
+        state.langDisabled.delete(key);
+        if(state.selKey===key){state.selKey=null;state.langDraft=null;state.vowelIdx=null;state.vowelDraft=null;}
+        renderLangList(); renderEditorAll(); markUnsaved();
+      });
+      wrap.appendChild(btn); wrap.appendChild(enBtn); wrap.appendChild(delBtn);
     }else{
       const disBtn=document.createElement('button');
       disBtn.type='button'; disBtn.className='lang-tab-del'; disBtn.textContent='×'; disBtn.title='Disable (exclude from index.json)';
       disBtn.addEventListener('click',e=>{e.stopPropagation();disableLang(key);});
-      wrap.appendChild(btn); wrap.appendChild(disBtn);
+      const delBtn2=document.createElement('button');
+      const canDel=src==='folder'&&!!state.dirHandle;
+      delBtn2.type='button'; delBtn2.className='lang-tab-del'; delBtn2.textContent='🗑';
+      delBtn2.title=canDel?'Delete from folder permanently':'Remove from editor';
+      delBtn2.addEventListener('click',async e=>{
+        e.stopPropagation();
+        const label=lang.label||key;
+        if(!confirm(canDel?`Permanently delete "${label}" from folder?`:`Remove "${label}" from editor?`))return;
+        if(canDel) await deleteLangFromFolder(key);
+        delete state.langs[key]; delete state.langSources[key];
+        const oi=state.langOrder.indexOf(key); if(oi!==-1)state.langOrder.splice(oi,1);
+        state.langDisabled.delete(key);
+        if(state.selKey===key){state.selKey=null;state.langDraft=null;state.vowelIdx=null;state.vowelDraft=null;}
+        renderLangList(); renderEditorAll(); markUnsaved();
+      });
+      wrap.appendChild(btn); wrap.appendChild(disBtn); wrap.appendChild(delBtn2);
     }
 
     wrap.addEventListener('dragstart',e=>{dragSrcKey=key;wrap.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
@@ -102,8 +126,10 @@ function enableLang(key){
 function selectLang(key){
   if(state.unsaved&&!confirm('Discard unsaved changes?'))return;
   state.selKey=key; state.langDraft=clone(state.langs[key]);
-  state.unsaved=false; state.vowelIdx=null; state.vowelDraft=null;
-  state.pickingMode=null;
+  state.unsaved=false;
+  state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
+  state.sampleIdx=null; state.sampleDraft=null; state.samplesTab=false;
+  state.samplesDraft=clone(state.langSamples[key]||[]);
   renderLangList();
   showLangPanel();
   updateSaveButtons();
@@ -127,9 +153,11 @@ function showLangPanel(){
 
   updateSaveButtons();
 
-  // Vowel section
-  const vs=document.getElementById('vowelSection');
-  if(vs) vs.style.display='block';
+  // Content section (vowels + samples tabs)
+  const cs=document.getElementById('contentSection');
+  if(cs) cs.style.display='block';
+  // Restore correct tab
+  if(state.samplesTab) switchToSamplesTab(); else switchToVowelsTab();
 
   refreshCharts();
   renderVowelCards();
@@ -183,9 +211,18 @@ function initEditorUI(){
   const saveAsBtn=document.getElementById('saveAsLangBtn');
   if(saveAsBtn) saveAsBtn.addEventListener('click',saveAsLang);
 
+  // Vowels / Samples tabs
+  document.getElementById('tabVowelsList')?.addEventListener('click',()=>switchToVowelsTab());
+  document.getElementById('tabSamplesList')?.addEventListener('click',()=>switchToSamplesTab());
+
   // Add vowel button
   const addBtn=document.getElementById('addVowelBtn');
   if(addBtn) addBtn.addEventListener('click',()=>openVowelEditor(-1));
+
+  // Add sample button
+  document.getElementById('addSampleBtn')?.addEventListener('click',()=>{
+    switchToSamplesTab(); openSampleEditor(-1);
+  });
 
   // Cardinal vowels toggle
   const cardinalToggle=document.getElementById('cardinalToggle');
@@ -284,5 +321,6 @@ function closeVowelEditor(){
   if(st){st.style.display='none';st.classList.remove('active');st.title='Show only current vowel';}
   const ve=document.getElementById('veInline');
   if(ve) ve.style.display='none';
+  if(typeof updatePaneHint==='function') updatePaneHint();
   renderVowelCards(); refreshCharts();
 }

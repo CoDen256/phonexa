@@ -42,9 +42,13 @@ async function loadFromFolder(h){
           state.langs[data.key]=data;
           state.langSources[data.key]='folder';
           if(!state.langOrder.includes(data.key))state.langOrder.push(data.key);
-          // Mark disabled if not listed in index.json
           if(!enabledKeys.includes(data.key))state.langDisabled.add(data.key);
           else state.langDisabled.delete(data.key);
+          // Load samples.json alongside lang.json
+          try{
+            const sf=await entry.getFileHandle('samples.json');
+            state.langSamples[data.key]=JSON.parse(await(await sf.getFile()).text());
+          }catch(e){ state.langSamples[data.key]=[]; }
           loaded++;
         }
       }catch(e){/* no lang.json in this subdir */}
@@ -79,10 +83,16 @@ function formatLangJson(data) {
 // ─── Write one language to a folder ──────────────────────────────────────────
 async function writeToFolder(handle,data){
   const key=data.key; if(!key)throw new Error('Language key required');
-  const json=formatLangJson(data);
   const subDir=await handle.getDirectoryHandle(key,{create:true});
-  const fh=await subDir.getFileHandle('lang.json',{create:true});
-  const w=await fh.createWritable(); await w.write(json); await w.close();
+  // Write lang.json
+  const lfh=await subDir.getFileHandle('lang.json',{create:true});
+  const lw=await lfh.createWritable(); await lw.write(formatLangJson(data)); await lw.close();
+  // Write samples.json if there are samples
+  const samples=state.langSamples[key]||[];
+  if(samples.length>0){
+    const sfh=await subDir.getFileHandle('samples.json',{create:true});
+    const sw=await sfh.createWritable(); await sw.write(formatLangJson(samples)); await sw.close();
+  }
   return key;
 }
 
@@ -101,12 +111,19 @@ async function writeIndex(handle,keys){
 // ─── Flush the current vowel/language draft into state.langs ─────────────────
 function flushCurrentDraft(){
   if(!state.langDraft)return;
-  // Flush open vowel editor into the lang draft
-  if(state.vowelIdx!==null&&state.vowelDraft&&state.vowelDraft.symbols?.[0]){
+  // Flush open vowel editor
+  if(state.vowelIdx!==null&&state.vowelDraft&&(state.vowelDraft.symbols?.[0]||state.vowelDraft.ipa)){
     if(state.vowelIdx<0)(state.langDraft.vowels=state.langDraft.vowels||[]).push(state.vowelDraft);
     else state.langDraft.vowels[state.vowelIdx]=state.vowelDraft;
   }
   state.langs[state.langDraft.key]=clone(state.langDraft);
+  // Flush sample draft
+  if(state.sampleIdx!==null&&state.sampleDraft){
+    if(!state.samplesDraft)state.samplesDraft=[];
+    if(state.sampleIdx<0)state.samplesDraft.push(state.sampleDraft);
+    else state.samplesDraft[state.sampleIdx]=state.sampleDraft;
+  }
+  if(state.samplesDraft) state.langSamples[state.langDraft.key]=clone(state.samplesDraft);
 }
 
 // ─── Save all languages to the connected folder ───────────────────────────────
