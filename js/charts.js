@@ -76,7 +76,7 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{playVowel(v,svgId);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
+      lg.addEventListener('click',()=>{playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
       dotL.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
     }
@@ -95,11 +95,11 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
       const {lk,lang,v,dx,dy}=members[0];
       dg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       dg.addEventListener('mousemove',moveTip); dg.addEventListener('mouseleave',hideTip);
-      dg.addEventListener('click',()=>{playVowel(v,svgId);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
+      dg.addEventListener('click',()=>{playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       let tm=false;
       dg.addEventListener('touchstart',e=>{tm=false;e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
       dg.addEventListener('touchmove', e=>{tm=true;moveTip(e.touches[0]);},{passive:false});
-      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playVowel(v,svgId);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
+      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
     }
     dotL.appendChild(dg);
   }
@@ -319,7 +319,7 @@ function renderDetail() {
       </div>`;
 
     card.querySelector('.dcard-play').addEventListener('click',()=>{
-      playVowel(v,'chartFormant');
+      playVowel(v,'chartFormant',lk);
       pulse('chartIpa',tPos.x,tPos.y,c);
       if(fPos) pulse('chartFormant',fPos.x,fPos.y,c);
     });

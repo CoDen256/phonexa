@@ -130,6 +130,7 @@ function selectLang(key){
   state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
   state.sampleIdx=null; state.sampleDraft=null; state.samplesTab=false;
   state.samplesDraft=clone(state.langSamples[key]||[]);
+  if(typeof setLangSamples==='function') setLangSamples(key, state.samplesDraft);
   renderLangList();
   showLangPanel();
   updateSaveButtons();
@@ -303,6 +304,7 @@ function syncCoordsToForm(){
 
 // ─── Open vowel editor ────────────────────────────────────────────────────────
 function openVowelEditor(idx){
+  if(typeof closeSampleEditor==='function') closeSampleEditor();
   state.vowelIdx=idx;
   state.pickingMode=null;
   const existing=(idx>=0&&state.langDraft?.vowels)?state.langDraft.vowels[idx]:null;

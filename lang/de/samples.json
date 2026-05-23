@@ -9,19 +9,21 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "iː"
   },
   {
     "text": "Liebe",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Liebe.ogg",
-    "phonemic": "/ˈliːbə/",
+    "phonemic": "/liːbə/",
     "tokens": [
       {
         "symbol": "iː",
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "wie",
@@ -33,19 +35,21 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mieter",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f8/De-Mieter.ogg/De-Mieter.ogg.mp3",
-    "phonemic": "/ˈmiːtər/",
+    "phonemic": "/miːtɐ/",
     "tokens": [
       {
         "symbol": "iː",
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "yː",
@@ -57,43 +61,47 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "yː"
   },
   {
     "text": "über",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-über.ogg",
-    "phonemic": "/ˈyːbər/",
+    "phonemic": "/yːbɐ/",
     "tokens": [
       {
         "symbol": "yː",
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "grün",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-grün.ogg",
-    "phonemic": "/ɡryːn/",
+    "phonemic": "/gʁyːn/",
     "tokens": [
       {
         "symbol": "yː",
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mühler",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/De-M%C3%BChle.ogg/De-M%C3%BChle.ogg.mp3",
-    "phonemic": null,
+    "phonemic": "/myːlɐ/",
     "tokens": [
       {
         "symbol": "yː",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɪ",
@@ -105,19 +113,21 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɪ"
   },
   {
     "text": "in",
     "audio": "lang/de/audio/in.mp3",
-    "phonemic": "/ɪn/",
+    "phonemic": "/in/",
     "tokens": [
       {
         "symbol": "ɪ",
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "mit",
@@ -129,31 +139,34 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "bitte",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bitte.ogg",
-    "phonemic": "/ˈbɪtə/",
+    "phonemic": "/bɪtə/",
     "tokens": [
       {
         "symbol": "ɪ",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mitte",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/De-Mitte.ogg/De-Mitte.ogg.mp3",
-    "phonemic": "/ˈmɪtə/",
+    "phonemic": "/mɪtə/",
     "tokens": [
       {
         "symbol": "ɪ",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ʏ",
@@ -165,7 +178,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ʏ"
   },
   {
     "text": "dünn",
@@ -177,19 +191,21 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Müller",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/De-M%C3%BCller.ogg/De-M%C3%BCller.ogg.mp3",
-    "phonemic": "/ˈmʏlər/",
+    "phonemic": "/mʏlɐ/",
     "tokens": [
       {
         "symbol": "ʏ",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "eː",
@@ -201,7 +217,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "eː"
   },
   {
     "text": "See",
@@ -213,19 +230,21 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "geben",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-geben.ogg",
-    "phonemic": "/ˈɡeːbən/",
+    "phonemic": "/geːbən/",
     "tokens": [
       {
         "symbol": "eː",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "øː",
@@ -237,7 +256,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "øː"
   },
   {
     "text": "schön",
@@ -249,31 +269,34 @@
         "position": [3, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hören",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-hören.ogg",
-    "phonemic": "/ˈhøːrən/",
+    "phonemic": "/høːʁən/",
     "tokens": [
       {
         "symbol": "øː",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Höhle",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/De-H%C3%B6hle.ogg/De-H%C3%B6hle.ogg.mp3",
-    "phonemic": "/ˈhøːlə/",
+    "phonemic": "/høːlə/",
     "tokens": [
       {
         "symbol": "øː",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɛ",
@@ -285,7 +308,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɛ"
   },
   {
     "text": "es",
@@ -297,7 +321,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Bett",
@@ -309,19 +334,21 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Stelle",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/De-Stelle.ogg/De-Stelle.ogg.mp3",
-    "phonemic": "/ˈʃtɛlə/",
+    "phonemic": "/ʃtɛlə/",
     "tokens": [
       {
         "symbol": "ɛ",
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɛː",
@@ -333,31 +360,34 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɛː"
   },
   {
     "text": "Käse",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/De-K%C3%A4se.ogg/De-K%C3%A4se.ogg.mp3",
-    "phonemic": "/ˈkɛːzə/",
+    "phonemic": "/kɛːzə/",
     "tokens": [
       {
         "symbol": "ɛː",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Hände",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hände.ogg",
-    "phonemic": "/ˈhɛːndə/",
+    "phonemic": "/hɛːndə/",
     "tokens": [
       {
         "symbol": "ɛː",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "œ",
@@ -369,43 +399,47 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "œ"
   },
   {
     "text": "öfter",
     "audio": "lang/de/audio/oefter.mp3",
-    "phonemic": "/ˈœftər/",
+    "phonemic": "/œftɐ/",
     "tokens": [
       {
         "symbol": "œ",
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "zwölf",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-zwölf.ogg",
-    "phonemic": "/tsvœlf/",
+    "phonemic": "/t͡svœlf/",
     "tokens": [
       {
         "symbol": "œ",
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Hölle",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hölle.ogg",
-    "phonemic": "/ˈhœlə/",
+    "phonemic": "/hœlə/",
     "tokens": [
       {
         "symbol": "œ",
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "a",
@@ -417,19 +451,21 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "a"
   },
   {
     "text": "ab",
     "audio": "lang/de/audio/ab.mp3",
-    "phonemic": "/ap/",
+    "phonemic": "/ab/",
     "tokens": [
       {
         "symbol": "a",
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mann",
@@ -441,7 +477,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "das",
@@ -453,7 +490,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Kamm",
@@ -465,7 +503,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "aː",
@@ -477,7 +516,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "aː"
   },
   {
     "text": "Bahn",
@@ -489,7 +529,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ja",
@@ -501,7 +542,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "kam",
@@ -513,7 +555,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "oː",
@@ -525,19 +568,21 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "oː"
   },
   {
     "text": "groß",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-groß.ogg",
-    "phonemic": "/ɡroːs/",
+    "phonemic": "/gʁoːs/",
     "tokens": [
       {
         "symbol": "oː",
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Sohn",
@@ -549,19 +594,21 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Ofen",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0f/DE-Ofen.ogg/DE-Ofen.ogg.mp3",
-    "phonemic": "/ˈoːfən/",
+    "phonemic": "/oːfən/",
     "tokens": [
       {
         "symbol": "oː",
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɔ",
@@ -573,31 +620,34 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɔ"
   },
   {
     "text": "ob",
     "audio": "lang/de/audio/ob.mp3",
-    "phonemic": "/ɔp/",
+    "phonemic": "/ɔb/",
     "tokens": [
       {
         "symbol": "ɔ",
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Kopf",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kopf.ogg",
-    "phonemic": "/kɔpf/",
+    "phonemic": "/kɔp͡f/",
     "tokens": [
       {
         "symbol": "ɔ",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Post",
@@ -609,19 +659,21 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "offen",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d7/De-offen.ogg/De-offen.ogg.mp3",
-    "phonemic": "/ˈɔfən/",
+    "phonemic": "/ɔfən/",
     "tokens": [
       {
         "symbol": "ɔ",
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "uː",
@@ -633,7 +685,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "uː"
   },
   {
     "text": "Buch",
@@ -645,19 +698,21 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Ruhe",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Ruhe.ogg",
-    "phonemic": "/ˈruːə/",
+    "phonemic": "/ʁuːə/",
     "tokens": [
       {
         "symbol": "uː",
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mut",
@@ -669,7 +724,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ʊ",
@@ -681,7 +737,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ʊ"
   },
   {
     "text": "um",
@@ -693,19 +750,21 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mutter",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mutter.ogg",
-    "phonemic": "/ˈmʊtər/",
+    "phonemic": "/mʊtɐ/",
     "tokens": [
       {
         "symbol": "ʊ",
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Hund",
@@ -717,7 +776,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ə",
@@ -729,43 +789,47 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ə"
   },
   {
     "text": "bitte",
     "audio": "lang/de/audio/bitte.mp3",
-    "phonemic": "/ˈbɪtə/",
+    "phonemic": "/bɪtə/",
     "tokens": [
       {
         "symbol": "ə",
         "position": [4, 5],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "bitte (2)",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f4/De-bitte-2.ogg/De-bitte-2.ogg.mp3",
-    "phonemic": "/ˈbɪtə/",
+    "phonemic": "/bɪtə/",
     "tokens": [
       {
         "symbol": "ə",
         "position": [4, 5],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Kette",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kette.ogg",
-    "phonemic": "/ˈkɛtə/",
+    "phonemic": "/kɛtə/",
     "tokens": [
       {
         "symbol": "ə",
         "position": [4, 5],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɐ",
@@ -777,7 +841,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɐ"
   },
   {
     "text": "er",
@@ -789,55 +854,60 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "wir",
     "audio": "lang/de/audio/wir.mp3",
-    "phonemic": "/viːɐ/",
+    "phonemic": "/viːɐ̯/",
     "tokens": [
       {
         "symbol": "ɐ",
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mieter",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f8/De-Mieter.ogg/De-Mieter.ogg.mp3",
-    "phonemic": "/ˈmiːtər/",
+    "phonemic": "/miːtɐ/",
     "tokens": [
       {
         "symbol": "ɐ",
         "position": [4, 6],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Mutter",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/De-Mutter.ogg/De-Mutter.ogg.mp3",
-    "phonemic": "/ˈmʊtər/",
+    "phonemic": "/mʊtɐ/",
     "tokens": [
       {
         "symbol": "ɐ",
         "position": [4, 6],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Oper",
     "audio": null,
-    "phonemic": "/ˈoːpɐ/",
+    "phonemic": "/oːpɐ/",
     "tokens": [
       {
         "symbol": "ɐ",
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "aɪ",
@@ -849,43 +919,47 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "aɪ"
   },
   {
     "text": "eins",
     "audio": "lang/de/audio/fit/ai/ein.mp3",
-    "phonemic": "/aɪns/",
+    "phonemic": "/aɪ̯ns/",
     "tokens": [
       {
         "symbol": "aɪ",
         "position": [0, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "arbeit",
     "audio": "lang/de/audio/fit/ai/arbeit.mp3",
-    "phonemic": null,
+    "phonemic": "/aɐ̯baɪ̯t/",
     "tokens": [
       {
         "symbol": "aɪ",
         "position": [3, 5],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "eingang",
     "audio": "lang/de/audio/fit/ai/eingang.mp3",
-    "phonemic": null,
+    "phonemic": "/aɪ̯ngaŋ/",
     "tokens": [
       {
         "symbol": "aɪ",
         "position": [0, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "aʊ",
@@ -897,55 +971,60 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "aʊ"
   },
   {
     "text": "bau",
     "audio": "lang/de/audio/fit/au/bau.mp3",
-    "phonemic": "/baʊ/",
+    "phonemic": "/baʊ̯/",
     "tokens": [
       {
         "symbol": "aʊ",
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "blau",
     "audio": "lang/de/audio/fit/au/blau.mp3",
-    "phonemic": "/blaʊ/",
+    "phonemic": "/blaʊ̯/",
     "tokens": [
       {
         "symbol": "aʊ",
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "grau",
     "audio": "lang/de/audio/fit/au/grau.mp3",
-    "phonemic": "/ɡraʊ/",
+    "phonemic": "/gʁaʊ̯/",
     "tokens": [
       {
         "symbol": "aʊ",
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "schau",
     "audio": "lang/de/audio/fit/au/schau.mp3",
-    "phonemic": "/ʃaʊ/",
+    "phonemic": "/ʃaʊ̯/",
     "tokens": [
       {
         "symbol": "aʊ",
         "position": [3, 5],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɔɪ",
@@ -957,31 +1036,34 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɔɪ"
   },
   {
     "text": "euro",
     "audio": "lang/de/audio/fit/oi/euro.mp3",
-    "phonemic": "/ˈɔɪro/",
+    "phonemic": "/ɔɪʁoː/",
     "tokens": [
       {
         "symbol": "ɔɪ",
         "position": [0, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "europa",
     "audio": "lang/de/audio/fit/oi/europa.mp3",
-    "phonemic": "/ɔɪˈroːpa/",
+    "phonemic": "/ɔɪʁoːpa/",
     "tokens": [
       {
         "symbol": "ɔɪ",
         "position": [0, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "neu",
@@ -993,30 +1075,33 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Geräusch",
     "audio": "lang/de/audio/fit/oi/geraeusch.mp3",
-    "phonemic": "/ɡəˈrɔɪʃ/",
+    "phonemic": "/gəʁɔɪʃ/",
     "tokens": [
       {
         "symbol": "ɔɪ",
         "position": [3, 5],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "Räuber",
     "audio": "lang/de/audio/fit/oi/raeuber.mp3",
-    "phonemic": "/ˈrɔɪbər/",
+    "phonemic": "/ʁɔɪbɐ/",
     "tokens": [
       {
         "symbol": "ɔɪ",
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   }
 ]

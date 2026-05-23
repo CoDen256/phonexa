@@ -31,52 +31,69 @@ function buildInlineForm() {
   applyBtn.addEventListener('click', applyVowel);
   sec.appendChild(hdr);
 
-  // ── IPA symbol section ─────────────────────────────────────────────────────
+  // ── IPA symbol section: big preview left-top, alt chips below ──────────────
   const ipaSection = document.createElement('div'); ipaSection.className = 'ipa-section';
   const ipaLeft    = document.createElement('div'); ipaLeft.className    = 'ipa-left';
-  ipaLeft.innerHTML = `
-    <div class="ipa-preview" id="ipaPreview" style="color:${c}">${sym || '?'}</div>
-    <div class="ipa-field-wrap">
-      <label>Symbol</label>
-      <input class="ipa-text" type="text" id="ipaInput" value="${sym}">
-    </div>`;
 
-  // Alternative notations
-  const altWrap = document.createElement('div'); altWrap.className = 'ipa-field-wrap'; altWrap.style.marginTop = '4px';
-  altWrap.innerHTML = `<label>Alt. notations <span style="font-weight:400;opacity:.5;font-size:.55rem">comma-separated</span></label>`;
-  const altIn = document.createElement('input'); altIn.className = 'ipa-text'; altIn.type = 'text'; altIn.id = 'ipaAltInput';
-  altIn.placeholder = 'e.g. iː, i̞'; altIn.value = (v.symbols?.slice(1) || []).join(', ');
-  altWrap.appendChild(altIn); ipaLeft.appendChild(altWrap);
+  // Big clickable preview — main symbol
+  const ipaPreview = document.createElement('div');
+  ipaPreview.className = 'ipa-preview'; ipaPreview.id = 'ipaPreview'; ipaPreview.style.color = c;
+  ipaPreview.style.cursor = 'pointer'; ipaPreview.title = 'Click to edit symbol';
+  ipaPreview.textContent = sym || '?';
+  const editHint = document.createElement('div');
+  editHint.style.cssText = 'font-size:.58rem;color:var(--muted);text-align:center;cursor:pointer;margin-top:1px';
+  editHint.textContent = '✎ click to edit';
+  ipaLeft.appendChild(ipaPreview);
+  ipaLeft.appendChild(editHint);
 
-  const ipaBox = document.createElement('div'); ipaBox.className = 'ipa-picker-box';
-  ipaBox.innerHTML = `<div class="ipa-picker-title">Click to insert</div><div class="ipa-grid" id="ipaGrid"></div><div class="ipa-mods-row" id="ipaMods"></div>`;
-  ipaSection.appendChild(ipaLeft); ipaSection.appendChild(ipaBox);
+  // Alt notations below the preview
+  const altLabel = document.createElement('div');
+  altLabel.style.cssText = 'font-size:.6rem;color:var(--muted);margin-top:6px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em';
+  altLabel.textContent = 'Alt. notations';
+  ipaLeft.appendChild(altLabel);
+  const altChipsWrap = document.createElement('div'); altChipsWrap.id = 'altChipsWrap';
+  altChipsWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;align-items:center';
+  ipaLeft.appendChild(altChipsWrap);
+
+  const renderAltChips = () => {
+    altChipsWrap.innerHTML = '';
+    (v.symbols?.slice(1)||[]).forEach((altSym, ai) => {
+      const chip = document.createElement('span');
+      chip.style.cssText = `font-family:Georgia,serif;font-size:1rem;padding:3px 10px;background:var(--input);border:1px solid var(--border);border-radius:5px;cursor:pointer;color:${c};transition:border-color .12s`;
+      chip.textContent = altSym; chip.title = 'Click to edit · leave empty to remove';
+      chip.addEventListener('mouseenter', ()=>chip.style.borderColor=c);
+      chip.addEventListener('mouseleave', ()=>chip.style.borderColor='');
+      chip.addEventListener('click', () => openIPAPickerPopup(altSym, newSym => {
+        if (newSym) v.symbols[ai+1] = newSym; else v.symbols.splice(ai+1,1);
+        renderAltChips(); refreshCharts(); renderVowelCards();
+      }));
+      altChipsWrap.appendChild(chip);
+    });
+    const addAlt = document.createElement('button');
+    addAlt.type = 'button'; addAlt.className = 'btn btn-secondary btn-sm';
+    addAlt.textContent = '+ Alt'; addAlt.style.cssText = 'font-size:.65rem;padding:3px 8px';
+    addAlt.addEventListener('click', () => openIPAPickerPopup('', newSym => {
+      if (!newSym) return;
+      v.symbols = [...(v.symbols||[sym]), newSym];
+      renderAltChips(); refreshCharts(); renderVowelCards();
+    }));
+    altChipsWrap.appendChild(addAlt);
+  };
+  renderAltChips();
+
+  ipaSection.appendChild(ipaLeft);
   sec.appendChild(ipaSection);
 
-  const ipaInput = sec.querySelector('#ipaInput');
-
-  // Track focus: IPA picker inserts into whichever input is active
-  let activeIpaInput = ipaInput;
-  ipaInput.addEventListener('focus', () => { activeIpaInput = ipaInput; });
-  altIn.addEventListener('focus',   () => { activeIpaInput = altIn; });
-
-  ipaInput.addEventListener('input', () => {
-    v.symbols = [ipaInput.value, ...(v.symbols?.slice(1) || [])];
-    document.getElementById('ipaPreview').textContent = v.symbols[0] || '?';
-    document.getElementById('veTitle').textContent = (state.vowelIdx < 0 ? 'New Vowel' : 'Edit: ') + v.symbols[0];
+  // Wire — click preview or hint opens IPA picker popup
+  const openMainEdit = () => openIPAPickerPopup(v.symbols?.[0]||'', newSym => {
+    if (!newSym) return;
+    v.symbols = [newSym, ...(v.symbols?.slice(1)||[])];
+    ipaPreview.textContent = newSym;
+    document.getElementById('veTitle').textContent = (state.vowelIdx<0?'New Vowel':'Edit: ')+newSym;
     refreshCharts(); renderVowelCards();
   });
-  altIn.addEventListener('input', () => {
-    const alts = altIn.value.split(',').map(s => s.trim()).filter(Boolean);
-    v.symbols = [v.symbols?.[0] || '', ...alts];
-  });
-
-  buildIpaPicker(
-      ipaBox.querySelector('#ipaGrid'),
-      ipaBox.querySelector('#ipaMods'),
-      () => activeIpaInput,
-      v, c
-  );
+  ipaPreview.addEventListener('click', openMainEdit);
+  editHint.addEventListener('click', openMainEdit);
 
   // ── Description · Type · Rounded ───────────────────────────────────────────
   const metaRow = document.createElement('div'); metaRow.className = 've-meta';
@@ -211,7 +228,7 @@ function buildInlineForm() {
       row.addEventListener('mouseleave', () => row.style.background='');
       row.addEventListener('click', () => {
         const idx = state.samplesDraft.indexOf(smp);
-        if (idx >= 0) { switchToSamplesTab(); openSampleEditor(idx); }
+        if (idx >= 0) openSampleInVowelEditor(idx);
       });
       strip.appendChild(row);
     });
@@ -221,15 +238,20 @@ function buildInlineForm() {
   const addSmpBtn = document.createElement('button'); addSmpBtn.className='btn btn-secondary btn-sm'; addSmpBtn.type='button'; addSmpBtn.style.marginTop='4px';
   addSmpBtn.textContent = '+ Add sample for /' + (v.symbols?.[0]||'?') + '/';
   addSmpBtn.addEventListener('click', () => {
-    switchToSamplesTab();
     state.samplesDraft = state.samplesDraft || [];
-    openSampleEditor(-1);
-    // Pre-populate first token with this vowel's symbol
-    if (state.sampleDraft) state.sampleDraft.tokens = [{symbol: v.symbols?.[0]||'', position:[0,0], analysis:null}];
-    buildSampleForm();
+    openSampleInVowelEditor(-1);
+    if (state.sampleDraft) { state.sampleDraft.tokens = [{symbol:v.symbols?.[0]||'', position:[0,0], analysis:null}]; buildSampleForm(document.getElementById('seVowelInline'), true); }
   });
   strip.appendChild(addSmpBtn);
   sec.appendChild(strip);
+
+  // Container for inline sample editing (within vowel form)
+  let sv = document.getElementById('seVowelInline');
+  if (!sv) {
+    sv = document.createElement('div'); sv.id = 'seVowelInline';
+    sv.style.cssText = 'display:none;border-top:1px solid var(--border);margin-top:8px;padding-top:8px';
+    sec.appendChild(sv);
+  }
 }
 
 // ─── Apply vowel to draft ─────────────────────────────────────────────────────
@@ -246,7 +268,95 @@ function applyVowel() {
   toast(`Vowel "${applied}" applied`);
 }
 
-// ─── IPA picker grid ──────────────────────────────────────────────────────────
+
+// ─── IPA symbol picker popup ──────────────────────────────────────────────────
+// onApply(selectedText): called when user clicks Apply
+function openIPAPickerPopup(initialVal, onApply) {
+  document.getElementById('ipaPickerBackdrop')?.remove();
+  let current = initialVal || '';
+  const c = state.langDraft?.color || '#7eb8f7';
+
+  const backdrop = document.createElement('div'); backdrop.id = 'ipaPickerBackdrop';
+  backdrop.style.cssText = 'position:fixed;inset:0;background:#000000bb;z-index:9500;display:flex;align-items:center;justify-content:center';
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:#0d1a28;border:1px solid var(--border);border-radius:12px;padding:18px;width:min(440px,95vw);max-height:90vh;overflow-y:auto';
+
+  const update = val => {
+    current = val;
+    const pr = modal.querySelector('#ippPreview');
+    const inp = modal.querySelector('#ippInput');
+    if (pr) pr.textContent = val || '?';
+    if (inp && document.activeElement !== inp) inp.value = val;
+  };
+
+  modal.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <div id="ippPreview" style="font-family:Georgia,serif;font-size:2rem;min-width:48px;text-align:center;color:${c}">${current||'?'}</div>
+        <input id="ippInput" type="text" value="${current}"
+          style="background:var(--input);border:1px solid var(--border);border-radius:5px;color:#d8e8f4;padding:6px 8px;font-size:1rem;font-family:Georgia,serif;width:90px;outline:none">
+        <button type="button" id="ippBackspace" class="btn btn-secondary btn-sm" title="Backspace">⌫</button>
+        <button type="button" id="ippClear" class="btn btn-secondary btn-sm" title="Clear">✕</button>
+      </div>
+      <button type="button" id="ippClose" class="btn btn-secondary btn-sm">✕</button>
+    </div>
+    <div id="ippGrid" style="font-size:.82rem"></div>
+    <div id="ippMods" class="ipa-mods-row" style="margin-top:5px"></div>
+    <div style="display:flex;gap:6px;margin-top:12px;border-top:1px solid var(--border);padding-top:10px">
+      <button type="button" id="ippApply" class="btn btn-primary btn-sm">Apply</button>
+      <button type="button" id="ippCancel" class="btn btn-secondary btn-sm">Cancel</button>
+    </div>`;
+
+  backdrop.appendChild(modal); document.body.appendChild(backdrop);
+
+  const inp = modal.querySelector('#ippInput');
+  inp.addEventListener('input', e => update(e.target.value));
+  modal.querySelector('#ippBackspace').addEventListener('click', () => update(current.slice(0,-1)));
+  modal.querySelector('#ippClear').addEventListener('click', () => update(''));
+  modal.querySelector('#ippClose').addEventListener('click', () => backdrop.remove());
+  modal.querySelector('#ippCancel').addEventListener('click', () => backdrop.remove());
+  modal.querySelector('#ippApply').addEventListener('click', () => { onApply(current); backdrop.remove(); });
+  backdrop.addEventListener('click', e => { if(e.target===backdrop) backdrop.remove(); });
+
+  // IPA table
+  const grid = modal.querySelector('#ippGrid');
+  const hdr = document.createElement('div'); hdr.className='ipa-row';
+  hdr.innerHTML='<span class="ipa-row-lbl"></span><span style="font-size:.5rem;color:#3a5878;flex:1;text-align:center">Front</span><span class="ipa-sep"></span><span style="font-size:.5rem;color:#3a5878;flex:1;text-align:center">Central</span><span class="ipa-sep"></span><span style="font-size:.5rem;color:#3a5878;flex:1;text-align:center">Back</span>';
+  grid.appendChild(hdr);
+  IPA_ROWS.forEach(row => {
+    const rowEl=document.createElement('div'); rowEl.className='ipa-row';
+    const lbl=document.createElement('span'); lbl.className='ipa-row-lbl'; lbl.textContent=row.label;
+    rowEl.appendChild(lbl);
+    row.pairs.forEach((pair,pi)=>{
+      if(pi>0){const sep=document.createElement('span');sep.className='ipa-sep';rowEl.appendChild(sep);}
+      const cell=document.createElement('span'); cell.style.cssText='display:flex;flex:1;justify-content:space-around';
+      pair.forEach(ch=>{
+        if(!ch){const sp=document.createElement('span');sp.className='ipa-ch';sp.style.cursor='default';cell.appendChild(sp);return;}
+        const btn=document.createElement('span'); btn.className='ipa-ch'; btn.textContent=ch; btn.title=ch;
+        btn.addEventListener('click',()=>update(current+ch));
+        cell.appendChild(btn);
+      });
+      rowEl.appendChild(cell);
+    });
+    grid.appendChild(rowEl);
+  });
+
+  const modsRow = modal.querySelector('#ippMods');
+  IPA_MODS.forEach(mod=>{
+    const btn=document.createElement('button'); btn.type='button'; btn.className='ipa-mod';
+    btn.innerHTML=`${mod.ch}<small>${mod.lbl}</small>`;
+    btn.addEventListener('click',()=>{
+      const pos=inp.selectionStart??current.length;
+      update(current.slice(0,pos)+mod.ch+current.slice(pos));
+    });
+    modsRow.appendChild(btn);
+  });
+
+  setTimeout(()=>inp.focus(),50);
+}
+
+// ─── IPA picker grid (legacy) ────────────────────────────────────────────────
 // getInputEl: function returning the currently active input element (main or alt)
 function buildIpaPicker(grid, modsRow, getInputEl, v, color) {
   const hdr = document.createElement('div'); hdr.className = 'ipa-row';

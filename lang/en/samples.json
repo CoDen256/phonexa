@@ -9,7 +9,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "i"
   },
   {
     "text": "green",
@@ -21,7 +22,8 @@
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "heed",
@@ -33,7 +35,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "feet",
@@ -45,7 +48,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "seen",
@@ -57,7 +61,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɪ",
@@ -69,7 +74,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɪ"
   },
   {
     "text": "pink",
@@ -81,7 +87,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hid",
@@ -93,7 +100,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "kit",
@@ -105,7 +113,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "bit",
@@ -117,7 +126,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɛ",
@@ -129,7 +139,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɛ"
   },
   {
     "text": "red",
@@ -141,7 +152,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "head",
@@ -153,7 +165,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "dress",
@@ -165,7 +178,8 @@
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "bed",
@@ -177,7 +191,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "æ",
@@ -189,7 +204,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "æ"
   },
   {
     "text": "sand",
@@ -201,7 +217,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "had",
@@ -213,7 +230,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "trap",
@@ -225,7 +243,8 @@
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "cat",
@@ -237,7 +256,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɑ",
@@ -249,7 +269,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɑ"
   },
   {
     "text": "coffee",
@@ -261,7 +282,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hod",
@@ -273,7 +295,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "father",
@@ -285,7 +308,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "palm",
@@ -297,7 +321,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɔ",
@@ -309,7 +334,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɔ"
   },
   {
     "text": "mauve",
@@ -321,7 +347,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hawed",
@@ -333,7 +360,8 @@
         "position": [1, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "thought",
@@ -345,7 +373,8 @@
         "position": [2, 6],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "claw",
@@ -357,7 +386,8 @@
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ʊ",
@@ -369,7 +399,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ʊ"
   },
   {
     "text": "wood",
@@ -381,7 +412,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hood",
@@ -393,7 +425,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "foot",
@@ -405,7 +438,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "put",
@@ -417,7 +451,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "u",
@@ -429,7 +464,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "u"
   },
   {
     "text": "blue",
@@ -441,7 +477,8 @@
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "who'd",
@@ -453,7 +490,8 @@
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "goose",
@@ -465,7 +503,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "food",
@@ -477,7 +516,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ʌ",
@@ -489,7 +529,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ʌ"
   },
   {
     "text": "cut",
@@ -501,7 +542,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hud",
@@ -513,7 +555,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "strut",
@@ -525,7 +568,8 @@
         "position": [3, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "bus",
@@ -537,7 +581,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ə",
@@ -549,7 +594,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ə"
   },
   {
     "text": "dust",
@@ -561,7 +607,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "about",
@@ -573,7 +620,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɝ",
@@ -585,7 +633,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɝ"
   },
   {
     "text": "purple",
@@ -597,7 +646,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "heard",
@@ -609,7 +659,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "nurse",
@@ -621,7 +672,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "bird",
@@ -633,7 +685,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "eɪ",
@@ -645,7 +698,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "eɪ"
   },
   {
     "text": "jade",
@@ -657,7 +711,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hayed",
@@ -669,7 +724,8 @@
         "position": [1, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "oʊ",
@@ -681,7 +737,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "oʊ"
   },
   {
     "text": "gold",
@@ -693,7 +750,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "hoed",
@@ -705,7 +763,8 @@
         "position": [1, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "aɪ",
@@ -717,7 +776,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "aɪ"
   },
   {
     "text": "lime",
@@ -729,7 +789,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "aʊ",
@@ -741,7 +802,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "aʊ"
   },
   {
     "text": "brown",
@@ -753,7 +815,8 @@
         "position": [2, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɔɪ",
@@ -765,7 +828,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɔɪ"
   },
   {
     "text": "turquoise",
@@ -777,6 +841,7 @@
         "position": [4, 7],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   }
 ]

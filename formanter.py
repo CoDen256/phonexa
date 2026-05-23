@@ -677,6 +677,7 @@ def http_frames():
     sample_rate_hint    = int(config_dict.pop('sample_rate',    44_100))
     config = ConnConfig()
     config.update_from_dict(config_dict)
+    print(config)
 
     slice_start = float(request.form.get('slice_start', 0.0))
     slice_end   = float(request.form.get('slice_end',   1.0))

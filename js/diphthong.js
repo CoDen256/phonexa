@@ -152,7 +152,10 @@ function renderDiph(arrowL, dotL, x1, y1, x2, y2, v, lang, lk, svgId) {
     if(now-st.lastClick>5000) st.slowed=false;
     else st.slowed=!st.slowed;
     st.lastClick=now;
-    playUrlAtRate(v.audio, st.slowed?0.5:1.0);
+    // Use representative sample audio if available, fall back to v.audio
+    const _diphAudio = (typeof findRepresentativeSample==='function'
+        ? findRepresentativeSample(v.symbols, lk)?.audio : null) || v.audio;
+    playUrlAtRate(_diphAudio, st.slowed?0.5:1.0);
     onVowelClicked(v,lang,lk);
     pulseDiphthong(svgId,x1,y1,x2,y2,color);
   });

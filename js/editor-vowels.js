@@ -63,7 +63,60 @@ function renderVowelCards(){
       <div class="vc-round" style="color:${c}70">${v.rounded?'\u2299 Rounded':'\u25cb Unrounded'} \u00b7 ${v.type||'short'}</div>
       ${v.f1?`<div class="vc-formants">F1 <span>${v.f1}</span> \u00b7 F2 <span>${v.f2}</span> Hz</div>`:''}`;
     card.appendChild(body);
-    card.addEventListener('click',()=>{localPlay(v.audio);openVowelEditor(i);});
+
+    // ── Linked samples ──────────────────────────────────────────────────
+    const linked = (state.samplesDraft||[]).filter(s =>
+        s.tokens?.some(t => v.symbols?.includes(t.symbol))
+    );
+    if (linked.length) {
+      const sampDiv = document.createElement('div');
+      sampDiv.style.cssText = 'border-top:1px solid var(--border);margin-top:6px;padding-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px';
+      const shown = linked.slice(0, 6);
+      shown.forEach(smp => {
+        const chip = document.createElement('div');
+        chip.style.cssText = `background:#0d1a28;border:1px solid #1e3048;border-radius:6px;padding:5px 7px;cursor:pointer;transition:border-color .12s,background .12s`;
+        chip.addEventListener('mouseenter', ()=>{ chip.style.borderColor=c+'55'; chip.style.background='#111e2e'; });
+        chip.addEventListener('mouseleave', ()=>{ chip.style.borderColor='#1e3048'; chip.style.background='#0d1a28'; });
+
+        // Rich text: relevant vowel tokens highlighted, click-to-play
+        // Use indexOf: smp is a direct reference to state.samplesDraft element
+        // (findIndex with id comparison fails when id is undefined for all samples)
+        const smpIdx = state.samplesDraft.indexOf(smp);
+        const textDiv = buildHighlightedText(smp, v.symbols, c, {
+          textStyle: 'font-size:.82rem;color:#c8d8e8;',
+          onFullPlay:  () => localPlay(smp.audio),
+          onTokenPlay: tok => playTokenSlice(smp, tok),
+        });
+        chip.appendChild(textDiv);
+
+        // Chip click: open inline editor (text spans handle audio + stopPropagation)
+        chip.addEventListener('click', e => {
+          e.stopPropagation();  // prevent vowel card's own click firing
+          // Play full audio (text spans handle their own audio + stopPropagation,
+          // so this only runs when user clicks on chip padding)
+          localPlay(smp.audio);
+          // Switch vowel editor to THIS vowel, then open sample inline.
+          // openVowelEditor(i) rebuilds veInline (which includes seVowelInline).
+          openVowelEditor(i);
+          if (smpIdx >= 0) openSampleInVowelEditor(smpIdx);
+        });
+        sampDiv.appendChild(chip);
+      });
+      if (linked.length > 6) {
+        const more = document.createElement('div');
+        more.style.cssText = 'font-size:.6rem;color:#3a5878;grid-column:span 2;text-align:center';
+        more.textContent = `+${linked.length-6} more samples`;
+        sampDiv.appendChild(more);
+      }
+      card.appendChild(sampDiv);
+    }
+
+    // Card click: play representative sample or vowel audio, open editor
+    card.addEventListener('click', () => {
+      const rep = (state.samplesDraft||[]).find(s => v.symbols?.includes(s.representative));
+      localPlay(rep?.audio || v.audio || null);
+      openVowelEditor(i);
+    });
     grid.appendChild(card);
   });
 }

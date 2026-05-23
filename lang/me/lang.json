@@ -11,11 +11,10 @@
       "type": "variable",
       "desc": "Close front unrounded",
       "f1": 271.48,
-      "f2": 2380.40,
+      "f2": 2380.4,
       "ipaAudio": "lang/me/audio/i.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
-      "words": [
-      ]
+      "words": []
     },
     {
       "ipa": "ɨ",
@@ -28,8 +27,7 @@
       "f2": 1854.85,
       "ipaAudio": "lang/me/audio/i_bar.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
-      "words": [
-      ]
+      "words": []
     },
     {
       "ipa": "u",
@@ -38,12 +36,11 @@
       "rounded": true,
       "type": "variable",
       "desc": "Close back rounded",
-      "f1": 317.03 ,
+      "f1": 317.03,
       "f2": 565.81,
       "ipaAudio": "lang/me/audio/u.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
-      "words": [
-      ]
+      "words": []
     },
     {
       "ipa": "o",
@@ -52,12 +49,11 @@
       "rounded": true,
       "type": "variable",
       "desc": "Mid front rounded ɔ̝/o̞",
-      "f1": 526.83  ,
+      "f1": 526.83,
       "f2": 803.64,
       "ipaAudio": "lang/me/audio/o.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
-      "words": [
-      ]
+      "words": []
     },
     {
       "ipa": "ɛ",
@@ -70,10 +66,8 @@
       "f2": 1830.72,
       "ipaAudio": "lang/me/audio/e_open.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
-      "words": [
-      ]
+      "words": []
     },
-   
     {
       "ipa": "a",
       "h": 1,
@@ -85,8 +79,7 @@
       "f2": 1309.47,
       "ipaAudio": "lang/me/audio/a.wav",
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
-      "words": [
-      ]
+      "words": []
     }
   ]
 }

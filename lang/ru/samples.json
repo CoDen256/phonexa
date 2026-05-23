@@ -9,7 +9,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "i"
   },
   {
     "text": "мир",
@@ -21,7 +22,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɪ",
@@ -33,7 +35,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɪ"
   },
   {
     "text": "его",
@@ -45,7 +48,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "переход",
@@ -57,7 +61,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ʊ",
@@ -69,7 +74,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ʊ"
   },
   {
     "text": "уже",
@@ -81,7 +87,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "тупая",
@@ -93,7 +100,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "сразу",
@@ -105,7 +113,8 @@
         "position": [4, 5],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɨ",
@@ -117,7 +126,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɨ"
   },
   {
     "text": "был",
@@ -129,7 +139,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ʉ",
@@ -141,7 +152,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ʉ"
   },
   {
     "text": "ю",
@@ -153,7 +165,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "свою",
@@ -165,7 +178,8 @@
         "position": [3, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "u",
@@ -177,7 +191,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "u"
   },
   {
     "text": "ему",
@@ -189,7 +204,8 @@
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "туп",
@@ -201,7 +217,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "e",
@@ -213,7 +230,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "e"
   },
   {
     "text": "е",
@@ -225,7 +243,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "месте",
@@ -237,7 +256,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɵ",
@@ -249,7 +269,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɵ"
   },
   {
     "text": "ё",
@@ -261,7 +282,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "моё",
@@ -273,7 +295,8 @@
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "живёт",
@@ -285,7 +308,8 @@
         "position": [3, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ə",
@@ -297,7 +321,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ə"
   },
   {
     "text": "мира",
@@ -309,7 +334,8 @@
         "position": [3, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "этому",
@@ -321,7 +347,8 @@
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "одновременно",
@@ -333,7 +360,8 @@
         "position": [11, 12],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "o",
@@ -345,7 +373,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "o"
   },
   {
     "text": "тот",
@@ -357,7 +386,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɛ",
@@ -369,7 +399,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɛ"
   },
   {
     "text": "этот",
@@ -381,7 +412,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ʌ",
@@ -393,7 +425,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ʌ"
   },
   {
     "text": "она",
@@ -405,7 +438,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "хотел",
@@ -417,7 +451,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "стояла",
@@ -429,7 +464,8 @@
         "position": [2, 3],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "голова",
@@ -441,7 +477,8 @@
         "position": [3, 4],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "a",
@@ -453,7 +490,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "a"
   },
   {
     "text": "нами",
@@ -465,7 +503,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "ɑ",
@@ -477,7 +516,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "ɑ"
   },
   {
     "text": "палка",
@@ -489,7 +529,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "кал",
@@ -501,7 +542,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "æ",
@@ -513,7 +555,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": "æ"
   },
   {
     "text": "я",
@@ -525,7 +568,8 @@
         "position": [0, 1],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "части",
@@ -537,7 +581,8 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   },
   {
     "text": "пять",
@@ -549,6 +594,7 @@
         "position": [1, 2],
         "analysis": null
       }
-    ]
+    ],
+    "representative": null
   }
 ]

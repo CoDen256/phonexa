@@ -49,6 +49,7 @@ async function loadFromFolder(h){
             const sf=await entry.getFileHandle('samples.json');
             state.langSamples[data.key]=JSON.parse(await(await sf.getFile()).text());
           }catch(e){ state.langSamples[data.key]=[]; }
+          if(typeof setLangSamples==='function') setLangSamples(data.key, state.langSamples[data.key]);
           loaded++;
         }
       }catch(e){/* no lang.json in this subdir */}
