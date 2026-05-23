@@ -54,3 +54,43 @@ function getLength(v) { return v.type || 'short'; }
  * Shared by filters.js and charts.js.
  */
 function getBase(ipa) { return ipa.replace('ː','')[0] || ipa; }
+
+
+
+// ─── Vowel sound synthesis (Web Audio API) ────────────────────────────────────
+function synthesizeVowel(f1, f2, duration=0.65) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 120; // nominal pitch (Hz)
+
+    const make_bp = (freq, q) => {
+      const f = ctx.createBiquadFilter();
+      f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+      return f;
+    };
+    const bp1 = make_bp(f1, 6);
+    const bp2 = make_bp(f2, 10);
+    const g1 = ctx.createGain(); g1.gain.value = 0.85;
+    const g2 = ctx.createGain(); g2.gain.value = 0.55;
+    const master = ctx.createGain();
+    const t = ctx.currentTime;
+    master.gain.setValueAtTime(0, t);
+    master.gain.linearRampToValueAtTime(0.28, t + 0.04);
+    master.gain.setValueAtTime(0.28, t + duration - 0.08);
+    master.gain.linearRampToValueAtTime(0, t + duration);
+
+    osc.connect(bp1); bp1.connect(g1); g1.connect(master);
+    osc.connect(bp2); bp2.connect(g2); g2.connect(master);
+    master.connect(ctx.destination);
+    osc.start(t); osc.stop(t + duration);
+    osc.onended = () => ctx.close().catch(()=>{});
+  } catch(e) { console.warn('Synthesis error:', e); }
+}
+
+// Play vowel audio, synthesizing from F1/F2 on formant chart when audio absent
+function playVowel(v, svgId) {
+  if (v.audio) { playUrl(v.audio); return; }
+  if (svgId === 'chartFormant' && v.f1 && v.f2) synthesizeVowel(v.f1, v.f2);
+}

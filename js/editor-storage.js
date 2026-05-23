@@ -34,7 +34,7 @@ async function loadFromFolder(h){
   let loaded=0;
   try{
     for await(const[name,entry]of h.entries()){
-      if(entry.kind!=='directory'||name.startsWith('_')||name==='cardinal')continue;
+      if(entry.kind!=='directory'||name.startsWith('_'))continue;
       try{
         const langFile=await entry.getFileHandle('lang.json');
         const data=JSON.parse(await(await langFile.getFile()).text());
@@ -54,10 +54,32 @@ async function loadFromFolder(h){
   renderLangList(); updateSaveButtons();
   return loaded;
 }
+
+// ─── Custom JSON formatter: small scalar arrays stay on one line ─────────────
+function formatLangJson(data) {
+  function isScalar(x){ return x===null||typeof x!=='object'; }
+  function fmt(val, depth) {
+    const pad='  '.repeat(depth), inner='  '.repeat(depth+1);
+    if(val===null||val===undefined) return 'null';
+    if(typeof val==='boolean') return String(val);
+    if(typeof val==='number') return String(val);
+    if(typeof val==='string') return JSON.stringify(val);
+    if(Array.isArray(val)){
+      if(val.length<=4&&val.every(isScalar))
+        return '['+val.map(x=>fmt(x,0)).join(', ')+']';
+      return '[\n'+val.map(x=>inner+fmt(x,depth+1)).join(',\n')+'\n'+pad+']';
+    }
+    const entries=Object.entries(val);
+    if(!entries.length) return '{}';
+    return '{\n'+entries.map(([k,v])=>inner+JSON.stringify(k)+': '+fmt(v,depth+1)).join(',\n')+'\n'+pad+'}';
+  }
+  return fmt(data,0);
+}
+
 // ─── Write one language to a folder ──────────────────────────────────────────
 async function writeToFolder(handle,data){
   const key=data.key; if(!key)throw new Error('Language key required');
-  const json=JSON.stringify(data,null,2);
+  const json=formatLangJson(data);
   const subDir=await handle.getDirectoryHandle(key,{create:true});
   const fh=await subDir.getFileHandle('lang.json',{create:true});
   const w=await fh.createWritable(); await w.write(json); await w.close();
@@ -91,8 +113,7 @@ function flushCurrentDraft(){
 async function saveLang(){
   if(!state.dirHandle){return saveAsLang();}
   flushCurrentDraft();
-  // Write all non-cardinal langs to disk; only include enabled in index.json
-  const allLangs=Object.entries(state.langs).filter(([k])=>k!=='cardinal');
+  const allLangs=Object.entries(state.langs);
   const enabledKeys=allLangs.filter(([k])=>!state.langDisabled.has(k)).map(([k])=>k);
   let saved=0,errors=0;
   for(const[,lang]of allLangs){
@@ -110,7 +131,7 @@ async function saveAsLang(){
     if(!state.langDraft){toast('No language selected');return;}
     flushCurrentDraft();
     const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([JSON.stringify(clone(state.langDraft),null,2)],{type:'application/json'}));
+    a.href=URL.createObjectURL(new Blob([formatLangJson(clone(state.langDraft))],{type:'application/json'}));
     a.download='lang.json'; a.click();
     toast('Downloaded (File System API not available in this browser)');
     return;
@@ -118,7 +139,7 @@ async function saveAsLang(){
   try{
     const h=await window.showDirectoryPicker({mode:'readwrite',startIn:'documents'});
     flushCurrentDraft();
-    const allLangs=Object.entries(state.langs).filter(([k])=>k!=='cardinal');
+    const allLangs=Object.entries(state.langs);
     const enabledKeys=allLangs.filter(([k])=>!state.langDisabled.has(k)).map(([k])=>k);
     let saved=0,errors=0;
     for(const[,lang]of allLangs){
@@ -138,6 +159,19 @@ async function saveAsLang(){
 function markSaved(){
   state.unsaved=false;
   const n=document.getElementById('unsavedNote'); if(n)n.style.display='none';
+}
+
+
+// ─── Permanently delete a language folder from disk ──────────────────────────
+async function deleteLangFromFolder(key) {
+  if (!state.dirHandle) return false;
+  try {
+    await state.dirHandle.removeEntry(key, {recursive: true});
+    return true;
+  } catch(e) {
+    console.warn('Could not delete folder:', key, e);
+    return false;
+  }
 }
 
 // ─── Load lang folder button ──────────────────────────────────────────────────

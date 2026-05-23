@@ -18,12 +18,16 @@ const tip=document.getElementById('tip');
 function showTip(e,v,lang) {
   const roundType=`${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}`;
   const sym=v.symbols?.[0]??'?';
+  const targetLine = v.target
+      ? `<div class="tip-meta" style="margin-top:1px">→ ${v.target.rounded?'⊙ Rounded':'○ Unrounded'}${v.target.f1?` · F1 <span style="color:#789ab8">${v.target.f1}</span> F2 <span style="color:#789ab8">${v.target.f2}</span> Hz`:''}</div>`
+      : '';
   tip.innerHTML=`
     <div class="tip-ipa" style="color:${lang.color}">${sym}</div>
     <div class="tip-lang" style="color:${lang.color}">${lang.label}</div>
     <div class="tip-desc">${v.desc}</div>
     <div class="tip-meta">${roundType}</div>
     ${v.f1?`<div class="tip-f">F1 <span>${v.f1} Hz</span> · F2 <span>${v.f2} Hz</span></div>`:''}
+    ${targetLine}
   `;
   tip.style.display='block'; moveTip(e);
 }

@@ -53,6 +53,22 @@ function renderLangList(){
       enBtn.type='button'; enBtn.className='lang-tab-enable'; enBtn.textContent='↩'; enBtn.title='Re-enable';
       enBtn.addEventListener('click',e=>{e.stopPropagation();enableLang(key);});
       wrap.appendChild(btn); wrap.appendChild(enBtn);
+      // Permanently delete from folder
+      if(src==='folder'&&state.dirHandle){
+        const delBtn=document.createElement('button');
+        delBtn.type='button'; delBtn.className='lang-tab-del'; delBtn.textContent='🗑'; delBtn.title='Delete from folder permanently';
+        delBtn.addEventListener('click',async e=>{
+          e.stopPropagation();
+          if(!confirm(`Permanently delete "${lang.label||key}" from folder?`))return;
+          await deleteLangFromFolder(key);
+          delete state.langs[key]; delete state.langSources[key];
+          const oi=state.langOrder.indexOf(key); if(oi!==-1)state.langOrder.splice(oi,1);
+          state.langDisabled.delete(key);
+          if(state.selKey===key){state.selKey=null;state.langDraft=null;state.vowelIdx=null;state.vowelDraft=null;}
+          renderLangList(); renderEditorAll(); markUnsaved();
+        });
+        wrap.appendChild(delBtn);
+      }
     }else{
       const disBtn=document.createElement('button');
       disBtn.type='button'; disBtn.className='lang-tab-del'; disBtn.textContent='×'; disBtn.title='Disable (exclude from index.json)';
@@ -127,7 +143,7 @@ function renderMain(){ showLangPanel(); }
 // ─── Save button visibility ───────────────────────────────────────────────────
 function updateSaveButtons(){
   const folderConnected=!!state.dirHandle;
-  const hasLangs=Object.keys(state.langs).some(k=>k!=='cardinal');
+  const hasLangs=Object.keys(state.langs).length > 0;
   // Save: only when a folder is connected (saves everything to it)
   const saveBtn=document.getElementById('saveLangBtn');
   if(saveBtn) saveBtn.style.display=folderConnected?'inline-flex':'none';
@@ -243,7 +259,9 @@ function syncCoordsToForm(){
   if(g('veF1')) g('veF1').value = v.f1??'';
   if(g('veF2')) g('veF2').value = v.f2??'';
   if(g('veH2')) g('veH2').value = v.target?.heightBackness?.[0]??'';
-  if(g('veB2')) g('veB2').value = v.target?.heightBackness?.[1]??'';
+  if(g('veB2'))  g('veB2').value  = v.target?.heightBackness?.[1]??'';
+  if(g('veTF1')) g('veTF1').value = v.target?.f1??'';
+  if(g('veTF2')) g('veTF2').value = v.target?.f2??'';
 }
 
 // ─── Open vowel editor ────────────────────────────────────────────────────────

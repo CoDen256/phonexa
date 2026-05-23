@@ -18,7 +18,7 @@
  */
 
 // ─── Chart builder (shared by IPA + Formant renderers) ───────────────────────
-function buildVowels(svg, getPos, svgId, showArrows=false) {
+function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
   const arrowL=$s('g'), langL=$s('g'), cardL=$s('g'), dotL=$s('g');
   svg.appendChild(arrowL); svg.appendChild(langL); svg.appendChild(cardL); svg.appendChild(dotL);
 
@@ -76,7 +76,7 @@ function buildVowels(svg, getPos, svgId, showArrows=false) {
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{playUrl(v.audio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
+      lg.addEventListener('click',()=>{playVowel(v,svgId);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
       dotL.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
     }
@@ -95,18 +95,19 @@ function buildVowels(svg, getPos, svgId, showArrows=false) {
       const {lk,lang,v,dx,dy}=members[0];
       dg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       dg.addEventListener('mousemove',moveTip); dg.addEventListener('mouseleave',hideTip);
-      dg.addEventListener('click',()=>{playUrl(v.audio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
+      dg.addEventListener('click',()=>{playVowel(v,svgId);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       let tm=false;
       dg.addEventListener('touchstart',e=>{tm=false;e.preventDefault();showTip(e.touches[0],v,lang);},{passive:false});
       dg.addEventListener('touchmove', e=>{tm=true;moveTip(e.touches[0]);},{passive:false});
-      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playUrl(v.audio);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
+      dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playVowel(v,svgId);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
     }
     dotL.appendChild(dg);
   }
 
   // ── Step 4: render diphthong arrows (IPA chart only) ─────────────────────────
   for (const {lk,lang,v,dx,dy} of diphs) {
-    const tp=v.target?.heightBackness?getPos({heightBackness:v.target.heightBackness}):null;
+    const tp = getTargetPos ? getTargetPos(v)
+        : (v.target?.heightBackness ? getPos({heightBackness:v.target.heightBackness}) : null);
     if (tp) renderDiph(arrowL, dotL, dx, dy, tp.x, tp.y, v, lang, lk, svgId);
   }
 }
@@ -160,7 +161,8 @@ function renderFormant() {
   svg.appendChild($s('rect',{x:FP.x0,y:FP.y0,width:FP.x1-FP.x0,height:FP.y1-FP.y0,fill:'none',stroke:'#385878','stroke-width':1.5,rx:6}));
 
   // Normal vowel dots (using JSON-specified F1/F2)
-  buildVowels(svg, v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null), 'chartFormant');
+  buildVowels(svg, v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null), 'chartFormant', true,
+      v=>(v.target?.f1&&v.target?.f2?formantPos(v.target.f1,v.target.f2):null));
 
   // Analyzed overlay — shown automatically when available (dashed line + filled dot)
   const overlayL=$s('g'); svg.appendChild(overlayL);
@@ -254,12 +256,15 @@ function buildSidebar() {
     grid.appendChild(chip('Unrounded', filters.roundness,'unrounded','#7eb8f7'));
   }));
 
+  body.appendChild(section('Type', filters.vtype, grid=>{
+    grid.appendChild(chip('Monophthong', filters.vtype,'monophthong','#7eb8f7'));
+    grid.appendChild(chip('Diphthong',   filters.vtype,'diphthong',  '#f87171'));
+  }));
+
   body.appendChild(section('Length', filters.length, grid=>{
-    grid.appendChild(chip('Monophthong', filters.length,'monophthong', '#7eb8f7'));
-    grid.appendChild(chip('Diphthong',   filters.length,'diphthong',   '#f87171'));
-    grid.appendChild(chip('Long ː',      filters.length,'long',        '#34d399'));
-    grid.appendChild(chip('Short',       filters.length,'short',       '#fbbf24'));
-    grid.appendChild(chip('Variable',    filters.length,'variable',    '#c084fc'));
+    grid.appendChild(chip('Long ː',   filters.length,'long',    '#34d399'));
+    grid.appendChild(chip('Short',    filters.length,'short',   '#fbbf24'));
+    grid.appendChild(chip('Variable', filters.length,'variable','#c084fc'));
   }));
 
   // Collect which base symbols actually exist in current loaded languages
@@ -277,7 +282,7 @@ function buildSidebar() {
 
 document.getElementById('clearAllFilters')?.addEventListener('click',()=>{
   filters.languages.clear(); filters.roundness.clear();
-  filters.length.clear();    filters.ipaBase.clear();
+  filters.vtype.clear();     filters.length.clear(); filters.ipaBase.clear();
   buildSidebar(); renderAll();
 });
 
@@ -314,7 +319,7 @@ function renderDetail() {
       </div>`;
 
     card.querySelector('.dcard-play').addEventListener('click',()=>{
-      playUrl(v.audio);
+      playVowel(v,'chartFormant');
       pulse('chartIpa',tPos.x,tPos.y,c);
       if(fPos) pulse('chartFormant',fPos.x,fPos.y,c);
     });

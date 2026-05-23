@@ -31,25 +31,28 @@ function playUrlAtRate(url, rate=1) {
 const filters = {
   languages : new Set(),
   roundness : new Set(),
-  length    : new Set(['monophthong']),  // default: show monophthongs
+  vtype     : new Set(['monophthong']),  // monophthong | diphthong
+  length    : new Set(),                 // long | short | variable
   ipaBase   : new Set(),
 };
 function passesFilters(lk, v) {
-  if (filters.languages.size > 0 && !filters.languages.has(lk))                           return false;
+  if (filters.languages.size > 0 && !filters.languages.has(lk))                              return false;
   if (filters.roundness.size > 0 && !filters.roundness.has(v.rounded?'rounded':'unrounded')) return false;
+  if (filters.vtype.size > 0) {
+    const isDiph = v.type === 'diphthong';
+    if (!(filters.vtype.has('diphthong') && isDiph) && !(filters.vtype.has('monophthong') && !isDiph)) return false;
+  }
   if (filters.length.size > 0) {
     const t = getLength(v);
     let passes = false;
     for (const f of filters.length) {
-      if (f === 'monophthong' && t !== 'diphthong')               { passes=true; break; }
-      if (f === 'diphthong'   && t === 'diphthong')               { passes=true; break; }
-      if (f === 'long'        && (t==='long'     || t==='variable')){ passes=true; break; }
-      if (f === 'short'       && (t==='short'    || t==='variable')){ passes=true; break; }
-      if (f === 'variable'    && t === 'variable')                 { passes=true; break; }
+      if (f === 'long'     && (t==='long'     || t==='variable')) { passes=true; break; }
+      if (f === 'short'    && (t==='short'    || t==='variable')) { passes=true; break; }
+      if (f === 'variable' && t === 'variable')                   { passes=true; break; }
     }
     if (!passes) return false;
   }
-  if (filters.ipaBase.size   > 0 && !filters.ipaBase.has(getBase(v.symbols?.[0] ?? ''))) return false;
+  if (filters.ipaBase.size > 0 && !filters.ipaBase.has(getBase(v.symbols?.[0] ?? ''))) return false;
   return true;
 }
 function countShown() {

@@ -61,11 +61,13 @@
 
   <div class="editor-pane" id="editorPane">
     <div class="lang-meta-form" id="langMetaForm" style="display:none">
-      <div class="field"><label>Key <span style="font-weight:400;opacity:.6;font-size:.58rem">(folder name · a-z 0-9 -)</span></label><input type="text" id="fKey" placeholder="e.g. en" pattern="[a-z0-9_-]+"></div>
-      <div class="field" style="margin-top:4px"><label>Label</label><input type="text" id="fLabel"></div>
-      <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
-        <label style="font-size:.62rem;color:var(--muted)">Color</label>
-        <input type="color" id="fColor">
+      <div style="display:flex;gap:6px;align-items:flex-end;flex-wrap:wrap">
+        <div class="field" style="flex:none;width:72px"><label>Key <span style="font-weight:400;opacity:.55;font-size:.55rem">a-z 0-9</span></label><input type="text" id="fKey" placeholder="en" pattern="[-a-z0-9_]+" style="width:100%"></div>
+        <div class="field" style="flex:none;width:128px"><label>Label</label><input type="text" id="fLabel" style="width:100%"></div>
+        <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:2px">
+          <label style="font-size:.62rem;color:var(--muted)">Color</label>
+          <input type="color" id="fColor">
+        </div>
       </div>
     </div>
     <div id="veInline" class="ve-inline" style="display:none"></div>
@@ -83,6 +85,7 @@
 <script src="js/tooltip.js"></script>
 <script src="js/diphthong.js"></script>
 <script src="js/charts.js"></script>
+<script src="js/audio.js"></script>
 <script src="js/editor-geometry.js"></script>
 <script src="js/editor-storage.js"></script>
 <script src="js/editor-vowels.js"></script>
@@ -114,7 +117,6 @@
 
   // Clicking a vowel on the chart opens it for editing
   function onVowelClicked(v, lang, lk) {
-    if (lk === 'cardinal') return;
     if (!state.langDraft) return;
     if (state.pickingMode) return;
     const idx = (state.langDraft.vowels || []).findIndex(w =>
@@ -151,7 +153,7 @@
 
   // ─── Pick mode: SVG click listener ───────────────────────────────────────────
   function attachPickListeners() {
-    [['chartIpa', ['ipa','ipa-target']], ['chartFormant', ['formant']]].forEach(([id, modes]) => {
+    [['chartIpa', ['ipa','ipa-target']], ['chartFormant', ['formant','formant-target']]].forEach(([id, modes]) => {
       const svg = document.getElementById(id); if (!svg) return;
       if (svg._pickHandler) { svg.removeEventListener('click', svg._pickHandler); svg._pickHandler = null; }
       if (!svg.querySelector('.pick-bg')) {
@@ -181,6 +183,11 @@
           const {f1,f2} = posToFormant(pt.x, pt.y);
           state.vowelDraft.f1 = f1;
           state.vowelDraft.f2 = f2;
+        } else if (state.pickingMode === 'formant-target') {
+          const {f1,f2} = posToFormant(pt.x, pt.y);
+          if (!state.vowelDraft.target) state.vowelDraft.target = {heightBackness:[...(state.vowelDraft.heightBackness||[0.5,0.5])],rounded:false,f1:null,f2:null};
+          state.vowelDraft.target.f1 = f1;
+          state.vowelDraft.target.f2 = f2;
         }
 
         state.pickingMode = null;
@@ -222,7 +229,7 @@
 
     const hint = document.getElementById('chartHint');
     if (hint) {
-      const msgs = {ipa:'Click chart to set position','ipa-target':'Click chart to set target position',formant:'Click formant chart to set F1/F2'};
+      const msgs = {ipa:'Click chart to set position','ipa-target':'Click chart to set target position',formant:'Click formant chart to set F1/F2','formant-target':'Click formant chart to set target F1/F2'};
       if (state.pickingMode && msgs[state.pickingMode]) hint.textContent = msgs[state.pickingMode];
       else hint.innerHTML = state.langDraft
               ? 'Click a vowel to edit · <b>Pick</b> buttons set chart position'
