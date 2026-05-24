@@ -1,6 +1,6 @@
 [
   {
-    "text": "i",
+    "text": "iː",
     "audio": "lang/en/audio/ipa/green.mp3",
     "phonemic": "/iː/",
     "tokens": [
@@ -275,7 +275,7 @@
   {
     "text": "coffee",
     "audio": "lang/en/audio/ipa/coffee_word.mp3",
-    "phonemic": "/ˈkɑfi/",
+    "phonemic": "/ˈkɑːfi/",
     "tokens": [
       {
         "symbol": "ɑ",
@@ -288,7 +288,7 @@
   {
     "text": "hod",
     "audio": "lang/en/audio/h95/hod.wav",
-    "phonemic": "/hɑd/",
+    "phonemic": "/hɑːd/",
     "tokens": [
       {
         "symbol": "ɑ",
@@ -301,7 +301,7 @@
   {
     "text": "father",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-father.ogg",
-    "phonemic": "/ˈfɑðər/",
+    "phonemic": "/ˈfɑːðər/",
     "tokens": [
       {
         "symbol": "ɑ",
@@ -314,7 +314,7 @@
   {
     "text": "palm",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-palm.ogg",
-    "phonemic": "/pɑm/",
+    "phonemic": "/pɑːm/",
     "tokens": [
       {
         "symbol": "ɑ",
@@ -340,7 +340,7 @@
   {
     "text": "mauve",
     "audio": "lang/en/audio/ipa/mauve_word.mp3",
-    "phonemic": "/mɔv/",
+    "phonemic": "/mɔːv/",
     "tokens": [
       {
         "symbol": "ɔ",
@@ -353,7 +353,7 @@
   {
     "text": "hawed",
     "audio": "lang/en/audio/h95/hawed.wav",
-    "phonemic": "/hɔd/",
+    "phonemic": "/hɔːd/",
     "tokens": [
       {
         "symbol": "ɔ",
@@ -366,7 +366,7 @@
   {
     "text": "thought",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-thought.ogg",
-    "phonemic": "/θɔt/",
+    "phonemic": "/θɔːt/",
     "tokens": [
       {
         "symbol": "ɔ",
@@ -379,7 +379,7 @@
   {
     "text": "claw",
     "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-claw.ogg",
-    "phonemic": "/klɔ/",
+    "phonemic": "/klɔː/",
     "tokens": [
       {
         "symbol": "ɔ",
@@ -561,7 +561,7 @@
   {
     "text": "strut",
     "audio": "https://dictionary.cambridge.org/media/english/us_pron/s/str/strut/strut.mp3",
-    "phonemic": "/stɹʌt/",
+    "phonemic": "/strʌt/",
     "tokens": [
       {
         "symbol": "ʌ",
@@ -639,7 +639,7 @@
   {
     "text": "purple",
     "audio": "lang/en/audio/ipa/purple_word.mp3",
-    "phonemic": "/ˈpɜːrpəl/",
+    "phonemic": "/ˈpɜːrpl/",
     "tokens": [
       {
         "symbol": "ɝ",
