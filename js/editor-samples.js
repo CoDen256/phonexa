@@ -143,7 +143,14 @@ function openSampleInVowelEditor(idx) {
 }
 
 function _initSampleDraft(idx) {
-    state.sampleIdx  = idx;
+    // Always flush the current draft back to samplesDraft before switching samples.
+    // This ensures analysis done in one sample is not lost when opening another.
+    if (state.sampleIdx != null && state.sampleIdx >= 0 &&
+        state.sampleDraft && state.sampleIdx !== idx) {
+        state.samplesDraft[state.sampleIdx] = clone(state.sampleDraft);
+        if (typeof setLangSamples === 'function') setLangSamples(state.selKey, state.samplesDraft);
+    }
+    state.sampleIdx   = idx;
     state.sampleDraft = idx >= 0 ? clone(state.samplesDraft[idx])
         : {text:'', audio:null, phonemic:null, tokens:[], representative:null};
     // Don't reset _wave — can reuse if same audio URL loaded
@@ -223,7 +230,7 @@ function buildSampleForm(container, showJumpBtn) {
     container.appendChild(repRow);
     container.querySelector('#seRepresentative').addEventListener('change', e => { s.representative = e.target.value || null; renderSampleList(); });
     container.appendChild(metaRow);
-    container.querySelector('#seText').addEventListener('input', e => { s.text = e.target.value; renderSampleList(); renderTokenRows(); });
+    container.querySelector('#seText').addEventListener('input', e => { s.text = e.target.value; renderSampleList(); renderTokenRows(tokContainer); });
     container.querySelector('#sePhonemic').addEventListener('input', e => { s.phonemic = e.target.value || null; });
 
     // Audio URL
@@ -244,7 +251,7 @@ function buildSampleForm(container, showJumpBtn) {
 
     // Tokens
     container.appendChild(makeDividerLabel('Tokens'));
-    const tokContainer = document.createElement('div'); tokContainer.id = 'seTokens';
+    const tokContainer = document.createElement('div'); tokContainer.className = 'se-tokens';
     container.appendChild(tokContainer);
 
     const addTok = document.createElement('button');
@@ -252,19 +259,19 @@ function buildSampleForm(container, showJumpBtn) {
     addTok.addEventListener('click', () => {
         const fullLen = (s.text||'').length;
         s.tokens = [...(s.tokens||[]), {symbol:'', position:[0, fullLen], analysis:null}];
-        renderTokenRows();
+        renderTokenRows(tokContainer);
     });
     container.appendChild(addTok);
 
-    renderTokenRows();
+    renderTokenRows(tokContainer);
     attachGlobalDragHandlers();
 
     if (s.audio) loadSampleAudio(s.audio);
 }
 
 // ─── Token rows ───────────────────────────────────────────────────────────────
-function renderTokenRows() {
-    const container = document.getElementById('seTokens');
+function renderTokenRows(tokCont) {
+    const container = tokCont || document.querySelector('.se-tokens');
     if (!container || !state.sampleDraft) return;
     container.innerHTML = '';
     const s = state.sampleDraft;

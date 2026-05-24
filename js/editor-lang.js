@@ -226,6 +226,17 @@ function initEditorUI(){
   });
 
   // Cardinal vowels toggle
+  // Averages toggle
+  const averagesToggle=document.getElementById('averagesToggle');
+  if(averagesToggle){
+    averagesToggle.classList.toggle('active', filters.showAverages);
+    averagesToggle.addEventListener('click',()=>{
+      filters.showAverages=!filters.showAverages;
+      averagesToggle.classList.toggle('active',filters.showAverages);
+      averagesToggle.title=filters.showAverages?'Hide average vowel dots':'Show average F1/F2 vowel dots';
+      refreshCharts();
+    });
+  }
   // Tokens toggle
   const tokensToggle=document.getElementById('tokensToggle');
   if(tokensToggle){
@@ -236,7 +247,6 @@ function initEditorUI(){
       refreshCharts();
     });
   }
-
   const cardinalToggle=document.getElementById('cardinalToggle');
   if(cardinalToggle){
     cardinalToggle.addEventListener('click',()=>{
@@ -315,6 +325,15 @@ function syncCoordsToForm(){
 
 // ─── Open vowel editor ────────────────────────────────────────────────────────
 function openVowelEditor(idx){
+  // Flush any pending sample analysis so it persists when switching vowels
+  if(state.sampleIdx!=null && state.sampleIdx>=0 && state.sampleDraft){
+    const prev=state.samplesDraft[state.sampleIdx];
+    if(JSON.stringify(prev)!==JSON.stringify(state.sampleDraft)){
+      state.samplesDraft[state.sampleIdx]=clone(state.sampleDraft);
+      if(typeof setLangSamples==='function') setLangSamples(state.selKey,state.samplesDraft);
+      if(typeof markUnsaved==='function') markUnsaved();
+    }
+  }
   if(typeof closeSampleEditor==='function') closeSampleEditor();
   state.vowelIdx=idx;
   state.pickingMode=null;
@@ -328,6 +347,11 @@ function openVowelEditor(idx){
 }
 
 function closeVowelEditor(){
+  // Flush any open sample draft before closing the vowel editor
+  if(state.sampleIdx!=null && state.sampleIdx>=0 && state.sampleDraft){
+    state.samplesDraft[state.sampleIdx]=clone(state.sampleDraft);
+    if(typeof setLangSamples==='function') setLangSamples(state.selKey,state.samplesDraft);
+  }
   state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
   state.showOtherVowels=true;
   const st=document.getElementById('soloToggle');

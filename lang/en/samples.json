@@ -7,7 +7,20 @@
       {
         "symbol": "i",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [86, 474],
+          "f1": 251,
+          "f2": 1700,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2300,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "i"
@@ -20,7 +33,20 @@
       {
         "symbol": "i",
         "position": [2, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [135, 250],
+          "f1": 321,
+          "f2": 2028,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2250,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -33,7 +59,20 @@
       {
         "symbol": "i",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [253, 439],
+          "f1": 346,
+          "f2": 2426,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -72,7 +111,20 @@
       {
         "symbol": "ɪ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [61, 169],
+          "f1": 306,
+          "f2": 2395,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2200,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɪ"
@@ -85,7 +137,20 @@
       {
         "symbol": "ɪ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [57, 164],
+          "f1": 466,
+          "f2": 1980,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -98,7 +163,20 @@
       {
         "symbol": "ɪ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [216, 357],
+          "f1": 390,
+          "f2": 2091,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -137,7 +215,20 @@
       {
         "symbol": "ɛ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [65, 175],
+          "f1": 528,
+          "f2": 1765,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɛ"
@@ -150,7 +241,20 @@
       {
         "symbol": "ɛ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [66, 196],
+          "f1": 594,
+          "f2": 1539,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -163,7 +267,20 @@
       {
         "symbol": "ɛ",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [231, 356],
+          "f1": 623,
+          "f2": 1860,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -202,7 +319,20 @@
       {
         "symbol": "æ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [81, 248],
+          "f1": 598,
+          "f2": 1707,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "æ"
@@ -215,7 +345,20 @@
       {
         "symbol": "æ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [156, 319],
+          "f1": 508,
+          "f2": 1894,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -228,7 +371,20 @@
       {
         "symbol": "æ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [235, 403],
+          "f1": 660,
+          "f2": 1954,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -267,7 +423,20 @@
       {
         "symbol": "ɑ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [152, 346],
+          "f1": 633,
+          "f2": 1050,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɑ"
@@ -280,7 +449,20 @@
       {
         "symbol": "ɑ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [148, 284],
+          "f1": 724,
+          "f2": 1078,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -293,7 +475,20 @@
       {
         "symbol": "ɑ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [243, 428],
+          "f1": 795,
+          "f2": 1276,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -332,7 +527,20 @@
       {
         "symbol": "ɔ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [101, 335],
+          "f1": 447,
+          "f2": 718,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɔ"
@@ -345,7 +553,20 @@
       {
         "symbol": "ɔ",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [187, 383],
+          "f1": 631,
+          "f2": 891,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -358,7 +579,20 @@
       {
         "symbol": "ɔ",
         "position": [1, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [288, 467],
+          "f1": 688,
+          "f2": 1051,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -397,7 +631,20 @@
       {
         "symbol": "ʊ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [74, 290],
+          "f1": 174,
+          "f2": 1243,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ʊ"
@@ -410,7 +657,20 @@
       {
         "symbol": "ʊ",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [74, 197],
+          "f1": 410,
+          "f2": 917,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -423,7 +683,20 @@
       {
         "symbol": "ʊ",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [218, 362],
+          "f1": 490,
+          "f2": 1033,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -462,7 +735,20 @@
       {
         "symbol": "u",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [171, 303],
+          "f1": 275,
+          "f2": 576,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "u"
@@ -475,7 +761,20 @@
       {
         "symbol": "u",
         "position": [2, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [142, 247],
+          "f1": 320,
+          "f2": 821,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -488,7 +787,20 @@
       {
         "symbol": "u",
         "position": [2, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [220, 385],
+          "f1": 366,
+          "f2": 909,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -527,7 +839,20 @@
       {
         "symbol": "ʌ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [105, 392],
+          "f1": 627,
+          "f2": 941,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ʌ"
@@ -540,7 +865,20 @@
       {
         "symbol": "ʌ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [504, 603],
+          "f1": 646,
+          "f2": 1339,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -553,7 +891,20 @@
       {
         "symbol": "ʌ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [203, 403],
+          "f1": 665,
+          "f2": 1291,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -592,7 +943,20 @@
       {
         "symbol": "ə",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [64, 205],
+          "f1": 569,
+          "f2": 1247,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ə"
@@ -605,7 +969,20 @@
       {
         "symbol": "ə",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [62, 193],
+          "f1": 701,
+          "f2": 1250,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -631,7 +1008,20 @@
       {
         "symbol": "ɝ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [49, 197],
+          "f1": 420,
+          "f2": 1087,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɝ"
@@ -644,7 +1034,20 @@
       {
         "symbol": "ɝ",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [64, 156],
+          "f1": 489,
+          "f2": 1112,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -657,7 +1060,20 @@
       {
         "symbol": "ɝ",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [251, 466],
+          "f1": 506,
+          "f2": 1406,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null

@@ -18,12 +18,14 @@
  */
 
 // ─── Chart builder (shared by IPA + Formant renderers) ───────────────────────
+// Shared constants used by buildVowels + renderTokenLayer
+const DOT_R=3, DH=14, PROX=22;
+
 function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
   const arrowL=$s('g'), langL=$s('g'), cardL=$s('g'), dotL=$s('g');
   svg.appendChild(arrowL); svg.appendChild(langL); svg.appendChild(cardL); svg.appendChild(dotL);
 
   const SF='drop-shadow(0px 1px 2px rgba(0,0,0,0.45))';
-  const DOT_R=3, DH=14, PROX=22;
 
   // ── Step 1: separate diphthongs (IPA chart only) from monophthongs ───────────
   const diphs=[], items=[];
@@ -168,9 +170,10 @@ function renderFormant() {
   svg.appendChild(f1el);
   svg.appendChild($s('rect',{x:FP.x0,y:FP.y0,width:FP.x1-FP.x0,height:FP.y1-FP.y0,fill:'none',stroke:'#385878','stroke-width':1.5,rx:6}));
 
-  // Average vowel dots (dimmed when tokens shown)
-  buildVowels(svg, v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null), 'chartFormant', true,
-      v=>(v.target?.f1&&v.target?.f2?formantPos(v.target.f1,v.target.f2):null));
+  // Average vowel dots (optional, dimmed when tokens shown)
+  if (filters.showAverages !== false)
+    buildVowels(svg, v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null), 'chartFormant', true,
+        v=>(v.target?.f1&&v.target?.f2?formantPos(v.target.f1,v.target.f2):null));
   // Token scatter layer — individual measurements on top
   renderTokenLayer(svg);
 
@@ -207,60 +210,180 @@ function renderFormant() {
 }
 
 
-// ─── Token scatter layer ──────────────────────────────────────────────────────
+// ─── Token scatter layer (with disambiguation clustering) ────────────────────
 function renderTokenLayer(svg) {
   if (!filters.showTokens) return;
   const tokL = $s('g'); tokL.setAttribute('class','tok-layer');
   svg.appendChild(tokL);
 
+  // Collect all analyzable tokens
+  const all = [];
   for (const [lk, lang] of Object.entries(LANGS)) {
-    const samples = LANG_SAMPLES[lk] || [];
-    const c = lang.color;
-    for (const sample of samples) {
+    for (const sample of (LANG_SAMPLES[lk]||[])) {
       for (const tok of (sample.tokens||[])) {
         const f = tok.analysis;
         if (!f?.f1 || !f?.f2) continue;
         const vowel = (lang.vowels||[]).find(v => v.symbols?.includes(tok.symbol));
         if (!vowel || !passesFilters(lk, vowel)) continue;
-
-        const pos = formantPos(f.f1, f.f2);
-        const g   = $s('g',{style:'cursor:pointer'});
-        // Vivid filled dot — primary visual
-        g.appendChild($s('circle',{cx:pos.x,cy:pos.y,r:5,fill:c,opacity:'0.85'}));
-        // Symbol label
-        g.appendChild($t(tok.symbol,{
-          x:pos.x+7, y:pos.y, dy:'0.36em',
-          'font-size':22, fill:c, opacity:'0.85',
-          'font-family':"Georgia,'Noto Serif',serif",
-          style:'pointer-events:none;user-select:none;cursor:pointer;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85))'
-        }));
-        // Transparent hit area
-        g.appendChild($s('circle',{cx:pos.x,cy:pos.y,r:9,fill:'transparent'}));
-
-        g.addEventListener('mouseenter', e => { showTokenTip(e,tok,sample,lang); moveTip(e); });
-        g.addEventListener('mousemove', moveTip);
-        g.addEventListener('mouseleave', hideTip);
-
-        // Left click → play full sample + pulse
-        g.addEventListener('click', e => {
-          e.stopPropagation();
-          if (sample.audio) new Audio(sample.audio).play().catch(()=>{});
-          pulse('chartFormant', pos.x, pos.y, c);
-        });
-        // Middle click → play slice + pulse
-        g.addEventListener('mousedown', e => {
-          if (e.button === 1) { e.preventDefault(); playTokenSlice(sample, tok); pulse('chartFormant', pos.x, pos.y, c); }
-        });
-        // Right click → context menu
-        g.addEventListener('contextmenu', e => {
-          e.preventDefault(); e.stopPropagation();
-          showTokenContextMenu(e, sample, tok, lang, lk);
-        });
-
-        tokL.appendChild(g);
+        all.push({lk, lang, c:lang.color, sample, tok, pos:formantPos(f.f1,f.f2)});
       }
     }
   }
+
+  // Cluster by PROX distance (same threshold as vowel disambiguation)
+  const used = new Set(), clusters = [];
+  for (let i = 0; i < all.length; i++) {
+    if (used.has(i)) continue;
+    const members = [all[i]]; used.add(i);
+    for (let j = i+1; j < all.length; j++) {
+      if (used.has(j)) continue;
+      const dx = all[i].pos.x - all[j].pos.x, dy = all[i].pos.y - all[j].pos.y;
+      if (Math.sqrt(dx*dx+dy*dy) < PROX) { members.push(all[j]); used.add(j); }
+    }
+    const cx = members.reduce((s,m)=>s+m.pos.x,0)/members.length;
+    const cy = members.reduce((s,m)=>s+m.pos.y,0)/members.length;
+    clusters.push({members, cx, cy});
+  }
+
+  for (const {members, cx, cy} of clusters) {
+    const multi = members.length > 1;
+    const first = members[0];
+    const c     = first.c;
+    const g     = $s('g',{style:'cursor:pointer'});
+
+    // Dot — same size as normal vowel dots
+    g.appendChild($s('circle',{cx,cy,r:DOT_R,fill:c,opacity:'0.85'}));
+
+    // Disambiguation dashed ring for multi-token clusters
+    if (multi) {
+      g.appendChild($s('circle',{cx,cy,r:DOT_R+4,fill:'none',stroke:c,
+        'stroke-width':1,'stroke-dasharray':'3 2',opacity:0.65}));
+    }
+
+    // Symbol label (unique symbols joined for clusters)
+    const syms = multi
+        ? [...new Set(members.map(m=>m.tok.symbol))].join('·')
+        : first.tok.symbol;
+    g.appendChild($t(syms,{
+      x:cx+DOT_R+4, y:cy, dy:'0.36em',
+      'font-size':22, fill:c, opacity:'0.85',
+      'font-family':"Georgia,'Noto Serif',serif",
+      style:'pointer-events:none;user-select:none;cursor:pointer;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85))'
+    }));
+
+    // Transparent hit area
+    g.appendChild($s('circle',{cx,cy,r:DH,fill:'transparent'}));
+
+    // Hover
+    g.addEventListener('mouseenter', e => {
+      if (multi) showTokenClusterTip(e, members); else showTokenTip(e,first.tok,first.sample,first.lang);
+      moveTip(e);
+    });
+    g.addEventListener('mousemove', moveTip);
+    g.addEventListener('mouseleave', hideTip);
+
+    // Left click
+    g.addEventListener('click', e => {
+      e.stopPropagation(); hideTip();
+      if (multi) {
+        showTokenClusterPicker(e.clientX, e.clientY, members, 'chartFormant');
+      } else {
+        if (first.sample.audio) new Audio(first.sample.audio).play().catch(()=>{});
+        pulse('chartFormant', cx, cy, c);
+      }
+    });
+
+    // Middle click — play slice of first member
+    g.addEventListener('mousedown', e => {
+      if (e.button === 1) {
+        e.preventDefault();
+        playTokenSlice(first.sample, first.tok);
+        pulse('chartFormant', cx, cy, c);
+      }
+    });
+
+    // Right click
+    g.addEventListener('contextmenu', e => {
+      e.preventDefault(); e.stopPropagation(); hideTip();
+      if (multi) showTokenClusterPicker(e.clientX, e.clientY, members, 'chartFormant');
+      else showTokenContextMenu(e, first.sample, first.tok, first.lang, first.lk);
+    });
+
+    tokL.appendChild(g);
+  }
+}
+
+// ─── Token cluster tooltip ────────────────────────────────────────────────────
+function showTokenClusterTip(e, members) {
+  tip.innerHTML = `
+    <div class="tip-meta">${members.length} tokens — click to pick</div>
+    ${members.slice(0,4).map(({tok,sample,c:mc})=>`
+      <div style="display:flex;gap:6px;align-items:baseline;margin-top:3px">
+        <span style="font-family:Georgia,serif;color:${mc};min-width:18px">${tok.symbol}</span>
+        <span style="font-size:.75rem;color:#8fa8c0">${sample.text||'?'}</span>
+        <span style="font-size:.62rem;color:#4a6878;font-family:monospace">${tok.analysis?.f1?`${tok.analysis.f1}·${tok.analysis.f2} Hz`:''}</span>
+      </div>`).join('')}
+    ${members.length>4?`<div style="font-size:.6rem;color:#4a6898;margin-top:3px">+${members.length-4} more</div>`:''}
+    <div style="font-size:.58rem;color:#4a6878;margin-top:5px">▶ click · ◉ middle · ⋯ right-click</div>`;
+  tip.style.display='block';
+}
+
+// ─── Token cluster picker ─────────────────────────────────────────────────────
+function showTokenClusterPicker(px, py, members, svgId) {
+  document.getElementById('_tokClusterPick')?.remove();
+  const picker = document.createElement('div');
+  picker.id = '_tokClusterPick';
+  picker.style.cssText = 'position:fixed;z-index:9999;background:#0d1a28;border:1px solid #2e4560;border-radius:8px;padding:5px 0;min-width:230px;max-height:320px;overflow-y:auto;box-shadow:0 4px 20px #000a;user-select:none';
+
+  const hd = document.createElement('div');
+  hd.style.cssText = 'padding:5px 12px 6px;border-bottom:1px solid #1e3048;margin-bottom:3px;font-size:.65rem;color:#4a6898;text-transform:uppercase;letter-spacing:.04em';
+  hd.textContent = `${members.length} tokens`;
+  picker.appendChild(hd);
+
+  for (const {tok, sample, lang, lk, c} of members) {
+    const row = document.createElement('div');
+    row.style.cssText = 'padding:6px 10px;cursor:pointer;display:flex;gap:7px;align-items:center';
+    row.addEventListener('mouseenter', ()=>row.style.background='#1a2e44');
+    row.addEventListener('mouseleave', ()=>row.style.background='');
+
+    const esc = x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    const f   = tok.analysis;
+    const [ps,pe]=[tok.position||[0,0]][0];
+    const txt = sample.text||'';
+    const hl  = esc(txt.slice(0,ps))+`<mark style="background:${c}33;color:${c};border-radius:2px;padding:0 1px">${esc(txt.slice(ps,pe)||'?')}</mark>`+esc(txt.slice(pe));
+
+    row.innerHTML = `
+      <span style="font-family:Georgia,serif;font-size:1.1rem;color:${c};min-width:22px">${tok.symbol}</span>
+      <span style="flex:1;min-width:0">
+        <div style="font-family:Georgia,serif;font-size:.82rem;color:#c8d8e8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${hl}</div>
+        <div style="font-size:.62rem;color:#4a7898;font-family:monospace">${f?.f1?`F1 ${f.f1} · F2 ${f.f2} Hz`:''}</div>
+      </span>
+      <button class="_tpFull"  style="background:none;border:none;color:#6a8898;cursor:pointer;padding:2px 4px;font-size:.9rem" title="Play full">▶</button>
+      <button class="_tpSlice" style="background:none;border:none;color:#6a8898;cursor:pointer;padding:2px 4px;font-size:.9rem" title="Play slice">◉</button>`;
+
+    row.querySelector('._tpFull').addEventListener('click', e => {
+      e.stopPropagation();
+      if (sample.audio) { new Audio(sample.audio).play().catch(()=>{}); pulse(svgId,px,py,c); }
+    });
+    row.querySelector('._tpSlice').addEventListener('click', e => {
+      e.stopPropagation();
+      playTokenSlice(sample, tok); pulse(svgId,px,py,c);
+    });
+    row.addEventListener('click', ()=>{
+      picker.remove();
+      showTokenContextMenu({clientX:px+10,clientY:py}, sample, tok, lang, lk);
+    });
+    picker.appendChild(row);
+  }
+
+  document.body.appendChild(picker);
+  const pw=picker.offsetWidth||230, ph=picker.scrollHeight||200;
+  picker.style.left=Math.min(px+4,window.innerWidth-pw-8)+'px';
+  picker.style.top=Math.min(py+4,window.innerHeight-ph-8)+'px';
+
+  const dismiss=ev=>{if(!picker.contains(ev.target)){picker.remove();document.removeEventListener('click',dismiss,true);}};
+  setTimeout(()=>document.addEventListener('click',dismiss,true),50);
+  document.addEventListener('keydown',ev=>{if(ev.key==='Escape')picker.remove();},{once:true});
 }
 
 // ─── Token right-click context menu ───────────────────────────────────────────
@@ -385,9 +508,15 @@ function buildSidebar() {
   const tokCb = document.createElement('input'); tokCb.type='checkbox'; tokCb.id='showTokensCb'; tokCb.checked=filters.showTokens;
   tokCb.addEventListener('change', e => { filters.showTokens=e.target.checked; renderAll(); });
   const tokLbl = document.createElement('label'); tokLbl.htmlFor='showTokensCb';
-  tokLbl.style.cssText='font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px';
-  tokLbl.innerHTML='<span style="font-size:.9rem">◉</span> Show token measurements';
-  tokWrap.appendChild(tokCb); tokWrap.appendChild(tokLbl); body.appendChild(tokWrap);
+  tokLbl.style.cssText='font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;flex:1';
+  tokLbl.innerHTML='<span style="font-size:.9rem">◉</span> Tokens';
+  const avgCb = document.createElement('input'); avgCb.type='checkbox'; avgCb.id='showAvgsCb'; avgCb.checked=filters.showAverages!==false;
+  avgCb.addEventListener('change', e => { filters.showAverages=e.target.checked; renderAll(); });
+  const avgLbl = document.createElement('label'); avgLbl.htmlFor='showAvgsCb';
+  avgLbl.style.cssText='font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px';
+  avgLbl.innerHTML='<span style="font-size:.9rem">◎</span> Averages';
+  tokWrap.appendChild(tokCb); tokWrap.appendChild(tokLbl);
+  tokWrap.appendChild(avgCb); tokWrap.appendChild(avgLbl); body.appendChild(tokWrap);
 
   body.appendChild(section('Language', filters.languages, grid=>{
     for (const[lk,lang] of Object.entries(LANGS))
