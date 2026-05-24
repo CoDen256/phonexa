@@ -6,8 +6,21 @@
     "tokens": [
       {
         "symbol": "iː",
-        "position": [0, 1],
-        "analysis": null
+        "position": [0, 2],
+        "analysis": {
+          "slice": [320, 614],
+          "f1": 350,
+          "f2": 2672,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "iː"
@@ -58,8 +71,21 @@
     "tokens": [
       {
         "symbol": "yː",
-        "position": [0, 1],
-        "analysis": null
+        "position": [0, 2],
+        "analysis": {
+          "slice": [494, 821],
+          "f1": 269,
+          "f2": 1979,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "yː"
@@ -111,7 +137,20 @@
       {
         "symbol": "ɪ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [396, 496],
+          "f1": 385,
+          "f2": 1636,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2200,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɪ"
@@ -124,7 +163,20 @@
       {
         "symbol": "ɪ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [232, 309],
+          "f1": 341,
+          "f2": 2241,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -176,7 +228,20 @@
       {
         "symbol": "ʏ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [442, 525],
+          "f1": 410,
+          "f2": 1743,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ʏ"
@@ -202,7 +267,20 @@
       {
         "symbol": "ʏ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [574, 665],
+          "f1": 333,
+          "f2": 1448,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -214,8 +292,21 @@
     "tokens": [
       {
         "symbol": "eː",
-        "position": [0, 1],
-        "analysis": null
+        "position": [0, 2],
+        "analysis": {
+          "slice": [341, 544],
+          "f1": 381,
+          "f2": 2699,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "eː"
@@ -253,8 +344,21 @@
     "tokens": [
       {
         "symbol": "øː",
-        "position": [0, 1],
-        "analysis": null
+        "position": [0, 2],
+        "analysis": {
+          "slice": [637, 909],
+          "f1": 393,
+          "f2": 1865,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "øː"
@@ -306,7 +410,20 @@
       {
         "symbol": "ɛ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [376, 473],
+          "f1": 602,
+          "f2": 1167,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɛ"
@@ -357,8 +474,21 @@
     "tokens": [
       {
         "symbol": "ɛː",
-        "position": [0, 1],
-        "analysis": null
+        "position": [0, 2],
+        "analysis": {
+          "slice": [454, 684],
+          "f1": 569,
+          "f2": 1430,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɛː"
@@ -397,7 +527,20 @@
       {
         "symbol": "œ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [380, 454],
+          "f1": 629,
+          "f2": 1837,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "œ"
@@ -449,7 +592,20 @@
       {
         "symbol": "a",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [293, 382],
+          "f1": 1070,
+          "f2": 1434,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "a"

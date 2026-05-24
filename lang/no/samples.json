@@ -216,9 +216,9 @@
         "symbol": "ʏ",
         "position": [0, 1],
         "analysis": {
-          "slice": [156, 197],
-          "f1": 380,
-          "f2": 2042,
+          "slice": [156, 227],
+          "f1": 362,
+          "f2": 2096,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -241,7 +241,20 @@
       {
         "symbol": "ʏ",
         "position": [5, 6],
-        "analysis": null
+        "analysis": {
+          "slice": [526, 584],
+          "f1": 457,
+          "f2": 1856,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -254,7 +267,20 @@
       {
         "symbol": "ʏ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [231, 324],
+          "f1": 394,
+          "f2": 2258,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -306,7 +332,20 @@
       {
         "symbol": "ʉː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [337, 580],
+          "f1": 270,
+          "f2": 1908,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ʉː"
@@ -319,7 +358,20 @@
       {
         "symbol": "ʉː",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [463, 593],
+          "f1": 242,
+          "f2": 1614,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -346,9 +398,9 @@
         "symbol": "ʉ",
         "position": [0, 1],
         "analysis": {
-          "slice": [99, 150],
-          "f1": 458,
-          "f2": 1801,
+          "slice": [107, 179],
+          "f1": 411,
+          "f2": 1882,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -437,9 +489,9 @@
         "symbol": "uː",
         "position": [0, 1],
         "analysis": {
-          "slice": [348, 568],
-          "f1": 394,
-          "f2": 467,
+          "slice": [356, 570],
+          "f1": 384,
+          "f2": 507,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -488,7 +540,20 @@
       {
         "symbol": "uː",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [349, 469],
+          "f1": 280,
+          "f2": 777,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -501,7 +566,20 @@
       {
         "symbol": "ʊ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [138, 191],
+          "f1": 463,
+          "f2": 905,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ʊ"
@@ -514,7 +592,20 @@
       {
         "symbol": "ʊ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [217, 274],
+          "f1": 396,
+          "f2": 1083,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -527,7 +618,20 @@
       {
         "symbol": "ʊ",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [167, 218],
+          "f1": 443,
+          "f2": 1269,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -605,7 +709,20 @@
       {
         "symbol": "eː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [324, 515],
+          "f1": 470,
+          "f2": 2147,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "eː"
@@ -618,7 +735,20 @@
       {
         "symbol": "eː",
         "position": [3, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [369, 512],
+          "f1": 450,
+          "f2": 2278,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -631,7 +761,20 @@
       {
         "symbol": "ɛ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [143, 182],
+          "f1": 585,
+          "f2": 1908,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɛ"
@@ -644,7 +787,20 @@
       {
         "symbol": "ɛ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [67, 132],
+          "f1": 579,
+          "f2": 1908,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -657,7 +813,20 @@
       {
         "symbol": "ɛ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [161, 210],
+          "f1": 614,
+          "f2": 1759,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -683,7 +852,20 @@
       {
         "symbol": "øː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [324, 557],
+          "f1": 407,
+          "f2": 1528,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "øː"
@@ -696,7 +878,20 @@
       {
         "symbol": "øː",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [369, 534],
+          "f1": 500,
+          "f2": 1420,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -709,7 +904,20 @@
       {
         "symbol": "ɘ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [232, 286],
+          "f1": 445,
+          "f2": 1870,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɘ"
@@ -748,7 +956,20 @@
       {
         "symbol": "œ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [93, 154],
+          "f1": 595,
+          "f2": 1491,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "œ"
@@ -814,9 +1035,9 @@
         "symbol": "ə",
         "position": [0, 1],
         "analysis": {
-          "slice": [145, 176],
-          "f1": 523,
-          "f2": 1409,
+          "slice": [126, 175],
+          "f1": 633,
+          "f2": 1441,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -892,9 +1113,9 @@
         "symbol": "oː",
         "position": [0, 1],
         "analysis": {
-          "slice": [343, 576],
-          "f1": 421,
-          "f2": 782,
+          "slice": [343, 548],
+          "f1": 426,
+          "f2": 765,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -931,9 +1152,9 @@
         "symbol": "ɔ",
         "position": [0, 1],
         "analysis": {
-          "slice": [301, 345],
-          "f1": 611,
-          "f2": 996,
+          "slice": [301, 339],
+          "f1": 610,
+          "f2": 955,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -956,7 +1177,20 @@
       {
         "symbol": "ɔ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [258, 293],
+          "f1": 662,
+          "f2": 1216,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -1047,7 +1281,20 @@
       {
         "symbol": "ɑ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [220, 292],
+          "f1": 795,
+          "f2": 1173,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɑ"
@@ -1060,7 +1307,20 @@
       {
         "symbol": "ɑ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [74, 127],
+          "f1": 686,
+          "f2": 1042,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -1112,7 +1372,20 @@
       {
         "symbol": "ɑː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [342, 550],
+          "f1": 661,
+          "f2": 967,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɑː"
@@ -1125,7 +1398,20 @@
       {
         "symbol": "ɑː",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [183, 314],
+          "f1": 728,
+          "f2": 1056,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -1151,7 +1437,20 @@
       {
         "symbol": "æ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [179, 248],
+          "f1": 941,
+          "f2": 1468,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "æ"
@@ -1164,7 +1463,20 @@
       {
         "symbol": "æ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [122, 165],
+          "f1": 872,
+          "f2": 1326,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -1215,11 +1527,11 @@
     "tokens": [
       {
         "symbol": "æː",
-        "position": [0, 1],
+        "position": [0, 2],
         "analysis": {
-          "slice": [161, 467],
+          "slice": [222, 448],
           "f1": 921,
-          "f2": 1418,
+          "f2": 1394,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -1235,13 +1547,13 @@
     "representative": "æː"
   },
   {
-    "text": "æ",
+    "text": "æː",
     "audio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ",
-    "phonemic": "/æ/",
+    "phonemic": "/æː/",
     "tokens": [
       {
-        "symbol": "æ",
-        "position": [0, 1],
+        "symbol": "æː",
+        "position": [0, 2],
         "analysis": null
       }
     ],
@@ -1255,7 +1567,20 @@
       {
         "symbol": "æː",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [252, 575],
+          "f1": 928,
+          "f2": 1401,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null

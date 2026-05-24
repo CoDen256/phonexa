@@ -7,7 +7,20 @@
       {
         "symbol": "i",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [532, 642],
+          "f1": 272,
+          "f2": 2755,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "i"
@@ -20,23 +33,23 @@
       {
         "symbol": "i",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [658, 994],
+          "f1": 488,
+          "f2": 2188,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2150,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
-    "representative": null
-  },
-  {
-    "text": "ɪ",
-    "audio": "lang/ru/audio/forvo/perehod.mp3",
-    "phonemic": "/ɪ/",
-    "tokens": [
-      {
-        "symbol": "ɪ",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "ɪ"
+    "representative": "i"
   },
   {
     "text": "его",
@@ -46,7 +59,20 @@
       {
         "symbol": "ɪ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [764, 874],
+          "f1": 388,
+          "f2": 1965,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -59,23 +85,23 @@
       {
         "symbol": "ɪ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [64, 121],
+          "f1": 472,
+          "f2": 2533,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
-    "representative": null
-  },
-  {
-    "text": "ʊ",
-    "audio": "lang/ru/audio/easy/uje.mp3",
-    "phonemic": "/ʊ/",
-    "tokens": [
-      {
-        "symbol": "ʊ",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "ʊ"
+    "representative": "ɪ"
   },
   {
     "text": "уже",
@@ -85,10 +111,23 @@
       {
         "symbol": "ʊ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [587, 730],
+          "f1": 383,
+          "f2": 839,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
-    "representative": null
+    "representative": "ʊ"
   },
   {
     "text": "тупая",
@@ -111,7 +150,20 @@
       {
         "symbol": "ʊ",
         "position": [4, 5],
-        "analysis": null
+        "analysis": {
+          "slice": [1535, 1647],
+          "f1": 298,
+          "f2": 669,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -124,7 +176,20 @@
       {
         "symbol": "ɨ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [501, 748],
+          "f1": 325,
+          "f2": 1637,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɨ"
@@ -137,23 +202,23 @@
       {
         "symbol": "ɨ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [703, 899],
+          "f1": 286,
+          "f2": 980,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
-  },
-  {
-    "text": "ʉ",
-    "audio": "lang/ru/audio/rufe/yu.mp3",
-    "phonemic": "/ʉ/",
-    "tokens": [
-      {
-        "symbol": "ʉ",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "ʉ"
   },
   {
     "text": "ю",
@@ -163,10 +228,23 @@
       {
         "symbol": "ʉ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [574, 716],
+          "f1": 368,
+          "f2": 516,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
-    "representative": null
+    "representative": "ʉ"
   },
   {
     "text": "свою",
@@ -176,7 +254,20 @@
       {
         "symbol": "ʉ",
         "position": [3, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [1005, 1445],
+          "f1": 339,
+          "f2": 905,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -189,7 +280,20 @@
       {
         "symbol": "u",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [575, 761],
+          "f1": 291,
+          "f2": 504,
+          "max_f": 5250,
+          "n_formants": 3,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "u"
@@ -202,36 +306,23 @@
       {
         "symbol": "u",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [1033, 1416],
+          "f1": 284,
+          "f2": 508,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
-  },
-  {
-    "text": "туп",
-    "audio": null,
-    "phonemic": "/tup/",
-    "tokens": [
-      {
-        "symbol": "u",
-        "position": [1, 2],
-        "analysis": null
-      }
-    ],
-    "representative": null
-  },
-  {
-    "text": "e",
-    "audio": "lang/ru/audio/rufe/ye.mp3",
-    "phonemic": "/e/",
-    "tokens": [
-      {
-        "symbol": "e",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "e"
   },
   {
     "text": "е",
@@ -241,10 +332,23 @@
       {
         "symbol": "e",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [644, 767],
+          "f1": 414,
+          "f2": 2486,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
-    "representative": null
+    "representative": "e"
   },
   {
     "text": "месте",
@@ -254,23 +358,23 @@
       {
         "symbol": "e",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [156, 292],
+          "f1": 335,
+          "f2": 2329,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2000,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
-  },
-  {
-    "text": "ɵ",
-    "audio": "lang/ru/audio/rufe/yo.mp3",
-    "phonemic": "/ɵ/",
-    "tokens": [
-      {
-        "symbol": "ɵ",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "ɵ"
   },
   {
     "text": "ё",
@@ -280,7 +384,20 @@
       {
         "symbol": "ɵ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [732, 895],
+          "f1": 428,
+          "f2": 788,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 2050,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -293,7 +410,20 @@
       {
         "symbol": "ɵ",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [1121, 1378],
+          "f1": 552,
+          "f2": 826,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -306,23 +436,23 @@
       {
         "symbol": "ɵ",
         "position": [3, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [1017, 1288],
+          "f1": 531,
+          "f2": 932,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
-  },
-  {
-    "text": "ə",
-    "audio": "lang/ru/audio/easy/mira.mp3",
-    "phonemic": "/ə/",
-    "tokens": [
-      {
-        "symbol": "ə",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "ə"
   },
   {
     "text": "мира",
@@ -332,7 +462,20 @@
       {
         "symbol": "ə",
         "position": [3, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [1196, 1325],
+          "f1": 656,
+          "f2": 1310,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -345,7 +488,20 @@
       {
         "symbol": "ə",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [965, 1092],
+          "f1": 524,
+          "f2": 1352,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -371,7 +527,20 @@
       {
         "symbol": "o",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [717, 967],
+          "f1": 398,
+          "f2": 767,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "o"
@@ -397,7 +566,20 @@
       {
         "symbol": "ɛ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [370, 550],
+          "f1": 451,
+          "f2": 1139,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɛ"
@@ -410,23 +592,23 @@
       {
         "symbol": "ɛ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [536, 658],
+          "f1": 470,
+          "f2": 1853,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
-  },
-  {
-    "text": "ʌ",
-    "audio": "lang/ru/audio/forvo/ona.mp3",
-    "phonemic": "/ʌ/",
-    "tokens": [
-      {
-        "symbol": "ʌ",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "ʌ"
   },
   {
     "text": "она",
@@ -436,10 +618,23 @@
       {
         "symbol": "ʌ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [54, 153],
+          "f1": 558,
+          "f2": 1315,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
-    "representative": null
+    "representative": "ʌ"
   },
   {
     "text": "хотел",
@@ -449,7 +644,20 @@
       {
         "symbol": "ʌ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [550, 642],
+          "f1": 696,
+          "f2": 1387,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -501,7 +709,20 @@
       {
         "symbol": "a",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [733, 1008],
+          "f1": 783,
+          "f2": 1188,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -527,7 +748,20 @@
       {
         "symbol": "ɑ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [152, 257],
+          "f1": 582,
+          "f2": 958,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -540,23 +774,23 @@
       {
         "symbol": "ɑ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [183, 260],
+          "f1": 592,
+          "f2": 1087,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
-  },
-  {
-    "text": "æ",
-    "audio": "lang/ru/audio/rufe/ya.mp3",
-    "phonemic": "/æ/",
-    "tokens": [
-      {
-        "symbol": "æ",
-        "position": [0, 1],
-        "analysis": null
-      }
-    ],
-    "representative": "æ"
   },
   {
     "text": "я",
@@ -566,10 +800,23 @@
       {
         "symbol": "æ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [650, 781],
+          "f1": 866,
+          "f2": 1283,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
-    "representative": null
+    "representative": "æ"
   },
   {
     "text": "части",
@@ -579,7 +826,20 @@
       {
         "symbol": "æ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [673, 816],
+          "f1": 687,
+          "f2": 1340,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -592,7 +852,20 @@
       {
         "symbol": "æ",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [329, 453],
+          "f1": 611,
+          "f2": 1786,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
