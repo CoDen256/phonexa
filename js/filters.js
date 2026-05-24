@@ -34,6 +34,7 @@ const filters = {
   vtype     : new Set(['monophthong']),  // monophthong | diphthong
   length    : new Set(),                 // long | short | variable
   ipaBase   : new Set(),
+  showTokens: false,                     // overlay individual token measurements on formant chart
 };
 function passesFilters(lk, v) {
   if (filters.languages.size > 0 && !filters.languages.has(lk))                              return false;

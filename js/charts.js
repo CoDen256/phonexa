@@ -43,6 +43,9 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
   const clusters=[];
   for (const item of items) {
     let found=null, best=Infinity;
+    // Dim average vowel dots when token scatter is active on formant chart
+    const dimAvg = filters.showTokens && svgId === 'chartFormant';
+
     for (const cl of clusters) {
       const d=Math.hypot(item.dx-cl.cx,item.dy-cl.cy);
       if (d<PROX&&d<best){best=d;found=cl;}
@@ -57,6 +60,9 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
   }
 
   // ── Step 3: render monophthong clusters ──────────────────────────────────────
+  // Dim average vowel dots when token scatter is active on formant chart
+  const dimAvg = filters.showTokens && svgId === 'chartFormant';
+
   for (const cl of clusters) {
     const {members,cx,cy}=cl;
     const multi=members.length>1;
@@ -71,14 +77,16 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
       const lg=$s('g',{style:'cursor:pointer'});
       lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
       lg.appendChild($t(sym,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
-        fill:lang.color,opacity:ic?0.98:0.78,
+        fill:lang.color,opacity:dimAvg?0.25:(ic?0.98:0.78),
         'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
       lg.addEventListener('click',()=>{playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
-      dotL.appendChild($s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
+      dotL.appendChild(dimAvg
+          ? $s('circle',{cx:dx,cy:dy,r:DOT_R-1,fill:'none',stroke:lang.color+'88','stroke-width':'1.5',opacity:'0.3'})
+          : $s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
     }
 
     const dg=$s('g',{style:'cursor:pointer'});
@@ -160,9 +168,11 @@ function renderFormant() {
   svg.appendChild(f1el);
   svg.appendChild($s('rect',{x:FP.x0,y:FP.y0,width:FP.x1-FP.x0,height:FP.y1-FP.y0,fill:'none',stroke:'#385878','stroke-width':1.5,rx:6}));
 
-  // Normal vowel dots (using JSON-specified F1/F2)
+  // Average vowel dots (dimmed when tokens shown)
   buildVowels(svg, v=>(v.f1&&v.f2?formantPos(v.f1,v.f2):null), 'chartFormant', true,
       v=>(v.target?.f1&&v.target?.f2?formantPos(v.target.f1,v.target.f2):null));
+  // Token scatter layer — individual measurements on top
+  renderTokenLayer(svg);
 
   // Analyzed overlay — shown automatically when available (dashed line + filled dot)
   const overlayL=$s('g'); svg.appendChild(overlayL);
@@ -194,6 +204,129 @@ function renderFormant() {
     svg.appendChild($s('circle',{cx:x,cy:y,r:5,fill:'#fbbf24',opacity:0.9,style:'pointer-events:none'}));
     svg.appendChild($t('Ref⚡',{x:x+10,y,dy:'0.36em','font-size':11,fill:'#fbbf24',opacity:0.9,'font-family':'system-ui,sans-serif','font-weight':'700',style:'pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))'}));
   }
+}
+
+
+// ─── Token scatter layer ──────────────────────────────────────────────────────
+function renderTokenLayer(svg) {
+  if (!filters.showTokens) return;
+  const tokL = $s('g'); tokL.setAttribute('class','tok-layer');
+  svg.appendChild(tokL);
+
+  for (const [lk, lang] of Object.entries(LANGS)) {
+    const samples = LANG_SAMPLES[lk] || [];
+    const c = lang.color;
+    for (const sample of samples) {
+      for (const tok of (sample.tokens||[])) {
+        const f = tok.analysis;
+        if (!f?.f1 || !f?.f2) continue;
+        const vowel = (lang.vowels||[]).find(v => v.symbols?.includes(tok.symbol));
+        if (!vowel || !passesFilters(lk, vowel)) continue;
+
+        const pos = formantPos(f.f1, f.f2);
+        const g   = $s('g',{style:'cursor:pointer'});
+        // Vivid filled dot — primary visual
+        g.appendChild($s('circle',{cx:pos.x,cy:pos.y,r:5,fill:c,opacity:'0.85'}));
+        // Symbol label
+        g.appendChild($t(tok.symbol,{
+          x:pos.x+7, y:pos.y, dy:'0.36em',
+          'font-size':22, fill:c, opacity:'0.85',
+          'font-family':"Georgia,'Noto Serif',serif",
+          style:'pointer-events:none;user-select:none;cursor:pointer;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85))'
+        }));
+        // Transparent hit area
+        g.appendChild($s('circle',{cx:pos.x,cy:pos.y,r:9,fill:'transparent'}));
+
+        g.addEventListener('mouseenter', e => { showTokenTip(e,tok,sample,lang); moveTip(e); });
+        g.addEventListener('mousemove', moveTip);
+        g.addEventListener('mouseleave', hideTip);
+
+        // Left click → play full sample + pulse
+        g.addEventListener('click', e => {
+          e.stopPropagation();
+          if (sample.audio) new Audio(sample.audio).play().catch(()=>{});
+          pulse('chartFormant', pos.x, pos.y, c);
+        });
+        // Middle click → play slice + pulse
+        g.addEventListener('mousedown', e => {
+          if (e.button === 1) { e.preventDefault(); playTokenSlice(sample, tok); pulse('chartFormant', pos.x, pos.y, c); }
+        });
+        // Right click → context menu
+        g.addEventListener('contextmenu', e => {
+          e.preventDefault(); e.stopPropagation();
+          showTokenContextMenu(e, sample, tok, lang, lk);
+        });
+
+        tokL.appendChild(g);
+      }
+    }
+  }
+}
+
+// ─── Token right-click context menu ───────────────────────────────────────────
+function showTokenContextMenu(e, sample, tok, lang, lk) {
+  document.getElementById('_tokCtxMenu')?.remove();
+  const c = lang.color;
+  const menu = document.createElement('div');
+  menu.id = '_tokCtxMenu';
+  menu.style.cssText = 'position:fixed;z-index:9999;background:#0d1a28;border:1px solid #2e4560;border-radius:8px;padding:5px 0;min-width:195px;box-shadow:0 4px 20px #000a;user-select:none';
+
+  // Header
+  const hd = document.createElement('div');
+  hd.style.cssText = 'padding:7px 12px 8px;border-bottom:1px solid #1e3048;margin-bottom:3px';
+  const f  = tok.analysis;
+  const esc = x => String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const [ps,pe] = tok.position||[0,0];
+  const txt = sample.text||'';
+  const hl  = esc(txt.slice(0,ps))
+      + `<mark style="background:${c}33;color:${c};padding:0 1px;border-radius:2px">${esc(txt.slice(ps,pe)||'?')}</mark>`
+      + esc(txt.slice(pe));
+  hd.innerHTML = `<span style="font-family:Georgia,serif;font-size:1.1rem;color:${c}">${tok.symbol}</span>`
+      + `<span style="font-size:.7rem;color:#6a8298;margin-left:6px">${lang.label}</span>`
+      + `<div style="font-family:Georgia,serif;font-size:.8rem;color:#8fa8c0;margin-top:3px">${hl}${sample.phonemic?` <span style='opacity:.5;font-style:italic'>${sample.phonemic}</span>`:''}</div>`
+      + (f?.f1?`<div style="font-size:.65rem;color:#4a7898;font-family:monospace;margin-top:3px">F1 ${f.f1} · F2 ${f.f2} Hz</div>`:'');
+  menu.appendChild(hd);
+
+  const item = (icon, label, cb) => {
+    const d = document.createElement('div');
+    d.style.cssText = 'padding:7px 14px;cursor:pointer;font-size:.8rem;color:#c8d8e8;display:flex;gap:8px;align-items:center';
+    d.innerHTML = `<span style="opacity:.7;width:12px">${icon}</span><span>${label}</span>`;
+    d.addEventListener('mouseenter', () => d.style.background = '#1a2e44');
+    d.addEventListener('mouseleave', () => d.style.background = '');
+    d.addEventListener('click', () => { menu.remove(); cb(); });
+    menu.appendChild(d);
+  };
+
+  item('▶', 'Play full sample',  () => { if (sample.audio) new Audio(sample.audio).play().catch(()=>{}); });
+  item('◉', 'Play token slice',  () => playTokenSlice(sample, tok));
+  // Only offer 'Open' when this token's language is the one currently being edited
+  const _st = typeof state !== 'undefined' ? state : null;
+  if (_st && lk === _st.selKey && typeof openSampleInVowelEditor === 'function') {
+    item('↗', `Open "${esc(sample.text||'?')}"`, () => {
+      // LANG_SAMPLES[lk] was set to state.samplesDraft by setLangSamples — same array
+      const smpIdx = (_st.samplesDraft||[]).indexOf(sample);
+      if (smpIdx < 0) return;
+      // Open the vowel that owns this token first
+      const vowelIdx = (_st.langDraft?.vowels||[]).findIndex(v => v.symbols?.includes(tok.symbol));
+      if (vowelIdx >= 0 && typeof openVowelEditor === 'function') {
+        openVowelEditor(vowelIdx);
+        openSampleInVowelEditor(smpIdx);
+      } else {
+        // Vowel not found — fall back to the samples panel
+        if (typeof switchToSamplesTab === 'function') switchToSamplesTab();
+        if (typeof openSampleEditor  === 'function') openSampleEditor(smpIdx);
+      }
+    });
+  }
+
+  document.body.appendChild(menu);
+  const pw = menu.offsetWidth||195, ph = menu.offsetHeight||130;
+  menu.style.left = Math.min(e.clientX+4, window.innerWidth -pw-8) + 'px';
+  menu.style.top  = Math.min(e.clientY+4, window.innerHeight-ph-8) + 'px';
+
+  const dismiss = ev => { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click',dismiss,true); } };
+  setTimeout(() => document.addEventListener('click',dismiss,true), 50);
+  document.addEventListener('keydown', ev => { if (ev.key==='Escape') menu.remove(); },{once:true});
 }
 
 function renderAll() { renderIpa(); renderFormant(); renderDetail(); updateCount(); }
@@ -245,6 +378,16 @@ function buildSidebar() {
     sec.appendChild(lbl); sec.appendChild(grid);
     return sec;
   }
+
+  // ── Token measurements toggle ──────────────────────────────────────────────
+  const tokWrap = document.createElement('div');
+  tokWrap.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border)';
+  const tokCb = document.createElement('input'); tokCb.type='checkbox'; tokCb.id='showTokensCb'; tokCb.checked=filters.showTokens;
+  tokCb.addEventListener('change', e => { filters.showTokens=e.target.checked; renderAll(); });
+  const tokLbl = document.createElement('label'); tokLbl.htmlFor='showTokensCb';
+  tokLbl.style.cssText='font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px';
+  tokLbl.innerHTML='<span style="font-size:.9rem">◉</span> Show token measurements';
+  tokWrap.appendChild(tokCb); tokWrap.appendChild(tokLbl); body.appendChild(tokWrap);
 
   body.appendChild(section('Language', filters.languages, grid=>{
     for (const[lk,lang] of Object.entries(LANGS))

@@ -74,6 +74,7 @@
         <button class="view-tab active" id="tabIpa" type="button">IPA Chart</button>
         <button class="view-tab" id="tabFormant" type="button">Formant Plot</button>
         <div style="margin-left:auto;display:flex;gap:4px;align-items:flex-end">
+          <button class="cardinal-toggle" id="tokensToggle" title="Show individual token F1/F2 measurements on formant chart" type="button">◉ Tokens</button>
           <button class="cardinal-toggle" id="cardinalToggle" title="Show cardinal vowels" type="button">Cardinals</button>
           <button class="cardinal-toggle" id="soloToggle" title="Show only current vowel" type="button" style="display:none">Only current</button>
         </div>
@@ -175,6 +176,10 @@
   // ─── Overrides for shared chart scripts ───────────────────────────────────────
   var LANGS = {};
   var refAnalyzed = null, refVowelMeta = null;
+  // Minimal filters stub — editor always shows all vowels; showTokens is user-toggled
+  if (typeof filters === 'undefined')
+    var filters = { showTokens:false, languages:new Set(), roundness:new Set(),
+      vtype:new Set(), length:new Set(), ipaBase:new Set() };
   function passesFilters(lk, v) { return true; }
   function isCompareMode() { return false; }
   function playUrl(url) { if (!url) return; new Audio(url).play().catch(()=>{}); }

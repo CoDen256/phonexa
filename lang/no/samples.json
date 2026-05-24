@@ -7,7 +7,20 @@
       {
         "symbol": "iː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [329, 564],
+          "f1": 256,
+          "f2": 2410,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "iː"
@@ -20,7 +33,20 @@
       {
         "symbol": "iː",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [146, 318],
+          "f1": 238,
+          "f2": 2174,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -33,7 +59,20 @@
       {
         "symbol": "iː",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [362, 462],
+          "f1": 295,
+          "f2": 2700,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -46,7 +85,20 @@
       {
         "symbol": "ɪ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [137, 195],
+          "f1": 352,
+          "f2": 2211,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɪ"
@@ -59,7 +111,20 @@
       {
         "symbol": "ɪ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [115, 153],
+          "f1": 369,
+          "f2": 2288,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -72,7 +137,20 @@
       {
         "symbol": "ɪ",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [346, 409],
+          "f1": 392,
+          "f2": 2228,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -85,7 +163,20 @@
       {
         "symbol": "yː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [346, 538],
+          "f1": 262,
+          "f2": 2182,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "yː"
@@ -98,7 +189,20 @@
       {
         "symbol": "yː",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [401, 442],
+          "f1": 316,
+          "f2": 2372,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -111,7 +215,20 @@
       {
         "symbol": "ʏ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [156, 197],
+          "f1": 380,
+          "f2": 2042,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ʏ"
@@ -228,7 +345,20 @@
       {
         "symbol": "ʉ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [99, 150],
+          "f1": 458,
+          "f2": 1801,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ʉ"
@@ -306,7 +436,20 @@
       {
         "symbol": "uː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [348, 568],
+          "f1": 394,
+          "f2": 467,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "uː"
@@ -319,7 +462,20 @@
       {
         "symbol": "uː",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [433, 556],
+          "f1": 359,
+          "f2": 428,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -657,7 +813,20 @@
       {
         "symbol": "ə",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [145, 176],
+          "f1": 523,
+          "f2": 1409,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ə"
@@ -722,7 +891,20 @@
       {
         "symbol": "oː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [343, 576],
+          "f1": 421,
+          "f2": 782,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "oː"
@@ -748,7 +930,20 @@
       {
         "symbol": "ɔ",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [301, 345],
+          "f1": 611,
+          "f2": 996,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "ɔ"
@@ -1021,7 +1216,20 @@
       {
         "symbol": "æː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [161, 467],
+          "f1": 921,
+          "f2": 1418,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "æː"
@@ -1029,10 +1237,10 @@
   {
     "text": "æ",
     "audio": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ",
-    "phonemic": "/æː/",
+    "phonemic": "/æ/",
     "tokens": [
       {
-        "symbol": "æː",
+        "symbol": "æ",
         "position": [0, 1],
         "analysis": null
       }

@@ -59,6 +59,26 @@ function moveTip(e) {
 }
 function hideTip() { tip.style.display='none'; }
 
+// Token tooltip (reuses the same tip element)
+function showTokenTip(e, tok, sample, lang) {
+  const c   = lang.color;
+  const txt = sample.text || '';
+  const [ps,pe] = tok.position || [0,0];
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const hl  = esc(txt.slice(0,ps))
+      + `<mark style='background:${c}33;color:${c};padding:0 1px;border-radius:2px'>${esc(txt.slice(ps,pe)||'?')}</mark>`
+      + esc(txt.slice(pe));
+  const f   = tok.analysis;
+  tip.innerHTML = `
+    <div class='tip-ipa' style='color:${c}'>${tok.symbol}</div>
+    <div class='tip-lang' style='color:${c}'>${lang.label}</div>
+    <div class='tip-desc' style='font-family:Georgia,serif;line-height:1.5'>${hl}${sample.phonemic?` <span style='opacity:.6;font-style:italic'>${sample.phonemic}</span>`:''}</div>
+    ${f?.f1?`<div class='tip-f'>F1 <span>${f.f1} Hz</span> · F2 <span>${f.f2} Hz</span></div>`:''}
+    <div style='font-size:.58rem;color:#4a6878;margin-top:4px'>▶ click · ◉ middle-click · ⋯ right-click</div>
+  `;
+  tip.style.display='block';
+}
+
 // ─── Disambiguation picker ────────────────────────────────────────────────────
 const picker=document.getElementById('vowelPicker');
 function showPicker(cx, cy, group, svgId, dx, dy) {

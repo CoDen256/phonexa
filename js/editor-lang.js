@@ -226,6 +226,17 @@ function initEditorUI(){
   });
 
   // Cardinal vowels toggle
+  // Tokens toggle
+  const tokensToggle=document.getElementById('tokensToggle');
+  if(tokensToggle){
+    tokensToggle.addEventListener('click',()=>{
+      filters.showTokens=!filters.showTokens;
+      tokensToggle.classList.toggle('active',filters.showTokens);
+      tokensToggle.title=filters.showTokens?'Hide token measurements':'Show token measurements on formant chart';
+      refreshCharts();
+    });
+  }
+
   const cardinalToggle=document.getElementById('cardinalToggle');
   if(cardinalToggle){
     cardinalToggle.addEventListener('click',()=>{
