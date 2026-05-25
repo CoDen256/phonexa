@@ -7,26 +7,25 @@ async function loadLanguages() {
     const idx = await fetch('lang/index.json').then(r => r.json());
     const names = (idx.languages || []).filter(n => n && n.length > 0 && !n.startsWith('_'));
 
-    // 2. Fetch all language files in parallel
-    const results = await Promise.all(
-        names.map(name =>
-            fetch(`lang/${name}/lang.json`)
-                .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-                .catch(e => { console.warn(`Skipped lang/${name}/lang.json:`, e.message); return null; })
-        )
-    );
-
-    // 3. Register each successfully loaded language
-    for (const data of results) {
-      if (data && data.key) {
-        LANGS[data.key] = data;
-        // Also load samples for this language
-        if (name) fetch(`lang/${name}/samples.json`)
-            .then(r => r.ok ? r.json() : [])
-            .then(samples => { if (typeof setLangSamples === 'function') setLangSamples(name, samples); })
-            .catch(() => {});
+    // 2. Fetch lang.json + samples.json for every language in parallel,
+    //    awaiting both before calling init() so LANG_SAMPLES is ready.
+    await Promise.all(names.map(async name => {
+      try {
+        const r = await fetch(`lang/${name}/lang.json`);
+        if (!r.ok) throw new Error(r.status);
+        const data = await r.json();
+        if (data && data.key) {
+          LANGS[data.key] = data;
+          // Load samples — use data.key so it matches LANGS key
+          try {
+            const samples = await fetch(`lang/${name}/samples.json`).then(r => r.ok ? r.json() : []);
+            if (typeof setLangSamples === 'function') setLangSamples(data.key, samples);
+          } catch (_) { /* samples optional */ }
+        }
+      } catch (e) {
+        console.warn(`Skipped lang/${name}:`, e.message);
       }
-    }
+    }));
   } catch (e) {
     console.error('Failed to load lang/index.json:', e);
   }

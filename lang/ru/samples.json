@@ -333,14 +333,14 @@
         "symbol": "e",
         "position": [0, 1],
         "analysis": {
-          "slice": [644, 767],
-          "f1": 414,
-          "f2": 2486,
-          "max_f": 5000,
+          "slice": [632, 695],
+          "f1": 381,
+          "f2": 2579,
+          "max_f": 5500,
           "n_formants": 5,
           "window_ms": 25,
           "pre_emphasis": 50,
-          "back_ceiling": 1800,
+          "back_ceiling": 1500,
           "back_ceiling_ratio": 0.95,
           "back_front_ratio": 0.75,
           "rms_floor": 0.005,
@@ -762,14 +762,14 @@
         "symbol": "ɑ",
         "position": [1, 2],
         "analysis": {
-          "slice": [152, 257],
-          "f1": 582,
-          "f2": 958,
+          "slice": [196, 287],
+          "f1": 531,
+          "f2": 932,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
           "pre_emphasis": 50,
-          "back_ceiling": 1800,
+          "back_ceiling": 2050,
           "back_ceiling_ratio": 0.95,
           "back_front_ratio": 0.75,
           "rms_floor": 0.005,
@@ -808,10 +808,10 @@
   {
     "text": "я",
     "audio": "lang/ru/audio/rufe/ya.mp3",
-    "phonemic": null,
+    "phonemic": "/ja/",
     "tokens": [
       {
-        "symbol": "æ",
+        "symbol": "a",
         "position": [0, 1],
         "analysis": {
           "slice": [650, 781],
@@ -829,7 +829,7 @@
         }
       }
     ],
-    "representative": "æ"
+    "representative": null
   },
   {
     "text": "части",

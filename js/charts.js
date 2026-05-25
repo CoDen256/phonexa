@@ -22,6 +22,7 @@
 const DOT_R=3, DH=14, PROX=22;
 
 function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
+  const showAsRing = (typeof filters!=='undefined') && filters.showTokens && svgId==='chartFormant';
   const arrowL=$s('g'), langL=$s('g'), cardL=$s('g'), dotL=$s('g');
   svg.appendChild(arrowL); svg.appendChild(langL); svg.appendChild(cardL); svg.appendChild(dotL);
 
@@ -45,9 +46,6 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
   const clusters=[];
   for (const item of items) {
     let found=null, best=Infinity;
-    // Dim average vowel dots when token scatter is active on formant chart
-    const dimAvg = filters.showTokens && svgId === 'chartFormant';
-
     for (const cl of clusters) {
       const d=Math.hypot(item.dx-cl.cx,item.dy-cl.cy);
       if (d<PROX&&d<best){best=d;found=cl;}
@@ -62,9 +60,6 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
   }
 
   // ── Step 3: render monophthong clusters ──────────────────────────────────────
-  // Dim average vowel dots when token scatter is active on formant chart
-  const dimAvg = filters.showTokens && svgId === 'chartFormant';
-
   for (const cl of clusters) {
     const {members,cx,cy}=cl;
     const multi=members.length>1;
@@ -79,15 +74,15 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
       const lg=$s('g',{style:'cursor:pointer'});
       lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
       lg.appendChild($t(sym,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
-        fill:lang.color,opacity:dimAvg?0.25:(ic?0.98:0.78),
+        fill:lang.color,opacity:ic?0.98:0.78,
         'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
         style:`filter:${SF};user-select:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
       lg.addEventListener('click',()=>{playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
-      dotL.appendChild(dimAvg
-          ? $s('circle',{cx:dx,cy:dy,r:DOT_R-1,fill:'none',stroke:lang.color+'88','stroke-width':'1.5',opacity:'0.3'})
+      dotL.appendChild(showAsRing
+          ? $s('circle',{cx:dx,cy:dy,r:DOT_R+1,fill:lang.color+'18',stroke:lang.color,'stroke-width':'1.5','stroke-dasharray':'3 2',opacity:'0.75'})
           : $s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
     }
 
@@ -216,8 +211,12 @@ function renderTokenLayer(svg) {
   const tokL = $s('g'); tokL.setAttribute('class','tok-layer');
   svg.appendChild(tokL);
 
-  // Collect all analyzable tokens
-  const all = [];
+  // Two sub-layers matching buildVowels: dots below, labels+rings on top
+  const dotL = $s('g'), topL = $s('g');
+  tokL.appendChild(dotL); tokL.appendChild(topL);
+
+  // ── Step 1: collect renderable token items ────────────────────────────────
+  const items = [];
   for (const [lk, lang] of Object.entries(LANGS)) {
     for (const sample of (LANG_SAMPLES[lk]||[])) {
       for (const tok of (sample.tokens||[])) {
@@ -225,91 +224,80 @@ function renderTokenLayer(svg) {
         if (!f?.f1 || !f?.f2) continue;
         const vowel = (lang.vowels||[]).find(v => v.symbols?.includes(tok.symbol));
         if (!vowel || !passesFilters(lk, vowel)) continue;
-        all.push({lk, lang, c:lang.color, sample, tok, pos:formantPos(f.f1,f.f2)});
+        items.push({lk, lang, c:lang.color, sample, tok, vowel,
+          pos: formantPos(f.f1, f.f2)});
       }
     }
   }
 
-  // Cluster by PROX distance (same threshold as vowel disambiguation)
-  const used = new Set(), clusters = [];
-  for (let i = 0; i < all.length; i++) {
-    if (used.has(i)) continue;
-    const members = [all[i]]; used.add(i);
-    for (let j = i+1; j < all.length; j++) {
-      if (used.has(j)) continue;
-      const dx = all[i].pos.x - all[j].pos.x, dy = all[i].pos.y - all[j].pos.y;
-      if (Math.sqrt(dx*dx+dy*dy) < PROX) { members.push(all[j]); used.add(j); }
+  // ── Step 2: greedy proximity clustering — IDENTICAL to buildVowels ────────
+  const clusters = [];
+  for (const item of items) {
+    let found = null, best = Infinity;
+    for (const cl of clusters) {
+      const d = Math.hypot(item.pos.x-cl.cx, item.pos.y-cl.cy);
+      if (d < PROX && d < best) { best = d; found = cl; }
     }
-    const cx = members.reduce((s,m)=>s+m.pos.x,0)/members.length;
-    const cy = members.reduce((s,m)=>s+m.pos.y,0)/members.length;
-    clusters.push({members, cx, cy});
+    if (found) {
+      found.members.push(item);
+      // Update rolling cluster centre, same as buildVowels
+      found.cx = found.members.reduce((a,m)=>a+m.pos.x,0)/found.members.length;
+      found.cy = found.members.reduce((a,m)=>a+m.pos.y,0)/found.members.length;
+    } else {
+      clusters.push({cx:item.pos.x, cy:item.pos.y, members:[item]});
+    }
   }
 
-  for (const {members, cx, cy} of clusters) {
+  // ── Step 3: render — MIRRORS buildVowels Step 3 exactly ──────────────────
+  for (const {cx, cy, members} of clusters) {
     const multi = members.length > 1;
-    const first = members[0];
-    const c     = first.c;
-    const g     = $s('g',{style:'cursor:pointer'});
 
-    // Dot — same size as normal vowel dots
-    g.appendChild($s('circle',{cx,cy,r:DOT_R,fill:c,opacity:'0.85'}));
-
-    // Disambiguation dashed ring for multi-token clusters
-    if (multi) {
-      g.appendChild($s('circle',{cx,cy,r:DOT_R+4,fill:'none',stroke:c,
-        'stroke-width':1,'stroke-dasharray':'3 2',opacity:0.65}));
+    // Each member: own dot + label at ACTUAL position — same as buildVowels
+    for (const {pos, tok, vowel, c, lang} of members) {
+      dotL.appendChild($s('circle',{cx:pos.x,cy:pos.y,r:DOT_R,fill:c,opacity:'0.9'}));
+      const rounded = vowel?.rounded ?? false;
+      topL.appendChild($t(tok.symbol,{
+        x: rounded?pos.x+DOT_R+4:pos.x-DOT_R-4, y:pos.y, dy:'0.36em',
+        'text-anchor': rounded?'start':'end',
+        'font-size':22, fill:c, opacity:'0.85',
+        'font-family':"Georgia,'Noto Serif',serif",
+        style:'pointer-events:none;user-select:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85))'
+      }));
     }
 
-    // Symbol label (unique symbols joined for clusters)
-    const syms = multi
-        ? [...new Set(members.map(m=>m.tok.symbol))].join('·')
-        : first.tok.symbol;
-    g.appendChild($t(syms,{
-      x:cx+DOT_R+4, y:cy, dy:'0.36em',
-      'font-size':22, fill:c, opacity:'0.85',
-      'font-family':"Georgia,'Noto Serif',serif",
-      style:'pointer-events:none;user-select:none;cursor:pointer;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85))'
-    }));
+    // Disambiguation group at cluster centre — mirrors buildVowels dg exactly
+    const dg = $s('g',{style:'cursor:pointer'});
+    dg.appendChild($s('circle',{cx,cy,r:DH,fill:'transparent'}));
 
-    // Transparent hit area
-    g.appendChild($s('circle',{cx,cy,r:DH,fill:'transparent'}));
-
-    // Hover
-    g.addEventListener('mouseenter', e => {
-      if (multi) showTokenClusterTip(e, members); else showTokenTip(e,first.tok,first.sample,first.lang);
-      moveTip(e);
-    });
-    g.addEventListener('mousemove', moveTip);
-    g.addEventListener('mouseleave', hideTip);
-
-    // Left click
-    g.addEventListener('click', e => {
-      e.stopPropagation(); hideTip();
-      if (multi) {
-        showTokenClusterPicker(e.clientX, e.clientY, members, 'chartFormant');
-      } else {
-        if (first.sample.audio) new Audio(first.sample.audio).play().catch(()=>{});
-        pulse('chartFormant', cx, cy, c);
-      }
-    });
-
-    // Middle click — play slice of first member
-    g.addEventListener('mousedown', e => {
-      if (e.button === 1) {
-        e.preventDefault();
-        playTokenSlice(first.sample, first.tok);
-        pulse('chartFormant', cx, cy, c);
-      }
-    });
-
-    // Right click
-    g.addEventListener('contextmenu', e => {
-      e.preventDefault(); e.stopPropagation(); hideTip();
-      if (multi) showTokenClusterPicker(e.clientX, e.clientY, members, 'chartFormant');
-      else showTokenContextMenu(e, first.sample, first.tok, first.lang, first.lk);
-    });
-
-    tokL.appendChild(g);
+    if (multi) {
+      // Dashed ring + cluster picker (same neutral color as buildVowels: #8090a8)
+      dg.appendChild($s('circle',{cx,cy,r:DOT_R+4,fill:'none',stroke:'#8090a8',
+        'stroke-width':1,'stroke-dasharray':'3 2',opacity:0.5}));
+      dg.addEventListener('mouseenter',e=>{showTokenClusterTip(e,members);moveTip(e);});
+      dg.addEventListener('mousemove',moveTip);
+      dg.addEventListener('mouseleave',hideTip);
+      dg.addEventListener('click',e=>{e.stopPropagation();hideTip();showTokenClusterPicker(e.clientX,e.clientY,members,'chartFormant');});
+      dg.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();hideTip();showTokenClusterPicker(e.clientX,e.clientY,members,'chartFormant');});
+    } else {
+      // Single token: interactions (label already added in the member loop above)
+      const {pos,tok,sample,lang,lk,c} = members[0];
+      dg.addEventListener('mouseenter',e=>{showTokenTip(e,tok,sample,lang);moveTip(e);});
+      dg.addEventListener('mousemove',moveTip);
+      dg.addEventListener('mouseleave',hideTip);
+      dg.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(sample.audio) new Audio(sample.audio).play().catch(()=>{});
+        pulse('chartFormant',pos.x,pos.y,c);
+      });
+      dg.addEventListener('mousedown',e=>{
+        if(e.button===1){e.preventDefault();playTokenSlice(sample,tok);pulse('chartFormant',pos.x,pos.y,c);}
+      });
+      dg.addEventListener('contextmenu',e=>{
+        e.preventDefault();e.stopPropagation();hideTip();
+        showTokenContextMenu(e,sample,tok,lang,lk);
+      });
+    }
+    topL.appendChild(dg);
   }
 }
 
@@ -455,27 +443,30 @@ function showTokenContextMenu(e, sample, tok, lang, lk) {
 function renderAll() { renderIpa(); renderFormant(); renderDetail(); updateCount(); }
 
 // ─── View tabs ────────────────────────────────────────────────────────────────
-document.getElementById('tabIpa').addEventListener('click',()=>{
+document.getElementById('tabIpa')?.addEventListener('click',()=>{
   document.getElementById('tabIpa').classList.add('active');
   document.getElementById('tabFormant').classList.remove('active');
   document.getElementById('panelIpa').classList.add('active');
   document.getElementById('panelFormant').classList.remove('active');
+  buildSidebar();
 });
-document.getElementById('tabFormant').addEventListener('click',()=>{
+document.getElementById('tabFormant')?.addEventListener('click',()=>{
   document.getElementById('tabFormant').classList.add('active');
   document.getElementById('tabIpa').classList.remove('active');
   document.getElementById('panelFormant').classList.add('active');
   document.getElementById('panelIpa').classList.remove('active');
+  buildSidebar();
 });
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 function updateCount() {
-  document.getElementById('sbCount').innerHTML =
-      `<b>${countShown()}</b> of ${totalVowels()} vowels shown`;
+  const el = document.getElementById('sbCount');
+  if (el) el.innerHTML = `<b>${countShown()}</b> of ${totalVowels()} vowels shown`;
 }
 
 function buildSidebar() {
   const body=document.getElementById('sidebarBody');
+  if (!body) return;
   body.innerHTML='';
 
   function chip(label, fset, value, color) {
@@ -502,21 +493,26 @@ function buildSidebar() {
     return sec;
   }
 
-  // ── Token measurements toggle ──────────────────────────────────────────────
-  const tokWrap = document.createElement('div');
-  tokWrap.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border)';
-  const tokCb = document.createElement('input'); tokCb.type='checkbox'; tokCb.id='showTokensCb'; tokCb.checked=filters.showTokens;
-  tokCb.addEventListener('change', e => { filters.showTokens=e.target.checked; renderAll(); });
-  const tokLbl = document.createElement('label'); tokLbl.htmlFor='showTokensCb';
-  tokLbl.style.cssText='font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;flex:1';
-  tokLbl.innerHTML='<span style="font-size:.9rem">◉</span> Tokens';
-  const avgCb = document.createElement('input'); avgCb.type='checkbox'; avgCb.id='showAvgsCb'; avgCb.checked=filters.showAverages!==false;
-  avgCb.addEventListener('change', e => { filters.showAverages=e.target.checked; renderAll(); });
-  const avgLbl = document.createElement('label'); avgLbl.htmlFor='showAvgsCb';
-  avgLbl.style.cssText='font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px';
-  avgLbl.innerHTML='<span style="font-size:.9rem">◎</span> Averages';
-  tokWrap.appendChild(tokCb); tokWrap.appendChild(tokLbl);
-  tokWrap.appendChild(avgCb); tokWrap.appendChild(avgLbl); body.appendChild(tokWrap);
+  // ── Formant Layers chips: only when Formant Plot tab active ─────────────────
+  if (document.getElementById('tabFormant')?.classList.contains('active')) {
+    const flSec = document.createElement('div'); flSec.className='filter-section';
+    const flLbl = document.createElement('div'); flLbl.className='filter-label'; flLbl.textContent='Formant Layers';
+    const flGrid = document.createElement('div'); flGrid.className='chip-grid';
+    const mkChip = (label, active, onToggle) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip' + (active ? ' on' : '');
+      b.textContent = label;
+      b.addEventListener('click', () => { onToggle();
+        if (typeof buildSidebar==='function') buildSidebar();
+        if (typeof renderAll==='function') renderAll(); else if (typeof refreshCharts==='function') refreshCharts();
+      });
+      return b;
+    };
+    flGrid.appendChild(mkChip('◎ Averages', filters.showAverages!==false, () => { filters.showAverages = !filters.showAverages; }));
+    flGrid.appendChild(mkChip('◉ Tokens',   filters.showTokens,           () => { filters.showTokens   = !filters.showTokens;   }));
+    flSec.appendChild(flLbl); flSec.appendChild(flGrid); body.appendChild(flSec);
+  }
 
   body.appendChild(section('Language', filters.languages, grid=>{
     for (const[lk,lang] of Object.entries(LANGS))
@@ -559,43 +555,157 @@ document.getElementById('clearAllFilters')?.addEventListener('click',()=>{
 });
 
 // ─── Detail cards ─────────────────────────────────────────────────────────────
+// ─── Shared highlighted-text builder (viewer context) ────────────────────────
+function buildDetailHighlightedText(smp, filterSymbols, langColor, onFullPlay) {
+  const text=smp.text||''; const c=langColor;
+  const div=document.createElement('div');
+  div.style.cssText='font-family:Georgia,serif;line-height:1.65;word-break:break-word';
+  const toks=(smp.tokens||[]).filter(t=>!filterSymbols||filterSymbols.includes(t.symbol));
+  if (!text) { div.textContent='?'; return div; }
+  const charTok=new Array(text.length).fill(null);
+  toks.forEach(tok=>{ const [ps,pe]=tok.position||[0,0]; for(let i=ps;i<Math.min(pe,text.length);i++) charTok[i]=tok; });
+  let i=0;
+  while (i<text.length) {
+    const tok=charTok[i]; let j=i+1;
+    while (j<text.length&&charTok[j]===tok) j++;
+    const seg=document.createElement('span'); seg.textContent=text.slice(i,j);
+    if (tok) {
+      seg.style.cssText=`background:${c}28;color:${c};border-radius:2px;padding:0 1px;cursor:pointer;transition:background .1s`;
+      seg.addEventListener('mouseenter',()=>seg.style.background=c+'50');
+      seg.addEventListener('mouseleave',()=>seg.style.background=c+'28');
+      const f=tok.analysis;
+      seg.title=f?.f1?`/${tok.symbol}/  F1 ${f.f1} · F2 ${f.f2} Hz`:`/${tok.symbol}/`;
+      seg.addEventListener('click',e=>{e.stopPropagation();playTokenSlice(smp,tok);});
+    } else if (onFullPlay) {
+      seg.style.cursor='pointer';
+      seg.addEventListener('click',e=>{e.stopPropagation();onFullPlay();});
+    }
+    div.appendChild(seg); i=j;
+  }
+  return div;
+}
+
+function buildSampleDetailCard(smp, lang) {
+  const c=lang.color;
+  const card=document.createElement('div');
+  card.style.cssText=`background:var(--card,#223042);border:1px solid ${c}40;border-radius:10px;padding:10px 12px;width:160px;flex-shrink:0;cursor:pointer;position:relative;transition:border-color .12s`;
+  card.addEventListener('mouseenter',()=>card.style.borderColor=c+'80');
+  card.addEventListener('mouseleave',()=>card.style.borderColor=c+'40');
+  if (smp.representative) {
+    const rep=document.createElement('div');
+    rep.style.cssText=`position:absolute;top:5px;right:8px;font-size:.55rem;color:${c};background:${c}18;border:1px solid ${c}50;border-radius:3px;padding:1px 5px`;
+    rep.textContent=`\u2605 ${smp.representative}`; card.appendChild(rep);
+  }
+  const play=()=>{ if(smp.audio) new Audio(smp.audio).play().catch(()=>{}); };
+  const txtDiv=buildDetailHighlightedText(smp,null,c,play);
+  txtDiv.style.fontSize='.9rem'; txtDiv.style.color='#c8d8e8'; card.appendChild(txtDiv);
+  if (smp.phonemic) {
+    const ph=document.createElement('div');
+    ph.style.cssText='font-size:.62rem;color:#4a6888;font-style:italic;margin-top:2px';
+    ph.textContent=smp.phonemic; card.appendChild(ph);
+  }
+  card.addEventListener('click',play); return card;
+}
+
 function renderDetail() {
-  const sec=document.getElementById('detailSection');
+  const sec=document.getElementById('detailSection'); if (!sec) return;
   sec.innerHTML='';
   const all=[];
   for (const [lk,lang] of Object.entries(LANGS))
-    for (const v of lang.vowels) if (passesFilters(lk,v)) all.push({lk,lang,v});
-  if (!all.length) {
-    sec.innerHTML='<div class="detail-empty">No vowels match the current filters</div>';
-    return;
-  }
-  all.sort((a,b)=>{ const dh=a.v.heightBackness[0]-b.v.heightBackness[0]; return Math.abs(dh)>.001?dh:a.v.heightBackness[1]-b.v.heightBackness[1]; });
-  const grid=document.createElement('div'); grid.className='detail-cards-row';
+    for (const v of (lang.vowels||[])) if (passesFilters(lk,v)) all.push({lk,lang,v});
+  if (!all.length) { sec.innerHTML='<div class="detail-empty">No vowels match the current filters</div>'; return; }
 
+  // Tab bar
+  const tabBar=document.createElement('div'); tabBar.style.cssText='display:flex;gap:2px';
+  const mkTab=(label,active)=>{
+    const b=document.createElement('button'); b.type='button'; b.textContent=label;
+    b.style.cssText=`padding:6px 18px;border-radius:8px 8px 0 0;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid var(--border,#2e4560);border-bottom:none;background:${active?'#253850':'var(--surface,#213040)'};color:${active?'#7eb8f7':'#6a8298'};transition:background .15s,color .15s`;
+    return b;
+  };
+  const tabV=mkTab('\u25ce Vowels',true), tabS=mkTab('\u25b6 Samples',false);
+  tabBar.appendChild(tabV); tabBar.appendChild(tabS); sec.appendChild(tabBar);
+
+  const paneV=document.createElement('div');
+  paneV.style.cssText='background:var(--surface,#213040);border:1px solid var(--border,#2e4560);border-radius:0 14px 14px 14px;padding:12px';
+  const paneS=document.createElement('div');
+  paneS.style.cssText='display:none;background:var(--surface,#213040);border:1px solid var(--border,#2e4560);border-radius:0 14px 14px 14px;padding:12px';
+
+  tabV.addEventListener('click',()=>{
+    tabV.style.background='#253850'; tabV.style.color='#7eb8f7';
+    tabS.style.background='var(--surface,#213040)'; tabS.style.color='#6a8298';
+    paneV.style.display=''; paneS.style.display='none';
+  });
+  tabS.addEventListener('click',()=>{
+    tabS.style.background='#253850'; tabS.style.color='#7eb8f7';
+    tabV.style.background='var(--surface,#213040)'; tabV.style.color='#6a8298';
+    paneS.style.display=''; paneV.style.display='none';
+  });
+
+  // Vowel cards
+  all.sort((a,b)=>{ const dh=a.v.heightBackness[0]-b.v.heightBackness[0]; return Math.abs(dh)>.001?dh:a.v.heightBackness[1]-b.v.heightBackness[1]; });
+  const vGrid=document.createElement('div'); vGrid.className='detail-cards-row';
   for (const {lk,lang,v} of all) {
     const c=lang.color;
     const tPos=trapPos(v.heightBackness[0],v.heightBackness[1]);
     const fPos=v.f1&&v.f2?formantPos(v.f1,v.f2):null;
     const sym=v.symbols?.[0]??'?';
-    const card=document.createElement('div');
-    card.className='dcard'; card.style.borderColor=c;
-    card.innerHTML=`
+    const card=document.createElement('div'); card.className='dcard'; card.style.borderColor=c;
+
+    const info=document.createElement('div');
+    info.innerHTML=`
       <div class="dcard-ipa" style="color:${c}">${sym}</div>
       <div class="dcard-sublang" style="color:${c}bb">${lang.label}</div>
-      <div class="dcard-desc">${v.desc}</div>
-      <div class="dcard-round" style="color:${c}88">${v.rounded?'⊙ Rounded':'○ Unrounded'} · ${getLength(v)}</div>
-      ${v.f1?`<div class="dcard-formants">F1 <span>${v.f1}</span> · F2 <span>${v.f2}</span> Hz</div>`:''}
-      <div class="dcard-actions">
-        <button class="dcard-btn dcard-play">▶ Sound</button>
-        ${v.wikiUrl?`<a class="dcard-btn" href="${v.wikiUrl}" target="_blank" rel="noopener">Wiki ↗</a>`:''}
-      </div>`;
+      <div class="dcard-desc">${v.desc||''}</div>
+      <div class="dcard-round" style="color:${c}88">${v.rounded?'\u2299 Rounded':'\u25cb Unrounded'} \u00b7 ${getLength(v)}</div>
+      ${v.f1?`<div class="dcard-formants">F1 <span>${v.f1}</span> \u00b7 F2 <span>${v.f2}</span> Hz</div>`:''}`;
+    card.appendChild(info);
 
-    card.querySelector('.dcard-play').addEventListener('click',()=>{
-      playVowel(v,'chartFormant',lk);
-      pulse('chartIpa',tPos.x,tPos.y,c);
-      if(fPos) pulse('chartFormant',fPos.x,fPos.y,c);
-    });
-    grid.appendChild(card);
+    // Linked samples
+    const linked=(LANG_SAMPLES[lk]||[]).filter(smp=>smp.tokens?.some(t=>v.symbols?.includes(t.symbol)));
+    if (linked.length) {
+      const strip=document.createElement('div');
+      strip.style.cssText='margin-top:6px;padding-top:6px;border-top:1px solid #1e3048;display:flex;flex-direction:column;gap:3px';
+      for (const smp of linked.slice(0,4)) {
+        const chip=document.createElement('div');
+        chip.style.cssText=`background:#0d1a28;border:1px solid #1e3048;border-radius:5px;padding:3px 7px;cursor:pointer`;
+        chip.addEventListener('mouseenter',()=>chip.style.borderColor=c+'55');
+        chip.addEventListener('mouseleave',()=>chip.style.borderColor='#1e3048');
+        const play=()=>{ if(smp.audio) new Audio(smp.audio).play().catch(()=>{}); };
+        chip.appendChild(buildDetailHighlightedText(smp,v.symbols,c,play));
+        if (smp.phonemic) {
+          const ph=document.createElement('div');
+          ph.style.cssText='font-size:.58rem;color:#4a6888;font-style:italic';
+          ph.textContent=smp.phonemic; chip.appendChild(ph);
+        }
+        chip.addEventListener('click',play); strip.appendChild(chip);
+      }
+      card.appendChild(strip);
+    }
+
+    const act=document.createElement('div'); act.className='dcard-actions';
+    const playBtn=document.createElement('button'); playBtn.className='dcard-btn dcard-play'; playBtn.textContent='\u25b6 Sound';
+    playBtn.addEventListener('click',()=>{ playVowel(v,'chartFormant',lk); pulse('chartIpa',tPos.x,tPos.y,c); if(fPos) pulse('chartFormant',fPos.x,fPos.y,c); });
+    act.appendChild(playBtn);
+    if (v.wikiUrl) {
+      const wl=document.createElement('a'); wl.className='dcard-btn'; wl.href=v.wikiUrl; wl.target='_blank'; wl.rel='noopener'; wl.textContent='Wiki \u2197';
+      act.appendChild(wl);
+    }
+    card.appendChild(act); vGrid.appendChild(card);
   }
-  sec.appendChild(grid);
+  paneV.appendChild(vGrid);
+
+  // Sample cards
+  for (const [lk,lang] of Object.entries(LANGS)) {
+    const samples=LANG_SAMPLES[lk]||[]; if (!samples.length) continue;
+    const langSec=document.createElement('div'); langSec.style.cssText='margin-bottom:18px';
+    const hdg=document.createElement('div');
+    hdg.style.cssText=`font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${lang.color};margin-bottom:8px`;
+    hdg.textContent=lang.label; langSec.appendChild(hdg);
+    const sGrid=document.createElement('div'); sGrid.className='detail-cards-row';
+    for (const smp of samples) { if (smp.text) sGrid.appendChild(buildSampleDetailCard(smp,lang)); }
+    langSec.appendChild(sGrid); paneS.appendChild(langSec);
+  }
+
+  sec.appendChild(paneV); sec.appendChild(paneS);
 }
+
