@@ -170,9 +170,8 @@ document.getElementById('refAnalyse').addEventListener('click', async()=>{
   const btn=document.getElementById('refAnalyse');
   btn.textContent='Analysing…'; btn.disabled=true;
   try{
-    const s=Math.floor(refStart*refSamples.length), e=Math.floor(refEnd*refSamples.length);
-    const blob=encodeWAV(refSamples.slice(s,e),refSampleRate);
-    const data=await analyzeWav(blob, AbortSignal.timeout(10000));
+    const fullBlob=encodeWAV(refSamples,refSampleRate);
+    const data=await analyzeWav(fullBlob, AbortSignal.timeout(10000), refStart, refEnd);
     refAnalyzed={f1:data.f1,f2:data.f2};
     // Store in analyzedFormants for mode toggle
     if(refVowelMeta){
@@ -214,10 +213,13 @@ document.getElementById('ppClose').addEventListener('click',()=>{
 // ── Server analysis helper ─────────────────────────────────────────────────────
 // Sends a pre-sliced WAV blob to /frames for single-frame formant analysis.
 // The client already trims the selection; single_segment:true analyses the whole clip.
-async function analyzeWav(wavBlob, signal) {
+async function analyzeWav(wavBlob, signal, sliceStart=null, sliceEnd=null) {
   const form = new FormData();
   form.append('file', wavBlob, 'audio.wav');
-  form.append('config', JSON.stringify({single_segment: true}));
+  const cfg = {single_segment: true};
+  if (sliceStart != null) cfg.slice_start = sliceStart;
+  if (sliceEnd   != null) cfg.slice_end   = sliceEnd;
+  form.append('config', JSON.stringify(cfg));
   const resp = await fetch(SERVER + '/frames', {method: 'POST', body: form, signal});
   if (!resp.ok) throw new Error(await resp.text());
   const data  = await resp.json();
@@ -314,9 +316,8 @@ document.getElementById('ppAnalyse').addEventListener('click', async()=>{
   const btn=document.getElementById('ppAnalyse');
   btn.textContent='…'; btn.disabled=true;
   try{
-    const s=Math.floor(waveStart*recSamples.length), e=Math.floor(waveEnd*recSamples.length);
-    const slicedBlob=encodeWAV(recSamples.slice(s,e),recSampleRate);
-    const data=await analyzeWav(slicedBlob, AbortSignal.timeout(10000));
+    const fullBlob=encodeWAV(recSamples,recSampleRate);
+    const data=await analyzeWav(fullBlob, AbortSignal.timeout(10000), waveStart, waveEnd);
     recordedVowel={f1:data.f1,f2:data.f2};
     document.getElementById('ppFormants').innerHTML=`F1 <b>${data.f1.toFixed(0)}</b> F2 <b>${data.f2.toFixed(0)}</b> Hz`;
     document.getElementById('tabFormant').click(); renderFormant();

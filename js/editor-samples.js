@@ -482,6 +482,7 @@ function openWaveformPopup(tokIdx) {
     <div class="wf-modal-wave">
       <canvas id="wfCanvas" style="display:block;width:100%;height:80px"></canvas>
     </div>
+    <canvas id="wfFmtCanvas" style="display:none;width:100%;height:88px;margin-top:3px;border-radius:4px"></canvas>
     <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);padding:2px 2px 8px;font-family:monospace">
       <span id="wfTL">—</span><span id="wfTD">—</span><span id="wfTR">—</span>
     </div>
@@ -500,6 +501,7 @@ function openWaveformPopup(tokIdx) {
     </div>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px">
       <button id="wfPlay"  class="btn btn-secondary btn-sm">▶ Play slice</button>
+      <button id="wfFmt"   class="btn btn-secondary btn-sm" title="Show F1/F2 formant trace">F1/F2</button>
       <button id="wfAnalyze" class="btn btn-primary btn-sm">⚡ Analyze</button>
       <span id="wfResult" style="font-size:.72rem;font-family:monospace"></span>
     </div>
@@ -529,12 +531,20 @@ function openWaveformPopup(tokIdx) {
     }
 
     // Note: no backdrop click-to-close — drag release outside modal would trigger it
-    modal.querySelector('#wfClose').addEventListener('click', closeWaveformPopup);
-    modal.querySelector('#wfCancel').addEventListener('click', closeWaveformPopup);
+    modal.querySelector('#wfClose')?.addEventListener('click', closeWaveformPopup);
+    modal.querySelector('#wfCancel')?.addEventListener('click', closeWaveformPopup);
 
-    modal.querySelector('#wfPlay').addEventListener('click', playPopupSlice);
-    modal.querySelector('#wfAnalyze').addEventListener('click', analyzeInPopup);
-    modal.querySelector('#wfApply').addEventListener('click', applyPopupResult);
+    modal.querySelector('#wfPlay')?.addEventListener('click', playPopupSlice);
+    modal.querySelector('#wfFmt')?.addEventListener('click', async () => {
+        _popFmtEnabled = !_popFmtEnabled;
+        const fmtBtn = modal.querySelector('#wfFmt');
+        if (fmtBtn) fmtBtn.style.color = _popFmtEnabled ? '#7eb8f7' : '';
+        const fmtCv2 = document.getElementById('wfFmtCanvas');
+        if (_popFmtEnabled) { if (fmtCv2) fmtCv2.style.display='block'; await fetchAndDrawFormantOverlay(); }
+        else { _popFmtFrames=null; if(fmtCv2) fmtCv2.style.display='none'; drawPopupWave(); }
+    });
+    modal.querySelector('#wfAnalyze')?.addEventListener('click', analyzeInPopup);
+    modal.querySelector('#wfApply')?.addEventListener('click', applyPopupResult);
 
     // Waveform drag
     const canvas = modal.querySelector('#wfCanvas');
@@ -567,6 +577,99 @@ function openWaveformPopup(tokIdx) {
     requestAnimationFrame(() => { drawPopupWave(); updatePopupTimeDisplay(); });
 }
 
+// ─── Separate formant diagram with labeled frequency axis ─────────────────────
+function drawFormantCanvas() {
+    const cv = document.getElementById('wfFmtCanvas');
+    if (!cv || !_popFmtEnabled || !_popFmtFrames?.length || !_wave) return;
+    const W   = cv.width  = cv.offsetWidth  || 500;
+    const H   = cv.height = cv.offsetHeight || 88;
+    const LM  = 36;   // left margin for Y-axis labels only — plot still uses full width
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H);
+
+    const maxF   = +(document.getElementById('wfMaxF')?.value) || 5000;
+    // Slice boundaries (for any guards if needed)
+    const t0Ms = _popLeft  * _wave.duration;
+    const t1Ms = _popRight * _wave.duration;
+
+    // Y-axis grid lines and labels (drawn in left margin region)
+    const ticks = [200,500,1000,1500,2000,3000,4000,5000].filter(v => v <= maxF);
+    ctx.font = '8px monospace'; ctx.textAlign = 'right';
+    for (const hz of ticks) {
+        const y = H * (1 - hz / maxF);
+        ctx.strokeStyle = '#1e3048'; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(LM, y); ctx.lineTo(W, y); ctx.stroke();
+        ctx.fillStyle = '#4a7090';
+        ctx.fillText(hz >= 1000 ? (hz/1000).toFixed(hz%1000?1:0)+'k' : hz, LM - 2, y + 3);
+    }
+    // Left axis border
+    ctx.strokeStyle = '#2e4560'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(LM, 0); ctx.lineTo(LM, H); ctx.stroke();
+
+    // Formant lines — X uses FULL duration scale (same as waveform canvas above)
+    // Server returned frames only for the slice, so they naturally appear in the selection region
+    const drawLine = (clr, getHz) => {
+        ctx.strokeStyle = clr; ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
+        ctx.beginPath(); let first = true;
+        for (const f of _popFmtFrames) {
+            if (!f.voiced || f.f1 == null) { first = true; continue; }
+            const hz = getHz(f); if (!hz) { first = true; continue; }
+            // Same X coordinate as waveform: maps full audio duration → 0..W
+            const x = (f.segment.at_ms / _wave.duration) * W;
+            const y = H * (1 - hz / maxF);
+            if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+    };
+    drawLine('#4db8ffcc', f => f.f2);  // F2 blue
+    drawLine('#ff9944cc', f => f.f1);  // F1 orange
+
+    // Legend
+    ctx.font = '8px monospace'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#4db8ffaa'; ctx.fillText('F2', 1, 10);
+    ctx.fillStyle = '#ff9944aa'; ctx.fillText('F1', 1, 21);
+}
+
+async function fetchAndDrawFormantOverlay() {
+    if (!_wave) { toast('Load audio first'); return; }
+    const btn = document.getElementById('wfFmt');
+    if (btn) { btn.disabled=true; btn.textContent='…'; }
+    const max_f      = +(document.getElementById('wfMaxF')?.value)    || 5000;
+    const n_formants = +(document.getElementById('wfNFmt')?.value)     || 5;
+    const window_ms  = +(document.getElementById('wfWinMs')?.value)    || 25;
+    const pre_emph   = +(document.getElementById('wfPreEmph')?.value)  || 50;
+    const rms_floor  = +(document.getElementById('wfRmsFloor')?.value) || 0.005;
+    const median_n   = +(document.getElementById('wfMedianN')?.value)  || 5;
+    try {
+        const form = new FormData();
+        form.append('file', encodeWavBlob(_wave.samples, _wave.sampleRate), 'full.wav');
+        form.append('config', JSON.stringify({
+            single_segment: false,
+            slice_start: _popLeft,
+            slice_end:   _popRight,
+            max_f, n_formants, window_ms, pre_emphasis: pre_emph, rms_floor, median_n,
+        }));
+        const resp = await fetch(`${SAMPLE_SERVER}/frames`, {method:'POST', body:form});
+        if (!resp.ok) throw new Error('Server ' + resp.status);
+        const data = await resp.json();
+        _popFmtFrames = (data.frames || []).filter(f => f.voiced && f.f1 != null && f.f2 != null);
+        if (!_popFmtFrames.length) throw new Error('No voiced frames returned');
+        const fmtCv = document.getElementById('wfFmtCanvas');
+        if (fmtCv) fmtCv.style.display = 'block';
+        drawPopupWave();
+        drawFormantCanvas();
+    } catch(e) {
+        console.error('fetchAndDrawFormantOverlay:', e);
+        toast('Formant overlay failed: ' + e.message);
+        _popFmtFrames = null;
+        _popFmtEnabled = false;
+        if (btn) btn.style.color = '';
+        drawPopupWave();
+    } finally {
+        if (btn) { btn.disabled=false; btn.textContent='F1/F2'; }
+    }
+}
+
 function closeWaveformPopup() {
     if (_popPlay) {
         cancelAnimationFrame(_popPlay.raf);
@@ -574,6 +677,8 @@ function closeWaveformPopup() {
         _popPlay = null;
     }
     _popDrag = null; _popTokIdx = null;
+    _popFmtFrames = null; _popFmtEnabled = false;
+    const _cv = document.getElementById('wfFmtCanvas'); if (_cv) _cv.style.display='none';
     document.getElementById('wfBackdrop')?.remove();
 }
 
@@ -614,6 +719,7 @@ function drawPopupWave(progress=null) {
         const px = lx + Math.floor(progress * (rx - lx));
         ctx.fillStyle = '#ffffffcc'; ctx.fillRect(px, 0, 1, H);
     }
+    // Formant diagram is drawn separately in drawFormantCanvas()
 }
 
 function updatePopupTimeDisplay() {
@@ -667,8 +773,6 @@ async function analyzeInPopup() {
     if (btn) { btn.disabled=true; btn.textContent='…'; }
     const res = document.getElementById('wfResult');
     if (res) res.textContent = 'Analyzing…';
-    const i0 = Math.floor(_popLeft  * _wave.samples.length);
-    const i1 = Math.ceil( _popRight * _wave.samples.length);
     const gv = id => +(document.getElementById(id)?.value ?? 0) || undefined;
     const max_f              = +(document.getElementById('wfMaxF')?.value)      || 5000;
     const n_formants         = +(document.getElementById('wfNFmt')?.value)      || 5;
@@ -682,9 +786,12 @@ async function analyzeInPopup() {
 
     try {
         const form = new FormData();
-        form.append('file', encodeWavBlob(_wave.samples.slice(i0,i1), _wave.sampleRate), 'slice.wav');
+        // Send full audio; server slices using relative 0.0-1.0 positions
+        form.append('file', encodeWavBlob(_wave.samples, _wave.sampleRate), 'full.wav');
         form.append('config', JSON.stringify({
             single_segment: true,
+            slice_start: _popLeft,
+            slice_end:   _popRight,
             max_f, n_formants, window_ms, pre_emphasis,
             back_ceiling, back_ceiling_ratio, back_front_ratio,
             rms_floor, median_n,
@@ -701,6 +808,11 @@ async function analyzeInPopup() {
             back_ceiling, back_ceiling_ratio, back_front_ratio, rms_floor, median_n,
         };
         if (res) res.innerHTML = `<span class="tok-analysis ok">F1 ${frame.f1} · F2 ${frame.f2} Hz</span>`;
+        // Auto-fetch full formant trace after successful analysis
+        _popFmtEnabled = true;
+        const fmtBtn2 = document.getElementById('wfFmt');
+        if (fmtBtn2) fmtBtn2.style.color = '#7eb8f7';
+        fetchAndDrawFormantOverlay().catch(()=>{});
     } catch(e) {
         if (res) res.textContent = '✗ ' + e.message;
     } finally {

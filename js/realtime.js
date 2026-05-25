@@ -194,6 +194,7 @@ class RealtimeTracker {
   }
 
   _draw() {
+    this._ensureGroup();  // re-attach if renderFormant() cleared chartFormant SVG
     if (!this.svgGroup || !this._dotPool) return;
     const n = this.trail.length;
     // Update pre-allocated pool in place — no DOM creation, no GC, smooth RAF

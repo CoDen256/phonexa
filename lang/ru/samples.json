@@ -382,7 +382,7 @@
     "phonemic": "/jo/",
     "tokens": [
       {
-        "symbol": "ɵ",
+        "symbol": "o",
         "position": [0, 1],
         "analysis": {
           "slice": [732, 895],
@@ -437,9 +437,9 @@
         "symbol": "ɵ",
         "position": [3, 4],
         "analysis": {
-          "slice": [1017, 1288],
-          "f1": 531,
-          "f2": 932,
+          "slice": [1104, 1304],
+          "f1": 530,
+          "f2": 801,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,

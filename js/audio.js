@@ -123,3 +123,22 @@ function playVowel(v, svgId, lk) {
         if (rep?.audio) { playUrl(rep.audio); return; }
     }
 }
+
+// ─── WAV blob encoder (shared: editor + viewer trace) ─────────────────────────
+function encodeWavBlob(samples, sr) {
+    const buf = new ArrayBuffer(44 + samples.length * 2);
+    const v   = new DataView(buf);
+    const w16 = (o,x) => v.setInt16(o,x,true);
+    const w32 = (o,x) => v.setUint32(o,x,true);
+    const wr  = (o,s) => { for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i)); };
+    wr(0,'RIFF'); w32(4,36+samples.length*2); wr(8,'WAVE');
+    wr(12,'fmt '); w32(16,16); w16(20,1); w16(22,1);
+    w32(24,sr); w32(28,sr*2); w16(32,2); w16(34,16);
+    wr(36,'data'); w32(40,samples.length*2);
+    let offset=44;
+    for(let i=0;i<samples.length;i++){
+        const s16=Math.max(-32768,Math.min(32767,samples[i]*32768));
+        v.setInt16(offset,s16,true); offset+=2;
+    }
+    return new Blob([buf],{type:'audio/wav'});
+}

@@ -1,22 +1,30 @@
 { pkgs ? import <nixpkgs> {} }:
-
+let
+  parselmouth = pkgs.python312Packages.parselmouth.overrideAttrs (old: {
+    # override the fmt submodule fetch with the correct hash
+    prePatch = (old.prePatch or "") + "";
+    # actually easier to override the whole src:
+    src = pkgs.fetchFromGitHub {
+      owner = "YannickJadoul";
+      repo = "Parselmouth";
+      rev = "v0.4.7";
+      hash = "sha256-8ZpQL//pmz9Yh89FzzmhdJDcJ9gEVayMeKURdn+nD5E=";
+      fetchSubmodules = true;
+    };
+  });
+in
 pkgs.mkShell {
   buildInputs = with pkgs; [
     python312
-    python312Packages.parselmouth
+    parselmouth
     stdenv.cc.cc.lib
   ];
-
   shellHook = ''
     export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH
-
-    # Auto-create and activate venv
     if [ ! -d .venv ]; then
       python -m venv .venv
     fi
     source .venv/bin/activate
-
-    # Install deps if needed
     pip install -r requirements.txt --quiet
   '';
 }

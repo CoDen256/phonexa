@@ -64,6 +64,8 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
     const {members,cx,cy}=cl;
     const multi=members.length>1;
 
+    // Collect label hit-rects to add to dotL AFTER dg so they're always on top
+    const _pendingHits = [];
     for (const {lk,lang,v,dx,dy} of members) {
       const ic=lk==='cardinal', lyr=ic?cardL:langL;
       const sym=v.symbols?.[0]??'?';
@@ -72,18 +74,19 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
       const anch=v.rounded?'start':'end', tw=ipaW(sym,FS);
       const hx=(v.rounded?lx:lx-tw)-PAD, hy=dy-FS*0.40-PAD;
       const lg=$s('g',{style:'cursor:pointer'});
-      lg.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
+      // Text display in langL/cardL (visual layer, below dots)
       lg.appendChild($t(sym,{x:lx,y:dy,dy:'0.36em','text-anchor':anch,'font-size':FS,
         fill:lang.color,opacity:ic?0.98:0.78,
         'font-family':"Georgia,'Noto Serif',serif",'font-weight':'normal',
-        style:`filter:${SF};user-select:none`}));
+        style:`filter:${SF};user-select:none;pointer-events:none`}));
       lg.addEventListener('mouseenter',e=>showTip(e,v,lang));
       lg.addEventListener('mousemove',moveTip); lg.addEventListener('mouseleave',hideTip);
-      lg.addEventListener('click',()=>{playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
       lyr.appendChild(lg);
       dotL.appendChild(showAsRing
           ? $s('circle',{cx:dx,cy:dy,r:DOT_R+1,fill:lang.color+'18',stroke:lang.color,'stroke-width':'1.5','stroke-dasharray':'3 2',opacity:'0.75'})
           : $s('circle',{cx:dx,cy:dy,r:DOT_R,fill:lang.color+'cc'}));
+      // Save hit-rect params — will be added to dotL AFTER dg
+      _pendingHits.push({hx,hy,tw,PAD,FS,v,lang,lk,dx,dy});
     }
 
     const dg=$s('g',{style:'cursor:pointer'});
@@ -107,6 +110,15 @@ function buildVowels(svg, getPos, svgId, showArrows=false, getTargetPos=null) {
       dg.addEventListener('touchend', ()=>{hideTip();if(!tm){playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);}});
     }
     dotL.appendChild(dg);
+    // Add label hit-rects ABOVE dg: clicking any label always plays that vowel
+    for (const {hx,hy,tw,PAD,FS,v,lang,lk,dx,dy} of _pendingHits) {
+      const hit=$s('g',{style:'cursor:pointer'});
+      hit.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
+      hit.addEventListener('mouseenter',e=>showTip(e,v,lang));
+      hit.addEventListener('mousemove',moveTip); hit.addEventListener('mouseleave',hideTip);
+      hit.addEventListener('click',e=>{e.stopPropagation();playVowel(v,svgId,lk);onVowelClicked(v,lang,lk);pulse(svgId,dx,dy,lang.color);});
+      dotL.appendChild(hit);
+    }
   }
 
   // ── Step 4: render diphthong arrows (IPA chart only) ─────────────────────────
@@ -252,17 +264,24 @@ function renderTokenLayer(svg) {
   for (const {cx, cy, members} of clusters) {
     const multi = members.length > 1;
 
-    // Each member: own dot + label at ACTUAL position — same as buildVowels
-    for (const {pos, tok, vowel, c, lang} of members) {
+    // Each member: dot + label — collect hit-rects for adding AFTER dg
+    const _tokPendingHits = [];
+    for (const {pos, tok, sample, lang, lk, vowel, c} of members) {
       dotL.appendChild($s('circle',{cx:pos.x,cy:pos.y,r:DOT_R,fill:c,opacity:'0.9'}));
       const rounded = vowel?.rounded ?? false;
+      const FS=22, PAD=3;
+      const lx = rounded?pos.x+DOT_R+4:pos.x-DOT_R-4;
+      const tw = ipaW(tok.symbol, FS);
+      const hx = (rounded?lx:lx-tw)-PAD, hy = pos.y-FS*0.40-PAD;
+      // Text display — pointer-events:none so hit-rect below handles interaction
       topL.appendChild($t(tok.symbol,{
-        x: rounded?pos.x+DOT_R+4:pos.x-DOT_R-4, y:pos.y, dy:'0.36em',
+        x:lx, y:pos.y, dy:'0.36em',
         'text-anchor': rounded?'start':'end',
-        'font-size':22, fill:c, opacity:'0.85',
+        'font-size':FS, fill:c, opacity:'0.85',
         'font-family':"Georgia,'Noto Serif',serif",
         style:'pointer-events:none;user-select:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85))'
       }));
+      _tokPendingHits.push({hx,hy,tw,PAD,FS,pos,tok,sample,lang,lk,c,vowel});
     }
 
     // Disambiguation group at cluster centre — mirrors buildVowels dg exactly
@@ -280,7 +299,7 @@ function renderTokenLayer(svg) {
       dg.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();hideTip();showTokenClusterPicker(e.clientX,e.clientY,members,'chartFormant');});
     } else {
       // Single token: interactions (label already added in the member loop above)
-      const {pos,tok,sample,lang,lk,c} = members[0];
+      const {pos,tok,sample,lang,lk,c,vowel:_sv} = members[0];
       dg.addEventListener('mouseenter',e=>{showTokenTip(e,tok,sample,lang);moveTip(e);});
       dg.addEventListener('mousemove',moveTip);
       dg.addEventListener('mouseleave',hideTip);
@@ -288,6 +307,11 @@ function renderTokenLayer(svg) {
         e.stopPropagation();
         if(sample.audio) new Audio(sample.audio).play().catch(()=>{});
         pulse('chartFormant',pos.x,pos.y,c);
+        // Update practice panel reference with this token's audio + F1/F2
+        if(typeof onVowelClicked==='function'){
+          const tv={..._sv,f1:tok.analysis?.f1||_sv?.f1,f2:tok.analysis?.f2||_sv?.f2,audio:sample.audio};
+          onVowelClicked(tv,lang,lk);
+        }
       });
       dg.addEventListener('mousedown',e=>{
         if(e.button===1){e.preventDefault();playTokenSlice(sample,tok);pulse('chartFormant',pos.x,pos.y,c);}
@@ -298,6 +322,30 @@ function renderTokenLayer(svg) {
       });
     }
     topL.appendChild(dg);
+    // Label hit-rects above dg — clicking the IPA symbol always interacts with that token
+    for (const {hx,hy,tw,PAD,FS,pos,tok,sample,lang,lk,c,vowel:_hv} of _tokPendingHits) {
+      const hit=$s('g',{style:'cursor:pointer'});
+      hit.appendChild($s('rect',{x:hx,y:hy,width:tw+PAD*2,height:FS*0.82+PAD*2,rx:3,fill:'transparent'}));
+      hit.addEventListener('mouseenter',e=>{showTokenTip(e,tok,sample,lang);moveTip(e);});
+      hit.addEventListener('mousemove',moveTip); hit.addEventListener('mouseleave',hideTip);
+      hit.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(sample.audio) new Audio(sample.audio).play().catch(()=>{});
+        pulse('chartFormant',pos.x,pos.y,c);
+        if(typeof onVowelClicked==='function'){
+          const tv={..._hv,f1:tok.analysis?.f1||_hv?.f1,f2:tok.analysis?.f2||_hv?.f2,audio:sample.audio};
+          onVowelClicked(tv,lang,lk);
+        }
+      });
+      hit.addEventListener('mousedown',e=>{
+        if(e.button===1){e.preventDefault();playTokenSlice(sample,tok);pulse('chartFormant',pos.x,pos.y,c);}
+      });
+      hit.addEventListener('contextmenu',e=>{
+        e.preventDefault();e.stopPropagation();hideTip();
+        showTokenContextMenu(e,sample,tok,lang,lk);
+      });
+      topL.appendChild(hit);
+    }
   }
 }
 
@@ -410,6 +458,8 @@ function showTokenContextMenu(e, sample, tok, lang, lk) {
 
   item('▶', 'Play full sample',  () => { if (sample.audio) new Audio(sample.audio).play().catch(()=>{}); });
   item('◉', 'Play token slice',  () => playTokenSlice(sample, tok));
+  item('⬤', 'Trace token slice',      () => traceOnFormantChart(sample, tok, lang, lk, false));
+  item('⬤', 'Trace full audio',       () => traceOnFormantChart(sample, tok, lang, lk, true));
   // Only offer 'Open' when this token's language is the one currently being edited
   const _st = typeof state !== 'undefined' ? state : null;
   if (_st && lk === _st.selKey && typeof openSampleInVowelEditor === 'function') {
@@ -438,6 +488,98 @@ function showTokenContextMenu(e, sample, tok, lang, lk) {
   const dismiss = ev => { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click',dismiss,true); } };
   setTimeout(() => document.addEventListener('click',dismiss,true), 50);
   document.addEventListener('keydown', ev => { if (ev.key==='Escape') menu.remove(); },{once:true});
+}
+
+
+// ─── Animated F1/F2 trace on formant chart ────────────────────────────────────
+async function traceOnFormantChart(sample, tok, lang, lk, fullAudio=false) {
+  const srv = typeof SAMPLE_SERVER !== 'undefined' ? SAMPLE_SERVER : 'http://localhost:5050';
+  const cfg = tok.analysis || {};
+  const c   = lang?.color || LANGS[lk]?.color || '#7eb8f7';
+
+  // Remove any previous trace
+  document.getElementById('_chartTrace')?.remove();
+  const svg = document.getElementById('chartFormant');
+  if (!svg) return;
+
+  // Build SVG overlay: trail + moving dot + start/end markers
+  const grp  = document.createElementNS('http://www.w3.org/2000/svg','g');
+  grp.id = '_chartTrace';
+  const trail = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  trail.setAttribute('fill','none'); trail.setAttribute('stroke',c);
+  trail.setAttribute('stroke-width','2'); trail.setAttribute('stroke-linecap','round');
+  trail.setAttribute('stroke-linejoin','round'); trail.setAttribute('opacity','0.65');
+  grp.appendChild(trail);
+  const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('r','6'); dot.setAttribute('fill',c); dot.setAttribute('opacity','0.9');
+  grp.appendChild(dot);
+  svg.appendChild(grp);
+
+  // Fetch all formant frames for the full audio
+  let frames = [];
+  try {
+    const wav = await fetchDecodeAudio(sample.audio);
+    const form = new FormData();
+    form.append('file', encodeWavBlob(wav.samples, wav.sampleRate), 'audio.wav');
+    form.append('config', JSON.stringify({
+      single_segment: false,
+      max_f:        cfg.max_f        || 5000,
+      n_formants:   cfg.n_formants   || 5,
+      window_ms:    cfg.window_ms    || 25,
+      pre_emphasis: cfg.pre_emphasis || 50,
+      rms_floor:    cfg.rms_floor    || 0.005,
+      median_n:     cfg.median_n     || 5,
+    }));
+    const resp = await fetch(`${srv}/frames`, {method:'POST', body:form});
+    if (!resp.ok) throw new Error('Server ' + resp.status);
+    const data = await resp.json();
+    frames = data.frames || [];
+  } catch(e) {
+    grp.remove();
+    if (typeof toast === 'function') toast('Trace failed: ' + e.message);
+    return;
+  }
+  if (!frames.length) { grp.remove(); return; }
+
+  // Playback range — server time is in f.segment.at_ms (ms)
+  const lastFrameMs = frames[frames.length-1]?.segment?.at_ms ?? 0;
+  const [startMs, endMs] = fullAudio
+      ? [0, lastFrameMs]
+      : (cfg.slice || [0, lastFrameMs]);
+  const audio = new Audio(sample.audio);
+  audio.currentTime = startMs / 1000;
+  audio.play().catch(()=>{});
+
+  const trailPts = [];
+  const t0 = performance.now();
+
+  const tick = () => {
+    // Match elapsed ms to nearest voiced frame by f.segment.at_ms
+    const elapsedMs = performance.now() - t0 + startMs;
+    let best = null, bestD = Infinity;
+    for (const f of frames) {
+      if (!f.voiced || f.f1 == null) continue;
+      const d = Math.abs(f.segment.at_ms - elapsedMs);
+      if (d < bestD) { bestD = d; best = f; }
+    }
+    if (best?.f1 && best?.f2) {
+      const pos = formantPos(best.f1, best.f2);
+      dot.setAttribute('cx', pos.x);
+      dot.setAttribute('cy', pos.y);
+      trailPts.push(`${pos.x.toFixed(1)},${pos.y.toFixed(1)}`);
+      if (trailPts.length > 80) trailPts.shift();
+      trail.setAttribute('points', trailPts.join(' '));
+    }
+    const elapsedTotal = performance.now() - t0;
+    const duration = endMs - startMs;
+    if (elapsedTotal < duration && !audio.paused && !audio.ended) {
+      requestAnimationFrame(tick);
+    } else {
+      audio.pause();
+      setTimeout(() => grp.remove(), 2500);
+    }
+  };
+  requestAnimationFrame(tick);
 }
 
 function renderAll() { renderIpa(); renderFormant(); renderDetail(); updateCount(); }
@@ -661,7 +803,9 @@ function renderDetail() {
     card.appendChild(info);
 
     // Linked samples
-    const linked=(LANG_SAMPLES[lk]||[]).filter(smp=>smp.tokens?.some(t=>v.symbols?.includes(t.symbol)));
+    const linked=(LANG_SAMPLES[lk]||[])
+        .filter(smp=>smp.tokens?.some(t=>v.symbols?.includes(t.symbol)))
+        .sort((a,b)=>(v.symbols?.includes(b.representative)?1:0)-(v.symbols?.includes(a.representative)?1:0));
     if (linked.length) {
       const strip=document.createElement('div');
       strip.style.cssText='margin-top:6px;padding-top:6px;border-top:1px solid #1e3048;display:flex;flex-direction:column;gap:3px';
@@ -708,4 +852,3 @@ function renderDetail() {
 
   sec.appendChild(paneV); sec.appendChild(paneS);
 }
-
