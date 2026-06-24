@@ -493,7 +493,7 @@ function showTokenContextMenu(e, sample, tok, lang, lk) {
 
 // ─── Animated F1/F2 trace on formant chart ────────────────────────────────────
 async function traceOnFormantChart(sample, tok, lang, lk, fullAudio=false) {
-  const srv = typeof SAMPLE_SERVER !== 'undefined' ? SAMPLE_SERVER : 'http://localhost:5050';
+  const srv = typeof SAMPLE_SERVER !== 'undefined' ? SAMPLE_SERVER : '';
   const cfg = tok.analysis || {};
   const c   = lang?.color || LANGS[lk]?.color || '#7eb8f7';
 

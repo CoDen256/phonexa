@@ -29,13 +29,10 @@ Install:  pip install flask flask-cors parselmouth numpy websockets
 
 from __future__ import annotations
 
-import asyncio
 import json
 import math
 import os
-import struct
 import tempfile
-import threading
 from collections import deque
 from dataclasses import dataclass, field
 
@@ -43,11 +40,13 @@ import numpy as np
 import parselmouth
 from parselmouth.praat import call
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
+from flask_sock import Sock
 
 app = Flask(__name__)
 CORS(app)
+sock = Sock(app)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -810,17 +809,33 @@ def http_debug():
     except Exception as error:
         return jsonify({'error': str(error)}), 500
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Static frontend
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('.', path)
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # WebSocket streaming
 # ══════════════════════════════════════════════════════════════════════════════
 
-async def stream_handler(websocket) -> None:
+@sock.route('/stream')
+def stream_ws(ws) -> None:
     """
-    Handle one stream connection end-to-end.
+    WebSocket streaming endpoint (flask-sock, same port as HTTP).
 
     Audio flow
     ~~~~~~~~~~
-    Client sends 128-sample Int16 binary frames continuously (no gate filtering).
+    Client sends 128-sample Int16 binary frames continuously.
     Server accumulates samples in the ring buffer and analyses every
     SEGMENT_STEP_MS of new audio.
 
@@ -835,16 +850,17 @@ async def stream_handler(websocket) -> None:
       {type:'reset'}                → flush analysis state, keep config
       {type:'config', <fields>}     → update ConnConfig live
     """
-    session                    = StreamingSession()
+    session                     = StreamingSession()
     samples_since_last_analysis = 0
 
     try:
-        async for message in websocket:
+        while True:
+            message = ws.receive()
 
             # ── Text: control message ──────────────────────────────────────
             if isinstance(message, str):
                 try:
-                    payload = json.loads(message)
+                    payload  = json.loads(message)
                     msg_type = payload.get('type', '')
 
                     if msg_type == 'init':
@@ -890,29 +906,14 @@ async def stream_handler(websocket) -> None:
                     seg=seg_info, config=session.config, state=session.analysis_state,
                 )
                 session.segment_index += 1
-                await websocket.send(json.dumps({'frames': [frame]}))
+                ws.send(json.dumps({'frames': [frame]}))
             except Exception as error:
-                await websocket.send(json.dumps({'frames': [], 'error': str(error)}))
+                ws.send(json.dumps({'frames': [], 'error': str(error)}))
 
     except Exception:
         pass
 
-# ══════════════════════════════════════════════════════════════════════════════
-# WebSocket server thread
-# ══════════════════════════════════════════════════════════════════════════════
-
-def _start_stream_server() -> None:
-    import websockets as _websockets
-
-    async def _serve_forever():
-        async with _websockets.serve(stream_handler, 'localhost', 5051):
-            await asyncio.Future()
-
-    asyncio.run(_serve_forever())
-
-
-threading.Thread(target=_start_stream_server, daemon=True).start()
 
 if __name__ == '__main__':
-    print('HTTP :5050   Stream :5051')
-    app.run(host='localhost', port=5050, threaded=True, debug=False)
+    print('HTTP + WebSocket :5050')
+    app.run(host='0.0.0.0', port=5050, threaded=True, debug=False)

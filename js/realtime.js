@@ -9,8 +9,8 @@
  *      white noise — Praat's LPC needs periodicity, not noise
  */
 
-const STREAM_URL = (location.protocol==='https:'?'wss:':'ws:')+'//localhost:5051';
-const HTTP_URL = 'http://localhost:5050';
+const STREAM_URL = (location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/stream';
+const HTTP_URL = '';
 const TRAIL_DOTS    = 50;     // keep last N voiced frames
 const TRAIL_COLOR   = '#ffd700'; // gold — matches reference style
 

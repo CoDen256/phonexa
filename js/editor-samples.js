@@ -9,7 +9,7 @@
  * Token rows show saved results + play/analyze buttons; no inline waveform.
  */
 
-const SAMPLE_SERVER = 'http://localhost:5050';
+const SAMPLE_SERVER = '';
 
 
 // ─── Module state ─────────────────────────────────────────────────────────────
