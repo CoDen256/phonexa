@@ -8,7 +8,7 @@ let
       owner = "YannickJadoul";
       repo = "Parselmouth";
       rev = "v0.4.7";
-      hash = "sha256-8ZpQL//pmz9Yh89FzzmhdJDcJ9gEVayMeKURdn+nD5E=";
+      hash = "sha256-gogNiKZVQaAzu/VeP4+bg61GtdptZeNkQatcJ/cjXFI=";
       fetchSubmodules = true;
     };
   });
