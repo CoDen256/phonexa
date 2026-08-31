@@ -365,39 +365,78 @@
   },
   {
     "text": "schön",
-    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-schön.ogg",
+    "audio": "/lang/de/audio/schoen.ogg",
     "phonemic": "/ʃøːn/",
     "tokens": [
       {
         "symbol": "øː",
         "position": [3, 4],
-        "analysis": null
+        "analysis": {
+          "slice": [298, 418],
+          "f1": 294,
+          "f2": 1496,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
   },
   {
     "text": "hören",
-    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-hören.ogg",
+    "audio": "/lang/de/audio/hoeren.ogg",
     "phonemic": "/høːʁən/",
     "tokens": [
       {
         "symbol": "øː",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [128, 287],
+          "f1": 426,
+          "f2": 1209,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
   },
   {
     "text": "Höhle",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/De-H%C3%B6hle.ogg/De-H%C3%B6hle.ogg.mp3",
+    "audio": "/lang/de/audio/hoelen.ogg",
     "phonemic": "/høːlə/",
     "tokens": [
       {
         "symbol": "øː",
         "position": [1, 2],
-        "analysis": null
+        "analysis": {
+          "slice": [644, 725],
+          "f1": 530,
+          "f2": 1410,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -722,46 +761,98 @@
       {
         "symbol": "oː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [425, 675],
+          "f1": 434,
+          "f2": 538,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": "oː"
   },
   {
     "text": "groß",
-    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-groß.ogg",
+    "audio": "lang/de/audio/gross.ogg",
     "phonemic": "/gʁoːs/",
     "tokens": [
       {
         "symbol": "oː",
         "position": [2, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [357, 504],
+          "f1": 367,
+          "f2": 497,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
   },
   {
     "text": "Sohn",
-    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Sohn.ogg",
+    "audio": "/lang/de/audio/sohn.ogg",
     "phonemic": "/zoːn/",
     "tokens": [
       {
         "symbol": "oː",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [686, 750],
+          "f1": 412,
+          "f2": 798,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
   },
   {
     "text": "Ofen",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0f/DE-Ofen.ogg/DE-Ofen.ogg.mp3",
+    "audio": "/lang/de/audio/ofen.ogg",
     "phonemic": "/oːfən/",
     "tokens": [
       {
         "symbol": "oː",
         "position": [0, 1],
-        "analysis": null
+        "analysis": {
+          "slice": [256, 369],
+          "f1": 523,
+          "f2": 1426,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
@@ -859,13 +950,26 @@
   },
   {
     "text": "Ruhe",
-    "audio": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Ruhe.ogg",
+    "audio": "/lang/de/audio/ruhe.ogg",
     "phonemic": "/ʁuːə/",
     "tokens": [
       {
         "symbol": "uː",
         "position": [1, 3],
-        "analysis": null
+        "analysis": {
+          "slice": [562, 727],
+          "f1": 439,
+          "f2": 1061,
+          "max_f": 5000,
+          "n_formants": 5,
+          "window_ms": 25,
+          "pre_emphasis": 50,
+          "back_ceiling": 1800,
+          "back_ceiling_ratio": 0.95,
+          "back_front_ratio": 0.75,
+          "rms_floor": 0.005,
+          "median_n": 5
+        }
       }
     ],
     "representative": null
