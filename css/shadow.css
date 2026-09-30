@@ -98,6 +98,7 @@
 .params-row .sent-btn { margin-left:auto; }
 .trim-toggle { display:flex; align-items:center; gap:5px; font-size:.7rem; color:var(--muted); flex-basis:100%; margin-top:2px; cursor:pointer; }
 .trim-toggle input { accent-color:#7eb8f7; cursor:pointer; }
+.sensitivity-cache-note { font-size:.66rem; color:#34d399; flex-basis:100%; margin-top:2px; }
 
 /* ── Sentence list ───────────────────────────────────────────── */
 .sentence-list-wrap { display:none; margin-top:18px; }

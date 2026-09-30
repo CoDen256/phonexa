@@ -1,93 +1,117 @@
 /**
  * shadow.js — Shadowing practice page (shadow.html).
  *
- * Flow: user picks/drops an audio file → its duration is probed cheaply
- * (WAV: parsed straight from the RIFF header; anything else: an <audio>
- * element's loadedmetadata, which browsers resolve without decoding the
- * whole file) → user picks a time range → only that range is decoded:
- *   WAV      — Blob.slice() reads just the needed byte range off disk,
- *              rebuilds a small valid WAV (original header + sliced PCM),
- *              decodeAudioData on that tiny buffer. Cheap regardless of
- *              how long the source file is (3h+ files are fine).
- *   Other    — no cheap byte-exact seek is available client-side, so the
- *              slice is captured in real time: an <audio> element seeks to
- *              the start, plays muted through a ScriptProcessorNode tap,
- *              and the raw samples are collected until the end of the
- *              range. Bounded to MAX_NONWAV_SLICE_SEC to stay responsive.
+ * Sessions: 1 file (identified by name+size+lastModified — see
+ * fileIdentityId) = 1 session, stored in IndexedDB (see sessionGet/
+ * saveSession). A session holds one *analysis* per silence-sensitivity
+ * value used on it — each analysis has its own (extendable) range, its
+ * segments, and its cached transcripts. Re-picking a file whose session
+ * already has an analysis for the current sensitivity prefills the range
+ * picker to it (see syncSensitivityCacheNote); loading that exact range is
+ * a pure cache hit (ensureBufferForAnalysis), and loading a LARGER range
+ * with the same start extends it (extendAnalysisTo) instead of redoing it:
+ * only the newly-added audio is decoded — the already-decoded prefix is
+ * reused straight out of memory — and the segmentation threshold from the
+ * original analysis is reused too, so old segment boundaries never shift.
+ * Old segments/transcripts before the extension point are left untouched;
+ * only a possibly-truncated last segment is re-examined against the new
+ * audio (see extendAnalysisTo's doc comment) before appending new ones.
  *
- * The sentence-boundary segmentation of a decoded slice is cached in
- * IndexedDB keyed by (file name, size, lastModified, slice range), so
- * re-loading the same file+range skips re-running the segmenter — only
- * the (cheap, range-scoped) decode step re-runs.
+ * Decoding a range: WAV is parsed straight from its RIFF header and
+ * Blob.slice() reads just the needed byte range off disk (cheap regardless
+ * of file length — 3h+ files are fine); everything else has no cheap
+ * byte-exact seek client-side, so it's captured in real time (an <audio>
+ * element seeks to the start, plays muted through a ScriptProcessorNode
+ * tap, raw samples are collected until the end of the range — bounded to
+ * MAX_NONWAV_SLICE_SEC to stay responsive).
  *
  * Per sentence: play the reference slice (from the decoded AudioBuffer via
  * an AudioBufferSourceNode start/offset/duration), record yourself with
  * MediaRecorder, play your take back, or compare (reference then yours).
  *
- * Transcription (optional) calls a local /transcribe endpoint on formanter.py
- * (faster-whisper — see requirements-transcribe.txt) with that sentence's WAV
- * slice. Nothing is sent anywhere unless that local server is running; the
- * resulting text is cached alongside the sentence's segmentation entry.
+ * Transcription can use a local /transcribe endpoint on formanter.py
+ * (faster-whisper — see requirements-transcribe.txt) or, as a no-install
+ * alternative, the Hugging Face Inference API directly from the browser.
+ * Either way, results are cached in the sentence's analysis entry above.
  */
 
 const MAX_NONWAV_SLICE_SEC = 1800;      // 30 min cap on real-time capture for non-WAV formats
 const WAV_DECODE_WARN_BYTES = 1.2e9;    // ~1.2 GB decoded (Float32) — advisory threshold, browsers commonly
                                          // fail to hold much more than ~2GB in one ArrayBuffer/AudioBuffer
 
-// ─── IndexedDB: 'segments' store caches sentence splits, 'fileHandles' remembers
-// File System Access API handles so a file doesn't need re-picking every visit ──
+// ─── IndexedDB: 'sessions' (one row per file — see fileIdentityId — holding one
+// analysis per silence-sensitivity value used), 'fileHandles' remembers File
+// System Access API handles so a file doesn't need re-picking every visit ──
 function shOpen() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('ipa-shadow', 2);
+    const rq = indexedDB.open('ipa-shadow', 3);
     rq.onupgradeneeded = e => {
       const db = e.target.result;
-      if (!db.objectStoreNames.contains('segments')) db.createObjectStore('segments');
+      if (!db.objectStoreNames.contains('sessions')) db.createObjectStore('sessions', { keyPath: 'fileId' });
       if (!db.objectStoreNames.contains('fileHandles')) db.createObjectStore('fileHandles', { keyPath: 'id' });
+      // 'segments' (v2's flat range-keyed cache) is superseded by 'sessions' — left in place
+      // rather than deleted so an upgrade never risks touching data it doesn't understand.
     };
     rq.onsuccess = e => res(e.target.result);
     rq.onerror = rej;
   });
 }
-async function shPut(key, val) {
-  try { const db = await shOpen(); const tx = db.transaction('segments', 'readwrite'); tx.objectStore('segments').put(val, key); }
-  catch (e) { console.warn('shPut failed:', e); }
-}
-async function shGet(key) {
+function fileIdentityId(file) { return `${file.name}|${file.size}|${file.lastModified}`; }
+
+// ─── Sessions: 1 file = 1 session; each session holds one analysis per
+// silence-sensitivity value, each with its own (extendable) range, its
+// segments, and its cached transcripts. ──────────────────────────────────────
+async function sessionGet(fileId) {
+  if (!fileId) return null;
   try {
     const db = await shOpen();
     return new Promise(res => {
-      const tx = db.transaction('segments', 'readonly');
-      const rq = tx.objectStore('segments').get(key);
+      const tx = db.transaction('sessions', 'readonly');
+      const rq = tx.objectStore('sessions').get(fileId);
       rq.onsuccess = () => res(rq.result ?? null);
       rq.onerror = () => res(null);
     });
   } catch (e) { return null; }
 }
-async function shDelete(key) {
-  try { const db = await shOpen(); const tx = db.transaction('segments', 'readwrite'); tx.objectStore('segments').delete(key); }
-  catch (e) { console.warn('shDelete failed:', e); }
+async function sessionPut(session) {
+  try { const db = await shOpen(); const tx = db.transaction('sessions', 'readwrite'); tx.objectStore('sessions').put(session); }
+  catch (e) { console.warn('sessionPut failed:', e); }
 }
-async function shGetAll() {
+async function sessionGetAll() {
   try {
     const db = await shOpen();
     return new Promise(res => {
-      const tx = db.transaction('segments', 'readonly');
-      const store = tx.objectStore('segments');
-      const out = [];
-      const rq = store.openCursor();
-      rq.onsuccess = e => {
-        const cur = e.target.result;
-        if (cur) { out.push({ key: cur.key, ...cur.value }); cur.continue(); }
-        else res(out);
-      };
-      rq.onerror = () => res(out);
+      const tx = db.transaction('sessions', 'readonly');
+      const rq = tx.objectStore('sessions').getAll();
+      rq.onsuccess = () => res(rq.result || []);
+      rq.onerror = () => res([]);
     });
   } catch (e) { return []; }
 }
-function buildCacheKey(file, startSec, endSec) {
-  return `${file.name}|${file.size}|${file.lastModified}|${Math.round(startSec * 1000)}-${Math.round(endSec * 1000)}`;
+async function sessionDeleteAnalysis(fileId, minSilenceMs) {
+  const session = await sessionGet(fileId);
+  if (!session) return;
+  delete session.analyses[minSilenceMs];
+  if (!Object.keys(session.analyses).length) {
+    try { const db = await shOpen(); const tx = db.transaction('sessions', 'readwrite'); tx.objectStore('sessions').delete(fileId); }
+    catch (e) { console.warn('session delete failed:', e); }
+  } else {
+    await sessionPut(session);
+  }
 }
-function fileIdentityId(file) { return `${file.name}|${file.size}|${file.lastModified}`; }
+/** Persists currentAnalysis into currentFileId's session (transcripts/segments already live-mutated on it). */
+async function saveSession() {
+  if (!currentFileId || !currentAnalysis) return;
+  let session = await sessionGet(currentFileId);
+  if (!session) session = { fileId: currentFileId, fileName: currentFile?.name, fileSize: currentFile?.size, createdAt: Date.now(), analyses: {} };
+  session.fileName = currentFile?.name;
+  session.fileSize = currentFile?.size;
+  session.updatedAt = Date.now();
+  if (!currentAnalysis.createdAt) currentAnalysis.createdAt = Date.now();
+  session.analyses[currentAnalysis.minSilenceMs] = currentAnalysis;
+  await sessionPut(session);
+  refreshSessionList();
+}
 
 // ─── Remembered file handles (File System Access API) ─────────────────────────
 // Only the handle is stored, not the audio bytes — re-granting access is near
@@ -258,6 +282,25 @@ async function decodeSliceViaCapture(file, startSec, endSec, onProgress) {
   }
 }
 
+// ─── Audio buffer helpers (decode, and concatenate two ranges of the same file) ─
+async function decodeAudioBuffer(arrayBuffer) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const buf = await ctx.decodeAudioData(arrayBuffer);
+  ctx.close();
+  return buf;
+}
+/** Appends bufB's samples after bufA's, channel by channel — used to extend a session's range without re-decoding the already-decoded prefix. */
+function concatAudioBuffers(bufA, bufB, ctx) {
+  const channels = Math.max(bufA.numberOfChannels, bufB.numberOfChannels);
+  const out = ctx.createBuffer(channels, bufA.length + bufB.length, bufA.sampleRate);
+  for (let ch = 0; ch < channels; ch++) {
+    const data = out.getChannelData(ch);
+    data.set(ch < bufA.numberOfChannels ? bufA.getChannelData(ch) : new Float32Array(bufA.length), 0);
+    data.set(ch < bufB.numberOfChannels ? bufB.getChannelData(ch) : new Float32Array(bufB.length), bufA.length);
+  }
+  return out;
+}
+
 // ─── Sentence boundary detection (energy-based silence gaps) ──────────────────
 function computeMonoData(buffer) {
   if (buffer.numberOfChannels === 1) return buffer.getChannelData(0);
@@ -295,32 +338,44 @@ function detectLeadingSilenceMs(buffer) {
 }
 
 /**
- * Splits an AudioBuffer into speech segments separated by silence gaps of
- * at least `minSilenceMs`. Shorter gaps (e.g. between words) are merged into
+ * Splits mono samples into speech segments separated by silence gaps of at
+ * least `minSilenceMs`. Shorter gaps (e.g. between words) are merged into
  * the surrounding speech, so a "sentence" can contain internal pauses.
+ *
+ * Takes raw samples (not an AudioBuffer) so a short in-memory sub-range —
+ * e.g. the tail of an already-decoded buffer plus a freshly-decoded
+ * extension — can be re-analysed without constructing a full AudioBuffer.
+ *
+ * The energy threshold is normally derived from this call's own sample
+ * percentile stats, but extending a session's range must reuse the
+ * ORIGINAL threshold (pass `params.threshold`) rather than recompute it —
+ * recomputing from a longer (or shorter) buffer shifts the percentile
+ * stats and can silently redraw old, already-cached sentence boundaries.
+ * Always returns the threshold actually used, so callers can cache it.
  */
-function detectSentences(buffer, params = {}) {
+function detectSentences(monoSamples, sampleRate, params = {}) {
   const windowMs      = 20;
   const minSilenceMs  = params.minSilenceMs  ?? 300;
   const minSentenceMs = params.minSentenceMs ?? 350;
   const padMs         = params.padMs         ?? 70;
 
-  const sr   = buffer.sampleRate;
-  const data = computeMonoData(buffer);
-  const winSize = Math.max(1, Math.round(sr * windowMs / 1000));
-  const nWin = Math.ceil(data.length / winSize);
+  const winSize = Math.max(1, Math.round(sampleRate * windowMs / 1000));
+  const nWin = Math.ceil(monoSamples.length / winSize);
   const rms = new Float32Array(nWin);
   for (let w = 0; w < nWin; w++) {
-    const start = w * winSize, end = Math.min(start + winSize, data.length);
+    const start = w * winSize, end = Math.min(start + winSize, monoSamples.length);
     let sum = 0;
-    for (let i = start; i < end; i++) sum += data[i] * data[i];
+    for (let i = start; i < end; i++) sum += monoSamples[i] * monoSamples[i];
     rms[w] = Math.sqrt(sum / Math.max(1, end - start));
   }
 
-  const sorted = Float32Array.from(rms).sort();
-  const floor  = sorted[Math.floor(sorted.length * 0.15)] || 0;
-  const peak   = sorted[sorted.length - 1] || 0.0001;
-  const threshold = Math.max(floor * 2.5, peak * 0.035, 0.0025);
+  let threshold = params.threshold;
+  if (threshold == null) {
+    const sorted = Float32Array.from(rms).sort();
+    const floor  = sorted[Math.floor(sorted.length * 0.15)] || 0;
+    const peak   = sorted[sorted.length - 1] || 0.0001;
+    threshold = Math.max(floor * 2.5, peak * 0.035, 0.0025);
+  }
 
   const isSpeech = new Uint8Array(nWin);
   for (let w = 0; w < nWin; w++) isSpeech[w] = rms[w] > threshold ? 1 : 0;
@@ -345,7 +400,7 @@ function detectSentences(buffer, params = {}) {
     } else i++;
   }
 
-  const durMs = buffer.duration * 1000;
+  const durMs = monoSamples.length / sampleRate * 1000;
   const padded = rawSegments
       .map(s => ({ start: Math.max(0, s.start - padMs), end: Math.min(durMs, s.end + padMs) }))
       .filter(s => s.end - s.start >= minSentenceMs);
@@ -357,12 +412,18 @@ function detectSentences(buffer, params = {}) {
     else merged.push({ ...s });
   }
 
-  return merged.map((s, idx) => ({ index: idx, start: Math.round(s.start), end: Math.round(s.end) }));
+  const segments = merged.map((s, idx) => ({ index: idx, start: Math.round(s.start), end: Math.round(s.end) }));
+  return { segments, threshold };
 }
 
 // ─── Session state ─────────────────────────────────────────────────────────────
-let currentFile = null, currentWavHeader = null, currentDuration = null, maxSecGlobal = 0;
-let currentCacheKey = null, currentBuffer = null, currentSegments = null, currentTranscripts = {};
+// currentAnalysis is one entry of a file's session (see sessionGet/saveSession);
+// currentSegments/currentTranscripts always point at currentAnalysis.segments/
+// .transcripts directly (same object, not a copy) so mutating them already
+// mutates the analysis — persisting just means writing that same object back.
+let currentFile = null, currentFileId = null, currentWavHeader = null, currentDuration = null, maxSecGlobal = 0;
+let currentBuffer = null, currentAnalysis = null, currentSegments = null, currentTranscripts = {};
+let currentSliceStart = 0, currentSliceEnd = 0;   // just for progress/error messaging during decode
 let playCtx = null, activeSource = null;
 let micStream = null, activeRecorder = null, activeRecordingIdx = null;
 const recordings = {};   // idx -> {blob, url}
@@ -523,13 +584,10 @@ function getTranscribeLanguage() {
   if (sel.value === '__other') return document.getElementById('transcribeLanguageOther')?.value.trim() || '';
   return sel.value;
 }
+// currentTranscripts IS currentAnalysis.transcripts (same object) — the mutation
+// at the call site already happened; this just persists that analysis.
 async function cacheTranscript(idx, text) {
-  if (!currentCacheKey) return;
-  const cached = await shGet(currentCacheKey);
-  if (!cached) return;
-  cached.transcripts = cached.transcripts || {};
-  cached.transcripts[idx] = text;
-  await shPut(currentCacheKey, cached);
+  await saveSession();
 }
 
 function blobToBase64(blob) {
@@ -815,25 +873,54 @@ function renderSentenceList() {
   });
 }
 
-async function refreshCacheList() {
-  const el = document.getElementById('cacheList');
+/** One row per (file, silence-sensitivity) analysis — a file can have several. */
+async function refreshSessionList() {
+  const el = document.getElementById('sessionList');
   if (!el) return;
-  const list = await shGetAll();
-  if (!list.length) { el.innerHTML = '<div class="cache-empty">No cached files yet</div>'; return; }
-  el.innerHTML = list.sort((a, b) => b.createdAt - a.createdAt).map(e => `
-    <div class="cache-item">
-      <span class="cache-name">${escapeHtml(e.fileName || '(unnamed)')}</span>
-      <span class="cache-n">${secToClock(e.sliceStartSec || 0)}–${secToClock(e.sliceEndSec || 0)} · ${e.segments?.length || 0} sentences</span>
-      <span class="cache-date">${new Date(e.createdAt).toLocaleDateString()}</span>
-      <button class="cache-forget" data-key="${e.key}" title="Forget cached analysis">✕</button>
-    </div>`).join('');
-  el.querySelectorAll('.cache-forget').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      await shDelete(btn.dataset.key);
-      if (btn.dataset.key === currentCacheKey) setCacheBadge(false);
-      refreshCacheList();
+  const sessions = await sessionGetAll();
+  if (!sessions.length) { el.innerHTML = '<div class="cache-empty">No sessions yet</div>'; return; }
+  const rows = [];
+  sessions.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).forEach(session => {
+    Object.values(session.analyses || {}).sort((a, b) => a.minSilenceMs - b.minSilenceMs).forEach(an => {
+      const nTranscribed = Object.keys(an.transcripts || {}).length;
+      rows.push(`
+        <div class="cache-item">
+          <span class="cache-name">${escapeHtml(session.fileName || '(unnamed)')}</span>
+          <span class="cache-n">${an.minSilenceMs}ms · ${secToClock(an.rangeStart / 1000)}–${secToClock(an.rangeEnd / 1000)} · ${an.segments.length} sentences · ${nTranscribed} transcribed</span>
+          <button class="cache-forget" data-file="${escapeHtml(session.fileId)}" data-sens="${an.minSilenceMs}" title="Forget this analysis">✕</button>
+        </div>`);
     });
   });
+  el.innerHTML = rows.join('');
+  el.querySelectorAll('.cache-forget').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const sens = parseInt(btn.dataset.sens, 10);
+      await sessionDeleteAnalysis(btn.dataset.file, sens);
+      if (btn.dataset.file === currentFileId && sens === currentAnalysis?.minSilenceMs) setCacheBadge(false);
+      refreshSessionList();
+    });
+  });
+}
+
+/** Shows (and, if found, prefills the range picker to) the current file's cached analysis for the selected sensitivity. */
+async function syncSensitivityCacheNote() {
+  const note = document.getElementById('sensitivityCacheNote');
+  if (!note) return;
+  if (!currentFileId) { note.textContent = ''; return; }
+  const minSilenceMs = parseInt(document.getElementById('silenceSlider').value, 10);
+  const session = await sessionGet(currentFileId);
+  const existing = session?.analyses?.[minSilenceMs];
+  if (!existing) { note.textContent = ''; return; }
+  const nTranscribed = Object.keys(existing.transcripts || {}).length;
+  note.textContent = `↺ cached: ${secToClock(existing.rangeStart / 1000)}–${secToClock(existing.rangeEnd / 1000)} · ${existing.segments.length} sentences · ${nTranscribed} transcribed — range below prefilled; move the end to extend`;
+  const startSlider = document.getElementById('rangeStartSlider'), endSlider = document.getElementById('rangeEndSlider');
+  const startText = document.getElementById('rangeStart'), endText = document.getElementById('rangeEnd');
+  if (startSlider && maxSecGlobal) {
+    const s = Math.round(existing.rangeStart / 1000), e = Math.min(maxSecGlobal, Math.round(existing.rangeEnd / 1000));
+    startSlider.value = s; endSlider.value = e;
+    startText.value = secToClock(s); endText.value = secToClock(e);
+    updateRangeDurLabel();
+  }
 }
 
 // ─── Range picker ──────────────────────────────────────────────────────────────
@@ -883,70 +970,174 @@ function resetPlaybackAndRecordings() {
 }
 function resetSession() {
   resetPlaybackAndRecordings();
-  currentFile = null; currentWavHeader = null; currentDuration = null;
-  currentBuffer = null; currentSegments = null; currentCacheKey = null; currentTranscripts = {};
+  currentFile = null; currentFileId = null; currentWavHeader = null; currentDuration = null;
+  currentBuffer = null; currentAnalysis = null; currentSegments = null; currentTranscripts = {};
   document.getElementById('fileInfo').style.display = 'none';
   document.getElementById('rangeWrap').style.display = 'none';
   document.getElementById('sentenceListWrap').style.display = 'none';
   document.getElementById('cacheBadge').textContent = '';
   document.getElementById('cacheBadge').className = 'cache-badge';
+  const note = document.getElementById('sensitivityCacheNote'); if (note) note.textContent = '';
   showProgress(false);
   setStatus('');
 }
 
+/** Fresh, from-scratch segmentation of the whole currentBuffer — becomes a new analysis entry. */
 async function runSegmentation() {
   if (!currentBuffer) return;
   showProgress(true, 'Analysing audio for sentence boundaries…', true);
   await new Promise(r => requestAnimationFrame(r));   // let the UI paint before the sync scan
   const params = readParams();
-  const segments = detectSentences(currentBuffer, params);
-  currentSegments = segments;
-  currentTranscripts = {};
-  await shPut(currentCacheKey, {
-    segments, params, transcripts: {},
-    sliceStartSec: currentSliceStart, sliceEndSec: currentSliceEnd,
-    fileName: currentFile?.name, size: currentFile?.size,
-    createdAt: Date.now(),
-  });
+  const mono = computeMonoData(currentBuffer);
+  const { segments, threshold } = detectSentences(mono, currentBuffer.sampleRate, params);
+  currentAnalysis = {
+    minSilenceMs: params.minSilenceMs,
+    rangeStart: Math.round(currentSliceStart * 1000),
+    rangeEnd: Math.round(currentSliceEnd * 1000),
+    threshold, segments, transcripts: {},
+    createdAt: Date.now(), updatedAt: Date.now(),
+  };
+  currentSegments = currentAnalysis.segments;
+  currentTranscripts = currentAnalysis.transcripts;
   showProgress(false);
   setCacheBadge(false);
+  await saveSession();
   renderSentenceList();
   setStatus(`Found ${segments.length} sentence${segments.length !== 1 ? 's' : ''}`);
-  refreshCacheList();
 }
 
-let currentSliceStart = 0, currentSliceEnd = 0;
+/** Decodes [startSec,endSec] into a standalone buffer, without touching currentBuffer. */
+async function decodeRangeToBuffer(startSec, endSec) {
+  if (currentWavHeader) {
+    showProgress(true, 'Reading WAV slice from disk…');
+    setProgressPct(30);
+    const buf = await sliceWavFile(currentFile, currentWavHeader, startSec, endSec);
+    setProgressPct(70);
+    setProgressLabel('Decoding…');
+    const result = await decodeAudioBuffer(buf);
+    setProgressPct(100);
+    showProgress(false);
+    return result;
+  }
+  showProgress(true, 'Decoding selected range in real time…');
+  const result = await decodeSliceViaCapture(currentFile, startSec, endSec, p => setProgressPct(p * 100));
+  showProgress(false);
+  return result;
+}
+async function decodeFullRange(startSec, endSec) {
+  currentSliceStart = startSec; currentSliceEnd = endSec;
+  currentBuffer = await decodeRangeToBuffer(startSec, endSec);
+}
+/**
+ * `analysis` typically comes from a fresh sessionGet() read (a new deserialized
+ * object each time), so it's never the SAME object as an already-loaded
+ * currentAnalysis even when the content is identical — compare by value.
+ */
+function analysisMatchesLoaded(analysis) {
+  return !!(currentAnalysis && currentBuffer
+    && currentAnalysis.minSilenceMs === analysis.minSilenceMs
+    && currentAnalysis.rangeStart === analysis.rangeStart
+    && currentAnalysis.rangeEnd === analysis.rangeEnd);
+}
+/** No-op when `analysis`'s range is already the one loaded; otherwise decodes its stored range fresh. */
+async function ensureBufferForAnalysis(analysis) {
+  if (analysisMatchesLoaded(analysis)) return;   // exactly what's already in memory — nothing to do
+  await decodeFullRange(analysis.rangeStart / 1000, analysis.rangeEnd / 1000);
+  currentAnalysis = analysis;
+  currentSegments = analysis.segments;
+  currentTranscripts = analysis.transcripts;
+}
 
-async function loadSlice(startSec, endSec) {
+/**
+ * Extends the currently-loaded analysis forward to newEndSec: decodes ONLY the
+ * newly-added byte range (the old range's audio is reused straight out of
+ * currentBuffer, never re-decoded), reuses the analysis's original threshold
+ * (see detectSentences), and appends the new segments.
+ *
+ * Boundary correctness: if the old range's LAST segment ends right at the old
+ * range's edge, it may have been cut off mid-sentence rather than by genuine
+ * silence. In that case, re-analyse (old last segment's start) → newEnd as one
+ * unit (reusing in-memory tail samples, not re-decoding them) and replace the
+ * old last segment with the result — its transcript (if any) is invalidated
+ * since the sentence's audio changed. Every other old segment/transcript,
+ * keyed by array position, is untouched.
+ */
+async function extendAnalysisTo(newEndSec) {
+  const a = currentAnalysis;
+  const oldEndSec = a.rangeEnd / 1000;
+  const params = { minSilenceMs: a.minSilenceMs, threshold: a.threshold };
+
+  const newChunkBuffer = await decodeRangeToBuffer(oldEndSec, newEndSec);
+
+  const oldMono = computeMonoData(currentBuffer);
+  const newMono = computeMonoData(newChunkBuffer);
+  const oldDurationMs = currentBuffer.duration * 1000;
+
+  let segments = a.segments.slice();
+  const last = segments[segments.length - 1];
+  const wasTruncated = last && last.end >= oldDurationMs - 40;   // small tolerance
+
+  if (wasTruncated) {
+    const lookbackStartMs = last.start;
+    const lookbackStartSample = Math.floor(lookbackStartMs / 1000 * currentBuffer.sampleRate);
+    const tail = oldMono.slice(lookbackStartSample);
+    const mergedSamples = new Float32Array(tail.length + newMono.length);
+    mergedSamples.set(tail, 0); mergedSamples.set(newMono, tail.length);
+    const { segments: mergedSegs } = detectSentences(mergedSamples, currentBuffer.sampleRate, params);
+    segments.pop();
+    delete a.transcripts[last.index];
+    mergedSegs.forEach(s => segments.push({ start: s.start + lookbackStartMs, end: s.end + lookbackStartMs }));
+  } else {
+    const { segments: freshSegs } = detectSentences(newMono, currentBuffer.sampleRate, params);
+    freshSegs.forEach(s => segments.push({ start: s.start + oldDurationMs, end: s.end + oldDurationMs }));
+  }
+  segments = segments.map((s, idx) => ({ index: idx, start: s.start, end: s.end }));
+
+  currentBuffer = concatAudioBuffers(currentBuffer, newChunkBuffer, getPlayCtx());
+  a.rangeEnd = Math.round(newEndSec * 1000);
+  a.segments = segments;
+  a.updatedAt = Date.now();
+  currentSegments = a.segments;
+  currentTranscripts = a.transcripts;
+  await saveSession();
+}
+
+async function loadOrExtendSlice(startSec, endSec) {
   if (!currentFile) return;
   if (!currentWavHeader) endSec = Math.min(endSec, startSec + MAX_NONWAV_SLICE_SEC);
   resetPlaybackAndRecordings();
-  currentBuffer = null; currentSegments = null; currentTranscripts = {};
   document.getElementById('sentenceListWrap').style.display = 'none';
-  currentSliceStart = startSec; currentSliceEnd = endSec;
-  currentCacheKey = buildCacheKey(currentFile, startSec, endSec);
+
+  const params = readParams();
+  const startMs = Math.round(startSec * 1000), endMs = Math.round(endSec * 1000);
+  const session = await sessionGet(currentFileId);
+  const existing = session?.analyses?.[params.minSilenceMs];
+  const sameStart = existing && Math.abs(existing.rangeStart - startMs) < 500;
 
   const loadBtn = document.getElementById('loadSliceBtn');
   loadBtn.disabled = true;
   try {
-    if (currentWavHeader) {
-      showProgress(true, 'Reading WAV slice from disk…');
-      setProgressPct(30);
-      const buf = await sliceWavFile(currentFile, currentWavHeader, startSec, endSec);
-      setProgressPct(70);
-      setProgressLabel('Decoding…');
-      const decodeCtx = new (window.AudioContext || window.webkitAudioContext)();
-      currentBuffer = await decodeCtx.decodeAudioData(buf);
-      decodeCtx.close();
-      setProgressPct(100);
+    if (existing && sameStart && endMs <= existing.rangeEnd + 100) {
+      await ensureBufferForAnalysis(existing);
+      setCacheBadge(true, existing.createdAt);
+      setStatus(`Restored from session — ${existing.segments.length} sentences, no re-analysis needed`);
+    } else if (existing && sameStart) {
+      await ensureBufferForAnalysis(existing);
+      const before = existing.segments.length;
+      await extendAnalysisTo(endSec);
+      setCacheBadge(false);
+      setStatus(`Extended session — ${currentSegments.length} sentences now (added ${currentSegments.length - before})`);
     } else {
-      showProgress(true, 'Decoding selected range in real time…');
-      currentBuffer = await decodeSliceViaCapture(currentFile, startSec, endSec, p => setProgressPct(p * 100));
+      currentBuffer = null; currentAnalysis = null; currentSegments = null; currentTranscripts = {};
+      await decodeFullRange(startSec, endSec);
+      await runSegmentation();
     }
   } catch (e) {
     showProgress(false);
     let hint = '';
     if (currentWavHeader) {
+      // Upper-bound estimate (the actual sub-range decoded — restore, extend-tail, or fresh —
+      // is never larger than the whole requested range), fine for an advisory hint.
       const bytes = estimateDecodedBytes(currentWavHeader.fmt, endSec - startSec);
       if (bytes > WAV_DECODE_WARN_BYTES) {
         hint = ` This range decodes to ~${fmtBytes(bytes)} of raw audio — likely too large for your browser to hold in memory at once. Try a shorter range.`;
@@ -956,30 +1147,15 @@ async function loadSlice(startSec, endSec) {
     loadBtn.disabled = false;
     return;
   }
-  showProgress(false);
   loadBtn.disabled = false;
-
-  const cached = await shGet(currentCacheKey);
-  if (cached && cached.segments?.length) {
-    currentSegments = cached.segments;
-    currentTranscripts = cached.transcripts || {};
-    if (cached.params?.minSilenceMs) {
-      document.getElementById('silenceSlider').value = cached.params.minSilenceMs;
-      document.getElementById('silenceVal').textContent = cached.params.minSilenceMs + ' ms';
-    }
-    setCacheBadge(true, cached.createdAt);
-    renderSentenceList();
-    setStatus(`Loaded ${cached.segments.length} sentences from cache — no re-analysis needed`);
-    refreshCacheList();
-    return;
-  }
-  setCacheBadge(false);
-  await runSegmentation();
+  renderSentenceList();
+  refreshSessionList();
 }
 
 async function handleFile(file) {
   resetSession();
   currentFile = file;
+  currentFileId = fileIdentityId(file);
   setStatus('Reading file info…');
 
   if (await looksLikeWav(file)) {
@@ -1001,6 +1177,7 @@ async function handleFile(file) {
   document.getElementById('fullAudio').src = URL.createObjectURL(file);
 
   setupRangeUI(duration);
+  await syncSensitivityCacheNote();
   setStatus('Pick a time range below, then load it.');
 }
 
@@ -1119,7 +1296,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('loadSliceBtn').addEventListener('click', () => {
-    loadSlice(clockToSec(startText.value), clockToSec(endText.value));
+    loadOrExtendSlice(clockToSec(startText.value), clockToSec(endText.value));
   });
 
   // ── Segmentation params ──
@@ -1127,12 +1304,13 @@ document.addEventListener('DOMContentLoaded', () => {
   slider.addEventListener('input', () => {
     document.getElementById('silenceVal').textContent = slider.value + ' ms';
   });
+  slider.addEventListener('change', () => syncSensitivityCacheNote());
   document.getElementById('reanalyzeBtn').addEventListener('click', () => runSegmentation());
   document.getElementById('clearCacheBtn').addEventListener('click', async () => {
-    if (!currentCacheKey) return;
-    await shDelete(currentCacheKey);
+    if (!currentFileId || !currentAnalysis) return;
+    await sessionDeleteAnalysis(currentFileId, currentAnalysis.minSilenceMs);
     setCacheBadge(false);
-    refreshCacheList();
+    refreshSessionList();
   });
 
   document.getElementById('transcribeAllBtn')?.addEventListener('click', () => transcribeAll());
@@ -1181,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hfModelInput.addEventListener('change', () => localStorage.setItem('shadowHfModel', hfModelInput.value.trim()));
   }
 
-  refreshCacheList();
+  refreshSessionList();
   renderRecentFiles();
   checkTranscribeServer();
 });

@@ -21,7 +21,7 @@
   <div class="dropzone" id="dropzone">
     <div class="dropzone-icon">🎧</div>
     <div>Click to choose an audio file, or drag one here</div>
-    <div class="dropzone-hint">Supports files of any length — pick a time range next. Re-loading the same file+range reuses its cached sentence split.</div>
+    <div class="dropzone-hint">Supports files of any length. Each file is one session: re-picking it resumes where you left off per silence-sensitivity, and extending the range reuses what's already decoded and analysed instead of redoing it.</div>
     <input type="file" id="audioFile" accept="audio/*" style="display:none">
   </div>
   <div class="open-file-row">
@@ -123,8 +123,9 @@
     <input type="range" id="silenceSlider" min="150" max="600" step="10" value="300">
     <span id="silenceVal">300 ms</span>
     <button class="sent-btn" id="reanalyzeBtn" type="button">↺ Re-analyse</button>
-    <button class="sent-btn" id="clearCacheBtn" type="button">🗑 Forget this slice's cache</button>
+    <button class="sent-btn" id="clearCacheBtn" type="button">🗑 Forget this analysis</button>
     <label class="trim-toggle"><input type="checkbox" id="trimSilenceToggle" checked> ✂ Ignore silence at start of my recordings</label>
+    <span class="sensitivity-cache-note" id="sensitivityCacheNote"></span>
   </div>
 
   <div class="sentence-list-wrap" id="sentenceListWrap">
@@ -139,8 +140,8 @@
   </div>
 
   <div class="cache-section">
-    <div class="cache-section-title">Cached files</div>
-    <div class="cache-list" id="cacheList"></div>
+    <div class="cache-section-title">Sessions (1 file = 1 session; one analysis per silence-sensitivity value)</div>
+    <div class="cache-list" id="sessionList"></div>
   </div>
 
 </div>
