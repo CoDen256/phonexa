@@ -851,6 +851,15 @@ def http_transcribe():
     already-decoded numpy array to ``model.transcribe()`` skips PyAV
     entirely and reuses the same decoder every other endpoint here depends on.
 
+    Called once per sentence slice by the shadowing page, but also supports
+    transcribing a much longer (or the whole) audio range in one call — a
+    multi-second clip gives Whisper far more context to condition on than an
+    isolated 1-3s sentence fragment, which usually transcribes noticeably
+    more accurately. The caller can realign the returned segment timestamps
+    back onto its own shorter sentence boundaries afterwards.
+    ``vad_filter=True`` skips silence gaps (e.g. the pauses between
+    sentences in a long slice) to avoid hallucinated segments there.
+
     Request (multipart/form-data)
     ------------------------------
     file      — audio file (magic-byte sniffed the same way as /frames)
@@ -879,7 +888,7 @@ def http_transcribe():
             samples = make_praat_sound(samples, sample_rate).resample(16000).values[0]
         audio = samples.astype(np.float32)
 
-        segments_iter, info = model.transcribe(audio, language=language)
+        segments_iter, info = model.transcribe(audio, language=language, vad_filter=True)
         segments = [
             {'start_ms': round(s.start * 1000), 'end_ms': round(s.end * 1000), 'text': s.text.strip()}
             for s in segments_iter

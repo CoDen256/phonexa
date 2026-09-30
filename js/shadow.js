@@ -561,6 +561,62 @@ async function transcribeAll() {
   }
 }
 
+/**
+ * Transcribes the ENTIRE loaded slice in a single Whisper call — far more
+ * context than an isolated per-sentence fragment, usually much more accurate
+ * — then splits the returned segments back onto our own sentence rows by
+ * matching each Whisper segment's midpoint timestamp to the nearest sentence.
+ */
+function assignWhisperSegmentsToSentences(whisperSegments) {
+  const buckets = currentSegments.map(() => []);
+  for (const ws of whisperSegments) {
+    const mid = (ws.start_ms + ws.end_ms) / 2;
+    let bestIdx = -1, bestDist = Infinity;
+    currentSegments.forEach((seg, idx) => {
+      const dist = (mid >= seg.start && mid <= seg.end) ? 0 : (mid < seg.start ? seg.start - mid : mid - seg.end);
+      if (dist < bestDist) { bestDist = dist; bestIdx = idx; }
+    });
+    if (bestIdx >= 0) buckets[bestIdx].push(ws.text.trim());
+  }
+  buckets.forEach((texts, idx) => {
+    if (!texts.length) return;
+    const text = texts.join(' ').trim();
+    currentTranscripts[idx] = text;
+    cacheTranscript(idx, text);
+    const row = rowRefs[idx];
+    if (row) {
+      const out = row.querySelector('.sent-transcript');
+      out.textContent = text;
+      out.style.display = 'block';
+    }
+  });
+}
+async function transcribeWholeSlice() {
+  if (!currentBuffer || !currentSegments?.length) return;
+  const btn = document.getElementById('transcribeWholeBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  setStatus('Transcribing the whole slice in one call (more context → usually more accurate)…');
+  try {
+    const samples = computeMonoData(currentBuffer);
+    const blob = encodeWavBlob(samples, currentBuffer.sampleRate);
+    const form = new FormData();
+    form.append('file', blob, 'slice.wav');
+    const lang = getTranscribeLanguage();
+    if (lang) form.append('language', lang);
+    const resp = await fetch(getTranscribeServer() + '/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(300000) });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || ('HTTP ' + resp.status));
+    }
+    const data = await resp.json();
+    assignWhisperSegmentsToSentences(data.segments || []);
+    setStatus(`Whole-slice transcription done — matched onto ${currentSegments.length} sentences.`);
+  } catch (e) {
+    setStatus('Whole-slice transcription failed: ' + e.message);
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '📝 Transcribe whole slice'; }
+}
+
 // ─── Waveform (static, per-row) ────────────────────────────────────────────────
 function drawStaticWave(canvas, buffer, startMs, endMs) {
   if (!canvas) return;
@@ -1008,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('transcribeAllBtn')?.addEventListener('click', () => transcribeAll());
+  document.getElementById('transcribeWholeBtn')?.addEventListener('click', () => transcribeWholeSlice());
 
   const langSelect = document.getElementById('transcribeLanguage');
   const langOther = document.getElementById('transcribeLanguageOther');

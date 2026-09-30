@@ -105,7 +105,8 @@
     <div class="sentence-list-header">
       <span><b id="sentCount">0</b> sentences detected</span>
       <span>▶ reference · 🐌 slow · ● record · ⇄ compare · 📝 transcribe</span>
-      <button class="sent-btn" id="transcribeAllBtn" type="button">📝 Transcribe all</button>
+      <button class="sent-btn" id="transcribeAllBtn" type="button" title="One request per sentence — fast, but short clips transcribe less accurately">📝 Transcribe all (per-sentence)</button>
+      <button class="sent-btn primary" id="transcribeWholeBtn" type="button" title="One request for the whole slice, then matched back onto sentences — usually more accurate">📝 Transcribe whole slice (recommended)</button>
     </div>
     <div id="sentenceList"></div>
   </div>
