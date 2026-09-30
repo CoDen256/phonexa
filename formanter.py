@@ -25,6 +25,7 @@ B  above rms_floor, no valid formants — all Praat outputs included for diagnos
 C  voiced — all fields populated including f1_median / f2_median
 
 Install:  pip install flask flask-cors parselmouth numpy websockets
+Optional (for /transcribe):  pip install faster-whisper
 """
 
 from __future__ import annotations
@@ -808,6 +809,78 @@ def http_debug():
         })
     except Exception as error:
         return jsonify({'error': str(error)}), 500
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Transcription (faster-whisper, local — no audio ever leaves this machine,
+# no API key, no rate limit). Optional: only loaded on first /transcribe call
+# so the rest of the server still runs fine without it installed.
+# ══════════════════════════════════════════════════════════════════════════════
+
+_whisper_model = None
+_whisper_error: str | None = None
+
+
+def _get_whisper_model():
+    global _whisper_model, _whisper_error
+    if _whisper_model is not None or _whisper_error is not None:
+        return _whisper_model
+    try:
+        from faster_whisper import WhisperModel
+        size = os.environ.get('WHISPER_MODEL', 'base')
+        _whisper_model = WhisperModel(size, device='cpu', compute_type='int8')
+    except Exception as error:
+        _whisper_error = str(error)
+    return _whisper_model
+
+
+@app.route('/transcribe', methods=['POST'])
+def http_transcribe():
+    """
+    Local speech-to-text. Requires ``pip install faster-whisper`` (not a
+    default dependency — see requirements.txt). Model size is picked via the
+    WHISPER_MODEL env var (tiny/base/small/medium/large-v3), default 'base'.
+
+    Request (multipart/form-data)
+    ------------------------------
+    file      — audio file (magic-byte sniffed the same way as /frames)
+    language  — optional ISO 639-1 hint (e.g. 'en'); auto-detected if omitted
+
+    Response
+    --------
+    { text, language, segments: [{start_ms, end_ms, text}] }
+    """
+    uploaded_file = request.files.get('file')
+    if not uploaded_file:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    model = _get_whisper_model()
+    if model is None:
+        return jsonify({
+            'error': 'Transcription unavailable — faster-whisper is not installed. '
+                     'Run: pip install faster-whisper',
+            'detail': _whisper_error,
+        }), 501
+
+    language = request.form.get('language') or None
+    raw = uploaded_file.read()
+    suffix = _AUDIO_FILE_MAGIC.get(raw[:4], '.wav')
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(raw)
+        tmp_path = tmp.name
+
+    try:
+        segments_iter, info = model.transcribe(tmp_path, language=language)
+        segments = [
+            {'start_ms': round(s.start * 1000), 'end_ms': round(s.end * 1000), 'text': s.text.strip()}
+            for s in segments_iter
+        ]
+        text = ' '.join(s['text'] for s in segments).strip()
+        return jsonify({'text': text, 'language': info.language, 'segments': segments})
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
+    finally:
+        os.unlink(tmp_path)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

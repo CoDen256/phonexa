@@ -1,0 +1,5 @@
+# Optional — only needed for the /transcribe endpoint in formanter.py.
+# Not included in requirements.txt so the base server stays light; install
+# this separately if you want local speech-to-text:
+#   pip install -r requirements-transcribe.txt
+faster-whisper==1.1.0

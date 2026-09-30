@@ -40,6 +40,10 @@
     <audio id="fullAudio" controls></audio>
   </div>
 
+  <div class="transcribe-status">
+    <span class="cache-badge" id="transcribeBadge"></span>
+  </div>
+
   <div class="range-wrap" id="rangeWrap" style="display:none">
     <div class="range-title">Select the time range to load &amp; analyse</div>
     <div class="range-row">
@@ -78,7 +82,8 @@
   <div class="sentence-list-wrap" id="sentenceListWrap">
     <div class="sentence-list-header">
       <span><b id="sentCount">0</b> sentences detected</span>
-      <span>▶ reference · 🐌 slow · ● record · ⇄ compare</span>
+      <span>▶ reference · 🐌 slow · ● record · ⇄ compare · 📝 transcribe</span>
+      <button class="sent-btn" id="transcribeAllBtn" type="button">📝 Transcribe all</button>
     </div>
     <div id="sentenceList"></div>
   </div>

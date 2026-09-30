@@ -23,6 +23,11 @@
  * Per sentence: play the reference slice (from the decoded AudioBuffer via
  * an AudioBufferSourceNode start/offset/duration), record yourself with
  * MediaRecorder, play your take back, or compare (reference then yours).
+ *
+ * Transcription (optional) calls a local /transcribe endpoint on formanter.py
+ * (faster-whisper — see requirements-transcribe.txt) with that sentence's WAV
+ * slice. Nothing is sent anywhere unless that local server is running; the
+ * resulting text is cached alongside the sentence's segmentation entry.
  */
 
 const MAX_NONWAV_SLICE_SEC = 1800;      // 30 min cap on real-time capture for non-WAV formats
@@ -357,7 +362,7 @@ function detectSentences(buffer, params = {}) {
 
 // ─── Session state ─────────────────────────────────────────────────────────────
 let currentFile = null, currentWavHeader = null, currentDuration = null, maxSecGlobal = 0;
-let currentCacheKey = null, currentBuffer = null, currentSegments = null;
+let currentCacheKey = null, currentBuffer = null, currentSegments = null, currentTranscripts = {};
 let playCtx = null, activeSource = null;
 let micStream = null, activeRecorder = null, activeRecordingIdx = null;
 const recordings = {};   // idx -> {blob, url}
@@ -464,6 +469,81 @@ function setRowRecordingState(row, active) {
   if (active) status.textContent = 'Recording…';
 }
 
+// ─── Transcription (optional local /transcribe server — see formanter.py) ─────
+function encodeWavBlob(samples, sampleRate) {
+  const buf = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(buf);
+  const writeStr = (off, str) => { for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i)); };
+  writeStr(0, 'RIFF'); view.setUint32(4, 36 + samples.length * 2, true); writeStr(8, 'WAVE');
+  writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+  writeStr(36, 'data'); view.setUint32(40, samples.length * 2, true);
+  for (let i = 0, off = 44; i < samples.length; i++, off += 2) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+  return new Blob([buf], { type: 'audio/wav' });
+}
+function extractMonoSlice(buffer, startMs, endMs) {
+  const sr = buffer.sampleRate;
+  const data = computeMonoData(buffer);
+  const i0 = Math.floor(startMs / 1000 * sr), i1 = Math.min(data.length, Math.ceil(endMs / 1000 * sr));
+  return { samples: data.slice(i0, i1), sampleRate: sr };
+}
+async function checkTranscribeServer() {
+  const el = document.getElementById('transcribeBadge');
+  if (!el) return;
+  try {
+    const r = await fetch('/ping', { signal: AbortSignal.timeout(1500) });
+    if (r.ok) { el.textContent = '📝 Transcription server: ✓ connected'; el.className = 'cache-badge hit'; return; }
+  } catch (e) {}
+  el.textContent = '📝 Transcription server: offline (run formanter.py)';
+  el.className = 'cache-badge';
+}
+async function cacheTranscript(idx, text) {
+  if (!currentCacheKey) return;
+  const cached = await shGet(currentCacheKey);
+  if (!cached) return;
+  cached.transcripts = cached.transcripts || {};
+  cached.transcripts[idx] = text;
+  await shPut(currentCacheKey, cached);
+}
+async function transcribeSentence(idx, row) {
+  if (!currentBuffer || !currentSegments?.[idx]) return;
+  const seg = currentSegments[idx];
+  const btn = row.querySelector('.transcribe-btn');
+  const out = row.querySelector('.sent-transcript');
+  btn.disabled = true; btn.textContent = '…';
+  out.textContent = 'Transcribing…'; out.style.display = 'block';
+  try {
+    const { samples, sampleRate } = extractMonoSlice(currentBuffer, seg.start, seg.end);
+    const blob = encodeWavBlob(samples, sampleRate);
+    const form = new FormData();
+    form.append('file', blob, 'slice.wav');
+    const resp = await fetch('/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(60000) });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || ('HTTP ' + resp.status));
+    }
+    const data = await resp.json();
+    const text = data.text || '(no speech detected)';
+    out.textContent = text;
+    currentTranscripts[idx] = text;
+    await cacheTranscript(idx, text);
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '📝';
+}
+async function transcribeAll() {
+  if (!currentSegments) return;
+  for (let idx = 0; idx < currentSegments.length; idx++) {
+    const row = rowRefs[idx];
+    if (row) await transcribeSentence(idx, row);
+  }
+}
+
 // ─── Waveform (static, per-row) ────────────────────────────────────────────────
 function drawStaticWave(canvas, buffer, startMs, endMs) {
   if (!canvas) return;
@@ -557,6 +637,7 @@ function renderSentenceList() {
           <span class="sent-dur">${((seg.end - seg.start) / 1000).toFixed(2)}s</span>
           <span class="sent-time">${msToClock(seg.start)} – ${msToClock(seg.end)}</span>
         </div>
+        <div class="sent-transcript" style="display:none"></div>
       </div>
       <div class="sent-controls">
         <button class="sent-btn play-ref" title="Play reference">▶</button>
@@ -565,6 +646,7 @@ function renderSentenceList() {
         <span class="rec-dot"></span>
         <button class="sent-btn play-mine" disabled title="Play your recording">▶ You</button>
         <button class="sent-btn compare-btn" disabled title="Play reference then yours">⇄ Compare</button>
+        <button class="sent-btn transcribe-btn" title="Transcribe this sentence (local Whisper server)">📝</button>
         <span class="sent-status">Not recorded</span>
       </div>`;
     container.appendChild(row);
@@ -573,11 +655,18 @@ function renderSentenceList() {
     const canvas = row.querySelector('.sent-wave');
     requestAnimationFrame(() => drawStaticWave(canvas, currentBuffer, seg.start, seg.end));
 
+    if (currentTranscripts[idx]) {
+      const out = row.querySelector('.sent-transcript');
+      out.textContent = currentTranscripts[idx];
+      out.style.display = 'block';
+    }
+
     row.querySelector('.play-ref').addEventListener('click', () => playRefSeg(idx));
     row.querySelector('.play-ref-slow').addEventListener('click', () => playRefSeg(idx, 0.6));
     row.querySelector('.rec-btn').addEventListener('click', () => toggleRecord(idx, row));
     row.querySelector('.play-mine').addEventListener('click', () => playMine(idx));
     row.querySelector('.compare-btn').addEventListener('click', () => compareSeg(idx));
+    row.querySelector('.transcribe-btn').addEventListener('click', () => transcribeSentence(idx, row));
   });
 }
 
@@ -650,7 +739,7 @@ function resetPlaybackAndRecordings() {
 function resetSession() {
   resetPlaybackAndRecordings();
   currentFile = null; currentWavHeader = null; currentDuration = null;
-  currentBuffer = null; currentSegments = null; currentCacheKey = null;
+  currentBuffer = null; currentSegments = null; currentCacheKey = null; currentTranscripts = {};
   document.getElementById('fileInfo').style.display = 'none';
   document.getElementById('rangeWrap').style.display = 'none';
   document.getElementById('sentenceListWrap').style.display = 'none';
@@ -667,8 +756,9 @@ async function runSegmentation() {
   const params = readParams();
   const segments = detectSentences(currentBuffer, params);
   currentSegments = segments;
+  currentTranscripts = {};
   await shPut(currentCacheKey, {
-    segments, params,
+    segments, params, transcripts: {},
     sliceStartSec: currentSliceStart, sliceEndSec: currentSliceEnd,
     fileName: currentFile?.name, size: currentFile?.size,
     createdAt: Date.now(),
@@ -686,7 +776,7 @@ async function loadSlice(startSec, endSec) {
   if (!currentFile) return;
   if (!currentWavHeader) endSec = Math.min(endSec, startSec + MAX_NONWAV_SLICE_SEC);
   resetPlaybackAndRecordings();
-  currentBuffer = null; currentSegments = null;
+  currentBuffer = null; currentSegments = null; currentTranscripts = {};
   document.getElementById('sentenceListWrap').style.display = 'none';
   currentSliceStart = startSec; currentSliceEnd = endSec;
   currentCacheKey = buildCacheKey(currentFile, startSec, endSec);
@@ -727,6 +817,7 @@ async function loadSlice(startSec, endSec) {
   const cached = await shGet(currentCacheKey);
   if (cached && cached.segments?.length) {
     currentSegments = cached.segments;
+    currentTranscripts = cached.transcripts || {};
     if (cached.params?.minSilenceMs) {
       document.getElementById('silenceSlider').value = cached.params.minSilenceMs;
       document.getElementById('silenceVal').textContent = cached.params.minSilenceMs + ' ms';
@@ -899,6 +990,9 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshCacheList();
   });
 
+  document.getElementById('transcribeAllBtn')?.addEventListener('click', () => transcribeAll());
+
   refreshCacheList();
   renderRecentFiles();
+  checkTranscribeServer();
 });
