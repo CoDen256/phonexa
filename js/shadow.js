@@ -1,0 +1,739 @@
+/**
+ * shadow.js — Shadowing practice page (shadow.html).
+ *
+ * Flow: user picks/drops an audio file → its duration is probed cheaply
+ * (WAV: parsed straight from the RIFF header; anything else: an <audio>
+ * element's loadedmetadata, which browsers resolve without decoding the
+ * whole file) → user picks a time range → only that range is decoded:
+ *   WAV      — Blob.slice() reads just the needed byte range off disk,
+ *              rebuilds a small valid WAV (original header + sliced PCM),
+ *              decodeAudioData on that tiny buffer. Cheap regardless of
+ *              how long the source file is (3h+ files are fine).
+ *   Other    — no cheap byte-exact seek is available client-side, so the
+ *              slice is captured in real time: an <audio> element seeks to
+ *              the start, plays muted through a ScriptProcessorNode tap,
+ *              and the raw samples are collected until the end of the
+ *              range. Bounded to MAX_NONWAV_SLICE_SEC to stay responsive.
+ *
+ * The sentence-boundary segmentation of a decoded slice is cached in
+ * IndexedDB keyed by (file name, size, lastModified, slice range), so
+ * re-loading the same file+range skips re-running the segmenter — only
+ * the (cheap, range-scoped) decode step re-runs.
+ *
+ * Per sentence: play the reference slice (from the decoded AudioBuffer via
+ * an AudioBufferSourceNode start/offset/duration), record yourself with
+ * MediaRecorder, play your take back, or compare (reference then yours).
+ */
+
+const MAX_NONWAV_SLICE_SEC = 1800;   // 30 min cap on real-time capture for non-WAV formats
+
+// ─── IndexedDB cache: cacheKey → {segments, params, sliceStartSec, sliceEndSec, fileName, size, createdAt} ─
+function shOpen() {
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('ipa-shadow', 1);
+    rq.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('segments')) db.createObjectStore('segments');
+    };
+    rq.onsuccess = e => res(e.target.result);
+    rq.onerror = rej;
+  });
+}
+async function shPut(key, val) {
+  try { const db = await shOpen(); const tx = db.transaction('segments', 'readwrite'); tx.objectStore('segments').put(val, key); }
+  catch (e) { console.warn('shPut failed:', e); }
+}
+async function shGet(key) {
+  try {
+    const db = await shOpen();
+    return new Promise(res => {
+      const tx = db.transaction('segments', 'readonly');
+      const rq = tx.objectStore('segments').get(key);
+      rq.onsuccess = () => res(rq.result ?? null);
+      rq.onerror = () => res(null);
+    });
+  } catch (e) { return null; }
+}
+async function shDelete(key) {
+  try { const db = await shOpen(); const tx = db.transaction('segments', 'readwrite'); tx.objectStore('segments').delete(key); }
+  catch (e) { console.warn('shDelete failed:', e); }
+}
+async function shGetAll() {
+  try {
+    const db = await shOpen();
+    return new Promise(res => {
+      const tx = db.transaction('segments', 'readonly');
+      const store = tx.objectStore('segments');
+      const out = [];
+      const rq = store.openCursor();
+      rq.onsuccess = e => {
+        const cur = e.target.result;
+        if (cur) { out.push({ key: cur.key, ...cur.value }); cur.continue(); }
+        else res(out);
+      };
+      rq.onerror = () => res(out);
+    });
+  } catch (e) { return []; }
+}
+function buildCacheKey(file, startSec, endSec) {
+  return `${file.name}|${file.size}|${file.lastModified}|${Math.round(startSec * 1000)}-${Math.round(endSec * 1000)}`;
+}
+
+// ─── WAV header parsing (for byte-exact, disk-cheap slicing) ──────────────────
+function readAscii(view, offset, len) {
+  let s = '';
+  for (let i = 0; i < len; i++) s += String.fromCharCode(view.getUint8(offset + i));
+  return s;
+}
+function tryParseWavChunks(buf) {
+  const view = new DataView(buf);
+  if (buf.byteLength < 12 || readAscii(view, 0, 4) !== 'RIFF' || readAscii(view, 8, 4) !== 'WAVE') return null;
+  let offset = 12, fmt = null, dataChunkStart = null, dataSize = null;
+  while (offset + 8 <= buf.byteLength) {
+    const id = readAscii(view, offset, 4);
+    const size = view.getUint32(offset + 4, true);
+    const payloadStart = offset + 8;
+    if (id === 'fmt ') {
+      fmt = {
+        audioFormat: view.getUint16(payloadStart, true),
+        channels: view.getUint16(payloadStart + 2, true),
+        sampleRate: view.getUint32(payloadStart + 4, true),
+        blockAlign: view.getUint16(payloadStart + 12, true),
+        bitsPerSample: view.getUint16(payloadStart + 14, true),
+      };
+    } else if (id === 'data') {
+      dataChunkStart = offset;
+      dataSize = size;
+      break;
+    }
+    offset = payloadStart + size + (size % 2);
+  }
+  if (!fmt || dataChunkStart == null) return null;
+  return { fmt, dataChunkStart, dataPayloadStart: dataChunkStart + 8, dataSize };
+}
+async function looksLikeWav(file) {
+  try {
+    const buf = await file.slice(0, 12).arrayBuffer();
+    const view = new DataView(buf);
+    return readAscii(view, 0, 4) === 'RIFF' && readAscii(view, 8, 4) === 'WAVE';
+  } catch (e) { return false; }
+}
+async function readWavHeaderInfo(file) {
+  let prefixSize = 65536;
+  const maxPrefix = 8 * 1024 * 1024;
+  while (true) {
+    const buf = await file.slice(0, Math.min(prefixSize, file.size)).arrayBuffer();
+    const info = tryParseWavChunks(buf);
+    if (info) {
+      if (!info.dataSize || info.dataPayloadStart + info.dataSize > file.size) {
+        info.dataSize = file.size - info.dataPayloadStart;
+      }
+      return info;
+    }
+    if (prefixSize >= file.size || prefixSize >= maxPrefix) return null;
+    prefixSize *= 4;
+  }
+}
+/** Byte-exact slice of a WAV file's PCM data — only reads the needed range off disk. */
+async function sliceWavFile(file, header, startSec, endSec) {
+  const { fmt, dataChunkStart, dataPayloadStart, dataSize } = header;
+  const blockAlign = fmt.blockAlign || (fmt.channels * fmt.bitsPerSample / 8);
+  const totalFrames = Math.floor(dataSize / blockAlign);
+  const startFrame = Math.max(0, Math.min(totalFrames, Math.floor(startSec * fmt.sampleRate)));
+  const endFrame = Math.max(startFrame, Math.min(totalFrames, Math.ceil(endSec * fmt.sampleRate)));
+  const startByte = dataPayloadStart + startFrame * blockAlign;
+  const endByte = dataPayloadStart + endFrame * blockAlign;
+
+  const headerBuf = await file.slice(0, dataPayloadStart).arrayBuffer();
+  const pcmBuf = await file.slice(startByte, endByte).arrayBuffer();
+
+  const headerBytes = new Uint8Array(headerBuf);
+  const view = new DataView(headerBytes.buffer);
+  const newDataSize = pcmBuf.byteLength;
+  view.setUint32(dataChunkStart + 4, newDataSize, true);
+  view.setUint32(4, dataChunkStart + 8 + newDataSize - 8, true);
+
+  return new Blob([headerBytes, pcmBuf], { type: 'audio/wav' }).arrayBuffer();
+}
+
+// ─── Duration probing for non-WAV formats (metadata only, no full decode) ─────
+function probeDuration(file) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const el = new Audio();
+    const cleanup = () => URL.revokeObjectURL(url);
+    el.preload = 'metadata';
+    el.addEventListener('loadedmetadata', () => { const d = isFinite(el.duration) ? el.duration : null; cleanup(); resolve(d); }, { once: true });
+    el.addEventListener('error', () => { cleanup(); resolve(null); }, { once: true });
+    el.src = url;
+  });
+}
+
+/** Real-time capture fallback: seeks to startSec, taps decoded samples through a muted graph until endSec. */
+async function decodeSliceViaCapture(file, startSec, endSec, onProgress) {
+  const url = URL.createObjectURL(file);
+  const el = document.createElement('audio');
+  el.preload = 'auto';
+  el.src = url;
+  try {
+    await new Promise((res, rej) => {
+      el.addEventListener('loadedmetadata', res, { once: true });
+      el.addEventListener('error', () => rej(new Error('Could not load audio')), { once: true });
+    });
+    await new Promise(res => {
+      const onSeeked = () => { el.removeEventListener('seeked', onSeeked); res(); };
+      el.addEventListener('seeked', onSeeked);
+      el.currentTime = startSec;
+    });
+
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = ctx.createMediaElementSource(el);
+    const processor = ctx.createScriptProcessor(4096, 1, 1);
+    const silence = ctx.createGain();
+    silence.gain.value = 0;
+    source.connect(processor);
+    processor.connect(silence);
+    silence.connect(ctx.destination);
+
+    const chunks = [];
+    const sliceDur = Math.max(0.01, endSec - startSec);
+    processor.onaudioprocess = e => {
+      chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+      onProgress?.(Math.min(1, (el.currentTime - startSec) / sliceDur));
+    };
+
+    await el.play();
+    await new Promise(res => {
+      const check = () => {
+        if (el.currentTime >= endSec || el.ended || el.paused) { res(); return; }
+        requestAnimationFrame(check);
+      };
+      requestAnimationFrame(check);
+    });
+    el.pause();
+    processor.disconnect(); source.disconnect(); silence.disconnect();
+
+    const total = chunks.reduce((s, c) => s + c.length, 0);
+    const samples = new Float32Array(total);
+    let off = 0; for (const c of chunks) { samples.set(c, off); off += c.length; }
+    const outBuffer = ctx.createBuffer(1, Math.max(1, samples.length), ctx.sampleRate);
+    outBuffer.copyToChannel(samples, 0);
+    await ctx.close();
+    return outBuffer;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+// ─── Sentence boundary detection (energy-based silence gaps) ──────────────────
+function computeMonoData(buffer) {
+  if (buffer.numberOfChannels === 1) return buffer.getChannelData(0);
+  const n = buffer.length;
+  const out = new Float32Array(n);
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < n; i++) out[i] += data[i] / buffer.numberOfChannels;
+  }
+  return out;
+}
+
+/**
+ * Splits an AudioBuffer into speech segments separated by silence gaps of
+ * at least `minSilenceMs`. Shorter gaps (e.g. between words) are merged into
+ * the surrounding speech, so a "sentence" can contain internal pauses.
+ */
+function detectSentences(buffer, params = {}) {
+  const windowMs      = 20;
+  const minSilenceMs  = params.minSilenceMs  ?? 300;
+  const minSentenceMs = params.minSentenceMs ?? 350;
+  const padMs         = params.padMs         ?? 70;
+
+  const sr   = buffer.sampleRate;
+  const data = computeMonoData(buffer);
+  const winSize = Math.max(1, Math.round(sr * windowMs / 1000));
+  const nWin = Math.ceil(data.length / winSize);
+  const rms = new Float32Array(nWin);
+  for (let w = 0; w < nWin; w++) {
+    const start = w * winSize, end = Math.min(start + winSize, data.length);
+    let sum = 0;
+    for (let i = start; i < end; i++) sum += data[i] * data[i];
+    rms[w] = Math.sqrt(sum / Math.max(1, end - start));
+  }
+
+  const sorted = Float32Array.from(rms).sort();
+  const floor  = sorted[Math.floor(sorted.length * 0.15)] || 0;
+  const peak   = sorted[sorted.length - 1] || 0.0001;
+  const threshold = Math.max(floor * 2.5, peak * 0.035, 0.0025);
+
+  const isSpeech = new Uint8Array(nWin);
+  for (let w = 0; w < nWin; w++) isSpeech[w] = rms[w] > threshold ? 1 : 0;
+
+  const minSilenceWin = Math.max(1, Math.round(minSilenceMs / windowMs));
+  let i = 0;
+  while (i < nWin) {
+    if (!isSpeech[i]) {
+      let j = i; while (j < nWin && !isSpeech[j]) j++;
+      if (j - i < minSilenceWin) for (let k = i; k < j; k++) isSpeech[k] = 1;
+      i = j;
+    } else i++;
+  }
+
+  const rawSegments = [];
+  i = 0;
+  while (i < nWin) {
+    if (isSpeech[i]) {
+      let j = i; while (j < nWin && isSpeech[j]) j++;
+      rawSegments.push({ start: i * windowMs, end: j * windowMs });
+      i = j;
+    } else i++;
+  }
+
+  const durMs = buffer.duration * 1000;
+  const padded = rawSegments
+      .map(s => ({ start: Math.max(0, s.start - padMs), end: Math.min(durMs, s.end + padMs) }))
+      .filter(s => s.end - s.start >= minSentenceMs);
+
+  const merged = [];
+  for (const s of padded) {
+    const last = merged[merged.length - 1];
+    if (last && s.start <= last.end) last.end = Math.max(last.end, s.end);
+    else merged.push({ ...s });
+  }
+
+  return merged.map((s, idx) => ({ index: idx, start: Math.round(s.start), end: Math.round(s.end) }));
+}
+
+// ─── Session state ─────────────────────────────────────────────────────────────
+let currentFile = null, currentWavHeader = null, currentDuration = null, maxSecGlobal = 0;
+let currentCacheKey = null, currentBuffer = null, currentSegments = null;
+let playCtx = null, activeSource = null;
+let micStream = null, activeRecorder = null, activeRecordingIdx = null;
+const recordings = {};   // idx -> {blob, url}
+const rowRefs = {};      // idx -> row element
+
+function getPlayCtx() {
+  if (!playCtx || playCtx.state === 'closed') playCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return playCtx;
+}
+function stopActiveSource() {
+  if (activeSource) { try { activeSource.stop(); } catch (e) {} activeSource = null; }
+}
+function playBufferSlice(startMs, endMs, rate = 1, onEnded) {
+  if (!currentBuffer) return null;
+  stopActiveSource();
+  const ctx = getPlayCtx();
+  const src = ctx.createBufferSource();
+  src.buffer = currentBuffer;
+  src.playbackRate.value = rate;
+  src.connect(ctx.destination);
+  src.start(0, startMs / 1000, (endMs - startMs) / 1000);
+  activeSource = src;
+  src.onended = () => { if (activeSource === src) activeSource = null; onEnded?.(); };
+  return src;
+}
+function playRefSeg(idx, rate = 1) { const seg = currentSegments[idx]; playBufferSlice(seg.start, seg.end, rate); }
+function playMine(idx) { const rec = recordings[idx]; if (!rec) return; new Audio(rec.url).play().catch(() => {}); }
+function compareSeg(idx) {
+  const seg = currentSegments[idx], rec = recordings[idx];
+  if (!rec) { playRefSeg(idx); return; }
+  playBufferSlice(seg.start, seg.end, 1, () => {
+    setTimeout(() => new Audio(rec.url).play().catch(() => {}), 300);
+  });
+}
+
+// ─── Recording ───────────────────────────────────────────────────────────────
+async function getMicStream() {
+  if (micStream) return micStream;
+  micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  return micStream;
+}
+function pickRecorderMime() {
+  for (const m of ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', '']) {
+    if (!m || MediaRecorder.isTypeSupported(m)) return m;
+  }
+  return '';
+}
+async function toggleRecord(idx, row) {
+  if (activeRecordingIdx === idx) { activeRecorder.stop(); return; }
+  if (activeRecorder) activeRecorder.stop();
+  try {
+    const stream = await getMicStream();
+    const chunks = [];
+    const mime = pickRecorderMime();
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => {
+      const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
+      if (recordings[idx]?.url) URL.revokeObjectURL(recordings[idx].url);
+      recordings[idx] = { blob, url: URL.createObjectURL(blob) };
+      activeRecorder = null; activeRecordingIdx = null;
+      setRowRecordingState(row, false);
+      row.querySelector('.play-mine').disabled = false;
+      row.querySelector('.compare-btn').disabled = false;
+      row.querySelector('.sent-status').textContent = 'Recorded ✓';
+    };
+    rec.start();
+    activeRecorder = rec; activeRecordingIdx = idx;
+    setRowRecordingState(row, true);
+  } catch (e) {
+    row.querySelector('.sent-status').textContent = 'Mic error: ' + e.message;
+  }
+}
+function setRowRecordingState(row, active) {
+  const btn = row.querySelector('.rec-btn'), dot = row.querySelector('.rec-dot'), status = row.querySelector('.sent-status');
+  btn.textContent = active ? '■ Stop' : '● Rec';
+  btn.classList.toggle('rec-active', active);
+  dot.classList.toggle('on', active);
+  if (active) status.textContent = 'Recording…';
+}
+
+// ─── Waveform (static, per-row) ────────────────────────────────────────────────
+function drawStaticWave(canvas, buffer, startMs, endMs) {
+  if (!canvas) return;
+  const W = canvas.width = canvas.offsetWidth || 300, H = canvas.height = 40;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#1a2e48'; ctx.fillRect(0, 0, W, H);
+  const sr = buffer.sampleRate, data = buffer.getChannelData(0);
+  const i0 = Math.floor(startMs / 1000 * sr), i1 = Math.min(data.length, Math.ceil(endMs / 1000 * sr));
+  const n = i1 - i0; if (n <= 0) return;
+  const step = Math.max(1, Math.ceil(n / W));
+  for (let x = 0; x < W; x++) {
+    let pk = 0;
+    const s = i0 + x * step, e = Math.min(i0 + (x + 1) * step, i1);
+    for (let i = s; i < e; i++) pk = Math.max(pk, Math.abs(data[i]));
+    const h = Math.max(1, pk * (H - 4));
+    ctx.fillStyle = '#4a90c8';
+    ctx.fillRect(x, (H - h) / 2, 1, h);
+  }
+}
+
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+function secToClock(sec) {
+  sec = Math.max(0, sec);
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = Math.floor(sec % 60);
+  return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`;
+}
+function clockToSec(str) {
+  const parts = String(str).split(':').map(x => parseFloat(x) || 0);
+  let sec = 0; for (const p of parts) sec = sec * 60 + p;
+  return sec;
+}
+function msToClock(ms) {
+  const s = ms / 1000;
+  const m = Math.floor(s / 60), rem = (s - m * 60).toFixed(2);
+  return `${m}:${rem.padStart(5, '0')}`;
+}
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function setStatus(text) { const el = document.getElementById('uploadStatus'); if (el) el.textContent = text; }
+function setCacheBadge(cached, when) {
+  const el = document.getElementById('cacheBadge');
+  if (!el) return;
+  if (cached) { el.textContent = `⚡ Cached${when ? ' · ' + new Date(when).toLocaleString() : ''}`; el.className = 'cache-badge hit'; }
+  else { el.textContent = '● Fresh analysis'; el.className = 'cache-badge miss'; }
+}
+function readParams() {
+  return { minSilenceMs: parseInt(document.getElementById('silenceSlider').value, 10) };
+}
+
+// ─── Progress bar (real percentages: file read / decode; indeterminate for segmentation) ─
+function showProgress(on, label = '', indeterminate = false) {
+  const wrap = document.getElementById('progressWrap');
+  wrap.style.display = on ? 'flex' : 'none';
+  wrap.classList.toggle('indeterminate', !!indeterminate);
+  if (on) { setProgressLabel(label); setProgressPct(indeterminate ? 100 : 0); }
+}
+function setProgressLabel(label) { document.getElementById('progressLabel').textContent = label; }
+function setProgressPct(pct) {
+  document.getElementById('progressFill').style.width = Math.max(0, Math.min(100, pct)) + '%';
+  document.getElementById('progressPct').textContent = Math.round(pct) + '%';
+}
+
+// ─── Rendering ─────────────────────────────────────────────────────────────────
+function renderSentenceList() {
+  const container = document.getElementById('sentenceList');
+  container.innerHTML = '';
+  for (const k in rowRefs) delete rowRefs[k];
+  const has = currentSegments && currentSegments.length > 0;
+  document.getElementById('sentenceListWrap').style.display = has ? 'block' : 'none';
+  document.getElementById('sentCount').textContent = has ? currentSegments.length : 0;
+  if (!has) return;
+
+  currentSegments.forEach((seg, idx) => {
+    const row = document.createElement('div');
+    row.className = 'sent-row';
+    row.innerHTML = `
+      <div class="sent-idx">${idx + 1}</div>
+      <div class="sent-main">
+        <canvas class="sent-wave"></canvas>
+        <div class="sent-meta">
+          <span class="sent-dur">${((seg.end - seg.start) / 1000).toFixed(2)}s</span>
+          <span class="sent-time">${msToClock(seg.start)} – ${msToClock(seg.end)}</span>
+        </div>
+      </div>
+      <div class="sent-controls">
+        <button class="sent-btn play-ref" title="Play reference">▶</button>
+        <button class="sent-btn play-ref-slow" title="Play at half speed">🐌</button>
+        <button class="sent-btn rec-btn" title="Record your voice">● Rec</button>
+        <span class="rec-dot"></span>
+        <button class="sent-btn play-mine" disabled title="Play your recording">▶ You</button>
+        <button class="sent-btn compare-btn" disabled title="Play reference then yours">⇄ Compare</button>
+        <span class="sent-status">Not recorded</span>
+      </div>`;
+    container.appendChild(row);
+    rowRefs[idx] = row;
+
+    const canvas = row.querySelector('.sent-wave');
+    requestAnimationFrame(() => drawStaticWave(canvas, currentBuffer, seg.start, seg.end));
+
+    row.querySelector('.play-ref').addEventListener('click', () => playRefSeg(idx));
+    row.querySelector('.play-ref-slow').addEventListener('click', () => playRefSeg(idx, 0.6));
+    row.querySelector('.rec-btn').addEventListener('click', () => toggleRecord(idx, row));
+    row.querySelector('.play-mine').addEventListener('click', () => playMine(idx));
+    row.querySelector('.compare-btn').addEventListener('click', () => compareSeg(idx));
+  });
+}
+
+async function refreshCacheList() {
+  const el = document.getElementById('cacheList');
+  if (!el) return;
+  const list = await shGetAll();
+  if (!list.length) { el.innerHTML = '<div class="cache-empty">No cached files yet</div>'; return; }
+  el.innerHTML = list.sort((a, b) => b.createdAt - a.createdAt).map(e => `
+    <div class="cache-item">
+      <span class="cache-name">${escapeHtml(e.fileName || '(unnamed)')}</span>
+      <span class="cache-n">${secToClock(e.sliceStartSec || 0)}–${secToClock(e.sliceEndSec || 0)} · ${e.segments?.length || 0} sentences</span>
+      <span class="cache-date">${new Date(e.createdAt).toLocaleDateString()}</span>
+      <button class="cache-forget" data-key="${e.key}" title="Forget cached analysis">✕</button>
+    </div>`).join('');
+  el.querySelectorAll('.cache-forget').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await shDelete(btn.dataset.key);
+      if (btn.dataset.key === currentCacheKey) setCacheBadge(false);
+      refreshCacheList();
+    });
+  });
+}
+
+// ─── Range picker ──────────────────────────────────────────────────────────────
+function setupRangeUI(duration) {
+  maxSecGlobal = Math.max(1, Math.floor(duration));
+  const startSlider = document.getElementById('rangeStartSlider');
+  const endSlider   = document.getElementById('rangeEndSlider');
+  startSlider.min = 0; startSlider.max = maxSecGlobal;
+  endSlider.min   = 0; endSlider.max   = maxSecGlobal;
+
+  const defaultEnd = currentWavHeader ? maxSecGlobal : Math.min(maxSecGlobal, 300);
+  startSlider.value = 0;
+  endSlider.value = defaultEnd;
+  document.getElementById('rangeStart').value = secToClock(0);
+  document.getElementById('rangeEnd').value = secToClock(defaultEnd);
+  updateRangeDurLabel();
+  document.getElementById('rangeWrap').style.display = 'block';
+}
+function updateRangeDurLabel() {
+  const s = clockToSec(document.getElementById('rangeStart').value);
+  const e = clockToSec(document.getElementById('rangeEnd').value);
+  const dur = Math.max(0, e - s);
+  let msg = `Selected: ${secToClock(dur)} of ${secToClock(maxSecGlobal)} total`;
+  if (!currentWavHeader && dur > MAX_NONWAV_SLICE_SEC) {
+    msg += ` — will be clamped to ${secToClock(MAX_NONWAV_SLICE_SEC)} (non-WAV real-time decode limit)`;
+  }
+  document.getElementById('rangeDurLabel').textContent = msg;
+}
+
+// ─── Upload / decode / segmentation flow ───────────────────────────────────────
+function resetPlaybackAndRecordings() {
+  stopActiveSource();
+  if (activeRecorder) { try { activeRecorder.stop(); } catch (e) {} activeRecorder = null; activeRecordingIdx = null; }
+  Object.values(recordings).forEach(r => r?.url && URL.revokeObjectURL(r.url));
+  for (const k in recordings) delete recordings[k];
+}
+function resetSession() {
+  resetPlaybackAndRecordings();
+  currentFile = null; currentWavHeader = null; currentDuration = null;
+  currentBuffer = null; currentSegments = null; currentCacheKey = null;
+  document.getElementById('fileInfo').style.display = 'none';
+  document.getElementById('rangeWrap').style.display = 'none';
+  document.getElementById('sentenceListWrap').style.display = 'none';
+  document.getElementById('cacheBadge').textContent = '';
+  document.getElementById('cacheBadge').className = 'cache-badge';
+  showProgress(false);
+  setStatus('');
+}
+
+async function runSegmentation() {
+  if (!currentBuffer) return;
+  showProgress(true, 'Analysing audio for sentence boundaries…', true);
+  await new Promise(r => requestAnimationFrame(r));   // let the UI paint before the sync scan
+  const params = readParams();
+  const segments = detectSentences(currentBuffer, params);
+  currentSegments = segments;
+  await shPut(currentCacheKey, {
+    segments, params,
+    sliceStartSec: currentSliceStart, sliceEndSec: currentSliceEnd,
+    fileName: currentFile?.name, size: currentFile?.size,
+    createdAt: Date.now(),
+  });
+  showProgress(false);
+  setCacheBadge(false);
+  renderSentenceList();
+  setStatus(`Found ${segments.length} sentence${segments.length !== 1 ? 's' : ''}`);
+  refreshCacheList();
+}
+
+let currentSliceStart = 0, currentSliceEnd = 0;
+
+async function loadSlice(startSec, endSec) {
+  if (!currentFile) return;
+  if (!currentWavHeader) endSec = Math.min(endSec, startSec + MAX_NONWAV_SLICE_SEC);
+  resetPlaybackAndRecordings();
+  currentBuffer = null; currentSegments = null;
+  document.getElementById('sentenceListWrap').style.display = 'none';
+  currentSliceStart = startSec; currentSliceEnd = endSec;
+  currentCacheKey = buildCacheKey(currentFile, startSec, endSec);
+
+  const loadBtn = document.getElementById('loadSliceBtn');
+  loadBtn.disabled = true;
+  try {
+    if (currentWavHeader) {
+      showProgress(true, 'Reading WAV slice from disk…');
+      setProgressPct(30);
+      const buf = await sliceWavFile(currentFile, currentWavHeader, startSec, endSec);
+      setProgressPct(70);
+      setProgressLabel('Decoding…');
+      const decodeCtx = new (window.AudioContext || window.webkitAudioContext)();
+      currentBuffer = await decodeCtx.decodeAudioData(buf);
+      decodeCtx.close();
+      setProgressPct(100);
+    } else {
+      showProgress(true, 'Decoding selected range in real time…');
+      currentBuffer = await decodeSliceViaCapture(currentFile, startSec, endSec, p => setProgressPct(p * 100));
+    }
+  } catch (e) {
+    showProgress(false);
+    setStatus('Could not decode selected range: ' + e.message);
+    loadBtn.disabled = false;
+    return;
+  }
+  showProgress(false);
+  loadBtn.disabled = false;
+
+  const cached = await shGet(currentCacheKey);
+  if (cached && cached.segments?.length) {
+    currentSegments = cached.segments;
+    if (cached.params?.minSilenceMs) {
+      document.getElementById('silenceSlider').value = cached.params.minSilenceMs;
+      document.getElementById('silenceVal').textContent = cached.params.minSilenceMs + ' ms';
+    }
+    setCacheBadge(true, cached.createdAt);
+    renderSentenceList();
+    setStatus(`Loaded ${cached.segments.length} sentences from cache — no re-analysis needed`);
+    refreshCacheList();
+    return;
+  }
+  setCacheBadge(false);
+  await runSegmentation();
+}
+
+async function handleFile(file) {
+  resetSession();
+  currentFile = file;
+  setStatus('Reading file info…');
+
+  if (await looksLikeWav(file)) {
+    currentWavHeader = await readWavHeaderInfo(file);
+  }
+  let duration;
+  if (currentWavHeader) {
+    duration = currentWavHeader.dataSize / (currentWavHeader.fmt.sampleRate * currentWavHeader.fmt.blockAlign);
+  } else {
+    duration = await probeDuration(file);
+  }
+  if (duration == null) { setStatus('Could not read audio duration — unsupported or corrupt file?'); return; }
+  currentDuration = duration;
+
+  document.getElementById('fileInfo').style.display = 'flex';
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileDuration').textContent =
+      `${secToClock(duration)}${currentWavHeader ? ' · WAV (instant slice decode)' : ' · non-WAV (real-time slice decode)'}`;
+  document.getElementById('fullAudio').src = URL.createObjectURL(file);
+
+  setupRangeUI(duration);
+  setStatus('Pick a time range below, then load it.');
+}
+
+// ─── Wiring ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('dropzone');
+  const fileInput = document.getElementById('audioFile');
+
+  dz.addEventListener('click', () => fileInput.click());
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag');
+    const f = e.dataTransfer.files?.[0];
+    if (f) handleFile(f);
+  });
+  fileInput.addEventListener('change', () => {
+    const f = fileInput.files?.[0];
+    if (f) handleFile(f);
+  });
+
+  // ── Range picker wiring ──
+  const startSlider = document.getElementById('rangeStartSlider');
+  const endSlider   = document.getElementById('rangeEndSlider');
+  const startText   = document.getElementById('rangeStart');
+  const endText     = document.getElementById('rangeEnd');
+
+  function onSliderInput() {
+    let s = parseInt(startSlider.value, 10), e = parseInt(endSlider.value, 10);
+    if (e <= s) { e = Math.min(maxSecGlobal, s + 1); endSlider.value = e; }
+    startText.value = secToClock(s);
+    endText.value = secToClock(e);
+    updateRangeDurLabel();
+  }
+  function onTextChange() {
+    let s = clockToSec(startText.value), e = clockToSec(endText.value);
+    s = Math.max(0, Math.min(maxSecGlobal, s));
+    e = Math.max(s + 1, Math.min(maxSecGlobal, e));
+    startSlider.value = s; endSlider.value = e;
+    startText.value = secToClock(s); endText.value = secToClock(e);
+    updateRangeDurLabel();
+  }
+  startSlider.addEventListener('input', onSliderInput);
+  endSlider.addEventListener('input', onSliderInput);
+  startText.addEventListener('change', onTextChange);
+  endText.addEventListener('change', onTextChange);
+
+  document.querySelectorAll('#rangeWrap [data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.preset;
+      const s = 0, e = p === 'full' ? maxSecGlobal : Math.min(maxSecGlobal, parseInt(p, 10));
+      startSlider.value = s; endSlider.value = e;
+      startText.value = secToClock(s); endText.value = secToClock(e);
+      updateRangeDurLabel();
+    });
+  });
+
+  document.getElementById('loadSliceBtn').addEventListener('click', () => {
+    loadSlice(clockToSec(startText.value), clockToSec(endText.value));
+  });
+
+  // ── Segmentation params ──
+  const slider = document.getElementById('silenceSlider');
+  slider.addEventListener('input', () => {
+    document.getElementById('silenceVal').textContent = slider.value + ' ms';
+  });
+  document.getElementById('reanalyzeBtn').addEventListener('click', () => runSegmentation());
+  document.getElementById('clearCacheBtn').addEventListener('click', async () => {
+    if (!currentCacheKey) return;
+    await shDelete(currentCacheKey);
+    setCacheBadge(false);
+    refreshCacheList();
+  });
+
+  refreshCacheList();
+});

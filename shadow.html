@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shadowing Practice — IPA Vowel Chart</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/shadow.css">
+</head>
+<body>
+
+<header>
+  <h1>Shadowing Practice</h1>
+  <p>Upload audio → it's split into sentences → listen, repeat, compare</p>
+  <a href="index.html"  class="editor-link">← Vowel Chart</a>
+  <a href="editor.html" class="editor-link">✎ Edit languages</a>
+</header>
+
+<div class="shadow-wrap">
+
+  <div class="dropzone" id="dropzone">
+    <div class="dropzone-icon">🎧</div>
+    <div>Click to choose an audio file, or drag one here</div>
+    <div class="dropzone-hint">Supports files of any length — pick a time range next. Re-loading the same file+range reuses its cached sentence split.</div>
+    <input type="file" id="audioFile" accept="audio/*" style="display:none">
+  </div>
+
+  <div class="file-info" id="fileInfo">
+    <span>📄 <b id="fileName"></b></span>
+    <span id="fileDuration"></span>
+    <span class="cache-badge" id="cacheBadge"></span>
+    <audio id="fullAudio" controls></audio>
+  </div>
+
+  <div class="range-wrap" id="rangeWrap" style="display:none">
+    <div class="range-title">Select the time range to load &amp; analyse</div>
+    <div class="range-row">
+      <label>Start <input type="text" id="rangeStart" class="range-text" value="0:00"></label>
+      <input type="range" id="rangeStartSlider" min="0" max="100" value="0">
+      <label>End <input type="text" id="rangeEnd" class="range-text" value="0:00"></label>
+      <input type="range" id="rangeEndSlider" min="0" max="100" value="100">
+    </div>
+    <div class="range-presets">
+      <button class="sent-btn" data-preset="120" type="button">First 2 min</button>
+      <button class="sent-btn" data-preset="600" type="button">First 10 min</button>
+      <button class="sent-btn" data-preset="full" type="button">Whole file</button>
+      <span class="range-dur" id="rangeDurLabel"></span>
+      <button class="sent-btn primary" id="loadSliceBtn" type="button">▶ Load &amp; analyse this slice</button>
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap" style="display:none">
+    <span class="mini-spinner"></span>
+    <span class="progress-label" id="progressLabel"></span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+
+  <div id="uploadStatus"></div>
+
+  <div class="params-row">
+    <span>Silence sensitivity (pause length that splits a sentence):</span>
+    <input type="range" id="silenceSlider" min="150" max="600" step="10" value="300">
+    <span id="silenceVal">300 ms</span>
+    <button class="sent-btn" id="reanalyzeBtn" type="button">↺ Re-analyse</button>
+    <button class="sent-btn" id="clearCacheBtn" type="button">🗑 Forget this slice's cache</button>
+  </div>
+
+  <div class="sentence-list-wrap" id="sentenceListWrap">
+    <div class="sentence-list-header">
+      <span><b id="sentCount">0</b> sentences detected</span>
+      <span>▶ reference · 🐌 slow · ● record · ⇄ compare</span>
+    </div>
+    <div id="sentenceList"></div>
+  </div>
+
+  <div class="cache-section">
+    <div class="cache-section-title">Cached files</div>
+    <div class="cache-list" id="cacheList"></div>
+  </div>
+
+</div>
+
+<script src="js/shadow.js"></script>
+</body>
+</html>

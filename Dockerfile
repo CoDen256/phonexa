@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY formanter.py .
 
 # Frontend assets
-COPY index.html editor.html debug.html processor.js ./
+COPY index.html editor.html debug.html shadow.html processor.js ./
 COPY js/ ./js/
 COPY css/ ./css/
 COPY lang/ ./lang/
