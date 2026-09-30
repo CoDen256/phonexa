@@ -497,16 +497,23 @@ function extractMonoSlice(buffer, startMs, endMs) {
 // served from a different origin.
 const TRANSCRIBE_SERVER = 'http://localhost:5050';
 function getTranscribeServer() { return TRANSCRIBE_SERVER; }
+function getTranscribeBackend() { return document.getElementById('transcribeBackend')?.value || 'local'; }
 async function checkTranscribeServer() {
   const el = document.getElementById('transcribeBadge');
   if (!el) return;
+  if (getTranscribeBackend() === 'hf') {
+    const hasToken = !!localStorage.getItem('shadowHfToken');
+    el.textContent = hasToken ? '📝 Online (Hugging Face): ✓ token set' : '📝 Online (Hugging Face): ⚠ no API token set below';
+    el.className = hasToken ? 'cache-badge hit' : 'cache-badge';
+    return;
+  }
   try {
     const r = await fetch(TRANSCRIBE_SERVER + '/ping', { signal: AbortSignal.timeout(1500) });
-    if (r.ok) { el.textContent = `📝 Transcription server: ✓ connected (${TRANSCRIBE_SERVER})`; el.className = 'cache-badge hit'; return; }
-    el.textContent = `📝 Transcription server: got HTTP ${r.status} from ${TRANSCRIBE_SERVER}`;
+    if (r.ok) { el.textContent = `📝 Local transcription server: ✓ connected (${TRANSCRIBE_SERVER})`; el.className = 'cache-badge hit'; return; }
+    el.textContent = `📝 Local transcription server: got HTTP ${r.status} from ${TRANSCRIBE_SERVER}`;
     el.className = 'cache-badge';
   } catch (e) {
-    el.textContent = `📝 Transcription server: unreachable at ${TRANSCRIBE_SERVER} — run formanter.py`;
+    el.textContent = `📝 Local transcription server: unreachable at ${TRANSCRIBE_SERVER} — run formanter.py`;
     el.className = 'cache-badge';
   }
 }
@@ -524,6 +531,35 @@ async function cacheTranscript(idx, text) {
   cached.transcripts[idx] = text;
   await shPut(currentCacheKey, cached);
 }
+
+/**
+ * Online fallback for when installing faster-whisper locally isn't wanted.
+ * Calls the Hugging Face Inference API directly from the browser — the
+ * audio never touches formanter.py. Requires a free HF account/token
+ * (huggingface.co/settings/tokens). No segment timestamps in this simple
+ * binary-upload form, so it only supports per-sentence transcription, not
+ * the whole-slice + realign flow.
+ */
+async function transcribeViaHuggingFace(blob) {
+  const token = (localStorage.getItem('shadowHfToken') || '').trim();
+  if (!token) throw new Error('No Hugging Face API token set — add one in the Online settings box above');
+  const model = (localStorage.getItem('shadowHfModel') || 'openai/whisper-large-v3').trim();
+  const resp = await fetch(`https://api-inference.huggingface.co/models/${encodeURIComponent(model)}`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'audio/wav' },
+    body: blob,
+    signal: AbortSignal.timeout(60000),
+  });
+  const data = await resp.json().catch(() => null);
+  if (!resp.ok) {
+    if (data?.error && /loading/i.test(data.error)) {
+      throw new Error(`Model is loading on Hugging Face's servers (~${Math.ceil(data.estimated_time || 20)}s) — try again shortly`);
+    }
+    throw new Error(data?.error || ('HTTP ' + resp.status));
+  }
+  return data?.text || '';
+}
+
 async function transcribeSentence(idx, row) {
   if (!currentBuffer || !currentSegments?.[idx]) return;
   const seg = currentSegments[idx];
@@ -534,17 +570,23 @@ async function transcribeSentence(idx, row) {
   try {
     const { samples, sampleRate } = extractMonoSlice(currentBuffer, seg.start, seg.end);
     const blob = encodeWavBlob(samples, sampleRate);
-    const form = new FormData();
-    form.append('file', blob, 'slice.wav');
-    const lang = getTranscribeLanguage();
-    if (lang) form.append('language', lang);
-    const resp = await fetch(getTranscribeServer() + '/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(60000) });
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error || ('HTTP ' + resp.status));
+    let text;
+    if (getTranscribeBackend() === 'hf') {
+      text = await transcribeViaHuggingFace(blob);
+    } else {
+      const form = new FormData();
+      form.append('file', blob, 'slice.wav');
+      const lang = getTranscribeLanguage();
+      if (lang) form.append('language', lang);
+      const resp = await fetch(getTranscribeServer() + '/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(60000) });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || ('HTTP ' + resp.status));
+      }
+      const data = await resp.json();
+      text = data.text;
     }
-    const data = await resp.json();
-    const text = data.text || '(no speech detected)';
+    text = text || '(no speech detected)';
     out.textContent = text;
     currentTranscripts[idx] = text;
     await cacheTranscript(idx, text);
@@ -593,6 +635,10 @@ function assignWhisperSegmentsToSentences(whisperSegments) {
 }
 async function transcribeWholeSlice() {
   if (!currentBuffer || !currentSegments?.length) return;
+  if (getTranscribeBackend() === 'hf') {
+    setStatus('Whole-slice mode needs the local backend (for segment timestamps) — switch to Local, or use per-sentence transcription.');
+    return;
+  }
   const btn = document.getElementById('transcribeWholeBtn');
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
   setStatus('Transcribing the whole slice in one call (more context → usually more accurate)…');
@@ -1078,6 +1124,33 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isOther) localStorage.setItem('shadowTranscribeLanguage', langSelect.value);
     });
     langOther?.addEventListener('change', () => localStorage.setItem('shadowTranscribeLanguage', langOther.value.trim()));
+  }
+
+  const backendSelect = document.getElementById('transcribeBackend');
+  const hfSettings = document.getElementById('hfSettings');
+  const hfTokenInput = document.getElementById('hfTokenInput');
+  const hfModelInput = document.getElementById('hfModelInput');
+  const wholeSliceBtn = document.getElementById('transcribeWholeBtn');
+  function applyBackendUI() {
+    const isHf = backendSelect.value === 'hf';
+    hfSettings.style.display = isHf ? 'flex' : 'none';
+    if (wholeSliceBtn) wholeSliceBtn.disabled = isHf;
+    checkTranscribeServer();
+  }
+  if (backendSelect) {
+    backendSelect.value = localStorage.getItem('shadowTranscribeBackend') || 'local';
+    hfTokenInput.value = localStorage.getItem('shadowHfToken') || '';
+    hfModelInput.value = localStorage.getItem('shadowHfModel') || 'openai/whisper-large-v3';
+    applyBackendUI();
+    backendSelect.addEventListener('change', () => {
+      localStorage.setItem('shadowTranscribeBackend', backendSelect.value);
+      applyBackendUI();
+    });
+    hfTokenInput.addEventListener('change', () => {
+      localStorage.setItem('shadowHfToken', hfTokenInput.value.trim());
+      checkTranscribeServer();
+    });
+    hfModelInput.addEventListener('change', () => localStorage.setItem('shadowHfModel', hfModelInput.value.trim()));
   }
 
   refreshCacheList();

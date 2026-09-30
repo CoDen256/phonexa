@@ -42,6 +42,12 @@
 
   <div class="transcribe-status">
     <span class="cache-badge" id="transcribeBadge"></span>
+    <label class="transcribe-lang-label">Backend
+      <select id="transcribeBackend">
+        <option value="local">Local (formanter.py + faster-whisper)</option>
+        <option value="hf">Online — Hugging Face (free tier, no install)</option>
+      </select>
+    </label>
     <label class="transcribe-lang-label">Language
       <select id="transcribeLanguage">
         <option value="">Auto-detect</option>
@@ -64,6 +70,22 @@
       </select>
       <input type="text" id="transcribeLanguageOther" placeholder="ISO 639-1, e.g. sv" style="display:none">
     </label>
+  </div>
+
+  <div class="hf-settings" id="hfSettings" style="display:none">
+    <label>Hugging Face API token
+      <input type="password" id="hfTokenInput" placeholder="hf_xxx — free at huggingface.co/settings/tokens">
+    </label>
+    <label>Model
+      <input type="text" id="hfModelInput" value="openai/whisper-large-v3" placeholder="e.g. openai/whisper-large-v3">
+    </label>
+    <div class="hf-hint">
+      Runs entirely in your browser — audio is sent directly to huggingface.co, never through formanter.py.
+      The token is stored only in this browser's local storage. Per-sentence transcription only —
+      "Transcribe whole slice" needs the local backend for segment timestamps. If the model shows as
+      "loading", the free tier is warming it up; try again in ~20s. If it 404s, pick a different model
+      id from <a href="https://huggingface.co/models?pipeline_tag=automatic-speech-recognition" target="_blank" rel="noopener">huggingface.co's ASR models</a>.
+    </div>
   </div>
 
   <div class="range-wrap" id="rangeWrap" style="display:none">

@@ -35,6 +35,19 @@
 }
 .transcribe-lang-label input { width:90px; font-family:monospace; cursor:text; }
 
+.hf-settings {
+  margin-top:8px; padding:10px 14px; background:var(--card);
+  border:1px solid var(--border); border-radius:10px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.hf-settings label { display:flex; align-items:center; gap:8px; font-size:.7rem; color:var(--muted); }
+.hf-settings input {
+  flex:1; background:#1a2e48; border:1px solid #2e4560; border-radius:5px;
+  color:#d8e8f4; font-family:monospace; font-size:.72rem; padding:4px 7px;
+}
+.hf-hint { font-size:.64rem; color:#4a6888; line-height:1.5; }
+.hf-hint a { color:#7eb8f7; }
+
 .mini-spinner {
   width:14px; height:14px; flex-shrink:0; border:2px solid #2e4560;
   border-top-color:#7eb8f7; border-radius:50%; animation:spin .8s linear infinite;
