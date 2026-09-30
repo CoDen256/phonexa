@@ -27,7 +27,13 @@
 .cache-badge.miss { color:#7eb8f7; border-color:#7eb8f755; }
 #fullAudio { height:28px; margin-left:auto; }
 
-.transcribe-status { margin-top:8px; display:flex; }
+.transcribe-status { margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.transcribe-lang-label { display:flex; align-items:center; gap:6px; font-size:.68rem; color:var(--muted); }
+.transcribe-lang-label select, .transcribe-lang-label input {
+  background:#1a2e48; border:1px solid #2e4560; border-radius:5px;
+  color:#d8e8f4; font-size:.72rem; padding:3px 6px; cursor:pointer;
+}
+.transcribe-lang-label input { width:90px; font-family:monospace; cursor:text; }
 
 .mini-spinner {
   width:14px; height:14px; flex-shrink:0; border:2px solid #2e4560;

@@ -510,6 +510,12 @@ async function checkTranscribeServer() {
     el.className = 'cache-badge';
   }
 }
+function getTranscribeLanguage() {
+  const sel = document.getElementById('transcribeLanguage');
+  if (!sel) return '';
+  if (sel.value === '__other') return document.getElementById('transcribeLanguageOther')?.value.trim() || '';
+  return sel.value;
+}
 async function cacheTranscript(idx, text) {
   if (!currentCacheKey) return;
   const cached = await shGet(currentCacheKey);
@@ -530,6 +536,8 @@ async function transcribeSentence(idx, row) {
     const blob = encodeWavBlob(samples, sampleRate);
     const form = new FormData();
     form.append('file', blob, 'slice.wav');
+    const lang = getTranscribeLanguage();
+    if (lang) form.append('language', lang);
     const resp = await fetch(getTranscribeServer() + '/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(60000) });
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({}));
@@ -1000,6 +1008,20 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('transcribeAllBtn')?.addEventListener('click', () => transcribeAll());
+
+  const langSelect = document.getElementById('transcribeLanguage');
+  const langOther = document.getElementById('transcribeLanguageOther');
+  if (langSelect) {
+    const saved = localStorage.getItem('shadowTranscribeLanguage') || '';
+    if (saved && [...langSelect.options].some(o => o.value === saved)) langSelect.value = saved;
+    else if (saved) { langSelect.value = '__other'; langOther.value = saved; langOther.style.display = 'inline-block'; }
+    langSelect.addEventListener('change', () => {
+      const isOther = langSelect.value === '__other';
+      langOther.style.display = isOther ? 'inline-block' : 'none';
+      if (!isOther) localStorage.setItem('shadowTranscribeLanguage', langSelect.value);
+    });
+    langOther?.addEventListener('change', () => localStorage.setItem('shadowTranscribeLanguage', langOther.value.trim()));
+  }
 
   refreshCacheList();
   renderRecentFiles();
