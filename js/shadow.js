@@ -544,7 +544,9 @@ async function transcribeViaHuggingFace(blob) {
   const token = (localStorage.getItem('shadowHfToken') || '').trim();
   if (!token) throw new Error('No Hugging Face API token set — add one in the Online settings box above');
   const model = (localStorage.getItem('shadowHfModel') || 'openai/whisper-large-v3').trim();
-  const resp = await fetch(`https://api-inference.huggingface.co/models/${encodeURIComponent(model)}`, {
+  // router.huggingface.co replaced the old api-inference.huggingface.co host (that hostname no
+  // longer resolves at all). Model id is org/name — don't percent-encode the slash in the path.
+  const resp = await fetch(`https://router.huggingface.co/hf-inference/models/${model}`, {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'audio/wav' },
     body: blob,
