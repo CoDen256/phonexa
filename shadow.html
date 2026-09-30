@@ -24,6 +24,14 @@
     <div class="dropzone-hint">Supports files of any length — pick a time range next. Re-loading the same file+range reuses its cached sentence split.</div>
     <input type="file" id="audioFile" accept="audio/*" style="display:none">
   </div>
+  <div class="open-file-row">
+    <button class="sent-btn" id="openFileBtn" type="button">📂 Open file (remembers access — Chrome/Edge)</button>
+  </div>
+
+  <div class="cache-section">
+    <div class="cache-section-title">Remembered files</div>
+    <div class="cache-list" id="recentFilesList"></div>
+  </div>
 
   <div class="file-info" id="fileInfo">
     <span>📄 <b id="fileName"></b></span>
@@ -64,6 +72,7 @@
     <span id="silenceVal">300 ms</span>
     <button class="sent-btn" id="reanalyzeBtn" type="button">↺ Re-analyse</button>
     <button class="sent-btn" id="clearCacheBtn" type="button">🗑 Forget this slice's cache</button>
+    <label class="trim-toggle"><input type="checkbox" id="trimSilenceToggle" checked> ✂ Ignore silence at start of my recordings</label>
   </div>
 
   <div class="sentence-list-wrap" id="sentenceListWrap">

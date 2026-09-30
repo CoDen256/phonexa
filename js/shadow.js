@@ -25,15 +25,19 @@
  * MediaRecorder, play your take back, or compare (reference then yours).
  */
 
-const MAX_NONWAV_SLICE_SEC = 1800;   // 30 min cap on real-time capture for non-WAV formats
+const MAX_NONWAV_SLICE_SEC = 1800;      // 30 min cap on real-time capture for non-WAV formats
+const WAV_DECODE_WARN_BYTES = 1.2e9;    // ~1.2 GB decoded (Float32) — advisory threshold, browsers commonly
+                                         // fail to hold much more than ~2GB in one ArrayBuffer/AudioBuffer
 
-// ─── IndexedDB cache: cacheKey → {segments, params, sliceStartSec, sliceEndSec, fileName, size, createdAt} ─
+// ─── IndexedDB: 'segments' store caches sentence splits, 'fileHandles' remembers
+// File System Access API handles so a file doesn't need re-picking every visit ──
 function shOpen() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('ipa-shadow', 1);
+    const rq = indexedDB.open('ipa-shadow', 2);
     rq.onupgradeneeded = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('segments')) db.createObjectStore('segments');
+      if (!db.objectStoreNames.contains('fileHandles')) db.createObjectStore('fileHandles', { keyPath: 'id' });
     };
     rq.onsuccess = e => res(e.target.result);
     rq.onerror = rej;
@@ -77,6 +81,30 @@ async function shGetAll() {
 }
 function buildCacheKey(file, startSec, endSec) {
   return `${file.name}|${file.size}|${file.lastModified}|${Math.round(startSec * 1000)}-${Math.round(endSec * 1000)}`;
+}
+function fileIdentityId(file) { return `${file.name}|${file.size}|${file.lastModified}`; }
+
+// ─── Remembered file handles (File System Access API) ─────────────────────────
+// Only the handle is stored, not the audio bytes — re-granting access is near
+// instant and avoids ever duplicating a (possibly huge) file into IndexedDB.
+async function fhAdd(entry) {
+  try { const db = await shOpen(); const tx = db.transaction('fileHandles', 'readwrite'); tx.objectStore('fileHandles').put(entry); }
+  catch (e) { console.warn('fhAdd failed:', e); }
+}
+async function fhDelete(id) {
+  try { const db = await shOpen(); const tx = db.transaction('fileHandles', 'readwrite'); tx.objectStore('fileHandles').delete(id); }
+  catch (e) { console.warn('fhDelete failed:', e); }
+}
+async function fhGetAll() {
+  try {
+    const db = await shOpen();
+    return new Promise(res => {
+      const tx = db.transaction('fileHandles', 'readonly');
+      const rq = tx.objectStore('fileHandles').getAll();
+      rq.onsuccess = () => res(rq.result || []);
+      rq.onerror = () => res([]);
+    });
+  } catch (e) { return []; }
 }
 
 // ─── WAV header parsing (for byte-exact, disk-cheap slicing) ──────────────────
@@ -237,6 +265,30 @@ function computeMonoData(buffer) {
   return out;
 }
 
+/** Same energy-threshold heuristic as detectSentences, but just the onset of the first speech. */
+function detectLeadingSilenceMs(buffer) {
+  const windowMs = 20;
+  const sr = buffer.sampleRate;
+  const data = computeMonoData(buffer);
+  const winSize = Math.max(1, Math.round(sr * windowMs / 1000));
+  const nWin = Math.ceil(data.length / winSize);
+  const rms = new Float32Array(nWin);
+  for (let w = 0; w < nWin; w++) {
+    const start = w * winSize, end = Math.min(start + winSize, data.length);
+    let sum = 0;
+    for (let i = start; i < end; i++) sum += data[i] * data[i];
+    rms[w] = Math.sqrt(sum / Math.max(1, end - start));
+  }
+  const sorted = Float32Array.from(rms).sort();
+  const floor = sorted[Math.floor(sorted.length * 0.15)] || 0;
+  const peak = sorted[sorted.length - 1] || 0.0001;
+  const threshold = Math.max(floor * 2.5, peak * 0.035, 0.0025);
+  for (let w = 0; w < nWin; w++) {
+    if (rms[w] > threshold) return Math.max(0, w * windowMs - 40);   // small pad-back so the onset isn't clipped
+  }
+  return 0;   // all silence — nothing to trim
+}
+
 /**
  * Splits an AudioBuffer into speech segments separated by silence gaps of
  * at least `minSilenceMs`. Shorter gaps (e.g. between words) are merged into
@@ -318,12 +370,12 @@ function getPlayCtx() {
 function stopActiveSource() {
   if (activeSource) { try { activeSource.stop(); } catch (e) {} activeSource = null; }
 }
-function playBufferSlice(startMs, endMs, rate = 1, onEnded) {
-  if (!currentBuffer) return null;
+function playAudioBufferSlice(buffer, startMs, endMs, rate = 1, onEnded) {
+  if (!buffer) return null;
   stopActiveSource();
   const ctx = getPlayCtx();
   const src = ctx.createBufferSource();
-  src.buffer = currentBuffer;
+  src.buffer = buffer;
   src.playbackRate.value = rate;
   src.connect(ctx.destination);
   src.start(0, startMs / 1000, (endMs - startMs) / 1000);
@@ -331,13 +383,27 @@ function playBufferSlice(startMs, endMs, rate = 1, onEnded) {
   src.onended = () => { if (activeSource === src) activeSource = null; onEnded?.(); };
   return src;
 }
+function playBufferSlice(startMs, endMs, rate = 1, onEnded) { return playAudioBufferSlice(currentBuffer, startMs, endMs, rate, onEnded); }
 function playRefSeg(idx, rate = 1) { const seg = currentSegments[idx]; playBufferSlice(seg.start, seg.end, rate); }
-function playMine(idx) { const rec = recordings[idx]; if (!rec) return; new Audio(rec.url).play().catch(() => {}); }
+
+function trimSilenceEnabled() { return document.getElementById('trimSilenceToggle')?.checked ?? true; }
+/** Plays a user recording, skipping its detected leading silence when the toggle is on and decode succeeded. */
+function playRecording(rec, onEnded) {
+  if (!rec) return;
+  if (trimSilenceEnabled() && rec.buffer) {
+    playAudioBufferSlice(rec.buffer, rec.trimStartMs, rec.buffer.duration * 1000, 1, onEnded);
+  } else {
+    const a = new Audio(rec.url);
+    if (onEnded) a.onended = onEnded;
+    a.play().catch(() => {});
+  }
+}
+function playMine(idx) { playRecording(recordings[idx]); }
 function compareSeg(idx) {
   const seg = currentSegments[idx], rec = recordings[idx];
   if (!rec) { playRefSeg(idx); return; }
   playBufferSlice(seg.start, seg.end, 1, () => {
-    setTimeout(() => new Audio(rec.url).play().catch(() => {}), 300);
+    setTimeout(() => playRecording(rec), 300);
   });
 }
 
@@ -362,15 +428,26 @@ async function toggleRecord(idx, row) {
     const mime = pickRecorderMime();
     const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
     rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
-    rec.onstop = () => {
+    rec.onstop = async () => {
       const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
       if (recordings[idx]?.url) URL.revokeObjectURL(recordings[idx].url);
-      recordings[idx] = { blob, url: URL.createObjectURL(blob) };
+      recordings[idx] = { blob, url: URL.createObjectURL(blob), buffer: null, trimStartMs: 0 };
       activeRecorder = null; activeRecordingIdx = null;
       setRowRecordingState(row, false);
       row.querySelector('.play-mine').disabled = false;
       row.querySelector('.compare-btn').disabled = false;
       row.querySelector('.sent-status').textContent = 'Recorded ✓';
+      // Decode in the background to locate leading silence — url-based playback already works meanwhile.
+      try {
+        const arrayBuf = await blob.arrayBuffer();
+        const decodeCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const buf = await decodeCtx.decodeAudioData(arrayBuf);
+        decodeCtx.close();
+        if (recordings[idx]?.blob === blob) {   // guard: a newer recording may have replaced this one meanwhile
+          recordings[idx].buffer = buf;
+          recordings[idx].trimStartMs = detectLeadingSilenceMs(buf);
+        }
+      } catch (e) { /* trimming unavailable for this recording; url playback still works */ }
     };
     rec.start();
     activeRecorder = rec; activeRecordingIdx = idx;
@@ -417,6 +494,15 @@ function clockToSec(str) {
   const parts = String(str).split(':').map(x => parseFloat(x) || 0);
   let sec = 0; for (const p of parts) sec = sec * 60 + p;
   return sec;
+}
+/** Web Audio always decodes to Float32 per channel, regardless of source bit depth. */
+function estimateDecodedBytes(fmt, durationSec) {
+  return durationSec * fmt.sampleRate * fmt.channels * 4;
+}
+function fmtBytes(n) {
+  if (n > 1e9) return (n / 1e9).toFixed(2) + ' GB';
+  if (n > 1e6) return (n / 1e6).toFixed(0) + ' MB';
+  return (n / 1e3).toFixed(0) + ' KB';
 }
 function msToClock(ms) {
   const s = ms / 1000;
@@ -524,7 +610,13 @@ function setupRangeUI(duration) {
   startSlider.min = 0; startSlider.max = maxSecGlobal;
   endSlider.min   = 0; endSlider.max   = maxSecGlobal;
 
-  const defaultEnd = currentWavHeader ? maxSecGlobal : Math.min(maxSecGlobal, 300);
+  let defaultEnd;
+  if (currentWavHeader) {
+    const safeSec = WAV_DECODE_WARN_BYTES / (currentWavHeader.fmt.sampleRate * currentWavHeader.fmt.channels * 4);
+    defaultEnd = Math.min(maxSecGlobal, Math.max(60, Math.floor(safeSec)));
+  } else {
+    defaultEnd = Math.min(maxSecGlobal, 300);
+  }
   startSlider.value = 0;
   endSlider.value = defaultEnd;
   document.getElementById('rangeStart').value = secToClock(0);
@@ -539,6 +631,11 @@ function updateRangeDurLabel() {
   let msg = `Selected: ${secToClock(dur)} of ${secToClock(maxSecGlobal)} total`;
   if (!currentWavHeader && dur > MAX_NONWAV_SLICE_SEC) {
     msg += ` — will be clamped to ${secToClock(MAX_NONWAV_SLICE_SEC)} (non-WAV real-time decode limit)`;
+  }
+  if (currentWavHeader) {
+    const bytes = estimateDecodedBytes(currentWavHeader.fmt, dur);
+    msg += ` · ~${fmtBytes(bytes)} decoded`;
+    if (bytes > WAV_DECODE_WARN_BYTES) msg += ' ⚠ large — your browser may run out of memory, try a shorter range';
   }
   document.getElementById('rangeDurLabel').textContent = msg;
 }
@@ -613,7 +710,14 @@ async function loadSlice(startSec, endSec) {
     }
   } catch (e) {
     showProgress(false);
-    setStatus('Could not decode selected range: ' + e.message);
+    let hint = '';
+    if (currentWavHeader) {
+      const bytes = estimateDecodedBytes(currentWavHeader.fmt, endSec - startSec);
+      if (bytes > WAV_DECODE_WARN_BYTES) {
+        hint = ` This range decodes to ~${fmtBytes(bytes)} of raw audio — likely too large for your browser to hold in memory at once. Try a shorter range.`;
+      }
+    }
+    setStatus('Could not decode selected range: ' + e.message + hint);
     loadBtn.disabled = false;
     return;
   }
@@ -664,6 +768,51 @@ async function handleFile(file) {
   setStatus('Pick a time range below, then load it.');
 }
 
+// ─── Remembered files list (populated only for files opened via "📂 Open file",
+// since drag-and-drop and <input type=file> never hand back a reusable handle) ─
+async function renderRecentFiles() {
+  const el = document.getElementById('recentFilesList');
+  if (!el) return;
+  if (!('showOpenFilePicker' in window)) {
+    el.innerHTML = '<div class="cache-empty">Remembered files need a Chromium browser (Chrome/Edge)</div>';
+    return;
+  }
+  const entries = await fhGetAll();
+  if (!entries.length) {
+    el.innerHTML = '<div class="cache-empty">No remembered files yet — use "📂 Open file" below</div>';
+    return;
+  }
+  el.innerHTML = entries.sort((a, b) => (b.lastOpened || 0) - (a.lastOpened || 0)).map(e => `
+    <div class="cache-item">
+      <span class="cache-name">${escapeHtml(e.name)}</span>
+      <span class="cache-n">${(e.size / 1e6).toFixed(1)} MB</span>
+      <button class="sent-btn recent-open-btn" data-id="${e.id}" type="button">▶ Open</button>
+      <button class="cache-forget" data-id="${e.id}" title="Forget this file">✕</button>
+    </div>`).join('');
+  el.querySelectorAll('.recent-open-btn').forEach(btn => {
+    btn.addEventListener('click', () => openRecentFile(btn.dataset.id));
+  });
+  el.querySelectorAll('.cache-forget').forEach(btn => {
+    btn.addEventListener('click', async () => { await fhDelete(btn.dataset.id); renderRecentFiles(); });
+  });
+}
+async function openRecentFile(id) {
+  const entries = await fhGetAll();
+  const entry = entries.find(e => e.id === id);
+  if (!entry) return;
+  try {
+    let perm = await entry.handle.queryPermission({ mode: 'read' });
+    if (perm !== 'granted') perm = await entry.handle.requestPermission({ mode: 'read' });
+    if (perm !== 'granted') { setStatus('Permission denied for ' + entry.name); return; }
+    const file = await entry.handle.getFile();
+    entry.lastOpened = Date.now();
+    await fhAdd(entry);
+    handleFile(file);
+  } catch (e) {
+    setStatus('Could not reopen file: ' + e.message);
+  }
+}
+
 // ─── Wiring ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
@@ -680,6 +829,21 @@ document.addEventListener('DOMContentLoaded', () => {
   fileInput.addEventListener('change', () => {
     const f = fileInput.files?.[0];
     if (f) handleFile(f);
+  });
+
+  document.getElementById('openFileBtn')?.addEventListener('click', async () => {
+    if (!('showOpenFilePicker' in window)) { fileInput.click(); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'Audio', accept: { 'audio/*': ['.wav', '.mp3', '.ogg', '.oga', '.m4a', '.flac', '.webm'] } }],
+      });
+      const file = await handle.getFile();
+      await fhAdd({ id: fileIdentityId(file), name: file.name, size: file.size, lastModified: file.lastModified, handle, lastOpened: Date.now() });
+      renderRecentFiles();
+      handleFile(file);
+    } catch (e) {
+      if (e.name !== 'AbortError') setStatus('Could not open file: ' + e.message);
+    }
   });
 
   // ── Range picker wiring ──
@@ -736,4 +900,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   refreshCacheList();
+  renderRecentFiles();
 });

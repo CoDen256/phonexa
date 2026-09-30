@@ -13,6 +13,7 @@
 .dropzone:hover, .dropzone.drag { border-color:#7eb8f7; background:#213a55; color:#8fa8c0; }
 .dropzone-icon { font-size:1.6rem; margin-bottom:6px; }
 .dropzone-hint { font-size:.68rem; margin-top:4px; color:#4a6888; }
+.open-file-row { display:flex; justify-content:center; margin-top:8px; }
 
 /* ── File info bar ───────────────────────────────────────────── */
 .file-info {
@@ -74,6 +75,8 @@
 }
 .params-row input[type=range] { accent-color:#7eb8f7; width:150px; cursor:pointer; }
 .params-row .sent-btn { margin-left:auto; }
+.trim-toggle { display:flex; align-items:center; gap:5px; font-size:.7rem; color:var(--muted); flex-basis:100%; margin-top:2px; cursor:pointer; }
+.trim-toggle input { accent-color:#7eb8f7; cursor:pointer; }
 
 /* ── Sentence list ───────────────────────────────────────────── */
 .sentence-list-wrap { display:none; margin-top:18px; }
