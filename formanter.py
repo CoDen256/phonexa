@@ -838,8 +838,18 @@ def _get_whisper_model():
 def http_transcribe():
     """
     Local speech-to-text. Requires ``pip install faster-whisper`` (not a
-    default dependency — see requirements.txt). Model size is picked via the
-    WHISPER_MODEL env var (tiny/base/small/medium/large-v3), default 'base'.
+    default dependency — see requirements-transcribe.txt). Model size is
+    picked via the WHISPER_MODEL env var (tiny/base/small/medium/large-v3),
+    default 'base'.
+
+    Decoding deliberately reuses ``decode_audio`` (parselmouth) instead of
+    handing the raw file to faster-whisper directly: faster-whisper's own
+    file decoding goes through PyAV, whose container API has changed across
+    versions in backwards-incompatible ways (e.g. ``av.open()`` dropping the
+    ``metadata_errors`` kwarg some faster-whisper releases pass) — installing
+    whatever `av` version pip resolves can break that path. Passing an
+    already-decoded numpy array to ``model.transcribe()`` skips PyAV
+    entirely and reuses the same decoder every other endpoint here depends on.
 
     Request (multipart/form-data)
     ------------------------------
@@ -858,19 +868,18 @@ def http_transcribe():
     if model is None:
         return jsonify({
             'error': 'Transcription unavailable — faster-whisper is not installed. '
-                     'Run: pip install faster-whisper',
+                     'Run: pip install -r requirements-transcribe.txt',
             'detail': _whisper_error,
         }), 501
 
     language = request.form.get('language') or None
-    raw = uploaded_file.read()
-    suffix = _AUDIO_FILE_MAGIC.get(raw[:4], '.wav')
-    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-        tmp.write(raw)
-        tmp_path = tmp.name
-
     try:
-        segments_iter, info = model.transcribe(tmp_path, language=language)
+        samples, sample_rate = decode_audio(uploaded_file)
+        if sample_rate != 16000:
+            samples = make_praat_sound(samples, sample_rate).resample(16000).values[0]
+        audio = samples.astype(np.float32)
+
+        segments_iter, info = model.transcribe(audio, language=language)
         segments = [
             {'start_ms': round(s.start * 1000), 'end_ms': round(s.end * 1000), 'text': s.text.strip()}
             for s in segments_iter
@@ -879,8 +888,6 @@ def http_transcribe():
         return jsonify({'text': text, 'language': info.language, 'segments': segments})
     except Exception as error:
         return jsonify({'error': str(error)}), 500
-    finally:
-        os.unlink(tmp_path)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
