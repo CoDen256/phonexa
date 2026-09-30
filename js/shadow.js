@@ -532,6 +532,15 @@ async function cacheTranscript(idx, text) {
   await shPut(currentCacheKey, cached);
 }
 
+function blobToBase64(blob) {
+  return blob.arrayBuffer().then(buf => {
+    let binary = '';
+    const bytes = new Uint8Array(buf), chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    return btoa(binary);
+  });
+}
+
 /**
  * Online fallback for when installing faster-whisper locally isn't wanted.
  * Calls the Hugging Face Inference API directly from the browser — the
@@ -539,19 +548,34 @@ async function cacheTranscript(idx, text) {
  * (huggingface.co/settings/tokens). No segment timestamps in this simple
  * binary-upload form, so it only supports per-sentence transcription, not
  * the whole-slice + realign flow.
+ *
+ * A language hint is passed as generate_kwargs (the same mechanism
+ * transformers' own Whisper pipeline uses to force a language locally),
+ * which HF's inference backend forwards to the underlying pipeline call.
+ * Not independently verified against a live call — if it's silently
+ * ignored by whatever provider serves the chosen model, the error/response
+ * shown on screen is the real one from HF, so that's diagnosable.
  */
-async function transcribeViaHuggingFace(blob) {
+async function transcribeViaHuggingFace(blob, language) {
   const token = (localStorage.getItem('shadowHfToken') || '').trim();
   if (!token) throw new Error('No Hugging Face API token set — add one in the Online settings box above');
   const model = (localStorage.getItem('shadowHfModel') || 'openai/whisper-large-v3').trim();
   // router.huggingface.co replaced the old api-inference.huggingface.co host (that hostname no
   // longer resolves at all). Model id is org/name — don't percent-encode the slash in the path.
-  const resp = await fetch(`https://router.huggingface.co/hf-inference/models/${model}`, {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'audio/wav' },
-    body: blob,
-    signal: AbortSignal.timeout(60000),
-  });
+  const url = `https://router.huggingface.co/hf-inference/models/${model}`;
+  const headers = { 'Authorization': 'Bearer ' + token };
+  let body;
+  if (language) {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify({
+      inputs: await blobToBase64(blob),
+      parameters: { generate_kwargs: { language, task: 'transcribe' } },
+    });
+  } else {
+    headers['Content-Type'] = 'audio/wav';
+    body = blob;
+  }
+  const resp = await fetch(url, { method: 'POST', headers, body, signal: AbortSignal.timeout(60000) });
   const data = await resp.json().catch(() => null);
   if (!resp.ok) {
     if (data?.error && /loading/i.test(data.error)) {
@@ -572,13 +596,13 @@ async function transcribeSentence(idx, row) {
   try {
     const { samples, sampleRate } = extractMonoSlice(currentBuffer, seg.start, seg.end);
     const blob = encodeWavBlob(samples, sampleRate);
+    const lang = getTranscribeLanguage();
     let text;
     if (getTranscribeBackend() === 'hf') {
-      text = await transcribeViaHuggingFace(blob);
+      text = await transcribeViaHuggingFace(blob, lang);
     } else {
       const form = new FormData();
       form.append('file', blob, 'slice.wav');
-      const lang = getTranscribeLanguage();
       if (lang) form.append('language', lang);
       const resp = await fetch(getTranscribeServer() + '/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(60000) });
       if (!resp.ok) {
