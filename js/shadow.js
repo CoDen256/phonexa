@@ -424,6 +424,7 @@ function detectSentences(monoSamples, sampleRate, params = {}) {
 let currentFile = null, currentFileId = null, currentWavHeader = null, currentDuration = null, maxSecGlobal = 0;
 let currentBuffer = null, currentAnalysis = null, currentSegments = null, currentTranscripts = {};
 let currentSliceStart = 0, currentSliceEnd = 0;   // just for progress/error messaging during decode
+let pendingResumeSensitivity = null;               // set by resumeSession() when the target file isn't loaded yet
 let playCtx = null, activeSource = null;
 let micStream = null, activeRecorder = null, activeRecordingIdx = null;
 const recordings = {};   // idx -> {blob, url}
@@ -887,11 +888,15 @@ async function refreshSessionList() {
         <div class="cache-item">
           <span class="cache-name">${escapeHtml(session.fileName || '(unnamed)')}</span>
           <span class="cache-n">${an.minSilenceMs}ms · ${secToClock(an.rangeStart / 1000)}–${secToClock(an.rangeEnd / 1000)} · ${an.segments.length} sentences · ${nTranscribed} transcribed</span>
+          <button class="sent-btn session-resume-btn" data-file="${escapeHtml(session.fileId)}" data-sens="${an.minSilenceMs}" type="button">▶ Resume</button>
           <button class="cache-forget" data-file="${escapeHtml(session.fileId)}" data-sens="${an.minSilenceMs}" title="Forget this analysis">✕</button>
         </div>`);
     });
   });
   el.innerHTML = rows.join('');
+  el.querySelectorAll('.session-resume-btn').forEach(btn => {
+    btn.addEventListener('click', () => resumeSession(btn.dataset.file, parseInt(btn.dataset.sens, 10)));
+  });
   el.querySelectorAll('.cache-forget').forEach(btn => {
     btn.addEventListener('click', async () => {
       const sens = parseInt(btn.dataset.sens, 10);
@@ -900,6 +905,48 @@ async function refreshSessionList() {
       refreshSessionList();
     });
   });
+}
+
+/** Switches to (or stays on) minSilenceMs on the currently-loaded file and loads its cached range. */
+async function selectSensitivityAndLoad(minSilenceMs) {
+  const slider = document.getElementById('silenceSlider');
+  slider.value = minSilenceMs;
+  document.getElementById('silenceVal').textContent = minSilenceMs + ' ms';
+  await syncSensitivityCacheNote();   // prefills the range picker from this session's stored range
+  const startText = document.getElementById('rangeStart'), endText = document.getElementById('rangeEnd');
+  await loadOrExtendSlice(clockToSec(startText.value), clockToSec(endText.value));
+}
+
+/**
+ * Resumes a session row from the Sessions list. If the file was opened via
+ * "📂 Open file" (a remembered File System Access handle exists for it),
+ * reopens it automatically. Otherwise a file can't be reopened without a user
+ * gesture through the file picker (browser security) — prompts the user to
+ * pick/drop it, and jumps straight to this analysis once they do.
+ */
+async function resumeSession(fileId, minSilenceMs) {
+  if (currentFileId === fileId) { await selectSensitivityAndLoad(minSilenceMs); return; }
+
+  const handles = await fhGetAll();
+  const entry = handles.find(h => h.id === fileId);
+  if (entry) {
+    try {
+      let perm = await entry.handle.queryPermission({ mode: 'read' });
+      if (perm !== 'granted') perm = await entry.handle.requestPermission({ mode: 'read' });
+      if (perm === 'granted') {
+        const file = await entry.handle.getFile();
+        entry.lastOpened = Date.now();
+        await fhAdd(entry);
+        renderRecentFiles();
+        pendingResumeSensitivity = minSilenceMs;
+        await handleFile(file);
+        return;
+      }
+    } catch (e) { /* fall through to the manual prompt below */ }
+  }
+
+  pendingResumeSensitivity = minSilenceMs;
+  setStatus(`Choose or drop that file to resume — it'll jump straight to the ${minSilenceMs}ms analysis once it matches.`);
 }
 
 /** Shows (and, if found, prefills the range picker to) the current file's cached analysis for the selected sensitivity. */
@@ -1178,7 +1225,14 @@ async function handleFile(file) {
 
   setupRangeUI(duration);
   await syncSensitivityCacheNote();
-  setStatus('Pick a time range below, then load it.');
+
+  if (pendingResumeSensitivity != null) {
+    const targetSens = pendingResumeSensitivity;
+    pendingResumeSensitivity = null;
+    await selectSensitivityAndLoad(targetSens);
+  } else {
+    setStatus('Pick a time range below, then load it.');
+  }
 }
 
 // ─── Remembered files list (populated only for files opened via "📂 Open file",
