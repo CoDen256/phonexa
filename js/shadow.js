@@ -1133,10 +1133,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const hfTokenInput = document.getElementById('hfTokenInput');
   const hfModelInput = document.getElementById('hfModelInput');
   const wholeSliceBtn = document.getElementById('transcribeWholeBtn');
+  const wholeSliceHint = document.getElementById('wholeSliceHint');
   function applyBackendUI() {
     const isHf = backendSelect.value === 'hf';
     hfSettings.style.display = isHf ? 'flex' : 'none';
     if (wholeSliceBtn) wholeSliceBtn.disabled = isHf;
+    if (wholeSliceHint) wholeSliceHint.style.display = isHf ? 'inline' : 'none';
     checkTranscribeServer();
   }
   if (backendSelect) {
