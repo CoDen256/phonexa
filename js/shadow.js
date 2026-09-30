@@ -491,27 +491,22 @@ function extractMonoSlice(buffer, startMs, endMs) {
   const i0 = Math.floor(startMs / 1000 * sr), i1 = Math.min(data.length, Math.ceil(endMs / 1000 * sr));
   return { samples: data.slice(i0, i1), sampleRate: sr };
 }
-// Same-origin by default (works when formanter.py itself serves this page).
-// If shadow.html is served some other way (a separate static server, a
-// different port), point this at wherever formanter.py is actually running —
-// it already has CORS enabled, so a cross-origin URL here works fine.
-function getTranscribeServer() {
-  return (localStorage.getItem('shadowTranscribeServer') || '').trim().replace(/\/$/, '');
-}
-function setTranscribeServer(url) {
-  localStorage.setItem('shadowTranscribeServer', url.trim().replace(/\/$/, ''));
-}
+// formanter.py always runs its HTTP server on :5050 (see its __main__ block),
+// regardless of what serves shadow.html itself — so just always talk to that.
+// CORS is already enabled there, so this works even when shadow.html is
+// served from a different origin.
+const TRANSCRIBE_SERVER = 'http://localhost:5050';
+function getTranscribeServer() { return TRANSCRIBE_SERVER; }
 async function checkTranscribeServer() {
   const el = document.getElementById('transcribeBadge');
   if (!el) return;
-  const base = getTranscribeServer();
   try {
-    const r = await fetch(base + '/ping', { signal: AbortSignal.timeout(1500) });
-    if (r.ok) { el.textContent = `📝 Transcription server: ✓ connected${base ? ' (' + base + ')' : ''}`; el.className = 'cache-badge hit'; return; }
-    el.textContent = `📝 Transcription server: got HTTP ${r.status} from ${base || location.origin} — wrong host/port?`;
+    const r = await fetch(TRANSCRIBE_SERVER + '/ping', { signal: AbortSignal.timeout(1500) });
+    if (r.ok) { el.textContent = `📝 Transcription server: ✓ connected (${TRANSCRIBE_SERVER})`; el.className = 'cache-badge hit'; return; }
+    el.textContent = `📝 Transcription server: got HTTP ${r.status} from ${TRANSCRIBE_SERVER}`;
     el.className = 'cache-badge';
   } catch (e) {
-    el.textContent = `📝 Transcription server: unreachable at ${base || location.origin} — run formanter.py there, or set the server URL below`;
+    el.textContent = `📝 Transcription server: unreachable at ${TRANSCRIBE_SERVER} — run formanter.py`;
     el.className = 'cache-badge';
   }
 }
@@ -1005,14 +1000,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('transcribeAllBtn')?.addEventListener('click', () => transcribeAll());
-  const serverUrlInput = document.getElementById('transcribeServerUrl');
-  if (serverUrlInput) {
-    serverUrlInput.value = getTranscribeServer();
-    serverUrlInput.addEventListener('change', () => {
-      setTranscribeServer(serverUrlInput.value);
-      checkTranscribeServer();
-    });
-  }
 
   refreshCacheList();
   renderRecentFiles();
