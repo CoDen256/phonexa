@@ -1,0 +1,82 @@
+/* praat.css — Formant Lab page. Extends css/index.css (shared vars, header,
+   .editor-link, .sent-btn-style look-alikes via local .sent-btn below). */
+
+.praat-wrap { width:100%; max-width:1000px; margin:0 auto; }
+
+.sent-btn {
+  padding:4px 10px; border-radius:7px; border:1px solid #2e4560;
+  background:#1a2e48; color:#d8e8f4; cursor:pointer; font-size:.72rem;
+  transition:background .12s, border-color .12s; white-space:nowrap;
+}
+.sent-btn:hover:not(:disabled) { background:#243c5a; border-color:#4a7098; }
+.sent-btn:disabled { opacity:.4; cursor:default; }
+.sent-btn.primary { border-color:#7eb8f7; color:#7eb8f7; }
+.sent-btn.primary:hover:not(:disabled) { background:#1f3a58; }
+
+/* ── Dropzone ────────────────────────────────────────────────── */
+.dropzone {
+  border:2px dashed var(--border); border-radius:14px;
+  padding:34px 20px; text-align:center; cursor:pointer;
+  background:var(--surface); color:var(--muted);
+  transition:border-color .15s, background .15s;
+}
+.dropzone:hover, .dropzone.drag { border-color:#7eb8f7; background:#213a55; color:#8fa8c0; }
+.dropzone-icon { font-size:1.6rem; margin-bottom:6px; }
+
+.token-context {
+  margin-top:12px; padding:8px 14px; background:var(--card);
+  border:1px solid var(--border); border-radius:10px; font-size:.78rem; color:var(--muted);
+}
+.token-symbol { font-family:Georgia,'Noto Serif',serif; font-size:1.1rem; color:#7eb8f7; }
+
+#uploadStatus { margin-top:8px; font-size:.72rem; color:var(--muted); min-height:1em; }
+
+/* ── Panels ──────────────────────────────────────────────────── */
+.praat-panels { margin-top:14px; }
+.panel-label {
+  font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:#4a6888; margin:10px 0 4px;
+}
+.panel-label .muted { font-weight:400; text-transform:none; letter-spacing:0; color:#3a5878; }
+
+.wave-lanes { display:flex; flex-direction:column; gap:3px; }
+.wave-lane {
+  display:block; width:100%; height:64px; background:#0a1520;
+  border:1px solid #1e3048; border-radius:6px; cursor:col-resize;
+}
+
+.spectrogram-wrap {
+  position:relative; width:100%; height:220px;
+  background:#0a1520; border:1px solid #1e3048; border-radius:6px;
+  overflow:hidden; cursor:col-resize;
+}
+.spectrogram-wrap canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+.axis-legend { display:flex; gap:16px; font-size:.64rem; color:var(--muted); padding:4px 2px; }
+
+.selection-row {
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  margin-top:6px; padding:7px 12px; background:var(--card);
+  border:1px solid var(--border); border-radius:8px; font-size:.72rem; color:var(--muted);
+  font-family:monospace;
+}
+.selection-means { color:#7eb8f7; }
+
+/* ── Params ──────────────────────────────────────────────────── */
+.params-row {
+  display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap;
+  margin-top:12px; padding:10px 14px; background:#1a2636;
+  border:1px solid var(--border); border-radius:10px;
+}
+.param-group { display:flex; flex-direction:column; gap:5px; }
+.param-group-title { font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#4a6888; margin-bottom:2px; }
+.param-group label { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:.7rem; color:var(--muted); }
+.param-group input {
+  width:80px; background:#1a2e48; border:1px solid #2e4560; border-radius:5px;
+  color:#d8e8f4; font-family:monospace; font-size:.72rem; padding:3px 6px;
+}
+#analyzeBtn, #applyBtn { align-self:flex-end; margin-top:auto; }
+
+@media (max-width:700px) {
+  .params-row { flex-direction:column; }
+}

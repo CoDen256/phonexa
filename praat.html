@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formant Lab — IPA Vowel Chart</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/praat.css">
+</head>
+<body>
+
+<header>
+  <h1>Formant Lab</h1>
+  <p>Praat-faithful static analysis — waveform, spectrogram, formants, pitch</p>
+  <a href="index.html"  class="editor-link">← Vowel Chart</a>
+  <a href="editor.html" class="editor-link">✎ Edit languages</a>
+</header>
+
+<div class="praat-wrap">
+
+  <div class="dropzone" id="dropzone">
+    <div class="dropzone-icon">🔬</div>
+    <div>Click to choose an audio file, or drag one here</div>
+    <input type="file" id="audioFile" accept="audio/*" style="display:none">
+  </div>
+
+  <div class="token-context" id="tokenContext" style="display:none">
+    Analyzing token <span id="tokenSymbol" class="token-symbol"></span> for
+    <span id="tokenSampleText"></span>
+  </div>
+
+  <div id="uploadStatus"></div>
+
+  <div class="praat-panels" id="praatPanels" style="display:none">
+    <div class="panel-label">Sound <span id="channelInfo"></span></div>
+    <div class="wave-lanes" id="waveLanes"></div>
+
+    <div class="panel-label">
+      Spectrogram <span class="muted">(+ formants in red, pitch in blue)</span>
+    </div>
+    <div class="spectrogram-wrap">
+      <canvas id="spectrogramCanvas"></canvas>
+      <canvas id="overlayCanvas"></canvas>
+    </div>
+    <div class="axis-legend">
+      <span><b style="color:#e8536b">●</b> formants (left axis, Hz)</span>
+      <span><b style="color:#4db8ff">—</b> pitch (right axis, Hz)</span>
+    </div>
+
+    <div class="selection-row">
+      <span id="selectionTime">Selection: —</span>
+      <span id="selectionMeans" class="selection-means">—</span>
+      <button class="sent-btn" id="playSelectionBtn" type="button">▶ Play selection</button>
+      <button class="sent-btn" id="playAllBtn" type="button">▶ Play all</button>
+    </div>
+  </div>
+
+  <div class="params-row" id="paramsRow" style="display:none">
+    <div class="param-group">
+      <div class="param-group-title">Formant (Burg) — Praat defaults shown</div>
+      <label>Max formants <input type="number" id="pMaxFormants" value="5" step="1" min="1" max="8"></label>
+      <label>Ceiling (Hz) <input type="number" id="pMaxFreq" value="5500" step="50" min="1000" max="9000"></label>
+      <label>Window (s) <input type="number" id="pWindowLen" value="0.025" step="0.005" min="0.005" max="0.1"></label>
+      <label>Pre-emphasis (Hz) <input type="number" id="pPreEmph" value="50" step="10" min="0" max="500"></label>
+    </div>
+    <div class="param-group">
+      <div class="param-group-title">Pitch (autocorrelation) — Praat defaults shown</div>
+      <label>Floor (Hz) <input type="number" id="pPitchFloor" value="75" step="5" min="25" max="300"></label>
+      <label>Ceiling (Hz) <input type="number" id="pPitchCeiling" value="600" step="25" min="100" max="1200"></label>
+    </div>
+    <button class="sent-btn primary" id="analyzeBtn" type="button">⚡ Analyze</button>
+    <button class="sent-btn primary" id="applyBtn" type="button" style="display:none">✓ Apply to token</button>
+  </div>
+
+</div>
+
+<script src="js/praat.js"></script>
+</body>
+</html>

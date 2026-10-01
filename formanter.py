@@ -812,6 +812,103 @@ def http_debug():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Praat-faithful static analysis (editor token audio — NOT the live practice
+# pipeline above). Deliberately bypasses dual-ceiling selection, continuity
+# correction, phantom-resonance fixing and median smoothing entirely: those
+# exist to stabilise a noisy real-time microphone stream, and were fighting
+# the editor's own parameter fields in confusing ways on clean, static
+# recordings. This calls parselmouth's bare to_formant_burg / to_pitch /
+# to_spectrogram — the exact same defaults Praat itself ships with — and
+# returns every native analysis frame verbatim, the way Praat's own Formant
+# listing / Pitch listing / spectrogram would.
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.route('/analyze-praat', methods=['POST'])
+def http_analyze_praat():
+    """
+    Request (multipart/form-data)
+    ------------------------------
+    file    — audio file
+    config  — JSON, all optional (Praat's own dialog defaults otherwise):
+              max_number_of_formants (5), maximum_formant (5500),
+              window_length (0.025 s), pre_emphasis_from (50 Hz),
+              formant_time_step (0 = auto, i.e. window_length / 4),
+              pitch_floor (75), pitch_ceiling (600),
+              pitch_time_step (0 = auto)
+
+    Response
+    --------
+    {
+      duration_ms,
+      formants:    [{t_ms, f1..f5, b1..b5}],   // null where Praat has no value
+      pitch:       [{t_ms, f0}],                // f0 null where unvoiced
+      spectrogram: {times_ms, freqs_hz, power_db},  // power_db[time][freq]
+    }
+    """
+    uploaded_file = request.files.get('file')
+    if not uploaded_file:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    try:
+        config = json.loads(request.form.get('config', '{}'))
+    except Exception:
+        config = {}
+
+    max_number_of_formants = float(config.get('max_number_of_formants', 5))
+    maximum_formant         = float(config.get('maximum_formant', 5500))
+    window_length           = float(config.get('window_length', 0.025))
+    pre_emphasis_from       = float(config.get('pre_emphasis_from', 50))
+    formant_time_step       = float(config.get('formant_time_step', 0)) or None
+    pitch_floor             = float(config.get('pitch_floor', 75))
+    pitch_ceiling           = float(config.get('pitch_ceiling', 600))
+    pitch_time_step         = float(config.get('pitch_time_step', 0)) or None
+
+    try:
+        samples, sample_rate = decode_audio(uploaded_file)
+        sound = make_praat_sound(samples, sample_rate)
+
+        formant = sound.to_formant_burg(
+            time_step=formant_time_step,
+            max_number_of_formants=max_number_of_formants,
+            maximum_formant=maximum_formant,
+            window_length=window_length,
+            pre_emphasis_from=pre_emphasis_from,
+        )
+        formants_out = []
+        for t in formant.xs():
+            row = {'t_ms': round(t * 1000, 1)}
+            for i in range(1, 6):
+                f = formant.get_value_at_time(i, t)
+                b = formant.get_bandwidth_at_time(i, t)
+                row[f'f{i}'] = None if math.isnan(f) else round(f, 1)
+                row[f'b{i}'] = None if math.isnan(b) else round(b, 1)
+            formants_out.append(row)
+
+        pitch = sound.to_pitch(time_step=pitch_time_step, pitch_floor=pitch_floor, pitch_ceiling=pitch_ceiling)
+        pitch_out = [
+            {'t_ms': round(t * 1000, 1), 'f0': None if freq <= 0 else round(float(freq), 1)}
+            for t, freq in zip(pitch.xs(), pitch.selected_array['frequency'])
+        ]
+
+        spectrogram = sound.to_spectrogram()
+        power_db = 10 * np.log10(np.maximum(spectrogram.values, 1e-20) / 4e-10)   # Praat's own dB reference (2e-5 Pa)²
+        spectrogram_out = {
+            'times_ms': [round(t * 1000, 1) for t in spectrogram.xs()],
+            'freqs_hz': [round(f, 1) for f in spectrogram.ys()],
+            'power_db': [[round(v, 1) for v in column] for column in power_db.T],   # → [time][freq]
+        }
+
+        return jsonify({
+            'duration_ms': round(sound.duration * 1000, 1),
+            'formants': formants_out,
+            'pitch': pitch_out,
+            'spectrogram': spectrogram_out,
+        })
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Transcription (faster-whisper, local — no audio ever leaves this machine,
 # no API key, no rate limit). Optional: only loaded on first /transcribe call
 # so the rest of the server still runs fine without it installed.

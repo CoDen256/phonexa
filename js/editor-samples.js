@@ -5,8 +5,11 @@
  *   1. Samples tab (seInline):  openSampleEditor(idx)       — no jump button
  *   2. Inline in vowel form:    openSampleInVowelEditor(idx) — shows ↗ Samples button
  *
- * Waveform slice is set via a popup modal (openWaveformPopup).
- * Token rows show saved results + play/analyze buttons; no inline waveform.
+ * Token analysis opens in a separate tab (js/praat.js, praat.html) — a
+ * Praat-faithful static analysis page (waveform + spectrogram + formants +
+ * pitch, Praat's own default Burg/autocorrelation settings, no dual-ceiling
+ * heuristics). It posts the result back via window.postMessage; see the
+ * 'message' listener near the bottom of this file.
  */
 
 const SAMPLE_SERVER = '';
@@ -16,13 +19,6 @@ const SAMPLE_SERVER = '';
 let _wave      = null;   // { samples: Float32Array, sampleRate, duration(ms) }
 let _waveUrl   = null;   // URL that _wave was decoded from
 let _wavePeaks = null;   // [Float32Array mn, Float32Array mx]
-
-// Popup waveform state
-let _popLeft  = 0.15;
-let _popRight = 0.85;
-let _popTokIdx = null;
-let _popDrag   = null;   // 'left' | 'right' | null
-let _popPlay   = null;   // { actx, startTime, sliceDur, raf }
 
 // Text-range selector drag state
 let _textDrag  = null;   // { tokIdx, which:'start'|'end', container, tok }
@@ -157,7 +153,6 @@ function _initSampleDraft(idx) {
 }
 
 function closeSampleEditor() {
-    closeWaveformPopup();
     state.sampleIdx = null; state.sampleDraft = null;
     // Close both possible containers
     document.getElementById('seInline').style.display = 'none';
@@ -306,13 +301,13 @@ function renderTokenRows(tokCont) {
         bot.style.cssText = 'display:flex;gap:5px;align-items:flex-end;flex-wrap:wrap;margin-top:6px';
         const an = tok.analysis;
         const anHtml = an?.f1
-            ? `<span class="tok-analysis ok">F1 ${an.f1} · F2 ${an.f2} Hz</span>`
+            ? `<span class="tok-analysis ok">F1 ${an.f1} · F2 ${an.f2}${an.f0 ? ` · F0 ${an.f0}` : ''} Hz</span>`
             : `<span class="tok-analysis pending">not analyzed</span>`;
         bot.innerHTML = `
       <div class="field" style="flex:none;width:60px"><label>Start</label><input type="number" class="tok-ps" value="${ps}" style="width:100%"></div>
       <div class="field" style="flex:none;width:60px"><label>End</label><input type="number" class="tok-pe" value="${pe}" style="width:100%"></div>
       ${an?.slice ? `<button class="btn btn-secondary btn-sm tok-play" type="button">▶ Play</button>` : ''}
-      <button class="btn btn-secondary btn-sm tok-analyze" type="button">⚡ Analyze</button>
+      <button class="btn btn-secondary btn-sm tok-analyze" type="button">🔬 Formant Lab</button>
       ${anHtml}`;
         row.appendChild(bot);
 
@@ -324,7 +319,7 @@ function renderTokenRows(tokCont) {
             tok.position = [tok.position[0]||0, Math.max(+e.target.value, tok.position[0]||0)];
             buildTokTextSel(i, textSel, tok);
         });
-        bot.querySelector('.tok-analyze')?.addEventListener('click', () => openWaveformPopup(i));
+        bot.querySelector('.tok-analyze')?.addEventListener('click', () => openFormantLab(i));
         bot.querySelector('.tok-play')?.addEventListener('click', () => playTokenResult(i));
 
         container.appendChild(row);
@@ -415,19 +410,9 @@ function attachGlobalDragHandlers() {
             else                   tok.position = [ps, Math.max(ci, ps + 1)];
             updateTokTextSel(container, tok);
         }
-        // Popup waveform drag
-        if (_popDrag && _wave) {
-            const canvas = document.getElementById('wfCanvas');
-            if (!canvas) return;
-            const rect = canvas.getBoundingClientRect();
-            const f = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-            if (_popDrag === 'left')  _popLeft  = Math.min(f, _popRight  - 0.005);
-            else                      _popRight = Math.max(f, _popLeft + 0.005);
-            drawPopupWave(); updatePopupTimeDisplay();
-        }
     });
 
-    document.addEventListener('mouseup', () => { _textDrag = null; _popDrag = null; });
+    document.addEventListener('mouseup', () => { _textDrag = null; });
 }
 
 // ─── Token result playback (no progress line) ─────────────────────────────────
@@ -448,394 +433,39 @@ async function playTokenResult(tokIdx) {
     src.onended = () => actx.close();
 }
 
-// ─── Waveform popup ───────────────────────────────────────────────────────────
-function openWaveformPopup(tokIdx) {
-    closeWaveformPopup();
-    const tok = state.sampleDraft?.tokens?.[tokIdx];
+// ─── Formant Lab (praat.html) — opens in a new tab, posts the result back ─────
+function openFormantLab(tokIdx) {
+    const s   = state.sampleDraft;
+    const tok = s?.tokens?.[tokIdx];
     if (!tok) return;
-    _popTokIdx = tokIdx;
+    if (!s.audio) { toast('Add an audio URL first'); return; }
 
-    // Init handles from saved slice or defaults
-    if (tok.analysis?.slice && _wave) {
-        _popLeft  = tok.analysis.slice[0] / _wave.duration;
-        _popRight = tok.analysis.slice[1] / _wave.duration;
-    } else {
-        _popLeft = 0.15; _popRight = 0.85;
-    }
-
-    const cfg = tok.analysis || {};
-    const backdrop = document.createElement('div'); backdrop.id = 'wfBackdrop';
-    backdrop.style.cssText = 'position:fixed;inset:0;background:#000000bb;z-index:9000;display:flex;align-items:center;justify-content:center';
-
-    const modal = document.createElement('div'); modal.className = 'wf-modal';
-    modal.innerHTML = `
-    <div class="wf-modal-head">
-      <span style="font-size:.85rem;font-weight:700;color:#d8e8f4">
-        Analyze token: <span style="font-family:Georgia,serif;color:${state.langDraft?.color||'#7eb8f7'}">${tok.symbol||'?'}</span>
-      </span>
-      <button id="wfClose" class="btn btn-secondary btn-sm">✕</button>
-    </div>
-    <div id="wfTextHighlight"></div>
-    <div id="wfAudioInfo" style="font-size:.62rem;color:var(--muted);margin-bottom:6px">
-      ${_wave ? `${(_wave.duration/1000).toFixed(2)}s · ${(_wave.sampleRate/1000).toFixed(1)} kHz` : 'Load audio in sample form first'}
-    </div>
-    <div class="wf-modal-wave">
-      <canvas id="wfCanvas" style="display:block;width:100%;height:80px"></canvas>
-    </div>
-    <canvas id="wfFmtCanvas" style="display:none;width:100%;height:88px;margin-top:3px;border-radius:4px"></canvas>
-    <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);padding:2px 2px 8px;font-family:monospace">
-      <span id="wfTL">—</span><span id="wfTD">—</span><span id="wfTR">—</span>
-    </div>
-    <div class="wf-params">
-      <div class="field" style="flex:1"><label>Max formant (Hz)</label>  <input type="number" id="wfMaxF"      value="${cfg.max_f??5000}"              step="50"    min="1000" max="9000"></div>
-      <div class="field" style="flex:1"><label>N formants</label>        <input type="number" id="wfNFmt"      value="${cfg.n_formants??5}"            step="1"     min="3"    max="8"></div>
-      <div class="field" style="flex:1"><label>Window (ms)</label>       <input type="number" id="wfWinMs"     value="${cfg.window_ms??25}"            step="1"     min="5"    max="100"></div>
-      <div class="field" style="flex:1"><label>Pre-emphasis (Hz)</label> <input type="number" id="wfPreEmph"   value="${cfg.pre_emphasis??50}"         step="10"    min="0"    max="500"></div>
-    </div>
-    <div class="wf-params" style="margin-top:4px">
-      <div class="field" style="flex:1"><label>Back ceiling (Hz)</label> <input type="number" id="wfBackCeil"  value="${cfg.back_ceiling??1800}"       step="50"    min="500"  max="3000"></div>
-      <div class="field" style="flex:1"><label>Back/ceil ratio</label>   <input type="number" id="wfBackRatio" value="${cfg.back_ceiling_ratio??0.95}" step="0.01"  min="0"    max="1"></div>
-      <div class="field" style="flex:1"><label>Back/front ratio</label>  <input type="number" id="wfFrontRatio"value="${cfg.back_front_ratio??0.75}"   step="0.01"  min="0"    max="1"></div>
-      <div class="field" style="flex:1"><label>RMS floor</label>         <input type="number" id="wfRmsFloor"  value="${cfg.rms_floor??0.005}"         step="0.001" min="0"    max="1"></div>
-      <div class="field" style="flex:1"><label>Median smooth n</label>   <input type="number" id="wfMedianN"   value="${cfg.median_n??5}"              step="2"     min="1"    max="21"></div>
-    </div>
-    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px">
-      <button id="wfPlay"  class="btn btn-secondary btn-sm">▶ Play slice</button>
-      <button id="wfFmt"   class="btn btn-secondary btn-sm" title="Show F1/F2 formant trace">F1/F2</button>
-      <button id="wfAnalyze" class="btn btn-primary btn-sm">⚡ Analyze</button>
-      <span id="wfResult" style="font-size:.72rem;font-family:monospace"></span>
-    </div>
-    <div style="display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
-      <button id="wfApply"  class="btn btn-primary btn-sm">✓ Apply</button>
-      <button id="wfCancel" class="btn btn-secondary btn-sm">Cancel</button>
-    </div>`;
-
-    backdrop.appendChild(modal);
-    document.body.appendChild(backdrop);
-    // Fill token text highlight in popup
-    {
-        const wfTH = modal.querySelector('#wfTextHighlight');
-        if (wfTH) {
-            const t  = state.sampleDraft?.text || '';
-            const [ps, pe] = tok.position || [0, 0];
-            const c2 = state.langDraft?.color || '#7eb8f7';
-            const esc = x => String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-            const mid = t.slice(ps, pe);
-            if (mid) {
-                wfTH.style.cssText = 'font-family:Georgia,serif;font-size:.95rem;margin-bottom:6px;line-height:1.6;padding:3px 4px;background:#0a1520;border-radius:5px';
-                wfTH.innerHTML = esc(t.slice(0,ps))
-                    + `<mark style="background:${c2}33;color:${c2};padding:0 2px;border-radius:2px">${esc(mid)}</mark>`
-                    + esc(t.slice(pe));
-            }
-        }
-    }
-
-    // Note: no backdrop click-to-close — drag release outside modal would trigger it
-    modal.querySelector('#wfClose')?.addEventListener('click', closeWaveformPopup);
-    modal.querySelector('#wfCancel')?.addEventListener('click', closeWaveformPopup);
-
-    modal.querySelector('#wfPlay')?.addEventListener('click', playPopupSlice);
-    modal.querySelector('#wfFmt')?.addEventListener('click', async () => {
-        _popFmtEnabled = !_popFmtEnabled;
-        const fmtBtn = modal.querySelector('#wfFmt');
-        if (fmtBtn) fmtBtn.style.color = _popFmtEnabled ? '#7eb8f7' : '';
-        const fmtCv2 = document.getElementById('wfFmtCanvas');
-        if (_popFmtEnabled) { if (fmtCv2) fmtCv2.style.display='block'; await fetchAndDrawFormantOverlay(); }
-        else { _popFmtFrames=null; if(fmtCv2) fmtCv2.style.display='none'; drawPopupWave(); }
+    const qp = new URLSearchParams({
+        audio: s.audio,
+        tokIdx: String(tokIdx),
+        symbol: tok.symbol || '',
+        sampleText: s.text || '',
     });
-    modal.querySelector('#wfAnalyze')?.addEventListener('click', analyzeInPopup);
-    modal.querySelector('#wfApply')?.addEventListener('click', applyPopupResult);
+    const cfg = { ...(tok.analysis || {}) };
+    if (tok.analysis?.slice) { cfg.sliceStart = tok.analysis.slice[0]; cfg.sliceEnd = tok.analysis.slice[1]; }
+    qp.set('cfg', JSON.stringify(cfg));
 
-    // Waveform drag
-    const canvas = modal.querySelector('#wfCanvas');
-    canvas.addEventListener('mousedown', e => {
-        if (!_wave) return;
-        const rect = canvas.getBoundingClientRect();
-        const f = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-        _popDrag = Math.abs(f - _popLeft) < Math.abs(f - _popRight) ? 'left' : 'right';
-        e.preventDefault();
-    });
-
-    // Touch
-    canvas.addEventListener('touchstart', e => {
-        if (!_wave) return;
-        const rect = canvas.getBoundingClientRect();
-        const f = Math.max(0, Math.min(1, (e.touches[0].clientX - rect.left) / rect.width));
-        _popDrag = Math.abs(f - _popLeft) < Math.abs(f - _popRight) ? 'left' : 'right';
-        e.preventDefault();
-    }, {passive:false});
-    canvas.addEventListener('touchmove', e => {
-        if (!_popDrag || !_wave) return;
-        const rect = canvas.getBoundingClientRect();
-        const f = Math.max(0, Math.min(1, (e.touches[0].clientX - rect.left) / rect.width));
-        if (_popDrag === 'left')  _popLeft  = Math.min(f, _popRight  - 0.005);
-        else                      _popRight = Math.max(f, _popLeft + 0.005);
-        drawPopupWave(); updatePopupTimeDisplay(); e.preventDefault();
-    }, {passive:false});
-    canvas.addEventListener('touchend', () => { _popDrag = null; });
-
-    requestAnimationFrame(() => { drawPopupWave(); updatePopupTimeDisplay(); });
+    window.open('praat.html?' + qp.toString(), '_blank');
 }
 
-// ─── Separate formant diagram with labeled frequency axis ─────────────────────
-function drawFormantCanvas() {
-    const cv = document.getElementById('wfFmtCanvas');
-    if (!cv || !_popFmtEnabled || !_popFmtFrames?.length || !_wave) return;
-    const W   = cv.width  = cv.offsetWidth  || 500;
-    const H   = cv.height = cv.offsetHeight || 88;
-    const LM  = 36;   // left margin for Y-axis labels only — plot still uses full width
-    const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H);
-
-    const maxF   = +(document.getElementById('wfMaxF')?.value) || 5000;
-    // Slice boundaries (for any guards if needed)
-    const t0Ms = _popLeft  * _wave.duration;
-    const t1Ms = _popRight * _wave.duration;
-
-    // Y-axis grid lines and labels (drawn in left margin region)
-    const ticks = [200,500,1000,1500,2000,3000,4000,5000].filter(v => v <= maxF);
-    ctx.font = '8px monospace'; ctx.textAlign = 'right';
-    for (const hz of ticks) {
-        const y = H * (1 - hz / maxF);
-        ctx.strokeStyle = '#1e3048'; ctx.lineWidth = 0.5;
-        ctx.beginPath(); ctx.moveTo(LM, y); ctx.lineTo(W, y); ctx.stroke();
-        ctx.fillStyle = '#4a7090';
-        ctx.fillText(hz >= 1000 ? (hz/1000).toFixed(hz%1000?1:0)+'k' : hz, LM - 2, y + 3);
-    }
-    // Left axis border
-    ctx.strokeStyle = '#2e4560'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(LM, 0); ctx.lineTo(LM, H); ctx.stroke();
-
-    // Formant lines — X uses FULL duration scale (same as waveform canvas above)
-    // Server returned frames only for the slice, so they naturally appear in the selection region
-    const drawLine = (clr, getHz) => {
-        ctx.strokeStyle = clr; ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
-        ctx.beginPath(); let first = true;
-        for (const f of _popFmtFrames) {
-            if (!f.voiced || f.f1 == null) { first = true; continue; }
-            const hz = getHz(f); if (!hz) { first = true; continue; }
-            // Same X coordinate as waveform: maps full audio duration → 0..W
-            const x = (f.segment.at_ms / _wave.duration) * W;
-            const y = H * (1 - hz / maxF);
-            if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-    };
-    drawLine('#4db8ffcc', f => f.f2);  // F2 blue
-    drawLine('#ff9944cc', f => f.f1);  // F1 orange
-
-    // Legend
-    ctx.font = '8px monospace'; ctx.textAlign = 'left';
-    ctx.fillStyle = '#4db8ffaa'; ctx.fillText('F2', 1, 10);
-    ctx.fillStyle = '#ff9944aa'; ctx.fillText('F1', 1, 21);
-}
-
-async function fetchAndDrawFormantOverlay() {
-    if (!_wave) { toast('Load audio first'); return; }
-    const btn = document.getElementById('wfFmt');
-    if (btn) { btn.disabled=true; btn.textContent='…'; }
-    const max_f      = +(document.getElementById('wfMaxF')?.value)    || 5000;
-    const n_formants = +(document.getElementById('wfNFmt')?.value)     || 5;
-    const window_ms  = +(document.getElementById('wfWinMs')?.value)    || 25;
-    const pre_emph   = +(document.getElementById('wfPreEmph')?.value)  || 50;
-    const rms_floor  = +(document.getElementById('wfRmsFloor')?.value) || 0.005;
-    const median_n   = +(document.getElementById('wfMedianN')?.value)  || 5;
-    try {
-        const form = new FormData();
-        form.append('file', encodeWavBlob(_wave.samples, _wave.sampleRate), 'full.wav');
-        form.append('config', JSON.stringify({
-            single_segment: false,
-            slice_start: _popLeft,
-            slice_end:   _popRight,
-            max_f, n_formants, window_ms, pre_emphasis: pre_emph, rms_floor, median_n,
-        }));
-        const resp = await fetch(`${SAMPLE_SERVER}/frames`, {method:'POST', body:form});
-        if (!resp.ok) throw new Error('Server ' + resp.status);
-        const data = await resp.json();
-        _popFmtFrames = (data.frames || []).filter(f => f.voiced && f.f1 != null && f.f2 != null);
-        if (!_popFmtFrames.length) throw new Error('No voiced frames returned');
-        const fmtCv = document.getElementById('wfFmtCanvas');
-        if (fmtCv) fmtCv.style.display = 'block';
-        drawPopupWave();
-        drawFormantCanvas();
-    } catch(e) {
-        console.error('fetchAndDrawFormantOverlay:', e);
-        toast('Formant overlay failed: ' + e.message);
-        _popFmtFrames = null;
-        _popFmtEnabled = false;
-        if (btn) btn.style.color = '';
-        drawPopupWave();
-    } finally {
-        if (btn) { btn.disabled=false; btn.textContent='F1/F2'; }
-    }
-}
-
-function closeWaveformPopup() {
-    if (_popPlay) {
-        cancelAnimationFrame(_popPlay.raf);
-        try { _popPlay.actx.close(); } catch(e) {}
-        _popPlay = null;
-    }
-    _popDrag = null; _popTokIdx = null;
-    _popFmtFrames = null; _popFmtEnabled = false;
-    const _cv = document.getElementById('wfFmtCanvas'); if (_cv) _cv.style.display='none';
-    document.getElementById('wfBackdrop')?.remove();
-}
-
-let _popupAnalysisResult = null;  // stores last analyze result for Apply
-
-function drawPopupWave(progress=null) {
-    const canvas = document.getElementById('wfCanvas');
-    if (!canvas) return;
-    const W = canvas.width  = canvas.offsetWidth  || 500;
-    const H = canvas.height = canvas.offsetHeight || 80;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H);
-
-    const c = state.langDraft?.color || '#7eb8f7';
-    if (!_wavePeaks) {
-        ctx.fillStyle = '#1a3050'; ctx.fillRect(0, H/2-1, W, 2);
-        ctx.fillStyle = '#2a4060'; ctx.font = '12px system-ui';
-        ctx.textAlign = 'center'; ctx.fillText('Load audio first', W/2, H/2+5);
-        return;
-    }
-    const lx = Math.floor(_popLeft  * W);
-    const rx = Math.ceil(_popRight * W);
-    const nb = _wavePeaks[0].length;
-
-    ctx.fillStyle = c + '18'; ctx.fillRect(lx, 0, rx-lx, H);
-
-    for (let x = 0; x < W; x++) {
-        const bi = Math.min(nb-1, Math.floor((x/W)*nb));
-        const mn = _wavePeaks[0][bi], mx = _wavePeaks[1][bi];
-        const yT = Math.floor((1-mx)*H/2), yB = Math.ceil((1-mn)*H/2);
-        ctx.fillStyle = (x>=lx && x<=rx) ? c+'cc' : c+'44';
-        ctx.fillRect(x, yT, 1, Math.max(1, yB-yT));
-    }
-
-    ctx.fillStyle = c; ctx.fillRect(lx, 0, 2, H); ctx.fillRect(rx-1, 0, 2, H);
-
-    if (progress !== null) {
-        const px = lx + Math.floor(progress * (rx - lx));
-        ctx.fillStyle = '#ffffffcc'; ctx.fillRect(px, 0, 1, H);
-    }
-    // Formant diagram is drawn separately in drawFormantCanvas()
-}
-
-function updatePopupTimeDisplay() {
-    if (!_wave) return;
-    const sl = _popLeft  * _wave.duration;
-    const sr = _popRight * _wave.duration;
-    const g  = id => document.getElementById(id);
-    if (g('wfTL')) g('wfTL').textContent = sl.toFixed(0) + ' ms';
-    if (g('wfTR')) g('wfTR').textContent = sr.toFixed(0) + ' ms';
-    if (g('wfTD')) g('wfTD').textContent = (sr-sl).toFixed(0) + ' ms';
-}
-
-async function playPopupSlice() {
-    if (!_wave) { toast('Load audio first'); return; }
-    if (_popPlay) {
-        cancelAnimationFrame(_popPlay.raf);
-        try { _popPlay.actx.close(); } catch(e) {}
-        _popPlay = null;
-        const btn = document.getElementById('wfPlay');
-        if (btn) btn.innerHTML = '▶ Play slice';
-        return;
-    }
-    const i0 = Math.floor(_popLeft  * _wave.samples.length);
-    const i1 = Math.ceil( _popRight * _wave.samples.length);
-    const slice = _wave.samples.slice(i0, i1);
-    const sliceDur = (i1-i0) / _wave.sampleRate;
-
-    const actx = new (window.AudioContext || window.webkitAudioContext)();
-    const buf  = actx.createBuffer(1, slice.length, _wave.sampleRate);
-    buf.getChannelData(0).set(slice);
-    const src  = actx.createBufferSource(); src.buffer = buf; src.connect(actx.destination); src.start();
-
-    const startTime = actx.currentTime;
-    const btn = document.getElementById('wfPlay');
-    if (btn) btn.innerHTML = '■ Stop';
-
-    _popPlay = {actx, startTime, sliceDur};
-    const tick = () => {
-        const p = (actx.currentTime - startTime) / sliceDur;
-        if (p >= 1 || !_popPlay) { _popPlay=null; drawPopupWave(); if(btn)btn.innerHTML='▶ Play slice'; return; }
-        drawPopupWave(p);
-        _popPlay.raf = requestAnimationFrame(tick);
-    };
-    _popPlay.raf = requestAnimationFrame(tick);
-    src.onended = () => { if(_popPlay){cancelAnimationFrame(_popPlay.raf);_popPlay=null;drawPopupWave();if(btn)btn.innerHTML='▶ Play slice';} };
-}
-
-async function analyzeInPopup() {
-    if (!_wave) { toast('Load audio first'); return; }
-    const btn = document.getElementById('wfAnalyze');
-    if (btn) { btn.disabled=true; btn.textContent='…'; }
-    const res = document.getElementById('wfResult');
-    if (res) res.textContent = 'Analyzing…';
-    const gv = id => +(document.getElementById(id)?.value ?? 0) || undefined;
-    const max_f              = +(document.getElementById('wfMaxF')?.value)      || 5000;
-    const n_formants         = +(document.getElementById('wfNFmt')?.value)      || 5;
-    const window_ms          = +(document.getElementById('wfWinMs')?.value)     || 25;
-    const pre_emphasis       = +(document.getElementById('wfPreEmph')?.value)   || 50;
-    const back_ceiling       = +(document.getElementById('wfBackCeil')?.value)  || 1800;
-    const back_ceiling_ratio = +(document.getElementById('wfBackRatio')?.value) || 0.95;
-    const back_front_ratio   = +(document.getElementById('wfFrontRatio')?.value)|| 0.75;
-    const rms_floor          = +(document.getElementById('wfRmsFloor')?.value)  || 0.005;
-    const median_n           = +(document.getElementById('wfMedianN')?.value)   || 5;
-
-    try {
-        const form = new FormData();
-        // Send full audio; server slices using relative 0.0-1.0 positions
-        form.append('file', encodeWavBlob(_wave.samples, _wave.sampleRate), 'full.wav');
-        form.append('config', JSON.stringify({
-            single_segment: true,
-            slice_start: _popLeft,
-            slice_end:   _popRight,
-            max_f, n_formants, window_ms, pre_emphasis,
-            back_ceiling, back_ceiling_ratio, back_front_ratio,
-            rms_floor, median_n,
-        }));
-        const resp  = await fetch(`${SAMPLE_SERVER}/frames`, {method:'POST', body:form});
-        if (!resp.ok) throw new Error('Server ' + resp.status);
-        const data  = await resp.json();
-        const frame = data.frames?.[0];
-        if (!frame?.voiced) { if(res) res.textContent = '⚠ No voiced speech'; return; }
-        _popupAnalysisResult = {
-            slice: [Math.round(_popLeft*_wave.duration), Math.round(_popRight*_wave.duration)],
-            f1: frame.f1, f2: frame.f2,
-            max_f, n_formants, window_ms, pre_emphasis,
-            back_ceiling, back_ceiling_ratio, back_front_ratio, rms_floor, median_n,
-        };
-        if (res) res.innerHTML = `<span class="tok-analysis ok">F1 ${frame.f1} · F2 ${frame.f2} Hz</span>`;
-        // Auto-fetch full formant trace after successful analysis
-        _popFmtEnabled = true;
-        const fmtBtn2 = document.getElementById('wfFmt');
-        if (fmtBtn2) fmtBtn2.style.color = '#7eb8f7';
-        fetchAndDrawFormantOverlay().catch(()=>{});
-    } catch(e) {
-        if (res) res.textContent = '✗ ' + e.message;
-    } finally {
-        if (btn) { btn.disabled=false; btn.textContent='⚡ Analyze'; }
-    }
-}
-
-function applyPopupResult() {
-    const tok = state.sampleDraft?.tokens?.[_popTokIdx];
-    if (!tok) { closeWaveformPopup(); return; }
-    // Apply whatever we have — even without running analyze, save the slice
-    if (_popupAnalysisResult) {
-        tok.analysis = _popupAnalysisResult;
-        _popupAnalysisResult = null;
-    } else if (_wave) {
-        // Save slice only (no F1/F2)
-        const existing = tok.analysis || {};
-        tok.analysis = { ...existing, slice: [Math.round(_popLeft*_wave.duration), Math.round(_popRight*_wave.duration)] };
-    }
+window.addEventListener('message', e => {
+    if (e.origin !== location.origin) return;
+    const data = e.data;
+    if (!data || data.type !== 'praat-analysis-result') return;
+    // Guard against the user having switched samples/tokens while the Formant Lab tab was open.
+    if (state.sampleDraft?.audio !== data.audioUrl) return;
+    const tok = state.sampleDraft?.tokens?.[data.tokIdx];
+    if (!tok) return;
+    tok.analysis = data.analysis;
     markUnsaved();
-    closeWaveformPopup();
     renderTokenRows(); renderSampleList();
-}
+    toast(`Applied F1 ${data.analysis.f1} · F2 ${data.analysis.f2} Hz to token`);
+});
 
 // ─── Audio loading ────────────────────────────────────────────────────────────
 async function loadSampleAudio(url) {
@@ -865,8 +495,6 @@ async function loadSampleAudio(url) {
         if(info) info.textContent = `${(_wave.duration/1000).toFixed(2)}s · ${(_wave.sampleRate/1000).toFixed(1)} kHz · ready`;
         // Re-enable analyze buttons
         document.querySelectorAll('.tok-analyze').forEach(b => b.disabled = false);
-        // If popup is open, redraw
-        if (_popTokIdx !== null) { drawPopupWave(); updatePopupTimeDisplay(); }
     } catch(e) {
         if(info) info.textContent = 'Failed: '+e.message;
         console.warn('loadSampleAudio:', e);
@@ -887,20 +515,7 @@ function precomputePeaks(numBins=800) {
     _wavePeaks = [mn, mx];
 }
 
-// ─── WAV encoder ──────────────────────────────────────────────────────────────
-function encodeWavBlob(samples, sr) {
-    const buf=new ArrayBuffer(44+samples.length*2), v=new DataView(buf);
-    const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
-    ws(0,'RIFF'); v.setUint32(4,36+samples.length*2,true);
-    ws(8,'WAVE'); ws(12,'fmt ');
-    v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
-    v.setUint32(24,sr,true); v.setUint32(28,sr*2,true);
-    v.setUint16(32,2,true);  v.setUint16(34,16,true);
-    ws(36,'data'); v.setUint32(40,samples.length*2,true);
-    for(let i=0;i<samples.length;i++)
-        v.setInt16(44+i*2,Math.max(-32768,Math.min(32767,Math.round(samples[i]*32767))),true);
-    return new Blob([buf],{type:'audio/wav'});
-}
+// encodeWavBlob lives in audio.js (loaded before this file) — shared, no local copy needed.
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
