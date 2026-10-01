@@ -4,13 +4,18 @@ scripts/verify_migration_roundtrip.py — validates the Phase 0 round-trip:
 original lang/*.json  --(migrate_legacy_to_db.py)-->  DB
                       --(export_db_to_json.py)-->  db-export/*.json
 
-The exported shape intentionally differs from the original (audio becomes
-{soundId:N} instead of a bare path/URL, derived token values aren't
-exported) — so this is a semantic equivalence check, not a byte diff.
-Reuses discover_language_dirs/schema-conversion from the migration script
-so both sides apply the exact same rules for what counts as real data.
-
-Usage: python scripts/verify_migration_roundtrip.py [--lang-dir lang] [--export-dir db-export]
+The exported shape deliberately differs from the original in ways beyond a
+simple rename, now that Sound is merged into Sample (see db/models.py):
+  - every vowel with its own `audio` gets a newly-created representative
+    sample that has NO counterpart in the original samples.json at all
+  - two original sample entries that happened to share the same audio
+    (found in real data: "Mieter" in lang/de, split across two JSON entries
+    purely to attach two different tokens) collapse into ONE exported
+    sample carrying both tokens — fewer rows, not a 1:1 count match
+So this walks each ORIGINAL entity and confirms it is faithfully
+represented somewhere in the export, rather than zipping two same-length
+lists — len(original) and len(exported) are expected to differ and are
+reported, not asserted equal.
 """
 
 from __future__ import annotations
@@ -26,6 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # for db.*, imp
 from migrate_legacy_to_db import discover_language_dirs  # noqa: E402
 
 errors: list[str] = []
+notes: list[str] = []
 
 
 def check(condition: bool, message: str) -> None:
@@ -33,23 +39,16 @@ def check(condition: bool, message: str) -> None:
         errors.append(message)
 
 
-def resolve_sound_ref(ref: dict | None, sounds_by_id: dict) -> dict | None:
-    if ref is None:
-        return None
-    return sounds_by_id.get(ref["soundId"])
-
-
-def audio_matches(original_audio, sound: dict | None, where: str) -> None:
+def audio_matches(original_audio, exp_sample: dict | None, where: str) -> None:
     if not original_audio:
-        check(sound is None, f"{where}: expected no audio, exported sound is {sound!r}")
+        return  # nothing to check — a sample with no audio in the original is fine either way
+    check(exp_sample is not None, f"{where}: original had audio {original_audio!r} but no exported sample was found")
+    if exp_sample is None:
         return
-    check(sound is not None, f"{where}: original had audio {original_audio!r} but no sound was exported")
-    if sound is None:
-        return
-    if sound.get("sourceUrl") is not None:
-        check(sound["sourceUrl"] == original_audio, f"{where}: sourceUrl {sound['sourceUrl']!r} != original {original_audio!r}")
+    if exp_sample.get("sourceUrl") is not None:
+        check(exp_sample["sourceUrl"] == original_audio, f"{where}: sourceUrl {exp_sample['sourceUrl']!r} != original {original_audio!r}")
     else:
-        check(sound.get("storageKey") == original_audio, f"{where}: storageKey {sound.get('storageKey')!r} != original {original_audio!r}")
+        check(exp_sample.get("storageKey") == original_audio, f"{where}: storageKey {exp_sample.get('storageKey')!r} != original {original_audio!r}")
 
 
 def verify(lang_root: Path, export_dir: Path) -> None:
@@ -57,9 +56,6 @@ def verify(lang_root: Path, export_dir: Path) -> None:
     original_by_key = {key: (enabled, data) for key, enabled, data in original_dirs}
 
     exported_index = json.loads((export_dir / "index.json").read_text())
-    exported_sounds = json.loads((export_dir / "sounds.json").read_text())
-    sounds_by_id = {s["id"]: s for s in exported_sounds}
-
     check(
         [e["key"] for e in exported_index] == list(original_by_key.keys()),
         f"language order/set mismatch: exported {[e['key'] for e in exported_index]!r} vs original {list(original_by_key.keys())!r}",
@@ -77,6 +73,17 @@ def verify(lang_root: Path, export_dir: Path) -> None:
         check(exp_lang["label"] == orig_data.get("label", key), f"[{key}] label mismatch")
         check(exp_lang["color"] == orig_data.get("color"), f"[{key}] color mismatch")
 
+        samples_path = export_dir / key / "samples.json"
+        exp_samples = json.loads(samples_path.read_text()) if samples_path.exists() else []
+        exp_sample_by_id = {s["id"]: s for s in exp_samples}
+        by_audio_key: dict[str, list[dict]] = {}
+        by_text: dict[str | None, list[dict]] = {}
+        for es in exp_samples:
+            k = es.get("storageKey") or es.get("sourceUrl")
+            if k:
+                by_audio_key.setdefault(k, []).append(es)
+            by_text.setdefault(es.get("text"), []).append(es)
+
         orig_vowels = orig_data.get("vowels", [])
         exp_vowels = exp_lang["vowels"]
         check(len(exp_vowels) == len(orig_vowels), f"[{key}] vowel count mismatch: {len(exp_vowels)} != {len(orig_vowels)}")
@@ -87,7 +94,11 @@ def verify(lang_root: Path, export_dir: Path) -> None:
             check(ev["type"] == ov.get("type", "short"), f"{where}: type mismatch")
             check(ev["rounded"] == bool(ov.get("rounded")), f"{where}: rounded mismatch")
             check(ev["f1"] == ov.get("f1") and ev["f2"] == ov.get("f2"), f"{where}: f1/f2 mismatch")
-            audio_matches(ov.get("audio"), resolve_sound_ref(ev["audio"], sounds_by_id), where)
+            if ov.get("audio"):
+                rep = exp_sample_by_id.get(ev["representativeSampleId"])
+                check(rep is not None, f"{where}: had audio {ov['audio']!r} but no representativeSampleId resolved")
+                if rep:
+                    audio_matches(ov["audio"], rep, where)
             orig_target = ov.get("target")
             if orig_target:
                 check(ev["target"] is not None, f"{where}: target missing in export")
@@ -97,34 +108,70 @@ def verify(lang_root: Path, export_dir: Path) -> None:
             else:
                 check(ev["target"] is None, f"{where}: unexpected target in export")
 
-        samples_path = lang_root / key / "samples.json"
-        exp_samples_path = export_dir / key / "samples.json"
-        if not samples_path.exists():
-            check(not exp_samples_path.exists(), f"[{key}] unexpected exported samples.json with no original")
+        samples_json_path = lang_root / key / "samples.json"
+        if not samples_json_path.exists():
+            # No samples.json — every exported sample here must be a vowel-representative stub,
+            # i.e. referenced by exactly the vowels whose own `audio` field created it.
+            rep_ids = {ev["representativeSampleId"] for ev in exp_vowels if ev["representativeSampleId"]}
+            for es in exp_samples:
+                check(es["id"] in rep_ids, f"[{key}] exported sample {es['id']} ({es.get('text')!r}) has no samples.json but isn't any vowel's representative either")
             continue
-        orig_samples = json.loads(samples_path.read_text())
-        exp_samples = json.loads(exp_samples_path.read_text())
-        check(len(exp_samples) == len(orig_samples), f"[{key}] sample count mismatch: {len(exp_samples)} != {len(orig_samples)}")
-        for i, (os_, es) in enumerate(zip(orig_samples, exp_samples)):
-            where = f"[{key}] sample[{i}] ({os_.get('text')!r})"
-            check(es["text"] == os_.get("text"), f"{where}: text mismatch")
-            check(es["phonemic"] == os_.get("phonemic"), f"{where}: phonemic mismatch")
-            check(es["representative"] == os_.get("representative"), f"{where}: representative mismatch")
-            audio_matches(os_.get("audio"), resolve_sound_ref(es["audio"], sounds_by_id), where)
+        orig_samples = json.loads(samples_json_path.read_text())
+        notes.append(f"[{key}] {len(orig_samples)} original sample entries -> {len(exp_samples)} exported samples "
+                     f"(expected to differ: dedup of shared-audio entries, plus new vowel-representative samples)")
 
-            orig_tokens = os_.get("tokens") or []
-            exp_tokens = es["tokens"]
-            check(len(exp_tokens) == len(orig_tokens), f"{where}: token count mismatch")
-            for j, (ot, et) in enumerate(zip(orig_tokens, exp_tokens)):
+        # The original data can itself be ambiguous (two different samples both declaring
+        # `representative` for the same symbol — observed in real data, e.g. ru's "i" symbol
+        # claimed by both the bare vowel sample and the word "мир"). There's no "correct" winner
+        # in that case, so collect every valid candidate per symbol rather than asserting one.
+        rep_candidates: dict[str, set[int]] = {}
+        for os_ in orig_samples:
+            rep_symbol = os_.get("representative")
+            if not rep_symbol:
+                continue
+            audio = os_.get("audio")
+            candidates = by_audio_key.get(audio, []) if audio else by_text.get(os_.get("text"), [])
+            if candidates:
+                rep_candidates.setdefault(rep_symbol, set()).add(candidates[0]["id"])
+
+        for i, os_ in enumerate(orig_samples):
+            where = f"[{key}] original sample[{i}] ({os_.get('text')!r})"
+            audio = os_.get("audio")
+            candidates = by_audio_key.get(audio, []) if audio else by_text.get(os_.get("text"), [])
+            check(bool(candidates), f"{where}: no exported sample found (audio={audio!r})")
+            if not candidates:
+                continue
+            es = candidates[0]
+            check(es["text"] == os_.get("text"), f"{where}: text mismatch in matched export")
+            check(es["phonemic"] == os_.get("phonemic"), f"{where}: phonemic mismatch in matched export")
+            audio_matches(audio, es, where)
+
+            exp_tokens_by_key = {(t["symbol"], tuple(t["position"])): t for t in es["tokens"]}
+            for j, ot in enumerate(os_.get("tokens") or []):
                 twhere = f"{where} token[{j}] ({ot.get('symbol')!r})"
-                check(et["symbol"] == ot.get("symbol"), f"{twhere}: symbol mismatch")
-                check(et["position"] == list(ot.get("position", [0, 0])), f"{twhere}: position mismatch")
+                tk = (ot.get("symbol"), tuple(ot.get("position", [0, 0])))
+                et = exp_tokens_by_key.get(tk)
+                check(et is not None, f"{twhere}: not found in matched exported sample's token list")
+                if et is None:
+                    continue
                 check(et["legacyAnalysis"] == ot.get("analysis"), f"{twhere}: legacyAnalysis mismatch")
                 orig_slice = (ot.get("analysis") or {}).get("slice")
                 if orig_slice:
                     check(
                         [et["timeStartMs"], et["timeEndMs"]] == orig_slice,
                         f"{twhere}: time range {[et['timeStartMs'], et['timeEndMs']]} != original slice {orig_slice}",
+                    )
+
+            rep_symbol = os_.get("representative")
+            if rep_symbol:
+                matching = [ev for ev in exp_vowels if rep_symbol in ev["symbols"]]
+                check(bool(matching), f"{where}: representative symbol {rep_symbol!r} matches no exported vowel")
+                valid_ids = rep_candidates.get(rep_symbol, set())
+                for ev in matching:
+                    check(
+                        ev["representativeSampleId"] in valid_ids,
+                        f"{where}: vowel {ev['symbols']} representativeSampleId {ev['representativeSampleId']} "
+                        f"not among the original data's own candidates {valid_ids} for symbol {rep_symbol!r}",
                     )
 
 
@@ -136,6 +183,8 @@ if __name__ == "__main__":
 
     verify(Path(args.lang_dir).resolve(), Path(args.export_dir).resolve())
 
+    for n in notes:
+        print(n)
     if errors:
         print(f"FAILED — {len(errors)} mismatch(es):")
         for e in errors[:50]:
@@ -143,4 +192,4 @@ if __name__ == "__main__":
         if len(errors) > 50:
             print(f"  ... and {len(errors) - 50} more")
         sys.exit(1)
-    print("Round-trip verified: original lang/*.json content matches db-export/*.json exactly (modulo the intentional shape changes).")
+    print("Round-trip verified: every original entity is faithfully represented in db-export/*.json.")

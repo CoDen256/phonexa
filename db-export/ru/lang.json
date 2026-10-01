@@ -16,8 +16,8 @@
       "desc": "Close front unrounded",
       "f1": 313.0,
       "f2": 2121.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+      "representativeSampleId": 221,
       "target": null
     },
     {
@@ -33,8 +33,8 @@
       "desc": "Near-close near-front unrounded (reduced i/ɛ)",
       "f1": 0.0,
       "f2": 0.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
+      "representativeSampleId": 223,
       "target": null
     },
     {
@@ -50,8 +50,8 @@
       "desc": "Near-close near-back rounded (reduced u)",
       "f1": 0.0,
       "f2": 0.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
+      "representativeSampleId": 224,
       "target": null
     },
     {
@@ -67,8 +67,8 @@
       "desc": "Close central unrounded",
       "f1": 352.0,
       "f2": 2094.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
+      "representativeSampleId": 227,
       "target": null
     },
     {
@@ -84,8 +84,8 @@
       "desc": "Close central rounded (palatalized u)",
       "f1": 309.0,
       "f2": 1662.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
+      "representativeSampleId": 229,
       "target": null
     },
     {
@@ -101,8 +101,8 @@
       "desc": "Close back rounded",
       "f1": 401.0,
       "f2": 555.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
+      "representativeSampleId": 231,
       "target": null
     },
     {
@@ -118,8 +118,8 @@
       "desc": "Close-mid front unrounded",
       "f1": 417.0,
       "f2": 2307.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
+      "representativeSampleId": 233,
       "target": null
     },
     {
@@ -135,8 +135,8 @@
       "desc": "Close-mid central rounded (palatalized o)",
       "f1": 482.0,
       "f2": 1474.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
+      "representativeSampleId": null,
       "target": null
     },
     {
@@ -152,8 +152,8 @@
       "desc": "Mid central (reduced a/o)",
       "f1": 0.0,
       "f2": 0.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
+      "representativeSampleId": null,
       "target": null
     },
     {
@@ -169,8 +169,8 @@
       "desc": "Mid back rounded ɔ̝/o̞",
       "f1": 595.0,
       "f2": 809.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
+      "representativeSampleId": 241,
       "target": null
     },
     {
@@ -186,8 +186,8 @@
       "desc": "Open-mid front unrounded",
       "f1": 702.0,
       "f2": 1770.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "representativeSampleId": 243,
       "target": null
     },
     {
@@ -203,8 +203,8 @@
       "desc": "Near-open central ɐ (reduced, weak stressed a/o)",
       "f1": 0.0,
       "f2": 0.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
+      "representativeSampleId": 245,
       "target": null
     },
     {
@@ -220,8 +220,8 @@
       "desc": "Open front unrounded",
       "f1": 932.0,
       "f2": 1538.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
+      "representativeSampleId": 249,
       "target": null
     },
     {
@@ -237,8 +237,8 @@
       "desc": "Open back unrounded (velarized a)",
       "f1": 941.0,
       "f2": 1346.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "representativeSampleId": 251,
       "target": null
     },
     {
@@ -254,8 +254,8 @@
       "desc": "Near-open front unrounded (palatalized a)",
       "f1": 912.0,
       "f2": 1768.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "representativeSampleId": null,
       "target": null
     }
   ]

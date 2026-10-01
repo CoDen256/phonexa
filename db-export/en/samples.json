@@ -1,11 +1,18 @@
 [
   {
+    "id": 257,
+    "storageKey": "lang/en/audio/ipa/green.mp3",
+    "sourceUrl": null,
+    "originalFilename": "green.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "iː",
     "phonemic": "/iː/",
-    "representative": "i",
-    "audio": {
-      "soundId": 255
-    },
     "tokens": [
       {
         "symbol": "i",
@@ -36,12 +43,19 @@
     ]
   },
   {
+    "id": 258,
+    "storageKey": "lang/en/audio/ipa/green_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "green_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "green",
     "phonemic": "/ɡriːn/",
-    "representative": null,
-    "audio": {
-      "soundId": 256
-    },
     "tokens": [
       {
         "symbol": "i",
@@ -72,12 +86,19 @@
     ]
   },
   {
+    "id": 259,
+    "storageKey": "lang/en/audio/h95/heed.wav",
+    "sourceUrl": null,
+    "originalFilename": "heed.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "heed",
     "phonemic": "/hiːd/",
-    "representative": null,
-    "audio": {
-      "soundId": 257
-    },
     "tokens": [
       {
         "symbol": "i",
@@ -108,12 +129,19 @@
     ]
   },
   {
+    "id": 260,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-feet.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "feet",
     "phonemic": "/fiːt/",
-    "representative": null,
-    "audio": {
-      "soundId": 258
-    },
     "tokens": [
       {
         "symbol": "i",
@@ -128,12 +156,19 @@
     ]
   },
   {
+    "id": 261,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-seen.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "seen",
     "phonemic": "/siːn/",
-    "representative": null,
-    "audio": {
-      "soundId": 259
-    },
     "tokens": [
       {
         "symbol": "i",
@@ -148,12 +183,19 @@
     ]
   },
   {
+    "id": 262,
+    "storageKey": "lang/en/audio/ipa/pink.mp3",
+    "sourceUrl": null,
+    "originalFilename": "pink.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɪ",
     "phonemic": "/ɪ/",
-    "representative": "ɪ",
-    "audio": {
-      "soundId": 260
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -184,12 +226,19 @@
     ]
   },
   {
+    "id": 263,
+    "storageKey": "lang/en/audio/ipa/pink_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "pink_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "pink",
     "phonemic": "/pɪŋk/",
-    "representative": null,
-    "audio": {
-      "soundId": 261
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -220,12 +269,19 @@
     ]
   },
   {
+    "id": 264,
+    "storageKey": "lang/en/audio/h95/hid.wav",
+    "sourceUrl": null,
+    "originalFilename": "hid.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hid",
     "phonemic": "/hɪd/",
-    "representative": null,
-    "audio": {
-      "soundId": 262
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -256,12 +312,19 @@
     ]
   },
   {
+    "id": 265,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-kit.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "kit",
     "phonemic": "/kɪt/",
-    "representative": null,
-    "audio": {
-      "soundId": 263
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -276,12 +339,19 @@
     ]
   },
   {
+    "id": 266,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bit.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bit",
     "phonemic": "/bɪt/",
-    "representative": null,
-    "audio": {
-      "soundId": 264
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -296,12 +366,19 @@
     ]
   },
   {
+    "id": 267,
+    "storageKey": "lang/en/audio/ipa/red.mp3",
+    "sourceUrl": null,
+    "originalFilename": "red.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
-    "representative": "ɛ",
-    "audio": {
-      "soundId": 265
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -332,12 +409,19 @@
     ]
   },
   {
+    "id": 268,
+    "storageKey": "lang/en/audio/ipa/red_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "red_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "red",
     "phonemic": "/rɛd/",
-    "representative": null,
-    "audio": {
-      "soundId": 266
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -368,12 +452,19 @@
     ]
   },
   {
+    "id": 269,
+    "storageKey": "lang/en/audio/h95/head.wav",
+    "sourceUrl": null,
+    "originalFilename": "head.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "head",
     "phonemic": "/hɛd/",
-    "representative": null,
-    "audio": {
-      "soundId": 267
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -404,12 +495,19 @@
     ]
   },
   {
+    "id": 270,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-dress.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "dress",
     "phonemic": "/drɛs/",
-    "representative": null,
-    "audio": {
-      "soundId": 268
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -424,12 +522,19 @@
     ]
   },
   {
+    "id": 271,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bed.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bed",
     "phonemic": "/bɛd/",
-    "representative": null,
-    "audio": {
-      "soundId": 269
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -444,12 +549,19 @@
     ]
   },
   {
+    "id": 272,
+    "storageKey": "lang/en/audio/ipa/sand.mp3",
+    "sourceUrl": null,
+    "originalFilename": "sand.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "æ",
     "phonemic": "/æ/",
-    "representative": "æ",
-    "audio": {
-      "soundId": 270
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -480,12 +592,19 @@
     ]
   },
   {
+    "id": 273,
+    "storageKey": "lang/en/audio/ipa/sand_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "sand_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "sand",
     "phonemic": "/sænd/",
-    "representative": null,
-    "audio": {
-      "soundId": 271
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -516,12 +635,19 @@
     ]
   },
   {
+    "id": 274,
+    "storageKey": "lang/en/audio/h95/had.wav",
+    "sourceUrl": null,
+    "originalFilename": "had.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "had",
     "phonemic": "/hæd/",
-    "representative": null,
-    "audio": {
-      "soundId": 272
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -552,12 +678,19 @@
     ]
   },
   {
+    "id": 275,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-trap.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "trap",
     "phonemic": "/træp/",
-    "representative": null,
-    "audio": {
-      "soundId": 273
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -572,12 +705,19 @@
     ]
   },
   {
+    "id": 276,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-cat.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "cat",
     "phonemic": "/kæt/",
-    "representative": null,
-    "audio": {
-      "soundId": 274
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -592,12 +732,19 @@
     ]
   },
   {
+    "id": 277,
+    "storageKey": "lang/en/audio/ipa/coffee.mp3",
+    "sourceUrl": null,
+    "originalFilename": "coffee.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɑ",
     "phonemic": "/ɑ/",
-    "representative": "ɑ",
-    "audio": {
-      "soundId": 275
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -628,12 +775,19 @@
     ]
   },
   {
+    "id": 278,
+    "storageKey": "lang/en/audio/ipa/coffee_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "coffee_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "coffee",
     "phonemic": "/ˈkɑːfi/",
-    "representative": null,
-    "audio": {
-      "soundId": 276
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -664,12 +818,19 @@
     ]
   },
   {
+    "id": 279,
+    "storageKey": "lang/en/audio/h95/hod.wav",
+    "sourceUrl": null,
+    "originalFilename": "hod.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hod",
     "phonemic": "/hɑːd/",
-    "representative": null,
-    "audio": {
-      "soundId": 277
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -700,12 +861,19 @@
     ]
   },
   {
+    "id": 280,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-father.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "father",
     "phonemic": "/ˈfɑːðər/",
-    "representative": null,
-    "audio": {
-      "soundId": 278
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -720,12 +888,19 @@
     ]
   },
   {
+    "id": 281,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-palm.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "palm",
     "phonemic": "/pɑːm/",
-    "representative": null,
-    "audio": {
-      "soundId": 279
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -740,12 +915,19 @@
     ]
   },
   {
+    "id": 282,
+    "storageKey": "lang/en/audio/ipa/mauve.mp3",
+    "sourceUrl": null,
+    "originalFilename": "mauve.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɔ",
     "phonemic": "/ɔ/",
-    "representative": "ɔ",
-    "audio": {
-      "soundId": 280
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -776,12 +958,19 @@
     ]
   },
   {
+    "id": 283,
+    "storageKey": "lang/en/audio/ipa/mauve_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "mauve_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "mauve",
     "phonemic": "/mɔːv/",
-    "representative": null,
-    "audio": {
-      "soundId": 281
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -812,12 +1001,19 @@
     ]
   },
   {
+    "id": 284,
+    "storageKey": "lang/en/audio/h95/hawed.wav",
+    "sourceUrl": null,
+    "originalFilename": "hawed.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hawed",
     "phonemic": "/hɔːd/",
-    "representative": null,
-    "audio": {
-      "soundId": 282
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -848,12 +1044,19 @@
     ]
   },
   {
+    "id": 285,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-thought.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "thought",
     "phonemic": "/θɔːt/",
-    "representative": null,
-    "audio": {
-      "soundId": 283
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -868,12 +1071,19 @@
     ]
   },
   {
+    "id": 286,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-claw.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "claw",
     "phonemic": "/klɔː/",
-    "representative": null,
-    "audio": {
-      "soundId": 284
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -888,12 +1098,19 @@
     ]
   },
   {
+    "id": 287,
+    "storageKey": "lang/en/audio/ipa/wood.mp3",
+    "sourceUrl": null,
+    "originalFilename": "wood.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʊ",
     "phonemic": "/ʊ/",
-    "representative": "ʊ",
-    "audio": {
-      "soundId": 285
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -924,12 +1141,19 @@
     ]
   },
   {
+    "id": 288,
+    "storageKey": "lang/en/audio/ipa/wood_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "wood_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "wood",
     "phonemic": "/wʊd/",
-    "representative": null,
-    "audio": {
-      "soundId": 286
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -960,12 +1184,19 @@
     ]
   },
   {
+    "id": 289,
+    "storageKey": "lang/en/audio/h95/hood.wav",
+    "sourceUrl": null,
+    "originalFilename": "hood.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hood",
     "phonemic": "/hʊd/",
-    "representative": null,
-    "audio": {
-      "soundId": 287
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -996,12 +1227,19 @@
     ]
   },
   {
+    "id": 290,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-foot.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "foot",
     "phonemic": "/fʊt/",
-    "representative": null,
-    "audio": {
-      "soundId": 288
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1016,12 +1254,19 @@
     ]
   },
   {
+    "id": 291,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-put.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "put",
     "phonemic": "/pʊt/",
-    "representative": null,
-    "audio": {
-      "soundId": 289
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1036,12 +1281,19 @@
     ]
   },
   {
+    "id": 292,
+    "storageKey": "lang/en/audio/ipa/blue.mp3",
+    "sourceUrl": null,
+    "originalFilename": "blue.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "u",
     "phonemic": "/uː/",
-    "representative": "u",
-    "audio": {
-      "soundId": 290
-    },
     "tokens": [
       {
         "symbol": "u",
@@ -1072,12 +1324,19 @@
     ]
   },
   {
+    "id": 293,
+    "storageKey": "lang/en/audio/ipa/blue_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "blue_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "blue",
     "phonemic": "/bluː/",
-    "representative": null,
-    "audio": {
-      "soundId": 291
-    },
     "tokens": [
       {
         "symbol": "u",
@@ -1108,12 +1367,19 @@
     ]
   },
   {
+    "id": 294,
+    "storageKey": "lang/en/audio/h95/whod.wav",
+    "sourceUrl": null,
+    "originalFilename": "whod.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "who'd",
     "phonemic": "/huːd/",
-    "representative": null,
-    "audio": {
-      "soundId": 292
-    },
     "tokens": [
       {
         "symbol": "u",
@@ -1144,12 +1410,19 @@
     ]
   },
   {
+    "id": 295,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-goose.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "goose",
     "phonemic": "/ɡuːs/",
-    "representative": null,
-    "audio": {
-      "soundId": 293
-    },
     "tokens": [
       {
         "symbol": "u",
@@ -1164,12 +1437,19 @@
     ]
   },
   {
+    "id": 296,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-food.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "food",
     "phonemic": "/fuːd/",
-    "representative": null,
-    "audio": {
-      "soundId": 294
-    },
     "tokens": [
       {
         "symbol": "u",
@@ -1184,12 +1464,19 @@
     ]
   },
   {
+    "id": 297,
+    "storageKey": "lang/en/audio/sa/strut.mp3",
+    "sourceUrl": null,
+    "originalFilename": "strut.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʌ",
     "phonemic": "/ʌ/",
-    "representative": "ʌ",
-    "audio": {
-      "soundId": 295
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1220,12 +1507,19 @@
     ]
   },
   {
+    "id": 298,
+    "storageKey": "lang/en/audio/sa/cut_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "cut_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "cut",
     "phonemic": "/kʌt/",
-    "representative": null,
-    "audio": {
-      "soundId": 296
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1256,12 +1550,19 @@
     ]
   },
   {
+    "id": 299,
+    "storageKey": "lang/en/audio/h95/hud.wav",
+    "sourceUrl": null,
+    "originalFilename": "hud.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hud",
     "phonemic": "/hʌd/",
-    "representative": null,
-    "audio": {
-      "soundId": 297
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1292,12 +1593,19 @@
     ]
   },
   {
+    "id": 300,
+    "storageKey": null,
+    "sourceUrl": "https://dictionary.cambridge.org/media/english/us_pron/s/str/strut/strut.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "strut",
     "phonemic": "/strʌt/",
-    "representative": null,
-    "audio": {
-      "soundId": 298
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1312,12 +1620,19 @@
     ]
   },
   {
+    "id": 301,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bus.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bus",
     "phonemic": "/bʌs/",
-    "representative": null,
-    "audio": {
-      "soundId": 299
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1332,12 +1647,19 @@
     ]
   },
   {
+    "id": 302,
+    "storageKey": "lang/en/audio/ipa/dust.mp3",
+    "sourceUrl": null,
+    "originalFilename": "dust.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ə",
     "phonemic": "/ə/",
-    "representative": "ə",
-    "audio": {
-      "soundId": 300
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1368,12 +1690,19 @@
     ]
   },
   {
+    "id": 303,
+    "storageKey": "lang/en/audio/ipa/dust_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "dust_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "dust",
     "phonemic": "/dəst/",
-    "representative": null,
-    "audio": {
-      "soundId": 301
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1404,12 +1733,19 @@
     ]
   },
   {
+    "id": 304,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-about.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "about",
     "phonemic": "/əˈbaʊt/",
-    "representative": null,
-    "audio": {
-      "soundId": 302
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1424,12 +1760,19 @@
     ]
   },
   {
+    "id": 305,
+    "storageKey": "lang/en/audio/ipa/purple.mp3",
+    "sourceUrl": null,
+    "originalFilename": "purple.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɝ",
     "phonemic": "/ɝː/",
-    "representative": "ɝ",
-    "audio": {
-      "soundId": 303
-    },
     "tokens": [
       {
         "symbol": "ɝ",
@@ -1460,12 +1803,19 @@
     ]
   },
   {
+    "id": 306,
+    "storageKey": "lang/en/audio/ipa/purple_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "purple_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "purple",
     "phonemic": "/ˈpɜːrpl/",
-    "representative": null,
-    "audio": {
-      "soundId": 304
-    },
     "tokens": [
       {
         "symbol": "ɝ",
@@ -1496,12 +1846,19 @@
     ]
   },
   {
+    "id": 307,
+    "storageKey": "lang/en/audio/h95/heard.wav",
+    "sourceUrl": null,
+    "originalFilename": "heard.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "heard",
     "phonemic": "/hɜːrd/",
-    "representative": null,
-    "audio": {
-      "soundId": 305
-    },
     "tokens": [
       {
         "symbol": "ɝ",
@@ -1532,12 +1889,19 @@
     ]
   },
   {
+    "id": 308,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-nurse.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "nurse",
     "phonemic": "/nɜːrs/",
-    "representative": null,
-    "audio": {
-      "soundId": 306
-    },
     "tokens": [
       {
         "symbol": "ɝ",
@@ -1552,12 +1916,19 @@
     ]
   },
   {
+    "id": 309,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/En-us-bird.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bird",
     "phonemic": "/bɜːrd/",
-    "representative": null,
-    "audio": {
-      "soundId": 307
-    },
     "tokens": [
       {
         "symbol": "ɝ",
@@ -1572,12 +1943,19 @@
     ]
   },
   {
+    "id": 310,
+    "storageKey": "lang/en/audio/ipa/ei.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ei.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "eɪ",
     "phonemic": "/eɪ/",
-    "representative": "eɪ",
-    "audio": {
-      "soundId": 308
-    },
     "tokens": [
       {
         "symbol": "eɪ",
@@ -1592,12 +1970,19 @@
     ]
   },
   {
+    "id": 311,
+    "storageKey": "lang/en/audio/ipa/jade_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "jade_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "jade",
     "phonemic": "/dʒeɪd/",
-    "representative": null,
-    "audio": {
-      "soundId": 309
-    },
     "tokens": [
       {
         "symbol": "eɪ",
@@ -1612,12 +1997,19 @@
     ]
   },
   {
+    "id": 312,
+    "storageKey": "lang/en/audio/h95/hayed.wav",
+    "sourceUrl": null,
+    "originalFilename": "hayed.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hayed",
     "phonemic": "/heɪd/",
-    "representative": null,
-    "audio": {
-      "soundId": 310
-    },
     "tokens": [
       {
         "symbol": "eɪ",
@@ -1632,12 +2024,19 @@
     ]
   },
   {
+    "id": 313,
+    "storageKey": "lang/en/audio/ipa/gold.mp3",
+    "sourceUrl": null,
+    "originalFilename": "gold.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "oʊ",
     "phonemic": "/oʊ/",
-    "representative": "oʊ",
-    "audio": {
-      "soundId": 311
-    },
     "tokens": [
       {
         "symbol": "oʊ",
@@ -1652,12 +2051,19 @@
     ]
   },
   {
+    "id": 314,
+    "storageKey": "lang/en/audio/ipa/gold_word.mp3",
+    "sourceUrl": null,
+    "originalFilename": "gold_word.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "gold",
     "phonemic": "/ɡoʊld/",
-    "representative": null,
-    "audio": {
-      "soundId": 312
-    },
     "tokens": [
       {
         "symbol": "oʊ",
@@ -1672,12 +2078,19 @@
     ]
   },
   {
+    "id": 315,
+    "storageKey": "lang/en/audio/h95/hoed.wav",
+    "sourceUrl": null,
+    "originalFilename": "hoed.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hoed",
     "phonemic": "/hoʊd/",
-    "representative": null,
-    "audio": {
-      "soundId": 313
-    },
     "tokens": [
       {
         "symbol": "oʊ",
@@ -1692,12 +2105,19 @@
     ]
   },
   {
+    "id": 316,
+    "storageKey": "lang/en/audio/ipa/ai.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ai.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "aɪ",
     "phonemic": "/aɪ/",
-    "representative": "aɪ",
-    "audio": {
-      "soundId": 314
-    },
     "tokens": [
       {
         "symbol": "aɪ",
@@ -1712,12 +2132,19 @@
     ]
   },
   {
+    "id": 317,
+    "storageKey": "lang/en/audio/ipa/lime.mp3",
+    "sourceUrl": null,
+    "originalFilename": "lime.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "lime",
     "phonemic": "/laɪm/",
-    "representative": null,
-    "audio": {
-      "soundId": 315
-    },
     "tokens": [
       {
         "symbol": "aɪ",
@@ -1732,12 +2159,19 @@
     ]
   },
   {
+    "id": 318,
+    "storageKey": "lang/en/audio/ipa/au.mp3",
+    "sourceUrl": null,
+    "originalFilename": "au.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "aʊ",
     "phonemic": "/aʊ/",
-    "representative": "aʊ",
-    "audio": {
-      "soundId": 316
-    },
     "tokens": [
       {
         "symbol": "aʊ",
@@ -1752,12 +2186,19 @@
     ]
   },
   {
+    "id": 319,
+    "storageKey": "lang/en/audio/ipa/brown.mp3",
+    "sourceUrl": null,
+    "originalFilename": "brown.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "brown",
     "phonemic": "/braʊn/",
-    "representative": null,
-    "audio": {
-      "soundId": 317
-    },
     "tokens": [
       {
         "symbol": "aʊ",
@@ -1772,12 +2213,19 @@
     ]
   },
   {
+    "id": 320,
+    "storageKey": "lang/en/audio/ipa/oi.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oi.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɔɪ",
     "phonemic": "/ɔɪ/",
-    "representative": "ɔɪ",
-    "audio": {
-      "soundId": 318
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -1792,12 +2240,19 @@
     ]
   },
   {
+    "id": 321,
+    "storageKey": "lang/en/audio/ipa/turquoise.mp3",
+    "sourceUrl": null,
+    "originalFilename": "turquoise.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "turquoise",
     "phonemic": "/ˈtɜːrkwɔɪz/",
-    "representative": null,
-    "audio": {
-      "soundId": 319
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",

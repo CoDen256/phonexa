@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 5ab09a33964e
+Revision ID: 61300f4cfd68
 Revises: 
-Create Date: 2026-10-01 20:54:54.027989
+Create Date: 2026-10-01 22:02:35.672066
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '5ab09a33964e'
+revision: str = '61300f4cfd68'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -32,8 +32,9 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('key')
     )
-    op.create_table('sounds',
+    op.create_table('samples',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('language_id', sa.SmallInteger(), nullable=True),
     sa.Column('storage_key', sa.Text(), nullable=True),
     sa.Column('source_url', sa.Text(), nullable=True),
     sa.Column('original_filename', sa.Text(), nullable=True),
@@ -44,61 +45,28 @@ def upgrade() -> None:
     sa.Column('provenance', sa.Text(), nullable=False),
     sa.Column('leading_silence_ms', sa.Integer(), nullable=True),
     sa.Column('trimmed', sa.Boolean(), nullable=False),
-    sa.Column('analysis_version', sa.Text(), nullable=True),
-    sa.Column('analysis_config', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('manual_f1', sa.Float(), nullable=True),
-    sa.Column('manual_f2', sa.Float(), nullable=True),
-    sa.Column('manual_f0', sa.Float(), nullable=True),
+    sa.Column('text', sa.Text(), nullable=True),
+    sa.Column('phonemic', sa.Text(), nullable=True),
+    sa.Column('sort_order', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.CheckConstraint('storage_key IS NOT NULL OR source_url IS NOT NULL', name='sound_has_a_location'),
+    sa.ForeignKeyConstraint(['language_id'], ['languages.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('storage_key')
     )
-    op.create_table('samples',
+    op.create_table('sample_analyses',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('language_id', sa.SmallInteger(), nullable=False),
-    sa.Column('sound_id', sa.Integer(), nullable=True),
-    sa.Column('text', sa.Text(), nullable=False),
-    sa.Column('phonemic', sa.Text(), nullable=True),
-    sa.Column('representative_symbol', sa.Text(), nullable=True),
-    sa.Column('sort_order', sa.Integer(), nullable=False),
+    sa.Column('sample_id', sa.Integer(), nullable=False),
+    sa.Column('source', sa.Text(), nullable=False),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('version', sa.Text(), nullable=True),
+    sa.Column('config', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('formants', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('pitch', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('manual_f1', sa.Float(), nullable=True),
+    sa.Column('manual_f2', sa.Float(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['language_id'], ['languages.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['sound_id'], ['sounds.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('sound_analysis_frames',
-    sa.Column('sound_id', sa.Integer(), nullable=False),
-    sa.Column('formants', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.Column('pitch', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.ForeignKeyConstraint(['sound_id'], ['sounds.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('sound_id')
-    )
-    op.create_table('vowels',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('language_id', sa.SmallInteger(), nullable=False),
-    sa.Column('symbols', sa.ARRAY(sa.Text()), nullable=False),
-    sa.Column('height', sa.Float(), nullable=False),
-    sa.Column('backness', sa.Float(), nullable=False),
-    sa.Column('type', sa.Text(), nullable=False),
-    sa.Column('rounded', sa.Boolean(), nullable=False),
-    sa.Column('desc', sa.Text(), nullable=True),
-    sa.Column('f1', sa.Float(), nullable=True),
-    sa.Column('f2', sa.Float(), nullable=True),
-    sa.Column('wiki_url', sa.Text(), nullable=True),
-    sa.Column('audio_sound_id', sa.Integer(), nullable=True),
-    sa.Column('target_height', sa.Float(), nullable=True),
-    sa.Column('target_backness', sa.Float(), nullable=True),
-    sa.Column('target_rounded', sa.Boolean(), nullable=True),
-    sa.Column('target_f1', sa.Float(), nullable=True),
-    sa.Column('target_f2', sa.Float(), nullable=True),
-    sa.Column('sort_order', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['audio_sound_id'], ['sounds.id'], ),
-    sa.ForeignKeyConstraint(['language_id'], ['languages.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['sample_id'], ['samples.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('tokens',
@@ -116,15 +84,39 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['sample_id'], ['samples.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('vowels',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('language_id', sa.SmallInteger(), nullable=False),
+    sa.Column('symbols', sa.ARRAY(sa.Text()), nullable=False),
+    sa.Column('height', sa.Float(), nullable=False),
+    sa.Column('backness', sa.Float(), nullable=False),
+    sa.Column('type', sa.Text(), nullable=False),
+    sa.Column('rounded', sa.Boolean(), nullable=False),
+    sa.Column('desc', sa.Text(), nullable=True),
+    sa.Column('f1', sa.Float(), nullable=True),
+    sa.Column('f2', sa.Float(), nullable=True),
+    sa.Column('wiki_url', sa.Text(), nullable=True),
+    sa.Column('representative_sample_id', sa.Integer(), nullable=True),
+    sa.Column('target_height', sa.Float(), nullable=True),
+    sa.Column('target_backness', sa.Float(), nullable=True),
+    sa.Column('target_rounded', sa.Boolean(), nullable=True),
+    sa.Column('target_f1', sa.Float(), nullable=True),
+    sa.Column('target_f2', sa.Float(), nullable=True),
+    sa.Column('sort_order', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['language_id'], ['languages.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['representative_sample_id'], ['samples.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('tokens')
     op.drop_table('vowels')
-    op.drop_table('sound_analysis_frames')
+    op.drop_table('tokens')
+    op.drop_table('sample_analyses')
     op.drop_table('samples')
-    op.drop_table('sounds')
     op.drop_table('languages')
     # ### end Alembic commands ###

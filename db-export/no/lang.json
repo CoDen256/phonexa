@@ -16,8 +16,8 @@
       "desc": "Close front unrounded",
       "f1": 274.0,
       "f2": 2083.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+      "representativeSampleId": 85,
       "target": null
     },
     {
@@ -33,8 +33,8 @@
       "desc": "Near-close near-front unrounded",
       "f1": 272.0,
       "f2": 2090.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
+      "representativeSampleId": 88,
       "target": null
     },
     {
@@ -50,8 +50,8 @@
       "desc": "Close front rounded (protruded)",
       "f1": 231.0,
       "f2": 2091.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
+      "representativeSampleId": 91,
       "target": null
     },
     {
@@ -67,8 +67,8 @@
       "desc": "Near-close near-front rounded (protruded)",
       "f1": 270.0,
       "f2": 1810.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
+      "representativeSampleId": 93,
       "target": null
     },
     {
@@ -84,8 +84,8 @@
       "desc": "Close central rounded",
       "f1": 239.0,
       "f2": 1509.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
+      "representativeSampleId": 99,
       "target": null
     },
     {
@@ -101,8 +101,8 @@
       "desc": "Close central rounded",
       "f1": 266.0,
       "f2": 1337.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
+      "representativeSampleId": 102,
       "target": null
     },
     {
@@ -118,8 +118,8 @@
       "desc": "Close back rounded",
       "f1": 250.0,
       "f2": 567.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
+      "representativeSampleId": 108,
       "target": null
     },
     {
@@ -135,8 +135,8 @@
       "desc": "Near-close near-back rounded",
       "f1": 287.0,
       "f2": 685.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
+      "representativeSampleId": 111,
       "target": null
     },
     {
@@ -152,8 +152,8 @@
       "desc": "Close-mid front unrounded",
       "f1": 376.0,
       "f2": 2006.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
+      "representativeSampleId": 119,
       "target": null
     },
     {
@@ -169,8 +169,8 @@
       "desc": "Open-mid front unrounded",
       "f1": 465.0,
       "f2": 1730.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "representativeSampleId": 121,
       "target": null
     },
     {
@@ -186,8 +186,8 @@
       "desc": "Close-mid front rounded",
       "f1": 337.0,
       "f2": 1254.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
+      "representativeSampleId": 125,
       "target": null
     },
     {
@@ -203,8 +203,8 @@
       "desc": "Close-mid central unrounded",
       "f1": null,
       "f2": null,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
+      "representativeSampleId": 127,
       "target": null
     },
     {
@@ -220,8 +220,8 @@
       "desc": "Open-mid front rounded",
       "f1": 400.0,
       "f2": 1326.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
+      "representativeSampleId": 130,
       "target": null
     },
     {
@@ -237,8 +237,8 @@
       "desc": "Mid central (Schwa)",
       "f1": 433.0,
       "f2": 1334.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
+      "representativeSampleId": 135,
       "target": null
     },
     {
@@ -254,8 +254,8 @@
       "desc": "Close-mid back rounded",
       "f1": 341.0,
       "f2": 671.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
+      "representativeSampleId": 140,
       "target": null
     },
     {
@@ -271,8 +271,8 @@
       "desc": "Open-mid back rounded",
       "f1": 360.0,
       "f2": 778.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
+      "representativeSampleId": 142,
       "target": null
     },
     {
@@ -288,8 +288,8 @@
       "desc": "Open back unrounded",
       "f1": 602.0,
       "f2": 1000.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "representativeSampleId": 150,
       "target": null
     },
     {
@@ -305,8 +305,8 @@
       "desc": "Open back unrounded",
       "f1": 620.0,
       "f2": 924.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "representativeSampleId": 155,
       "target": null
     },
     {
@@ -322,8 +322,8 @@
       "desc": "Near-open front unrounded",
       "f1": 695.0,
       "f2": 1353.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "representativeSampleId": 158,
       "target": null
     },
     {
@@ -339,8 +339,8 @@
       "desc": "Near-open front unrounded",
       "f1": 778.0,
       "f2": 1360.0,
-      "audio": null,
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "representativeSampleId": 163,
       "target": null
     },
     {
@@ -356,8 +356,8 @@
       "desc": "Diphtong æ (○ unrounded) → ʉ (⊙ rounded)",
       "f1": null,
       "f2": null,
-      "audio": null,
       "wikiUrl": "",
+      "representativeSampleId": 168,
       "target": {
         "heightBackness": [
           0.165,
@@ -381,8 +381,8 @@
       "desc": "Diphtong æ (○ unrounded) → ɪ (○ unrounded)",
       "f1": null,
       "f2": null,
-      "audio": null,
       "wikiUrl": "",
+      "representativeSampleId": 171,
       "target": {
         "heightBackness": [
           0.167,
@@ -406,8 +406,8 @@
       "desc": "Diphtong œ (⊙ rounded) → ʏ (⊙ rounded)",
       "f1": null,
       "f2": null,
-      "audio": null,
       "wikiUrl": "",
+      "representativeSampleId": 174,
       "target": {
         "heightBackness": [
           0.167,

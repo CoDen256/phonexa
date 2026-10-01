@@ -16,10 +16,8 @@
       "desc": "Close front unrounded",
       "f1": 240.0,
       "f2": 2400.0,
-      "audio": {
-        "soundId": 186
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+      "representativeSampleId": 187,
       "target": null
     },
     {
@@ -35,10 +33,8 @@
       "desc": "Near-close near-front unrounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 187
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
+      "representativeSampleId": 188,
       "target": null
     },
     {
@@ -54,10 +50,8 @@
       "desc": "Close front rounded",
       "f1": 235.0,
       "f2": 2100.0,
-      "audio": {
-        "soundId": 188
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
+      "representativeSampleId": 189,
       "target": null
     },
     {
@@ -73,10 +67,8 @@
       "desc": "Near-close near-front rounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 189
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
+      "representativeSampleId": 190,
       "target": null
     },
     {
@@ -92,10 +84,8 @@
       "desc": "Near-close near-back rounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 190
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
+      "representativeSampleId": 191,
       "target": null
     },
     {
@@ -111,10 +101,8 @@
       "desc": "Close central unrounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 191
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
+      "representativeSampleId": 192,
       "target": null
     },
     {
@@ -130,10 +118,8 @@
       "desc": "Close central rounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 192
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
+      "representativeSampleId": 193,
       "target": null
     },
     {
@@ -149,10 +135,8 @@
       "desc": "Close back unrounded",
       "f1": 300.0,
       "f2": 1390.0,
-      "audio": {
-        "soundId": 193
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_unrounded_vowel",
+      "representativeSampleId": 194,
       "target": null
     },
     {
@@ -168,10 +152,8 @@
       "desc": "Close back rounded",
       "f1": 250.0,
       "f2": 595.0,
-      "audio": {
-        "soundId": 194
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
+      "representativeSampleId": 195,
       "target": null
     },
     {
@@ -187,10 +169,8 @@
       "desc": "Close-mid front unrounded",
       "f1": 390.0,
       "f2": 2300.0,
-      "audio": {
-        "soundId": 195
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
+      "representativeSampleId": 196,
       "target": null
     },
     {
@@ -206,10 +186,8 @@
       "desc": "Close-mid front rounded",
       "f1": 370.0,
       "f2": 1900.0,
-      "audio": {
-        "soundId": 196
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
+      "representativeSampleId": 197,
       "target": null
     },
     {
@@ -225,10 +203,8 @@
       "desc": "Close-mid central unrounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 197
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
+      "representativeSampleId": 198,
       "target": null
     },
     {
@@ -244,10 +220,8 @@
       "desc": "Close-mid central rounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 198
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_rounded_vowel",
+      "representativeSampleId": 199,
       "target": null
     },
     {
@@ -263,10 +237,8 @@
       "desc": "Close-mid back unrounded",
       "f1": 460.0,
       "f2": 1310.0,
-      "audio": {
-        "soundId": 199
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_unrounded_vowel",
+      "representativeSampleId": 200,
       "target": null
     },
     {
@@ -282,10 +254,8 @@
       "desc": "Close-mid back rounded",
       "f1": 360.0,
       "f2": 640.0,
-      "audio": {
-        "soundId": 200
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
+      "representativeSampleId": 201,
       "target": null
     },
     {
@@ -301,10 +271,8 @@
       "desc": "Mid front unrounded ɛ̝",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 201
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_front_unrounded_vowel",
+      "representativeSampleId": 202,
       "target": null
     },
     {
@@ -320,10 +288,8 @@
       "desc": "Mid front rounded œ̝",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 202
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_front_rounded_vowel",
+      "representativeSampleId": 203,
       "target": null
     },
     {
@@ -339,10 +305,8 @@
       "desc": "Mid central",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 203
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
+      "representativeSampleId": 204,
       "target": null
     },
     {
@@ -358,10 +322,8 @@
       "desc": "Mid back unrounded ʌ̝",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 204
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_unrounded_vowel",
+      "representativeSampleId": 205,
       "target": null
     },
     {
@@ -377,10 +339,8 @@
       "desc": "Mid back rounded ɔ̝",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 205
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
+      "representativeSampleId": 206,
       "target": null
     },
     {
@@ -396,10 +356,8 @@
       "desc": "Open-mid front unrounded",
       "f1": 610.0,
       "f2": 1900.0,
-      "audio": {
-        "soundId": 206
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "representativeSampleId": 207,
       "target": null
     },
     {
@@ -415,10 +373,8 @@
       "desc": "Open-mid front rounded",
       "f1": 585.0,
       "f2": 1710.0,
-      "audio": {
-        "soundId": 207
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
+      "representativeSampleId": 208,
       "target": null
     },
     {
@@ -434,10 +390,8 @@
       "desc": "Open-mid central unrounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 208
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_unrounded_vowel",
+      "representativeSampleId": 209,
       "target": null
     },
     {
@@ -453,10 +407,8 @@
       "desc": "Open-mid central rounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 209
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_rounded_vowel",
+      "representativeSampleId": 210,
       "target": null
     },
     {
@@ -472,10 +424,8 @@
       "desc": "Open-mid back unrounded",
       "f1": 600.0,
       "f2": 1170.0,
-      "audio": {
-        "soundId": 210
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_unrounded_vowel",
+      "representativeSampleId": 211,
       "target": null
     },
     {
@@ -491,10 +441,8 @@
       "desc": "Open-mid back rounded",
       "f1": 500.0,
       "f2": 700.0,
-      "audio": {
-        "soundId": 211
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
+      "representativeSampleId": 212,
       "target": null
     },
     {
@@ -510,10 +458,8 @@
       "desc": "Near-open front unrounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 212
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "representativeSampleId": 213,
       "target": null
     },
     {
@@ -529,10 +475,8 @@
       "desc": "Near-open central",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 213
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_central_vowel",
+      "representativeSampleId": 214,
       "target": null
     },
     {
@@ -548,10 +492,8 @@
       "desc": "Open front unrounded",
       "f1": 850.0,
       "f2": 1610.0,
-      "audio": {
-        "soundId": 214
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
+      "representativeSampleId": 215,
       "target": null
     },
     {
@@ -567,10 +509,8 @@
       "desc": "Open front rounded",
       "f1": 820.0,
       "f2": 1530.0,
-      "audio": {
-        "soundId": 215
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_rounded_vowel",
+      "representativeSampleId": 216,
       "target": null
     },
     {
@@ -586,10 +526,8 @@
       "desc": "Open central unrounded",
       "f1": null,
       "f2": null,
-      "audio": {
-        "soundId": 216
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_central_unrounded_vowel",
+      "representativeSampleId": 217,
       "target": null
     },
     {
@@ -605,10 +543,8 @@
       "desc": "Open back unrounded",
       "f1": 750.0,
       "f2": 940.0,
-      "audio": {
-        "soundId": 217
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "representativeSampleId": 218,
       "target": null
     },
     {
@@ -624,10 +560,8 @@
       "desc": "Open back rounded",
       "f1": 700.0,
       "f2": 760.0,
-      "audio": {
-        "soundId": 218
-      },
       "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_rounded_vowel",
+      "representativeSampleId": 219,
       "target": null
     }
   ]

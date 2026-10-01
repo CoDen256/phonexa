@@ -1,11 +1,18 @@
 [
   {
+    "id": 85,
+    "storageKey": "lang/no/audio/auto/i_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "i_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "iː",
     "phonemic": "/iː/",
-    "representative": "iː",
-    "audio": {
-      "soundId": 84
-    },
     "tokens": [
       {
         "symbol": "iː",
@@ -36,12 +43,19 @@
     ]
   },
   {
+    "id": 86,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/No-de.ogg/No-de.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "de",
     "phonemic": "/deː/",
-    "representative": null,
-    "audio": {
-      "soundId": 85
-    },
     "tokens": [
       {
         "symbol": "iː",
@@ -72,12 +86,19 @@
     ]
   },
   {
+    "id": 87,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/36/LL-Q9043_%28nor%29-Telaneo-skive.wav/LL-Q9043_%28nor%29-Telaneo-skive.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skive",
     "phonemic": "/ˈʃiːvə/",
-    "representative": null,
-    "audio": {
-      "soundId": 86
-    },
     "tokens": [
       {
         "symbol": "iː",
@@ -108,12 +129,19 @@
     ]
   },
   {
+    "id": 88,
+    "storageKey": "lang/no/audio/mjolnir/i/i_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "i_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɪ",
     "phonemic": "/ɪ/",
-    "representative": "ɪ",
-    "audio": {
-      "soundId": 87
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -144,12 +172,19 @@
     ]
   },
   {
+    "id": 89,
+    "storageKey": "lang/no/audio/mjolnir/i/ikke.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ikke.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ikke",
     "phonemic": "/ˈɪkə/",
-    "representative": null,
-    "audio": {
-      "soundId": 88
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -180,12 +215,19 @@
     ]
   },
   {
+    "id": 90,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/LL-Q9043_%28nor%29-Telaneo-skille.wav/LL-Q9043_%28nor%29-Telaneo-skille.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skille",
     "phonemic": "/ˈʃɪlə/",
-    "representative": null,
-    "audio": {
-      "soundId": 89
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -216,12 +258,19 @@
     ]
   },
   {
+    "id": 91,
+    "storageKey": "lang/no/audio/auto/y_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "y_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "yː",
     "phonemic": "/yː/",
-    "representative": "yː",
-    "audio": {
-      "soundId": 90
-    },
     "tokens": [
       {
         "symbol": "yː",
@@ -252,12 +301,19 @@
     ]
   },
   {
+    "id": 92,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/50/LL-Q9043_%28nor%29-Telaneo-sky.wav/LL-Q9043_%28nor%29-Telaneo-sky.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "sky",
     "phonemic": "/ʃyː/",
-    "representative": null,
-    "audio": {
-      "soundId": 91
-    },
     "tokens": [
       {
         "symbol": "yː",
@@ -288,12 +344,19 @@
     ]
   },
   {
+    "id": 93,
+    "storageKey": "lang/no/audio/mjolnir/y/y_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "y_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʏ",
     "phonemic": "/ʏ/",
-    "representative": "ʏ",
-    "audio": {
-      "soundId": 92
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -324,12 +387,19 @@
     ]
   },
   {
+    "id": 94,
+    "storageKey": "lang/no/audio/mjolnir/y/unnskyld.mp3",
+    "sourceUrl": null,
+    "originalFilename": "unnskyld.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "unnskyld",
     "phonemic": "/ˈʉnʃʏl/",
-    "representative": null,
-    "audio": {
-      "soundId": 93
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -360,12 +430,19 @@
     ]
   },
   {
+    "id": 95,
+    "storageKey": "lang/no/audio/mjolnir/y/nytt.mp3",
+    "sourceUrl": null,
+    "originalFilename": "nytt.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "nytt",
     "phonemic": "/nʏtː/",
-    "representative": null,
-    "audio": {
-      "soundId": 94
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -396,12 +473,19 @@
     ]
   },
   {
+    "id": 96,
+    "storageKey": "lang/no/audio/dict/yndi.mp3",
+    "sourceUrl": null,
+    "originalFilename": "yndi.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "yndi",
     "phonemic": "/ˈʏndɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 95
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -416,12 +500,19 @@
     ]
   },
   {
+    "id": 97,
+    "storageKey": null,
+    "sourceUrl": "lang/no/audio/yndi.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "yndi",
     "phonemic": "/ˈʏndɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 96
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -436,12 +527,19 @@
     ]
   },
   {
+    "id": 98,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/LL-Q9043_%28nor%29-Telaneo-skydd.wav/LL-Q9043_%28nor%29-Telaneo-skydd.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skydd",
     "phonemic": "/ʃʏdː/",
-    "representative": null,
-    "audio": {
-      "soundId": 97
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -456,12 +554,19 @@
     ]
   },
   {
+    "id": 99,
+    "storageKey": "lang/no/audio/auto/u_bar_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "u_bar_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʉː",
     "phonemic": "/ʉː/",
-    "representative": "ʉː",
-    "audio": {
-      "soundId": 98
-    },
     "tokens": [
       {
         "symbol": "ʉː",
@@ -492,12 +597,19 @@
     ]
   },
   {
+    "id": 100,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b2/LL-Q9043_%28nor%29-Telaneo-sju.wav/LL-Q9043_%28nor%29-Telaneo-sju.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "sju",
     "phonemic": "/ʃʉː/",
-    "representative": null,
-    "audio": {
-      "soundId": 99
-    },
     "tokens": [
       {
         "symbol": "ʉː",
@@ -528,12 +640,19 @@
     ]
   },
   {
+    "id": 101,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/Nb-ajourf%C3%B8re.ogg/Nb-ajourf%C3%B8re.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ajourføre",
     "phonemic": "/aˈʒʉːrføːrə/",
-    "representative": null,
-    "audio": {
-      "soundId": 100
-    },
     "tokens": [
       {
         "symbol": "ʉː",
@@ -548,12 +667,19 @@
     ]
   },
   {
+    "id": 102,
+    "storageKey": "lang/no/audio/mjolnir/ue/ue_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ue_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʉ",
     "phonemic": "/ʉ/",
-    "representative": "ʉ",
-    "audio": {
-      "soundId": 101
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -584,12 +710,19 @@
     ]
   },
   {
+    "id": 103,
+    "storageKey": "lang/no/audio/mjolnir/ue/hun.mp3",
+    "sourceUrl": null,
+    "originalFilename": "hun.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hun",
     "phonemic": "/hʉn/",
-    "representative": null,
-    "audio": {
-      "soundId": 102
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -604,12 +737,19 @@
     ]
   },
   {
+    "id": 104,
+    "storageKey": "lang/no/audio/mjolnir/ue/kunne.mp3",
+    "sourceUrl": null,
+    "originalFilename": "kunne.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "kunne",
     "phonemic": "/ˈkʉnə/",
-    "representative": null,
-    "audio": {
-      "soundId": 103
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -624,12 +764,19 @@
     ]
   },
   {
+    "id": 105,
+    "storageKey": "lang/no/audio/mjolnir/ue/unnskyld.mp3",
+    "sourceUrl": null,
+    "originalFilename": "unnskyld.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "unnskyld",
     "phonemic": "/ˈʉnʃʏl/",
-    "representative": null,
-    "audio": {
-      "soundId": 104
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -644,12 +791,19 @@
     ]
   },
   {
+    "id": 106,
+    "storageKey": "lang/no/audio/dict/ull.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ull.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ull",
     "phonemic": "/ʉlː/",
-    "representative": null,
-    "audio": {
-      "soundId": 105
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -664,12 +818,19 @@
     ]
   },
   {
+    "id": 107,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/LL-Q9043_%28nor%29-Telaneo-skuffe.wav/LL-Q9043_%28nor%29-Telaneo-skuffe.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skuffe",
     "phonemic": "/ˈskʉfə/",
-    "representative": null,
-    "audio": {
-      "soundId": 106
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -684,12 +845,19 @@
     ]
   },
   {
+    "id": 108,
+    "storageKey": "lang/no/audio/auto/u_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "u_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "uː",
     "phonemic": "/uː/",
-    "representative": "uː",
-    "audio": {
-      "soundId": 107
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -720,12 +888,19 @@
     ]
   },
   {
+    "id": 109,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/01/LL-Q9043_%28nor%29-Telaneo-skog.wav/LL-Q9043_%28nor%29-Telaneo-skog.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skog",
     "phonemic": "/skuːɡ/",
-    "representative": null,
-    "audio": {
-      "soundId": 108
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -756,12 +931,19 @@
     ]
   },
   {
+    "id": 110,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "for",
     "phonemic": "/fɔr/",
-    "representative": null,
-    "audio": {
-      "soundId": 109
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -792,12 +974,19 @@
     ]
   },
   {
+    "id": 111,
+    "storageKey": "lang/no/audio/mjolnir/u/u_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "u_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʊ",
     "phonemic": "/ʊ/",
-    "representative": "ʊ",
-    "audio": {
-      "soundId": 110
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -828,12 +1017,19 @@
     ]
   },
   {
+    "id": 112,
+    "storageKey": "lang/no/audio/mjolnir/u/sukker.mp3",
+    "sourceUrl": null,
+    "originalFilename": "sukker.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "sukker",
     "phonemic": "/ˈsʊkər/",
-    "representative": null,
-    "audio": {
-      "soundId": 111
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -864,12 +1060,19 @@
     ]
   },
   {
+    "id": 113,
+    "storageKey": "lang/no/audio/mjolnir/u/hvor.mp3",
+    "sourceUrl": null,
+    "originalFilename": "hvor.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hvor",
     "phonemic": "/vʊr/",
-    "representative": null,
-    "audio": {
-      "soundId": 112
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -900,12 +1103,19 @@
     ]
   },
   {
+    "id": 114,
+    "storageKey": "lang/no/audio/mjolnir/u/rom.mp3",
+    "sourceUrl": null,
+    "originalFilename": "rom.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "rom",
     "phonemic": "/rʊm/",
-    "representative": null,
-    "audio": {
-      "soundId": 113
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -920,12 +1130,19 @@
     ]
   },
   {
+    "id": 115,
+    "storageKey": "lang/no/audio/mjolnir/u/bukk.mp3",
+    "sourceUrl": null,
+    "originalFilename": "bukk.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bukk",
     "phonemic": "/bʊkː/",
-    "representative": null,
-    "audio": {
-      "soundId": 114
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -940,12 +1157,19 @@
     ]
   },
   {
+    "id": 116,
+    "storageKey": "lang/no/audio/mjolnir/u/fordi.mp3",
+    "sourceUrl": null,
+    "originalFilename": "fordi.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "fordi",
     "phonemic": "/fʊrˈdiː/",
-    "representative": null,
-    "audio": {
-      "soundId": 115
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -960,12 +1184,19 @@
     ]
   },
   {
+    "id": 117,
+    "storageKey": "lang/no/audio/dict/loff.mp3",
+    "sourceUrl": null,
+    "originalFilename": "loff.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "loff",
     "phonemic": "/lɔfː/",
-    "representative": null,
-    "audio": {
-      "soundId": 116
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -980,12 +1211,19 @@
     ]
   },
   {
+    "id": 118,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/No-journal.ogg/No-journal.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "journal",
     "phonemic": "/ʒʊrˈnɑːl/",
-    "representative": null,
-    "audio": {
-      "soundId": 117
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1000,12 +1238,19 @@
     ]
   },
   {
+    "id": 119,
+    "storageKey": "lang/no/audio/auto/e_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "e_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "eː",
     "phonemic": "/eː/",
-    "representative": "eː",
-    "audio": {
-      "soundId": 118
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -1036,12 +1281,19 @@
     ]
   },
   {
+    "id": 120,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/LL-Q9043_%28nor%29-Telaneo-skje.wav/LL-Q9043_%28nor%29-Telaneo-skje.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skje",
     "phonemic": "/ʃeː/",
-    "representative": null,
-    "audio": {
-      "soundId": 119
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -1072,12 +1324,19 @@
     ]
   },
   {
+    "id": 121,
+    "storageKey": "lang/no/audio/mjolnir/e/e_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "e_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
-    "representative": "ɛ",
-    "audio": {
-      "soundId": 120
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1108,12 +1367,19 @@
     ]
   },
   {
+    "id": 122,
+    "storageKey": "lang/no/audio/mjolnir/e/etter.mp3",
+    "sourceUrl": null,
+    "originalFilename": "etter.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "etter",
     "phonemic": "/ˈɛtər/",
-    "representative": null,
-    "audio": {
-      "soundId": 121
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1144,12 +1410,19 @@
     ]
   },
   {
+    "id": 123,
+    "storageKey": "lang/no/audio/mjolnir/e/menn.mp3",
+    "sourceUrl": null,
+    "originalFilename": "menn.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "menn",
     "phonemic": "/mɛnː/",
-    "representative": null,
-    "audio": {
-      "soundId": 122
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1180,12 +1453,19 @@
     ]
   },
   {
+    "id": 124,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/LL-Q9043_%28nor%29-Telaneo-skjell.wav/LL-Q9043_%28nor%29-Telaneo-skjell.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skjell",
     "phonemic": "/ʃɛlː/",
-    "representative": null,
-    "audio": {
-      "soundId": 123
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1200,12 +1480,19 @@
     ]
   },
   {
+    "id": 125,
+    "storageKey": "lang/no/audio/auto/oe_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oe_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "øː",
     "phonemic": "/øː/",
-    "representative": "øː",
-    "audio": {
-      "soundId": 124
-    },
     "tokens": [
       {
         "symbol": "øː",
@@ -1236,12 +1523,19 @@
     ]
   },
   {
+    "id": 126,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1b/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "sjø",
     "phonemic": "/ʃøː/",
-    "representative": null,
-    "audio": {
-      "soundId": 125
-    },
     "tokens": [
       {
         "symbol": "øː",
@@ -1272,12 +1566,19 @@
     ]
   },
   {
+    "id": 127,
+    "storageKey": "lang/no/audio/mjolnir/er/er.mp3",
+    "sourceUrl": null,
+    "originalFilename": "er.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɘ",
     "phonemic": "/ɘ/",
-    "representative": "ɘ",
-    "audio": {
-      "soundId": 126
-    },
     "tokens": [
       {
         "symbol": "ɘ",
@@ -1308,12 +1609,19 @@
     ]
   },
   {
+    "id": 128,
+    "storageKey": "lang/no/audio/mjolnir/er/jenter.mp3",
+    "sourceUrl": null,
+    "originalFilename": "jenter.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "jenter",
     "phonemic": "/ˈjɛntər/",
-    "representative": null,
-    "audio": {
-      "soundId": 127
-    },
     "tokens": [
       {
         "symbol": "ɘ",
@@ -1328,12 +1636,19 @@
     ]
   },
   {
+    "id": 129,
+    "storageKey": "lang/no/audio/mjolnir/er/skriver.mp3",
+    "sourceUrl": null,
+    "originalFilename": "skriver.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skriver",
     "phonemic": "/ˈskriːvər/",
-    "representative": null,
-    "audio": {
-      "soundId": 128
-    },
     "tokens": [
       {
         "symbol": "ɘ",
@@ -1348,12 +1663,19 @@
     ]
   },
   {
+    "id": 130,
+    "storageKey": "lang/no/audio/mjolnir/oe/oe_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oe_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "œ",
     "phonemic": "/œ/",
-    "representative": "œ",
-    "audio": {
-      "soundId": 129
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -1384,12 +1706,19 @@
     ]
   },
   {
+    "id": 131,
+    "storageKey": "lang/no/audio/mjolnir/oe/foedt.mp3",
+    "sourceUrl": null,
+    "originalFilename": "foedt.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "født",
     "phonemic": "/føtː/",
-    "representative": null,
-    "audio": {
-      "soundId": 130
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -1404,12 +1733,19 @@
     ]
   },
   {
+    "id": 132,
+    "storageKey": "lang/no/audio/mjolnir/oe/skjoenner.mp3",
+    "sourceUrl": null,
+    "originalFilename": "skjoenner.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skjønner",
     "phonemic": "/ˈʃœnər/",
-    "representative": null,
-    "audio": {
-      "soundId": 131
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -1424,12 +1760,19 @@
     ]
   },
   {
+    "id": 133,
+    "storageKey": "lang/no/audio/dict/oest.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oest.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "øst",
     "phonemic": "/œst/",
-    "representative": null,
-    "audio": {
-      "soundId": 132
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -1444,12 +1787,19 @@
     ]
   },
   {
+    "id": 134,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5e/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skjønne",
     "phonemic": "/ˈʃœnə/",
-    "representative": null,
-    "audio": {
-      "soundId": 133
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -1464,12 +1814,19 @@
     ]
   },
   {
+    "id": 135,
+    "storageKey": "lang/no/audio/mjolnir/schwa/schwa.mp3",
+    "sourceUrl": null,
+    "originalFilename": "schwa.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ə",
     "phonemic": "/ə/",
-    "representative": "ə",
-    "audio": {
-      "soundId": 134
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1500,12 +1857,19 @@
     ]
   },
   {
+    "id": 136,
+    "storageKey": "lang/no/audio/mjolnir/schwa/bare.mp3",
+    "sourceUrl": null,
+    "originalFilename": "bare.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bare",
     "phonemic": "/ˈbɑːrə/",
-    "representative": null,
-    "audio": {
-      "soundId": 135
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1520,12 +1884,19 @@
     ]
   },
   {
+    "id": 137,
+    "storageKey": "lang/no/audio/mjolnir/schwa/dette.mp3",
+    "sourceUrl": null,
+    "originalFilename": "dette.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "dette",
     "phonemic": "/ˈdɛtə/",
-    "representative": null,
-    "audio": {
-      "soundId": 136
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1540,12 +1911,19 @@
     ]
   },
   {
+    "id": 138,
+    "storageKey": "lang/no/audio/dict/krysse.mp3",
+    "sourceUrl": null,
+    "originalFilename": "krysse.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "krysse",
     "phonemic": "/ˈkrʏsə/",
-    "representative": null,
-    "audio": {
-      "soundId": 137
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1560,12 +1938,19 @@
     ]
   },
   {
+    "id": 139,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/LL-Q9043_%28nor%29-Telaneo-berike.wav/LL-Q9043_%28nor%29-Telaneo-berike.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "berike",
     "phonemic": "/bəˈriːkə/",
-    "representative": null,
-    "audio": {
-      "soundId": 138
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1580,12 +1965,19 @@
     ]
   },
   {
+    "id": 140,
+    "storageKey": "lang/no/audio/auto/o_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "o_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "oː",
     "phonemic": "/oː/",
-    "representative": "oː",
-    "audio": {
-      "soundId": 139
-    },
     "tokens": [
       {
         "symbol": "oː",
@@ -1616,12 +2008,19 @@
     ]
   },
   {
+    "id": 141,
+    "storageKey": null,
+    "sourceUrl": "/lang/no/audio/slaa.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "slå",
     "phonemic": "/sloː/",
-    "representative": null,
-    "audio": {
-      "soundId": 140
-    },
     "tokens": [
       {
         "symbol": "oː",
@@ -1652,12 +2051,19 @@
     ]
   },
   {
+    "id": 142,
+    "storageKey": "lang/no/audio/mjolnir/o/o_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "o_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɔ",
     "phonemic": "/ɔ/",
-    "representative": "ɔ",
-    "audio": {
-      "soundId": 141
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1688,12 +2094,19 @@
     ]
   },
   {
+    "id": 143,
+    "storageKey": "lang/no/audio/mjolnir/o/for.mp3",
+    "sourceUrl": null,
+    "originalFilename": "for.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "for",
     "phonemic": "/fɔr/",
-    "representative": null,
-    "audio": {
-      "soundId": 142
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1724,12 +2137,19 @@
     ]
   },
   {
+    "id": 144,
+    "storageKey": "lang/no/audio/mjolnir/o/som.mp3",
+    "sourceUrl": null,
+    "originalFilename": "som.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "som",
     "phonemic": "/sɔm/",
-    "representative": null,
-    "audio": {
-      "soundId": 143
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1760,12 +2180,19 @@
     ]
   },
   {
+    "id": 145,
+    "storageKey": "lang/no/audio/mjolnir/o/jobb.mp3",
+    "sourceUrl": null,
+    "originalFilename": "jobb.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "jobb",
     "phonemic": "/jɔbː/",
-    "representative": null,
-    "audio": {
-      "soundId": 144
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1780,12 +2207,19 @@
     ]
   },
   {
+    "id": 146,
+    "storageKey": "lang/no/audio/mjolnir/o/aatte.mp3",
+    "sourceUrl": null,
+    "originalFilename": "aatte.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "åtte",
     "phonemic": "/ˈɔtə/",
-    "representative": null,
-    "audio": {
-      "soundId": 145
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1800,12 +2234,19 @@
     ]
   },
   {
+    "id": 147,
+    "storageKey": "lang/no/audio/dict/og.mp3",
+    "sourceUrl": null,
+    "originalFilename": "og.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "og",
     "phonemic": "/ɔɡ/",
-    "representative": null,
-    "audio": {
-      "soundId": 146
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1836,12 +2277,19 @@
     ]
   },
   {
+    "id": 148,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2d/LL-Q9043_%28nor%29-Telaneo-skjold.wav/LL-Q9043_%28nor%29-Telaneo-skjold.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "skjold",
     "phonemic": "/ʃɔlː/",
-    "representative": null,
-    "audio": {
-      "soundId": 147
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1856,12 +2304,19 @@
     ]
   },
   {
+    "id": 149,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "slåss",
     "phonemic": "/sloːsː/",
-    "representative": null,
-    "audio": {
-      "soundId": 148
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1876,12 +2331,19 @@
     ]
   },
   {
+    "id": 150,
+    "storageKey": "lang/no/audio/mjolnir/a/a_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "a_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɑ",
     "phonemic": "/ɑ/",
-    "representative": "ɑ",
-    "audio": {
-      "soundId": 149
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1912,12 +2374,19 @@
     ]
   },
   {
+    "id": 151,
+    "storageKey": "lang/no/audio/mjolnir/a/alle.mp3",
+    "sourceUrl": null,
+    "originalFilename": "alle.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "alle",
     "phonemic": "/ˈɑlə/",
-    "representative": null,
-    "audio": {
-      "soundId": 150
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1948,12 +2417,19 @@
     ]
   },
   {
+    "id": 152,
+    "storageKey": "lang/no/audio/dict/av.mp3",
+    "sourceUrl": null,
+    "originalFilename": "av.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "av",
     "phonemic": "/ɑv/",
-    "representative": null,
-    "audio": {
-      "soundId": 151
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1968,12 +2444,19 @@
     ]
   },
   {
+    "id": 153,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/38/LL-Q9043_%28nor%29-Telaneo-hagle.wav/LL-Q9043_%28nor%29-Telaneo-hagle.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hagle",
     "phonemic": "/ˈhɑːɡlə/",
-    "representative": null,
-    "audio": {
-      "soundId": 152
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1988,12 +2471,19 @@
     ]
   },
   {
+    "id": 154,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "pensjonist",
     "phonemic": "/pɑŋʃʊˈnist/",
-    "representative": null,
-    "audio": {
-      "soundId": 153
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -2008,12 +2498,19 @@
     ]
   },
   {
+    "id": 155,
+    "storageKey": "lang/no/audio/auto/a_back_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "a_back_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɑː",
     "phonemic": "/ɑː/",
-    "representative": "ɑː",
-    "audio": {
-      "soundId": 154
-    },
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2044,12 +2541,19 @@
     ]
   },
   {
+    "id": 156,
+    "storageKey": "lang/no/audio/mjolnir/a/dag.mp3",
+    "sourceUrl": null,
+    "originalFilename": "dag.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "dag",
     "phonemic": "/dɑːɡ/",
-    "representative": null,
-    "audio": {
-      "soundId": 155
-    },
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2080,12 +2584,19 @@
     ]
   },
   {
+    "id": 157,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/LL-Q9043_%28nor%29-Telaneo-hale.wav/LL-Q9043_%28nor%29-Telaneo-hale.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hale",
     "phonemic": "/ˈhɑːlə/",
-    "representative": null,
-    "audio": {
-      "soundId": 156
-    },
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2100,12 +2611,19 @@
     ]
   },
   {
+    "id": 158,
+    "storageKey": "lang/no/audio/mjolnir/ae/ae_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ae_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "æ",
     "phonemic": "/æ/",
-    "representative": "æ",
-    "audio": {
-      "soundId": 157
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -2136,12 +2654,19 @@
     ]
   },
   {
+    "id": 159,
+    "storageKey": "lang/no/audio/mjolnir/ae/vaert.mp3",
+    "sourceUrl": null,
+    "originalFilename": "vaert.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "vært",
     "phonemic": "/væːrt/",
-    "representative": null,
-    "audio": {
-      "soundId": 158
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -2172,12 +2697,19 @@
     ]
   },
   {
+    "id": 160,
+    "storageKey": "lang/no/audio/dict/aesj.mp3",
+    "sourceUrl": null,
+    "originalFilename": "aesj.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "æsj",
     "phonemic": "/æʃ/",
-    "representative": null,
-    "audio": {
-      "soundId": 159
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -2192,12 +2724,19 @@
     ]
   },
   {
+    "id": 161,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/LL-Q9043_%28nor%29-Telaneo-kjerring.wav/LL-Q9043_%28nor%29-Telaneo-kjerring.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "kjerring",
     "phonemic": "/ˈçæːrɪŋ/",
-    "representative": null,
-    "audio": {
-      "soundId": 160
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -2212,12 +2751,19 @@
     ]
   },
   {
+    "id": 162,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Telaneo-krasj.wav/LL-Q9043_%28nor%29-Telaneo-krasj.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "krasj",
     "phonemic": "/kræʃ/",
-    "representative": null,
-    "audio": {
-      "soundId": 161
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -2232,12 +2778,19 @@
     ]
   },
   {
+    "id": 163,
+    "storageKey": "lang/no/audio/mjolnir/ae/ae_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ae_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "æː",
     "phonemic": "/æː/",
-    "representative": "æː",
-    "audio": {
-      "soundId": 162
-    },
     "tokens": [
       {
         "symbol": "æː",
@@ -2268,12 +2821,19 @@
     ]
   },
   {
+    "id": 164,
+    "storageKey": null,
+    "sourceUrl": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "æː",
     "phonemic": "/æː/",
-    "representative": null,
-    "audio": {
-      "soundId": 163
-    },
     "tokens": [
       {
         "symbol": "æː",
@@ -2288,12 +2848,19 @@
     ]
   },
   {
+    "id": 165,
+    "storageKey": "lang/no/audio/mjolnir/ae/laerer.mp3",
+    "sourceUrl": null,
+    "originalFilename": "laerer.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "lærer",
     "phonemic": "/ˈlæːrər/",
-    "representative": null,
-    "audio": {
-      "soundId": 164
-    },
     "tokens": [
       {
         "symbol": "æː",
@@ -2324,12 +2891,19 @@
     ]
   },
   {
+    "id": 166,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Nb-kjerning.ogg/Nb-kjerning.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "kjerning",
     "phonemic": "/ˈçæːrnɪŋ/",
-    "representative": null,
-    "audio": {
-      "soundId": 165
-    },
     "tokens": [
       {
         "symbol": "æː",
@@ -2344,12 +2918,19 @@
     ]
   },
   {
+    "id": 167,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ærlig",
     "phonemic": "/ˈæːrlɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 166
-    },
     "tokens": [
       {
         "symbol": "æː",
@@ -2364,12 +2945,19 @@
     ]
   },
   {
+    "id": 168,
+    "storageKey": "lang/no/audio/mjolnir/aeue/sau.mp3",
+    "sourceUrl": null,
+    "originalFilename": "sau.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "sau",
     "phonemic": "/sæʉ/",
-    "representative": "æʉ",
-    "audio": {
-      "soundId": 167
-    },
     "tokens": [
       {
         "symbol": "æʉ",
@@ -2384,12 +2972,19 @@
     ]
   },
   {
+    "id": 169,
+    "storageKey": "lang/no/audio/mjolnir/aeue/tau.mp3",
+    "sourceUrl": null,
+    "originalFilename": "tau.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "tau",
     "phonemic": "/tæʉ/",
-    "representative": null,
-    "audio": {
-      "soundId": 168
-    },
     "tokens": [
       {
         "symbol": "æʉ",
@@ -2404,12 +2999,19 @@
     ]
   },
   {
+    "id": 170,
+    "storageKey": "lang/no/audio/mjolnir/aeue/europa.mp3",
+    "sourceUrl": null,
+    "originalFilename": "europa.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Europa",
     "phonemic": "/æʉˈroːpɑ/",
-    "representative": null,
-    "audio": {
-      "soundId": 169
-    },
     "tokens": [
       {
         "symbol": "æʉ",
@@ -2424,12 +3026,19 @@
     ]
   },
   {
+    "id": 171,
+    "storageKey": "lang/no/audio/mjolnir/aei/hei.mp3",
+    "sourceUrl": null,
+    "originalFilename": "hei.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hei",
     "phonemic": "/hæɪ/",
-    "representative": "æɪ",
-    "audio": {
-      "soundId": 170
-    },
     "tokens": [
       {
         "symbol": "æɪ",
@@ -2444,12 +3053,19 @@
     ]
   },
   {
+    "id": 172,
+    "storageKey": "lang/no/audio/mjolnir/aei/nei.mp3",
+    "sourceUrl": null,
+    "originalFilename": "nei.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "nei",
     "phonemic": "/næɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 171
-    },
     "tokens": [
       {
         "symbol": "æɪ",
@@ -2464,12 +3080,19 @@
     ]
   },
   {
+    "id": 173,
+    "storageKey": "lang/no/audio/mjolnir/aei/bein.mp3",
+    "sourceUrl": null,
+    "originalFilename": "bein.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bein",
     "phonemic": "/bæɪn/",
-    "representative": null,
-    "audio": {
-      "soundId": 172
-    },
     "tokens": [
       {
         "symbol": "æɪ",
@@ -2484,12 +3107,19 @@
     ]
   },
   {
+    "id": 174,
+    "storageKey": "lang/no/audio/mjolnir/oey/goey.mp3",
+    "sourceUrl": null,
+    "originalFilename": "goey.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "gøy",
     "phonemic": "/ɡœʏ/",
-    "representative": "œʏ",
-    "audio": {
-      "soundId": 173
-    },
     "tokens": [
       {
         "symbol": "œʏ",
@@ -2504,12 +3134,19 @@
     ]
   },
   {
+    "id": 175,
+    "storageKey": "lang/no/audio/mjolnir/oey/oeye.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oeye.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "øye",
     "phonemic": "/ˈœʏə/",
-    "representative": null,
-    "audio": {
-      "soundId": 174
-    },
     "tokens": [
       {
         "symbol": "œʏ",
@@ -2524,12 +3161,19 @@
     ]
   },
   {
+    "id": 176,
+    "storageKey": "lang/no/audio/mjolnir/oey/hoeyre.mp3",
+    "sourceUrl": null,
+    "originalFilename": "hoeyre.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "høyre",
     "phonemic": "/ˈhœʏrə/",
-    "representative": null,
-    "audio": {
-      "soundId": 175
-    },
     "tokens": [
       {
         "symbol": "œʏ",
@@ -2544,12 +3188,19 @@
     ]
   },
   {
+    "id": 177,
+    "storageKey": "lang/no/audio/god_morgen.mp3",
+    "sourceUrl": null,
+    "originalFilename": "god_morgen.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "God morgen",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 176
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -2580,12 +3231,19 @@
     ]
   },
   {
+    "id": 178,
+    "storageKey": "lang/no/audio/god_dag.mp3",
+    "sourceUrl": null,
+    "originalFilename": "god_dag.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "God dag",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 177
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -2616,12 +3274,19 @@
     ]
   },
   {
+    "id": 179,
+    "storageKey": null,
+    "sourceUrl": "/lang/no/audio/mot.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "mot",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 178
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -2652,12 +3317,19 @@
     ]
   },
   {
+    "id": 180,
+    "storageKey": "lang/no/audio/mjolnir/mening.mp3",
+    "sourceUrl": null,
+    "originalFilename": "mening.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "mening",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 179
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -2688,12 +3360,19 @@
     ]
   },
   {
+    "id": 181,
+    "storageKey": "lang/no/audio/mjolnir/ledig.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ledig.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ledig",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 180
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -2724,12 +3403,19 @@
     ]
   },
   {
+    "id": 182,
+    "storageKey": "lang/no/audio/mjolnir/enig.mp3",
+    "sourceUrl": null,
+    "originalFilename": "enig.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "enig",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 181
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -2760,12 +3446,19 @@
     ]
   },
   {
+    "id": 183,
+    "storageKey": "lang/no/audio/pavei/a.wav",
+    "sourceUrl": null,
+    "originalFilename": "a.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɑː",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 182
-    },
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2796,12 +3489,19 @@
     ]
   },
   {
+    "id": 184,
+    "storageKey": "lang/no/audio/pavei/asia.wav",
+    "sourceUrl": null,
+    "originalFilename": "asia.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "asia",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 183
-    },
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2816,12 +3516,19 @@
     ]
   },
   {
+    "id": 185,
+    "storageKey": "lang/no/audio/pavei/svar.wav",
+    "sourceUrl": null,
+    "originalFilename": "svar.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "svar",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 184
-    },
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2836,12 +3543,19 @@
     ]
   },
   {
+    "id": 186,
+    "storageKey": "lang/no/audio/pavei/staver.wav",
+    "sourceUrl": null,
+    "originalFilename": "staver.wav",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "staver",
     "phonemic": null,
-    "representative": null,
-    "audio": {
-      "soundId": 185
-    },
     "tokens": [
       {
         "symbol": "ɑː",

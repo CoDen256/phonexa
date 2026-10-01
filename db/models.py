@@ -1,15 +1,34 @@
 """
-db/models.py — SQLAlchemy ORM models for the Phase 0 schema.
+db/models.py — SQLAlchemy ORM models.
 
-See the architecture plan (db-export/ round-trip, Sound-owns-analysis model)
-for the reasoning behind each design choice referenced in comments below.
+Revised from the original Phase 0 draft after discussion: Sound and Sample
+turned out not to be a real distinction (confirmed against the actual
+migrated data — Sample:Sound is "almost always" 1:1, and the rare
+exceptions — audio with no text, text with no audio — are exactly the
+nullable-field states the ingestion workflow needs anyway). They're merged
+into one `Sample` table: a row progresses from "just uploaded audio" to
+"fully tokenized sample" by having more of its nullable fields filled in
+over time, not by moving between tables.
 
-Core principle: a `Sound` is analyzed once (full-clip formant+pitch track in
-`SoundAnalysisFrames`); `Vowel.audio` and `Sample.audio` are references to a
-Sound instead of bare path/URL strings; a `Token` only stores a time range
-into its Sample's Sound — its F1/F2/F0 are DERIVED on read (see
-db/queries.py, added in a later phase) rather than cached, so there is no
-stale-value invalidation problem to get wrong.
+Core principle, preserved from the original design: a Sample's own audio is
+analyzed once per analysis attempt (`SampleAnalysis` — kept as *history*,
+not overwritten, so re-analyzing with different settings never destroys a
+previous result; exactly one row per sample is flagged `is_active` for
+whichever one derivation should use). A `Token` only stores a time range
+into its sample's audio — no F1/F2/F0 of its own; those are DERIVED on read
+from the active analysis's frame track restricted to that range, so there
+is no stale-cached-value problem to get wrong.
+
+F0/pitch: real signal (e.g. Norwegian tonemes are a pitch-contour pattern,
+not a vowel-quality feature) — kept as the raw curve inside a Praat-sourced
+SampleAnalysis row, but deliberately NOT promoted to a per-vowel or
+per-token "value" the way F1/F2 are. A sample-level contour/toneme
+descriptor is a plausible future feature, not built now.
+
+legacy_analysis on Token is a deliberate, temporary escape hatch: the old
+dual-ceiling pipeline's blob is kept verbatim for tokens migrated from the
+pre-DB JSON files, until a later pass re-analyzes them through the real
+Praat pipeline and attaches a proper SampleAnalysis-derived range instead.
 """
 
 from __future__ import annotations
@@ -19,13 +38,10 @@ import datetime
 from sqlalchemy import (
     ARRAY,
     Boolean,
-    CheckConstraint,
     ForeignKey,
     Integer,
     SmallInteger,
-    String,
     Text,
-    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -52,19 +68,21 @@ class Language(Base):
     samples: Mapped[list["Sample"]] = relationship(back_populates="language", cascade="all, delete-orphan", order_by="Sample.sort_order")
 
 
-class Sound(Base):
+class Sample(Base):
     """
-    Raw audio + its own full-clip analysis. Exists independently of any
-    Vowel/Sample that happens to reference it — deleting a language does NOT
-    delete the Sounds its vowels/samples pointed to (see Language cascade: it
-    only cascades to vowels/samples, never to sounds).
+    A single piece of audio plus whatever is known about it so far — file
+    facts, which language/text it belongs to (if assigned yet), and its
+    tokens. `language_id`/`text`/`storage_key` are all nullable because a
+    freshly-ingested recording legitimately exists before any of those are
+    decided (see the module docstring) — this one table covers the whole
+    lifecycle from "just uploaded" to "fully tokenized library entry."
     """
-    __tablename__ = "sounds"
-    __table_args__ = (
-        CheckConstraint("storage_key IS NOT NULL OR source_url IS NOT NULL", name="sound_has_a_location"),
-    )
+    __tablename__ = "samples"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    language_id: Mapped[int | None] = mapped_column(ForeignKey("languages.id", ondelete="CASCADE"))
+
+    # File facts
     storage_key: Mapped[str | None] = mapped_column(Text, unique=True)
     source_url: Mapped[str | None] = mapped_column(Text)
     original_filename: Mapped[str | None] = mapped_column(Text)
@@ -75,26 +93,47 @@ class Sound(Base):
     provenance: Mapped[str] = mapped_column(Text, nullable=False)  # 'uploaded'|'shadowing-segment'|'legacy-migrated'|'external-link'
     leading_silence_ms: Mapped[int | None] = mapped_column(Integer)
     trimmed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    analysis_version: Mapped[str | None] = mapped_column(Text)
-    analysis_config: Mapped[dict | None] = mapped_column(JSONB)
-    manual_f1: Mapped[float | None] = mapped_column()
-    manual_f2: Mapped[float | None] = mapped_column()
-    manual_f0: Mapped[float | None] = mapped_column()
+
+    # What's being said
+    text: Mapped[str | None] = mapped_column(Text)
+    phonemic: Mapped[str | None] = mapped_column(Text)
+
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
-    analysis_frames: Mapped["SoundAnalysisFrames | None"] = relationship(back_populates="sound", cascade="all, delete-orphan", uselist=False)
+    language: Mapped["Language | None"] = relationship(back_populates="samples")
+    tokens: Mapped[list["Token"]] = relationship(back_populates="sample", cascade="all, delete-orphan", order_by="Token.sort_order")
+    analyses: Mapped[list["SampleAnalysis"]] = relationship(back_populates="sample", cascade="all, delete-orphan", order_by="SampleAnalysis.created_at")
 
 
-class SoundAnalysisFrames(Base):
-    """1:1 with Sound — split out so the frequently-queried `sounds` row stays small."""
-    __tablename__ = "sound_analysis_frames"
+class SampleAnalysis(Base):
+    """
+    One analysis ATTEMPT over a sample's full audio — kept as history (not
+    overwritten) so re-analyzing with different settings never destroys a
+    previous result. Exactly one row per sample should be `is_active` at a
+    time; that's the one token-value derivation (a later phase) reads from.
+    """
+    __tablename__ = "sample_analyses"
 
-    sound_id: Mapped[int] = mapped_column(ForeignKey("sounds.id", ondelete="CASCADE"), primary_key=True)
-    formants: Mapped[list] = mapped_column(JSONB, nullable=False)  # [{t_ms, f1..f5, b1..b5}, ...]
-    pitch: Mapped[list] = mapped_column(JSONB, nullable=False)     # [{t_ms, f0}, ...]
+    id: Mapped[int] = mapped_column(primary_key=True)
+    sample_id: Mapped[int] = mapped_column(ForeignKey("samples.id", ondelete="CASCADE"), nullable=False)
+    source: Mapped[str] = mapped_column(Text, nullable=False)  # 'praat' | 'manual'
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    sound: Mapped["Sound"] = relationship(back_populates="analysis_frames")
+    # Praat-sourced fields
+    version: Mapped[str | None] = mapped_column(Text)   # e.g. 'praat-default-v1'
+    config: Mapped[dict | None] = mapped_column(JSONB)  # {max_number_of_formants, maximum_formant, window_length, ...}
+    formants: Mapped[list | None] = mapped_column(JSONB)  # [{t_ms, f1..f5, b1..b5}, ...]
+    pitch: Mapped[list | None] = mapped_column(JSONB)     # [{t_ms, f0}, ...] — real signal (e.g. tonemes), not a per-vowel value
+
+    # Manual-override fields (only meaningful when source='manual', e.g. values measured in desktop Praat)
+    manual_f1: Mapped[float | None] = mapped_column()
+    manual_f2: Mapped[float | None] = mapped_column()
+
+    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+    sample: Mapped["Sample"] = relationship(back_populates="analyses")
 
 
 class Vowel(Base):
@@ -111,7 +150,10 @@ class Vowel(Base):
     f1: Mapped[float | None] = mapped_column()
     f2: Mapped[float | None] = mapped_column()
     wiki_url: Mapped[str | None] = mapped_column(Text)
-    audio_sound_id: Mapped[int | None] = mapped_column(ForeignKey("sounds.id"))
+    # The vowel's own representative recording — a direct FK (not the old
+    # string-based `representative_symbol` on Sample), so there's no
+    # ambiguity when one symbol string spans multiple vowel rows.
+    representative_sample_id: Mapped[int | None] = mapped_column(ForeignKey("samples.id"))
     # Diphthong target — denormalized inline (1:1 with the vowel row, never queried independently)
     target_height: Mapped[float | None] = mapped_column()
     target_backness: Mapped[float | None] = mapped_column()
@@ -123,27 +165,7 @@ class Vowel(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     language: Mapped["Language"] = relationship(back_populates="vowels")
-    audio_sound: Mapped["Sound | None"] = relationship()
-
-
-class Sample(Base):
-    __tablename__ = "samples"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    language_id: Mapped[int] = mapped_column(ForeignKey("languages.id", ondelete="CASCADE"), nullable=False)
-    sound_id: Mapped[int | None] = mapped_column(ForeignKey("sounds.id"))
-    text: Mapped[str] = mapped_column(Text, nullable=False)
-    phonemic: Mapped[str | None] = mapped_column(Text)
-    # Kept as symbol text, not an FK to one vowel row, since one symbol can span
-    # multiple vowel rows' `symbols` arrays — matches today's semantics exactly.
-    representative_symbol: Mapped[str | None] = mapped_column(Text)
-    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-
-    language: Mapped["Language"] = relationship(back_populates="samples")
-    sound: Mapped["Sound | None"] = relationship()
-    tokens: Mapped[list["Token"]] = relationship(back_populates="sample", cascade="all, delete-orphan", order_by="Token.sort_order")
+    representative_sample: Mapped["Sample | None"] = relationship()
 
 
 class Token(Base):
@@ -154,14 +176,11 @@ class Token(Base):
     symbol: Mapped[str] = mapped_column(Text, nullable=False)
     char_start: Mapped[int] = mapped_column(Integer, nullable=False)
     char_end: Mapped[int] = mapped_column(Integer, nullable=False)
-    # A range INTO THE SAMPLE'S SOUND — not a separate clip. Null for tokens whose
-    # sample has no sound, or whose range hasn't been set yet.
+    # A range INTO THE SAMPLE'S OWN AUDIO. Null until someone draws it.
     time_start_ms: Mapped[int | None] = mapped_column(Integer)
     time_end_ms: Mapped[int | None] = mapped_column(Integer)
-    # Escape hatch: verbatim old dual-ceiling analysis blob (max_f, n_formants,
-    # window_ms, pre_emphasis, back_ceiling, back_ceiling_ratio, back_front_ratio,
-    # rms_floor, median_n, slice, f1, f2) for tokens migrated from legacy data.
-    # Never written to by new code — new/re-analyzed tokens are sound-backed instead.
+    # TEMPORARY escape hatch — see module docstring. Never written to by new
+    # code; only ever set by the legacy migration script.
     legacy_analysis: Mapped[dict | None] = mapped_column(JSONB)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())

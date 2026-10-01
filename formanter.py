@@ -1003,17 +1003,20 @@ def http_transcribe():
 # ══════════════════════════════════════════════════════════════════════════════
 
 from db.session import get_sessionmaker  # noqa: E402
-from db.models import Sound  # noqa: E402
+from db.models import Sample  # noqa: E402
 from db.storage import get_audio_store  # noqa: E402
 from flask import send_file, abort  # noqa: E402
 
 
 @app.route('/api/v1/sounds')
 def list_sounds():
+    """Named /sounds rather than /samples: every sample row is "a sound" in
+    the sense this browser cares about (has it got audio, does the file
+    exist) — whether or not it's been assigned a language/text/tokens yet."""
     try:
         store = get_audio_store()
         with get_sessionmaker()() as db:
-            sounds = db.query(Sound).order_by(Sound.id).all()
+            samples = db.query(Sample).order_by(Sample.id).all()
             return jsonify([{
                 'id': s.id,
                 'storageKey': s.storage_key,
@@ -1021,9 +1024,10 @@ def list_sounds():
                 'originalFilename': s.original_filename,
                 'durationMs': s.duration_ms,
                 'provenance': s.provenance,
+                'text': s.text,
                 'hasFile': bool(s.storage_key) and store.exists(s.storage_key),
                 'audioUrl': f'/audio/{s.storage_key}' if s.storage_key else s.source_url,
-            } for s in sounds])
+            } for s in samples])
     except Exception as error:
         return jsonify({'error': str(error)}), 500
 

@@ -10,6 +10,14 @@ one that already has data, since merging is not what this script is for (see
 the plan's destructive-rebuild philosophy for the general import/export tool,
 a later phase).
 
+Sample now absorbs what used to be a separate Sound entity (see db/models.py
+docstring) — a Vowel's own representative audio and a text Sample's audio are
+both just Sample rows, found-or-created by storage_key/source_url, with
+language_id/text filled in as each is discovered. `legacy_analysis` on Token
+is a deliberate, temporary escape hatch for the old dual-ceiling blob — kept
+verbatim rather than discarded or faked up as a real Praat analysis, until a
+later pass re-analyzes these samples' actual audio for real.
+
 Usage:
   docker compose up -d postgres
   DATABASE_URL=postgresql+psycopg2://phonexa:phonexa@localhost:5432/phonexa \
@@ -26,7 +34,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from db.models import Language, Sample, Sound, Token, Vowel  # noqa: E402
+from db.models import Language, Sample, Token, Vowel  # noqa: E402
 from db.session import get_sessionmaker  # noqa: E402
 from db.storage import get_audio_store  # noqa: E402
 
@@ -101,27 +109,35 @@ def discover_language_dirs(lang_root: Path) -> list[tuple[str, bool, dict]]:
     return result
 
 
-def get_or_create_sound(db, store, audio, provenance: str, repo_root: Path) -> Sound | None:
+def find_or_create_sample_for_audio(
+    db, store, audio, provenance: str, repo_root: Path, *, language_id: int | None, text: str | None,
+) -> Sample | None:
     """audio: a path/URL string or None/empty, as found in today's JSON. Returns
-    a Sound row (possibly reused from an earlier reference to the same audio)."""
+    a Sample row (possibly reused from an earlier reference to the same audio —
+    e.g. a vowel's representative clip that also turns out to be a full sample)."""
     if not audio:
         return None
 
     if is_external_url(audio):
-        existing = db.query(Sound).filter_by(source_url=audio).one_or_none()
-        return existing or Sound(source_url=audio, provenance=provenance)
+        existing = db.query(Sample).filter_by(source_url=audio).one_or_none()
+        if existing:
+            return existing
+        return Sample(source_url=audio, provenance=provenance, language_id=language_id, text=text)
 
     src_path = (repo_root / audio) if not Path(audio).is_absolute() else Path(audio)
     if not src_path.exists():
         print(f"    WARNING: referenced audio file missing on disk, recording as a dangling reference: {audio}")
-        return Sound(source_url=audio, provenance=provenance)
+        return Sample(source_url=audio, provenance=provenance, language_id=language_id, text=text)
 
     storage_key = audio  # reuse today's relative path verbatim — trivially reviewable against the original tree
-    existing = db.query(Sound).filter_by(storage_key=storage_key).one_or_none()
+    existing = db.query(Sample).filter_by(storage_key=storage_key).one_or_none()
     if existing:
         return existing
     store.put_path(str(src_path), storage_key)
-    return Sound(storage_key=storage_key, provenance=provenance, original_filename=src_path.name)
+    return Sample(
+        storage_key=storage_key, provenance=provenance, original_filename=src_path.name,
+        language_id=language_id, text=text,
+    )
 
 
 def migrate(lang_root: Path) -> None:
@@ -151,25 +167,34 @@ def migrate(lang_root: Path) -> None:
             db.add(language)
             db.flush()  # assign language.id
 
+            symbol_to_vowels: dict[str, list[Vowel]] = {}
+
             for v_order, v in enumerate(lang_data.get("vowels", [])):
                 hb = v.get("heightBackness") or [0, 0]
                 target = v.get("target")
-                audio_sound = get_or_create_sound(db, store, v.get("audio"), "legacy-migrated", repo_root)
-                if audio_sound is not None:
-                    db.add(audio_sound)
+                rep_sample = find_or_create_sample_for_audio(
+                    db, store, v.get("audio"), "legacy-migrated", repo_root,
+                    language_id=language.id, text=(v.get("symbols") or [None])[0],
+                )
+                if rep_sample is not None:
+                    db.add(rep_sample)
                     db.flush()
-                db.add(Vowel(
+                vowel = Vowel(
                     language_id=language.id, symbols=v.get("symbols") or [], height=hb[0], backness=hb[1],
                     type=v.get("type", "short"), rounded=bool(v.get("rounded")), desc=v.get("desc"),
                     f1=v.get("f1"), f2=v.get("f2"), wiki_url=v.get("wikiUrl"),
-                    audio_sound_id=audio_sound.id if audio_sound else None,
+                    representative_sample_id=rep_sample.id if rep_sample else None,
                     target_height=target["heightBackness"][0] if target else None,
                     target_backness=target["heightBackness"][1] if target else None,
                     target_rounded=target.get("rounded") if target else None,
                     target_f1=target.get("f1") if target else None,
                     target_f2=target.get("f2") if target else None,
                     sort_order=v_order,
-                ))
+                )
+                db.add(vowel)
+                db.flush()
+                for sym in (v.get("symbols") or []):
+                    symbol_to_vowels.setdefault(sym, []).append(vowel)
 
             samples_path = d / "samples.json"
             if not samples_path.exists():
@@ -177,17 +202,26 @@ def migrate(lang_root: Path) -> None:
             samples = json.loads(samples_path.read_text())
             print(f"[{key}] {len(samples)} sample(s)")
             for s_order, s in enumerate(samples):
-                sound = get_or_create_sound(db, store, s.get("audio"), "legacy-migrated", repo_root)
-                if sound is not None:
-                    db.add(sound)
-                    db.flush()
-                sample = Sample(
-                    language_id=language.id, sound_id=sound.id if sound else None,
-                    text=s.get("text", ""), phonemic=s.get("phonemic"),
-                    representative_symbol=s.get("representative"), sort_order=s_order,
+                sample = find_or_create_sample_for_audio(
+                    db, store, s.get("audio"), "legacy-migrated", repo_root,
+                    language_id=language.id, text=s.get("text"),
                 )
+                if sample is None:
+                    # e.g. "Oper"/"тупая" in the real data — text was authored but no audio was ever attached
+                    sample = Sample(provenance="legacy-migrated", language_id=language.id, text=s.get("text"))
+                else:
+                    # may be a reused vowel-representative stub — the fuller sample record wins
+                    sample.language_id = language.id
+                    sample.text = s.get("text")
+                sample.phonemic = s.get("phonemic")
+                sample.sort_order = s_order
                 db.add(sample)
                 db.flush()  # assign sample.id
+
+                rep_symbol = s.get("representative")
+                if rep_symbol:
+                    for vw in symbol_to_vowels.get(rep_symbol, []):
+                        vw.representative_sample_id = sample.id
 
                 for t_order, t in enumerate(s.get("tokens") or []):
                     pos = t.get("position") or [0, 0]

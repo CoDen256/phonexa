@@ -1,11 +1,18 @@
 [
   {
+    "id": 1,
+    "storageKey": "lang/de/audio/fit/i_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "i_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "iː",
     "phonemic": "/iː/",
-    "representative": "iː",
-    "audio": {
-      "soundId": 1
-    },
     "tokens": [
       {
         "symbol": "iː",
@@ -36,12 +43,19 @@
     ]
   },
   {
+    "id": 2,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Liebe.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Liebe",
     "phonemic": "/liːbə/",
-    "representative": null,
-    "audio": {
-      "soundId": 2
-    },
     "tokens": [
       {
         "symbol": "iː",
@@ -56,12 +70,19 @@
     ]
   },
   {
+    "id": 3,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-wie.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "wie",
     "phonemic": "/viː/",
-    "representative": null,
-    "audio": {
-      "soundId": 3
-    },
     "tokens": [
       {
         "symbol": "iː",
@@ -76,32 +97,19 @@
     ]
   },
   {
-    "text": "Mieter",
-    "phonemic": "/miːtɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 4
-    },
-    "tokens": [
-      {
-        "symbol": "iː",
-        "position": [
-          1,
-          3
-        ],
-        "timeStartMs": null,
-        "timeEndMs": null,
-        "legacyAnalysis": null
-      }
-    ]
-  },
-  {
+    "id": 5,
+    "storageKey": "lang/de/audio/fit/y_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "y_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "yː",
     "phonemic": "/yː/",
-    "representative": "yː",
-    "audio": {
-      "soundId": 5
-    },
     "tokens": [
       {
         "symbol": "yː",
@@ -132,12 +140,19 @@
     ]
   },
   {
+    "id": 6,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-über.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "über",
     "phonemic": "/yːbɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 6
-    },
     "tokens": [
       {
         "symbol": "yː",
@@ -152,12 +167,19 @@
     ]
   },
   {
+    "id": 7,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-grün.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "grün",
     "phonemic": "/gʁyːn/",
-    "representative": null,
-    "audio": {
-      "soundId": 7
-    },
     "tokens": [
       {
         "symbol": "yː",
@@ -172,12 +194,19 @@
     ]
   },
   {
+    "id": 8,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/De-M%C3%BChle.ogg/De-M%C3%BChle.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Mühler",
     "phonemic": "/myːlɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 8
-    },
     "tokens": [
       {
         "symbol": "yː",
@@ -192,12 +221,19 @@
     ]
   },
   {
+    "id": 9,
+    "storageKey": "lang/de/audio/fit/i_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "i_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɪ",
     "phonemic": "/ɪ/",
-    "representative": "ɪ",
-    "audio": {
-      "soundId": 9
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -228,12 +264,19 @@
     ]
   },
   {
+    "id": 10,
+    "storageKey": "lang/de/audio/in.mp3",
+    "sourceUrl": null,
+    "originalFilename": "in.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "in",
     "phonemic": "/in/",
-    "representative": null,
-    "audio": {
-      "soundId": 10
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -264,12 +307,19 @@
     ]
   },
   {
+    "id": 11,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-mit.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "mit",
     "phonemic": "/mɪt/",
-    "representative": null,
-    "audio": {
-      "soundId": 11
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -284,12 +334,19 @@
     ]
   },
   {
+    "id": 12,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bitte.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bitte",
     "phonemic": "/bɪtə/",
-    "representative": null,
-    "audio": {
-      "soundId": 12
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -304,12 +361,19 @@
     ]
   },
   {
+    "id": 13,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/De-Mitte.ogg/De-Mitte.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Mitte",
     "phonemic": "/mɪtə/",
-    "representative": null,
-    "audio": {
-      "soundId": 13
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -324,12 +388,19 @@
     ]
   },
   {
+    "id": 14,
+    "storageKey": "lang/de/audio/fit/y_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "y_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʏ",
     "phonemic": "/ʏ/",
-    "representative": "ʏ",
-    "audio": {
-      "soundId": 14
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -360,12 +431,19 @@
     ]
   },
   {
+    "id": 15,
+    "storageKey": "lang/de/audio/duenn.mp3",
+    "sourceUrl": null,
+    "originalFilename": "duenn.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "dünn",
     "phonemic": "/dʏn/",
-    "representative": null,
-    "audio": {
-      "soundId": 15
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -380,12 +458,19 @@
     ]
   },
   {
+    "id": 16,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/De-M%C3%BCller.ogg/De-M%C3%BCller.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Müller",
     "phonemic": "/mʏlɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 16
-    },
     "tokens": [
       {
         "symbol": "ʏ",
@@ -416,12 +501,19 @@
     ]
   },
   {
+    "id": 17,
+    "storageKey": "lang/de/audio/fit/ee_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ee_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "eː",
     "phonemic": "/eː/",
-    "representative": "eː",
-    "audio": {
-      "soundId": 17
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -452,12 +544,19 @@
     ]
   },
   {
+    "id": 18,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-See.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "See",
     "phonemic": "/zeː/",
-    "representative": null,
-    "audio": {
-      "soundId": 18
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -472,12 +571,19 @@
     ]
   },
   {
+    "id": 19,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-geben.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "geben",
     "phonemic": "/geːbən/",
-    "representative": null,
-    "audio": {
-      "soundId": 19
-    },
     "tokens": [
       {
         "symbol": "eː",
@@ -492,12 +598,19 @@
     ]
   },
   {
+    "id": 20,
+    "storageKey": "lang/de/audio/fit/oe_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oe_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "øː",
     "phonemic": "/øː/",
-    "representative": "øː",
-    "audio": {
-      "soundId": 20
-    },
     "tokens": [
       {
         "symbol": "øː",
@@ -528,12 +641,19 @@
     ]
   },
   {
+    "id": 21,
+    "storageKey": null,
+    "sourceUrl": "/lang/de/audio/schoen.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "schön",
     "phonemic": "/ʃøːn/",
-    "representative": null,
-    "audio": {
-      "soundId": 21
-    },
     "tokens": [
       {
         "symbol": "øː",
@@ -564,12 +684,19 @@
     ]
   },
   {
+    "id": 22,
+    "storageKey": null,
+    "sourceUrl": "/lang/de/audio/hoeren.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "hören",
     "phonemic": "/høːʁən/",
-    "representative": null,
-    "audio": {
-      "soundId": 22
-    },
     "tokens": [
       {
         "symbol": "øː",
@@ -600,12 +727,19 @@
     ]
   },
   {
+    "id": 23,
+    "storageKey": null,
+    "sourceUrl": "/lang/de/audio/hoelen.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Höhle",
     "phonemic": "/høːlə/",
-    "representative": null,
-    "audio": {
-      "soundId": 23
-    },
     "tokens": [
       {
         "symbol": "øː",
@@ -636,12 +770,19 @@
     ]
   },
   {
+    "id": 24,
+    "storageKey": "lang/de/audio/fit/e_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "e_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
-    "representative": "ɛ",
-    "audio": {
-      "soundId": 24
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -672,12 +813,19 @@
     ]
   },
   {
+    "id": 25,
+    "storageKey": "lang/de/audio/es.mp3",
+    "sourceUrl": null,
+    "originalFilename": "es.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "es",
     "phonemic": "/ɛs/",
-    "representative": null,
-    "audio": {
-      "soundId": 25
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -692,12 +840,19 @@
     ]
   },
   {
+    "id": 26,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bett.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Bett",
     "phonemic": "/bɛt/",
-    "representative": null,
-    "audio": {
-      "soundId": 26
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -712,12 +867,19 @@
     ]
   },
   {
+    "id": 27,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/De-Stelle.ogg/De-Stelle.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Stelle",
     "phonemic": "/ʃtɛlə/",
-    "representative": null,
-    "audio": {
-      "soundId": 27
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -732,12 +894,19 @@
     ]
   },
   {
+    "id": 28,
+    "storageKey": "lang/de/audio/fit/e_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "e_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɛː",
     "phonemic": "/ɛː/",
-    "representative": "ɛː",
-    "audio": {
-      "soundId": 28
-    },
     "tokens": [
       {
         "symbol": "ɛː",
@@ -768,12 +937,19 @@
     ]
   },
   {
+    "id": 29,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/De-K%C3%A4se.ogg/De-K%C3%A4se.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Käse",
     "phonemic": "/kɛːzə/",
-    "representative": null,
-    "audio": {
-      "soundId": 29
-    },
     "tokens": [
       {
         "symbol": "ɛː",
@@ -788,12 +964,19 @@
     ]
   },
   {
+    "id": 30,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hände.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Hände",
     "phonemic": "/hɛːndə/",
-    "representative": null,
-    "audio": {
-      "soundId": 30
-    },
     "tokens": [
       {
         "symbol": "ɛː",
@@ -808,12 +991,19 @@
     ]
   },
   {
+    "id": 31,
+    "storageKey": "lang/de/audio/fit/oe_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oe_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "œ",
     "phonemic": "/œ/",
-    "representative": "œ",
-    "audio": {
-      "soundId": 31
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -844,12 +1034,19 @@
     ]
   },
   {
+    "id": 32,
+    "storageKey": null,
+    "sourceUrl": "lang/de/audio/oefter.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "öfter",
     "phonemic": "/œftɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 32
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -864,12 +1061,19 @@
     ]
   },
   {
+    "id": 33,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-zwölf.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "zwölf",
     "phonemic": "/t͡svœlf/",
-    "representative": null,
-    "audio": {
-      "soundId": 33
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -884,12 +1088,19 @@
     ]
   },
   {
+    "id": 34,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hölle.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Hölle",
     "phonemic": "/hœlə/",
-    "representative": null,
-    "audio": {
-      "soundId": 34
-    },
     "tokens": [
       {
         "symbol": "œ",
@@ -904,12 +1115,19 @@
     ]
   },
   {
+    "id": 35,
+    "storageKey": "lang/de/audio/fit/a_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "a_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "a",
     "phonemic": "/a/",
-    "representative": "a",
-    "audio": {
-      "soundId": 35
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -940,12 +1158,19 @@
     ]
   },
   {
+    "id": 36,
+    "storageKey": "lang/de/audio/ab.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ab.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ab",
     "phonemic": "/ab/",
-    "representative": null,
-    "audio": {
-      "soundId": 36
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -960,12 +1185,19 @@
     ]
   },
   {
+    "id": 37,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mann.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Mann",
     "phonemic": "/man/",
-    "representative": null,
-    "audio": {
-      "soundId": 37
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -980,12 +1212,19 @@
     ]
   },
   {
+    "id": 38,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-das.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "das",
     "phonemic": "/das/",
-    "representative": null,
-    "audio": {
-      "soundId": 38
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -1000,12 +1239,19 @@
     ]
   },
   {
+    "id": 39,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b8/De-Kamm.ogg/De-Kamm.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Kamm",
     "phonemic": "/kam/",
-    "representative": null,
-    "audio": {
-      "soundId": 39
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -1020,12 +1266,19 @@
     ]
   },
   {
+    "id": 40,
+    "storageKey": "lang/de/audio/fit/a_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "a_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "aː",
     "phonemic": "/aː/",
-    "representative": "aː",
-    "audio": {
-      "soundId": 40
-    },
     "tokens": [
       {
         "symbol": "aː",
@@ -1040,12 +1293,19 @@
     ]
   },
   {
+    "id": 41,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bahn.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Bahn",
     "phonemic": "/baːn/",
-    "representative": null,
-    "audio": {
-      "soundId": 41
-    },
     "tokens": [
       {
         "symbol": "aː",
@@ -1060,12 +1320,19 @@
     ]
   },
   {
+    "id": 42,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-ja.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ja",
     "phonemic": "/jaː/",
-    "representative": null,
-    "audio": {
-      "soundId": 42
-    },
     "tokens": [
       {
         "symbol": "aː",
@@ -1080,12 +1347,19 @@
     ]
   },
   {
+    "id": 43,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ee/De-kam.ogg/De-kam.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "kam",
     "phonemic": "/kaːm/",
-    "representative": null,
-    "audio": {
-      "soundId": 43
-    },
     "tokens": [
       {
         "symbol": "aː",
@@ -1100,12 +1374,19 @@
     ]
   },
   {
+    "id": 44,
+    "storageKey": "lang/de/audio/fit/o_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "o_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "oː",
     "phonemic": "/oː/",
-    "representative": "oː",
-    "audio": {
-      "soundId": 44
-    },
     "tokens": [
       {
         "symbol": "oː",
@@ -1136,12 +1417,19 @@
     ]
   },
   {
+    "id": 45,
+    "storageKey": "lang/de/audio/gross.ogg",
+    "sourceUrl": null,
+    "originalFilename": "gross.ogg",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "groß",
     "phonemic": "/gʁoːs/",
-    "representative": null,
-    "audio": {
-      "soundId": 45
-    },
     "tokens": [
       {
         "symbol": "oː",
@@ -1172,12 +1460,19 @@
     ]
   },
   {
+    "id": 46,
+    "storageKey": null,
+    "sourceUrl": "/lang/de/audio/sohn.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Sohn",
     "phonemic": "/zoːn/",
-    "representative": null,
-    "audio": {
-      "soundId": 46
-    },
     "tokens": [
       {
         "symbol": "oː",
@@ -1208,12 +1503,19 @@
     ]
   },
   {
+    "id": 47,
+    "storageKey": null,
+    "sourceUrl": "/lang/de/audio/ofen.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Ofen",
     "phonemic": "/oːfən/",
-    "representative": null,
-    "audio": {
-      "soundId": 47
-    },
     "tokens": [
       {
         "symbol": "oː",
@@ -1244,12 +1546,19 @@
     ]
   },
   {
+    "id": 48,
+    "storageKey": "lang/de/audio/fit/o_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "o_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɔ",
     "phonemic": "/ɔ/",
-    "representative": "ɔ",
-    "audio": {
-      "soundId": 48
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1264,12 +1573,19 @@
     ]
   },
   {
+    "id": 49,
+    "storageKey": "lang/de/audio/ob.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ob.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ob",
     "phonemic": "/ɔb/",
-    "representative": null,
-    "audio": {
-      "soundId": 49
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1284,12 +1600,19 @@
     ]
   },
   {
+    "id": 50,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kopf.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Kopf",
     "phonemic": "/kɔp͡f/",
-    "representative": null,
-    "audio": {
-      "soundId": 50
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1304,12 +1627,19 @@
     ]
   },
   {
+    "id": 51,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Post.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Post",
     "phonemic": "/pɔst/",
-    "representative": null,
-    "audio": {
-      "soundId": 51
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1324,12 +1654,19 @@
     ]
   },
   {
+    "id": 52,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d7/De-offen.ogg/De-offen.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "offen",
     "phonemic": "/ɔfən/",
-    "representative": null,
-    "audio": {
-      "soundId": 52
-    },
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1344,12 +1681,19 @@
     ]
   },
   {
+    "id": 53,
+    "storageKey": "lang/de/audio/fit/u_long.mp3",
+    "sourceUrl": null,
+    "originalFilename": "u_long.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "uː",
     "phonemic": "/uː/",
-    "representative": "uː",
-    "audio": {
-      "soundId": 53
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -1364,12 +1708,19 @@
     ]
   },
   {
+    "id": 54,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Buch.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Buch",
     "phonemic": "/buːx/",
-    "representative": null,
-    "audio": {
-      "soundId": 54
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -1384,12 +1735,19 @@
     ]
   },
   {
+    "id": 55,
+    "storageKey": null,
+    "sourceUrl": "/lang/de/audio/ruhe.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Ruhe",
     "phonemic": "/ʁuːə/",
-    "representative": null,
-    "audio": {
-      "soundId": 55
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -1420,12 +1778,19 @@
     ]
   },
   {
+    "id": 56,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5d/De-Mut2.oga/De-Mut2.oga.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Mut",
     "phonemic": "/muːt/",
-    "representative": null,
-    "audio": {
-      "soundId": 56
-    },
     "tokens": [
       {
         "symbol": "uː",
@@ -1440,12 +1805,19 @@
     ]
   },
   {
+    "id": 57,
+    "storageKey": "lang/de/audio/fit/u_short.mp3",
+    "sourceUrl": null,
+    "originalFilename": "u_short.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ʊ",
     "phonemic": "/ʊ/",
-    "representative": "ʊ",
-    "audio": {
-      "soundId": 57
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1460,12 +1832,19 @@
     ]
   },
   {
+    "id": 58,
+    "storageKey": "lang/de/audio/um.mp3",
+    "sourceUrl": null,
+    "originalFilename": "um.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "um",
     "phonemic": "/ʊm/",
-    "representative": null,
-    "audio": {
-      "soundId": 58
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1480,12 +1859,19 @@
     ]
   },
   {
+    "id": 59,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mutter.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Mutter",
     "phonemic": "/mʊtɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 59
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1500,12 +1886,19 @@
     ]
   },
   {
+    "id": 60,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hund.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Hund",
     "phonemic": "/hʊnt/",
-    "representative": null,
-    "audio": {
-      "soundId": 60
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1520,12 +1913,19 @@
     ]
   },
   {
+    "id": 61,
+    "storageKey": "lang/de/audio/fit/schwa.mp3",
+    "sourceUrl": null,
+    "originalFilename": "schwa.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ə",
     "phonemic": "/ə/",
-    "representative": "ə",
-    "audio": {
-      "soundId": 61
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1540,12 +1940,19 @@
     ]
   },
   {
+    "id": 62,
+    "storageKey": "lang/de/audio/bitte.mp3",
+    "sourceUrl": null,
+    "originalFilename": "bitte.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bitte",
     "phonemic": "/bɪtə/",
-    "representative": null,
-    "audio": {
-      "soundId": 62
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1560,12 +1967,19 @@
     ]
   },
   {
+    "id": 63,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f4/De-bitte-2.ogg/De-bitte-2.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bitte (2)",
     "phonemic": "/bɪtə/",
-    "representative": null,
-    "audio": {
-      "soundId": 63
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1580,12 +1994,19 @@
     ]
   },
   {
+    "id": 64,
+    "storageKey": null,
+    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kette.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Kette",
     "phonemic": "/kɛtə/",
-    "representative": null,
-    "audio": {
-      "soundId": 64
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -1600,12 +2021,19 @@
     ]
   },
   {
+    "id": 65,
+    "storageKey": "lang/de/audio/fit/er.mp3",
+    "sourceUrl": null,
+    "originalFilename": "er.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɐ",
     "phonemic": "/ɐ/",
-    "representative": "ɐ",
-    "audio": {
-      "soundId": 65
-    },
     "tokens": [
       {
         "symbol": "ɐ",
@@ -1620,12 +2048,19 @@
     ]
   },
   {
+    "id": 66,
+    "storageKey": "lang/de/audio/er.mp3",
+    "sourceUrl": null,
+    "originalFilename": "er.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "er",
     "phonemic": "/eːɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 66
-    },
     "tokens": [
       {
         "symbol": "ɐ",
@@ -1640,12 +2075,19 @@
     ]
   },
   {
+    "id": 67,
+    "storageKey": "lang/de/audio/wir.mp3",
+    "sourceUrl": null,
+    "originalFilename": "wir.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "wir",
     "phonemic": "/viːɐ̯/",
-    "representative": null,
-    "audio": {
-      "soundId": 67
-    },
     "tokens": [
       {
         "symbol": "ɐ",
@@ -1660,13 +2102,30 @@
     ]
   },
   {
+    "id": 4,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f8/De-Mieter.ogg/De-Mieter.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Mieter",
     "phonemic": "/miːtɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 4
-    },
     "tokens": [
+      {
+        "symbol": "iː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      },
       {
         "symbol": "ɐ",
         "position": [
@@ -1680,12 +2139,19 @@
     ]
   },
   {
+    "id": 68,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/De-Mutter.ogg/De-Mutter.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Mutter",
     "phonemic": "/mʊtɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 68
-    },
     "tokens": [
       {
         "symbol": "ɐ",
@@ -1700,10 +2166,19 @@
     ]
   },
   {
+    "id": 69,
+    "storageKey": null,
+    "sourceUrl": null,
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Oper",
     "phonemic": "/oːpɐ/",
-    "representative": null,
-    "audio": null,
     "tokens": [
       {
         "symbol": "ɐ",
@@ -1718,12 +2193,19 @@
     ]
   },
   {
+    "id": 70,
+    "storageKey": "lang/de/audio/fit/ai/ai.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ai.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "aɪ",
     "phonemic": "/aɪ/",
-    "representative": "aɪ",
-    "audio": {
-      "soundId": 69
-    },
     "tokens": [
       {
         "symbol": "aɪ",
@@ -1738,12 +2220,19 @@
     ]
   },
   {
+    "id": 71,
+    "storageKey": "lang/de/audio/fit/ai/ein.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ein.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "eins",
     "phonemic": "/aɪ̯ns/",
-    "representative": null,
-    "audio": {
-      "soundId": 70
-    },
     "tokens": [
       {
         "symbol": "aɪ",
@@ -1758,12 +2247,19 @@
     ]
   },
   {
+    "id": 72,
+    "storageKey": "lang/de/audio/fit/ai/arbeit.mp3",
+    "sourceUrl": null,
+    "originalFilename": "arbeit.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "arbeit",
     "phonemic": "/aɐ̯baɪ̯t/",
-    "representative": null,
-    "audio": {
-      "soundId": 71
-    },
     "tokens": [
       {
         "symbol": "aɪ",
@@ -1778,12 +2274,19 @@
     ]
   },
   {
+    "id": 73,
+    "storageKey": "lang/de/audio/fit/ai/eingang.mp3",
+    "sourceUrl": null,
+    "originalFilename": "eingang.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "eingang",
     "phonemic": "/aɪ̯ngaŋ/",
-    "representative": null,
-    "audio": {
-      "soundId": 72
-    },
     "tokens": [
       {
         "symbol": "aɪ",
@@ -1798,12 +2301,19 @@
     ]
   },
   {
+    "id": 74,
+    "storageKey": "lang/de/audio/fit/au/au.mp3",
+    "sourceUrl": null,
+    "originalFilename": "au.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "aʊ",
     "phonemic": "/aʊ/",
-    "representative": "aʊ",
-    "audio": {
-      "soundId": 73
-    },
     "tokens": [
       {
         "symbol": "aʊ",
@@ -1818,12 +2328,19 @@
     ]
   },
   {
+    "id": 75,
+    "storageKey": "lang/de/audio/fit/au/bau.mp3",
+    "sourceUrl": null,
+    "originalFilename": "bau.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "bau",
     "phonemic": "/baʊ̯/",
-    "representative": null,
-    "audio": {
-      "soundId": 74
-    },
     "tokens": [
       {
         "symbol": "aʊ",
@@ -1838,12 +2355,19 @@
     ]
   },
   {
+    "id": 76,
+    "storageKey": "lang/de/audio/fit/au/blau.mp3",
+    "sourceUrl": null,
+    "originalFilename": "blau.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "blau",
     "phonemic": "/blaʊ̯/",
-    "representative": null,
-    "audio": {
-      "soundId": 75
-    },
     "tokens": [
       {
         "symbol": "aʊ",
@@ -1858,12 +2382,19 @@
     ]
   },
   {
+    "id": 77,
+    "storageKey": "lang/de/audio/fit/au/grau.mp3",
+    "sourceUrl": null,
+    "originalFilename": "grau.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "grau",
     "phonemic": "/gʁaʊ̯/",
-    "representative": null,
-    "audio": {
-      "soundId": 76
-    },
     "tokens": [
       {
         "symbol": "aʊ",
@@ -1878,12 +2409,19 @@
     ]
   },
   {
+    "id": 78,
+    "storageKey": "lang/de/audio/fit/au/schau.mp3",
+    "sourceUrl": null,
+    "originalFilename": "schau.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "schau",
     "phonemic": "/ʃaʊ̯/",
-    "representative": null,
-    "audio": {
-      "soundId": 77
-    },
     "tokens": [
       {
         "symbol": "aʊ",
@@ -1898,12 +2436,19 @@
     ]
   },
   {
+    "id": 79,
+    "storageKey": "lang/de/audio/fit/oi/oi.mp3",
+    "sourceUrl": null,
+    "originalFilename": "oi.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɔɪ",
     "phonemic": "/ɔɪ/",
-    "representative": "ɔɪ",
-    "audio": {
-      "soundId": 78
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -1918,12 +2463,19 @@
     ]
   },
   {
+    "id": 80,
+    "storageKey": "lang/de/audio/fit/oi/euro.mp3",
+    "sourceUrl": null,
+    "originalFilename": "euro.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "euro",
     "phonemic": "/ɔɪʁoː/",
-    "representative": null,
-    "audio": {
-      "soundId": 79
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -1938,12 +2490,19 @@
     ]
   },
   {
+    "id": 81,
+    "storageKey": "lang/de/audio/fit/oi/europa.mp3",
+    "sourceUrl": null,
+    "originalFilename": "europa.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "europa",
     "phonemic": "/ɔɪʁoːpa/",
-    "representative": null,
-    "audio": {
-      "soundId": 80
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -1958,12 +2517,19 @@
     ]
   },
   {
+    "id": 82,
+    "storageKey": "lang/de/audio/fit/oi/neu.mp3",
+    "sourceUrl": null,
+    "originalFilename": "neu.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "neu",
     "phonemic": "/nɔɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 81
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -1978,12 +2544,19 @@
     ]
   },
   {
+    "id": 83,
+    "storageKey": "lang/de/audio/fit/oi/geraeusch.mp3",
+    "sourceUrl": null,
+    "originalFilename": "geraeusch.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Geräusch",
     "phonemic": "/gəʁɔɪʃ/",
-    "representative": null,
-    "audio": {
-      "soundId": 82
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -1998,12 +2571,19 @@
     ]
   },
   {
+    "id": 84,
+    "storageKey": "lang/de/audio/fit/oi/raeuber.mp3",
+    "sourceUrl": null,
+    "originalFilename": "raeuber.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "Räuber",
     "phonemic": "/ʁɔɪbɐ/",
-    "representative": null,
-    "audio": {
-      "soundId": 83
-    },
     "tokens": [
       {
         "symbol": "ɔɪ",

@@ -1,11 +1,18 @@
 [
   {
+    "id": 220,
+    "storageKey": "lang/ru/audio/auto/i.mp3",
+    "sourceUrl": null,
+    "originalFilename": "i.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "i",
     "phonemic": "/i/",
-    "representative": "i",
-    "audio": {
-      "soundId": 219
-    },
     "tokens": [
       {
         "symbol": "i",
@@ -36,12 +43,19 @@
     ]
   },
   {
+    "id": 221,
+    "storageKey": "lang/ru/audio/easy/mir.mp3",
+    "sourceUrl": null,
+    "originalFilename": "mir.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "мир",
     "phonemic": "/mʲir/",
-    "representative": "i",
-    "audio": {
-      "soundId": 220
-    },
     "tokens": [
       {
         "symbol": "i",
@@ -72,12 +86,19 @@
     ]
   },
   {
+    "id": 222,
+    "storageKey": "lang/ru/audio/easy/ego.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ego.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "его",
     "phonemic": "/jɪˈvo/",
-    "representative": null,
-    "audio": {
-      "soundId": 221
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -108,12 +129,19 @@
     ]
   },
   {
+    "id": 223,
+    "storageKey": "lang/ru/audio/forvo/perehod.mp3",
+    "sourceUrl": null,
+    "originalFilename": "perehod.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "переход",
     "phonemic": "/pʲɪrʲɪˈxot/",
-    "representative": "ɪ",
-    "audio": {
-      "soundId": 222
-    },
     "tokens": [
       {
         "symbol": "ɪ",
@@ -144,12 +172,19 @@
     ]
   },
   {
+    "id": 224,
+    "storageKey": "lang/ru/audio/easy/uje.mp3",
+    "sourceUrl": null,
+    "originalFilename": "uje.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "уже",
     "phonemic": "/ʊˈʐɛ/",
-    "representative": "ʊ",
-    "audio": {
-      "soundId": 223
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -180,10 +215,19 @@
     ]
   },
   {
+    "id": 225,
+    "storageKey": null,
+    "sourceUrl": null,
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "тупая",
     "phonemic": "/tʊˈpajə/",
-    "representative": null,
-    "audio": null,
     "tokens": [
       {
         "symbol": "ʊ",
@@ -198,12 +242,19 @@
     ]
   },
   {
+    "id": 226,
+    "storageKey": "lang/ru/audio/easy/srazu.mp3",
+    "sourceUrl": null,
+    "originalFilename": "srazu.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "сразу",
     "phonemic": "/ˈsrazʊ/",
-    "representative": null,
-    "audio": {
-      "soundId": 224
-    },
     "tokens": [
       {
         "symbol": "ʊ",
@@ -234,12 +285,19 @@
     ]
   },
   {
+    "id": 227,
+    "storageKey": "lang/ru/audio/auto/i_bar.mp3",
+    "sourceUrl": null,
+    "originalFilename": "i_bar.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɨ",
     "phonemic": "/ɨ/",
-    "representative": "ɨ",
-    "audio": {
-      "soundId": 225
-    },
     "tokens": [
       {
         "symbol": "ɨ",
@@ -270,12 +328,19 @@
     ]
   },
   {
+    "id": 228,
+    "storageKey": "lang/ru/audio/easy/byl.mp3",
+    "sourceUrl": null,
+    "originalFilename": "byl.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "был",
     "phonemic": "/bɨl/",
-    "representative": null,
-    "audio": {
-      "soundId": 226
-    },
     "tokens": [
       {
         "symbol": "ɨ",
@@ -306,12 +371,19 @@
     ]
   },
   {
+    "id": 229,
+    "storageKey": "lang/ru/audio/rufe/yu.mp3",
+    "sourceUrl": null,
+    "originalFilename": "yu.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ю",
     "phonemic": "/jʉ/",
-    "representative": "ʉ",
-    "audio": {
-      "soundId": 227
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -342,12 +414,19 @@
     ]
   },
   {
+    "id": 230,
+    "storageKey": "lang/ru/audio/easy/svou.mp3",
+    "sourceUrl": null,
+    "originalFilename": "svou.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "свою",
     "phonemic": "/svɐˈjʉ/",
-    "representative": null,
-    "audio": {
-      "soundId": 228
-    },
     "tokens": [
       {
         "symbol": "ʉ",
@@ -378,12 +457,19 @@
     ]
   },
   {
+    "id": 231,
+    "storageKey": "lang/ru/audio/auto/u.mp3",
+    "sourceUrl": null,
+    "originalFilename": "u.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "u",
     "phonemic": "/u/",
-    "representative": "u",
-    "audio": {
-      "soundId": 229
-    },
     "tokens": [
       {
         "symbol": "u",
@@ -414,12 +500,19 @@
     ]
   },
   {
+    "id": 232,
+    "storageKey": "lang/ru/audio/easy/emu.mp3",
+    "sourceUrl": null,
+    "originalFilename": "emu.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ему",
     "phonemic": "/jɪˈmu/",
-    "representative": null,
-    "audio": {
-      "soundId": 230
-    },
     "tokens": [
       {
         "symbol": "u",
@@ -450,12 +543,19 @@
     ]
   },
   {
+    "id": 233,
+    "storageKey": "lang/ru/audio/rufe/ye.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ye.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "е",
     "phonemic": "/je/",
-    "representative": "e",
-    "audio": {
-      "soundId": 231
-    },
     "tokens": [
       {
         "symbol": "e",
@@ -486,12 +586,19 @@
     ]
   },
   {
+    "id": 234,
+    "storageKey": "lang/ru/audio/forvo/meste.mp3",
+    "sourceUrl": null,
+    "originalFilename": "meste.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "месте",
     "phonemic": "/ˈmʲestʲɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 232
-    },
     "tokens": [
       {
         "symbol": "e",
@@ -522,12 +629,19 @@
     ]
   },
   {
+    "id": 235,
+    "storageKey": "lang/ru/audio/rufe/yo.mp3",
+    "sourceUrl": null,
+    "originalFilename": "yo.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ё",
     "phonemic": "/jo/",
-    "representative": null,
-    "audio": {
-      "soundId": 233
-    },
     "tokens": [
       {
         "symbol": "o",
@@ -558,12 +672,19 @@
     ]
   },
   {
+    "id": 236,
+    "storageKey": "lang/ru/audio/easy/moe.mp3",
+    "sourceUrl": null,
+    "originalFilename": "moe.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "моё",
     "phonemic": "/mɐˈjo/",
-    "representative": null,
-    "audio": {
-      "soundId": 234
-    },
     "tokens": [
       {
         "symbol": "ɵ",
@@ -594,12 +715,19 @@
     ]
   },
   {
+    "id": 237,
+    "storageKey": "lang/ru/audio/easy/jivet.mp3",
+    "sourceUrl": null,
+    "originalFilename": "jivet.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "живёт",
     "phonemic": "/ʐɨˈvot/",
-    "representative": null,
-    "audio": {
-      "soundId": 235
-    },
     "tokens": [
       {
         "symbol": "ɵ",
@@ -630,12 +758,19 @@
     ]
   },
   {
+    "id": 238,
+    "storageKey": "lang/ru/audio/easy/mira.mp3",
+    "sourceUrl": null,
+    "originalFilename": "mira.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "мира",
     "phonemic": "/ˈmʲirə/",
-    "representative": null,
-    "audio": {
-      "soundId": 236
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -666,12 +801,19 @@
     ]
   },
   {
+    "id": 239,
+    "storageKey": "lang/ru/audio/easy/etomu.mp3",
+    "sourceUrl": null,
+    "originalFilename": "etomu.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "этому",
     "phonemic": "/ˈetəmʊ/",
-    "representative": null,
-    "audio": {
-      "soundId": 237
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -702,12 +844,19 @@
     ]
   },
   {
+    "id": 240,
+    "storageKey": "lang/ru/audio/easy/odnovremenno.mp3",
+    "sourceUrl": null,
+    "originalFilename": "odnovremenno.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "одновременно",
     "phonemic": "/ɐdnəvrʲɪˈmʲenə/",
-    "representative": null,
-    "audio": {
-      "soundId": 238
-    },
     "tokens": [
       {
         "symbol": "ə",
@@ -722,12 +871,19 @@
     ]
   },
   {
+    "id": 241,
+    "storageKey": "lang/ru/audio/auto/o.mp3",
+    "sourceUrl": null,
+    "originalFilename": "o.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "o",
     "phonemic": "/o/",
-    "representative": "o",
-    "audio": {
-      "soundId": 239
-    },
     "tokens": [
       {
         "symbol": "o",
@@ -758,12 +914,19 @@
     ]
   },
   {
+    "id": 242,
+    "storageKey": "lang/ru/audio/easy/tot.mp3",
+    "sourceUrl": null,
+    "originalFilename": "tot.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "тот",
     "phonemic": "/tot/",
-    "representative": null,
-    "audio": {
-      "soundId": 240
-    },
     "tokens": [
       {
         "symbol": "o",
@@ -778,12 +941,19 @@
     ]
   },
   {
+    "id": 243,
+    "storageKey": "lang/ru/audio/auto/e_open.mp3",
+    "sourceUrl": null,
+    "originalFilename": "e_open.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
-    "representative": "ɛ",
-    "audio": {
-      "soundId": 241
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -814,12 +984,19 @@
     ]
   },
   {
+    "id": 244,
+    "storageKey": "lang/ru/audio/easy/etot.mp3",
+    "sourceUrl": null,
+    "originalFilename": "etot.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "этот",
     "phonemic": "/ˈetət/",
-    "representative": null,
-    "audio": {
-      "soundId": 242
-    },
     "tokens": [
       {
         "symbol": "ɛ",
@@ -850,12 +1027,19 @@
     ]
   },
   {
+    "id": 245,
+    "storageKey": "lang/ru/audio/forvo/ona.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ona.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "она",
     "phonemic": "/ɐˈna/",
-    "representative": "ʌ",
-    "audio": {
-      "soundId": 243
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -886,12 +1070,19 @@
     ]
   },
   {
+    "id": 246,
+    "storageKey": "lang/ru/audio/easy/hotel.mp3",
+    "sourceUrl": null,
+    "originalFilename": "hotel.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "хотел",
     "phonemic": "/xɐˈtʲel/",
-    "representative": null,
-    "audio": {
-      "soundId": 244
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -922,12 +1113,19 @@
     ]
   },
   {
+    "id": 247,
+    "storageKey": "lang/ru/audio/easy/stoyala.mp3",
+    "sourceUrl": null,
+    "originalFilename": "stoyala.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "стояла",
     "phonemic": "/stɐˈjalə/",
-    "representative": null,
-    "audio": {
-      "soundId": 245
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -942,12 +1140,19 @@
     ]
   },
   {
+    "id": 248,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/da/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "голова",
     "phonemic": "/ɡələˈva/",
-    "representative": null,
-    "audio": {
-      "soundId": 246
-    },
     "tokens": [
       {
         "symbol": "ʌ",
@@ -962,12 +1167,19 @@
     ]
   },
   {
+    "id": 249,
+    "storageKey": "lang/ru/audio/auto/a.mp3",
+    "sourceUrl": null,
+    "originalFilename": "a.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "a",
     "phonemic": "/a/",
-    "representative": "a",
-    "audio": {
-      "soundId": 247
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -998,12 +1210,19 @@
     ]
   },
   {
+    "id": 250,
+    "storageKey": "lang/ru/audio/easy/nami.mp3",
+    "sourceUrl": null,
+    "originalFilename": "nami.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "нами",
     "phonemic": "/ˈnamʲɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 248
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -1034,12 +1253,19 @@
     ]
   },
   {
+    "id": 251,
+    "storageKey": "lang/ru/audio/auto/a_back.ogg",
+    "sourceUrl": null,
+    "originalFilename": "a_back.ogg",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "ɑ",
     "phonemic": "/ɑ/",
-    "representative": "ɑ",
-    "audio": {
-      "soundId": 249
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1054,12 +1280,19 @@
     ]
   },
   {
+    "id": 252,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Ru-%D0%BF%D0%B0%D0%BB%D0%BA%D0%B0.ogg",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "палка",
     "phonemic": "/ˈpalkə/",
-    "representative": null,
-    "audio": {
-      "soundId": 250
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1090,12 +1323,19 @@
     ]
   },
   {
+    "id": 253,
+    "storageKey": "lang/ru/audio/forvo/kal.mp3",
+    "sourceUrl": null,
+    "originalFilename": "kal.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "кал",
     "phonemic": "/kal/",
-    "representative": null,
-    "audio": {
-      "soundId": 251
-    },
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1126,12 +1366,19 @@
     ]
   },
   {
+    "id": 254,
+    "storageKey": "lang/ru/audio/rufe/ya.mp3",
+    "sourceUrl": null,
+    "originalFilename": "ya.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "я",
     "phonemic": "/ja/",
-    "representative": null,
-    "audio": {
-      "soundId": 252
-    },
     "tokens": [
       {
         "symbol": "a",
@@ -1162,12 +1409,19 @@
     ]
   },
   {
+    "id": 255,
+    "storageKey": "lang/ru/audio/easy/chasti.mp3",
+    "sourceUrl": null,
+    "originalFilename": "chasti.mp3",
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "части",
     "phonemic": "/ˈtʃastʲɪ/",
-    "representative": null,
-    "audio": {
-      "soundId": 253
-    },
     "tokens": [
       {
         "symbol": "æ",
@@ -1198,12 +1452,19 @@
     ]
   },
   {
+    "id": 256,
+    "storageKey": null,
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg.mp3",
+    "originalFilename": null,
+    "contentType": null,
+    "durationMs": null,
+    "sampleRateHz": null,
+    "channels": null,
+    "provenance": "legacy-migrated",
+    "trimmed": false,
+    "leadingSilenceMs": null,
     "text": "пять",
     "phonemic": "/pʲatʲ/",
-    "representative": null,
-    "audio": {
-      "soundId": 254
-    },
     "tokens": [
       {
         "symbol": "æ",

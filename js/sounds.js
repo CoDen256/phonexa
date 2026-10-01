@@ -32,6 +32,7 @@ function renderRows(sounds) {
     return `<tr>
       <td class="sounds-id">${s.id}</td>
       <td>${player}${missing}</td>
+      <td>${escapeHtml(s.text || '—')}</td>
       <td>${location}</td>
       <td><span class="sounds-prov">${escapeHtml(s.provenance)}</span></td>
       <td>${fmtDuration(s.durationMs)}</td>
@@ -47,7 +48,8 @@ function applyFilter() {
     (s.storageKey || '').toLowerCase().includes(q) ||
     (s.sourceUrl || '').toLowerCase().includes(q) ||
     (s.originalFilename || '').toLowerCase().includes(q) ||
-    (s.provenance || '').toLowerCase().includes(q)
+    (s.provenance || '').toLowerCase().includes(q) ||
+    (s.text || '').toLowerCase().includes(q)
   ));
 }
 
