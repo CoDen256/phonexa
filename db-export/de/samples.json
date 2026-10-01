@@ -1,0 +1,2020 @@
+[
+  {
+    "text": "iː",
+    "phonemic": "/iː/",
+    "representative": "iː",
+    "audio": {
+      "soundId": 1
+    },
+    "tokens": [
+      {
+        "symbol": "iː",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": 320,
+        "timeEndMs": 614,
+        "legacyAnalysis": {
+          "f1": 350,
+          "f2": 2672,
+          "max_f": 5000,
+          "slice": [
+            320,
+            614
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 2000,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "Liebe",
+    "phonemic": "/liːbə/",
+    "representative": null,
+    "audio": {
+      "soundId": 2
+    },
+    "tokens": [
+      {
+        "symbol": "iː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "wie",
+    "phonemic": "/viː/",
+    "representative": null,
+    "audio": {
+      "soundId": 3
+    },
+    "tokens": [
+      {
+        "symbol": "iː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Mieter",
+    "phonemic": "/miːtɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 4
+    },
+    "tokens": [
+      {
+        "symbol": "iː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "yː",
+    "phonemic": "/yː/",
+    "representative": "yː",
+    "audio": {
+      "soundId": 5
+    },
+    "tokens": [
+      {
+        "symbol": "yː",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": 494,
+        "timeEndMs": 821,
+        "legacyAnalysis": {
+          "f1": 269,
+          "f2": 1979,
+          "max_f": 5000,
+          "slice": [
+            494,
+            821
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "über",
+    "phonemic": "/yːbɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 6
+    },
+    "tokens": [
+      {
+        "symbol": "yː",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "grün",
+    "phonemic": "/gʁyːn/",
+    "representative": null,
+    "audio": {
+      "soundId": 7
+    },
+    "tokens": [
+      {
+        "symbol": "yː",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Mühler",
+    "phonemic": "/myːlɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 8
+    },
+    "tokens": [
+      {
+        "symbol": "yː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɪ",
+    "phonemic": "/ɪ/",
+    "representative": "ɪ",
+    "audio": {
+      "soundId": 9
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 396,
+        "timeEndMs": 496,
+        "legacyAnalysis": {
+          "f1": 385,
+          "f2": 1636,
+          "max_f": 5000,
+          "slice": [
+            396,
+            496
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 2200,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "in",
+    "phonemic": "/in/",
+    "representative": null,
+    "audio": {
+      "soundId": 10
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 232,
+        "timeEndMs": 309,
+        "legacyAnalysis": {
+          "f1": 341,
+          "f2": 2241,
+          "max_f": 5000,
+          "slice": [
+            232,
+            309
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "mit",
+    "phonemic": "/mɪt/",
+    "representative": null,
+    "audio": {
+      "soundId": 11
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bitte",
+    "phonemic": "/bɪtə/",
+    "representative": null,
+    "audio": {
+      "soundId": 12
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Mitte",
+    "phonemic": "/mɪtə/",
+    "representative": null,
+    "audio": {
+      "soundId": 13
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʏ",
+    "phonemic": "/ʏ/",
+    "representative": "ʏ",
+    "audio": {
+      "soundId": 14
+    },
+    "tokens": [
+      {
+        "symbol": "ʏ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 442,
+        "timeEndMs": 525,
+        "legacyAnalysis": {
+          "f1": 410,
+          "f2": 1743,
+          "max_f": 5000,
+          "slice": [
+            442,
+            525
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "dünn",
+    "phonemic": "/dʏn/",
+    "representative": null,
+    "audio": {
+      "soundId": 15
+    },
+    "tokens": [
+      {
+        "symbol": "ʏ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Müller",
+    "phonemic": "/mʏlɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 16
+    },
+    "tokens": [
+      {
+        "symbol": "ʏ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 574,
+        "timeEndMs": 665,
+        "legacyAnalysis": {
+          "f1": 333,
+          "f2": 1448,
+          "max_f": 5000,
+          "slice": [
+            574,
+            665
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "eː",
+    "phonemic": "/eː/",
+    "representative": "eː",
+    "audio": {
+      "soundId": 17
+    },
+    "tokens": [
+      {
+        "symbol": "eː",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": 341,
+        "timeEndMs": 544,
+        "legacyAnalysis": {
+          "f1": 381,
+          "f2": 2699,
+          "max_f": 5000,
+          "slice": [
+            341,
+            544
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "See",
+    "phonemic": "/zeː/",
+    "representative": null,
+    "audio": {
+      "soundId": 18
+    },
+    "tokens": [
+      {
+        "symbol": "eː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "geben",
+    "phonemic": "/geːbən/",
+    "representative": null,
+    "audio": {
+      "soundId": 19
+    },
+    "tokens": [
+      {
+        "symbol": "eː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "øː",
+    "phonemic": "/øː/",
+    "representative": "øː",
+    "audio": {
+      "soundId": 20
+    },
+    "tokens": [
+      {
+        "symbol": "øː",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": 637,
+        "timeEndMs": 909,
+        "legacyAnalysis": {
+          "f1": 393,
+          "f2": 1865,
+          "max_f": 5000,
+          "slice": [
+            637,
+            909
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "schön",
+    "phonemic": "/ʃøːn/",
+    "representative": null,
+    "audio": {
+      "soundId": 21
+    },
+    "tokens": [
+      {
+        "symbol": "øː",
+        "position": [
+          3,
+          4
+        ],
+        "timeStartMs": 298,
+        "timeEndMs": 418,
+        "legacyAnalysis": {
+          "f1": 294,
+          "f2": 1496,
+          "max_f": 5000,
+          "slice": [
+            298,
+            418
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "hören",
+    "phonemic": "/høːʁən/",
+    "representative": null,
+    "audio": {
+      "soundId": 22
+    },
+    "tokens": [
+      {
+        "symbol": "øː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 128,
+        "timeEndMs": 287,
+        "legacyAnalysis": {
+          "f1": 426,
+          "f2": 1209,
+          "max_f": 5000,
+          "slice": [
+            128,
+            287
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "Höhle",
+    "phonemic": "/høːlə/",
+    "representative": null,
+    "audio": {
+      "soundId": 23
+    },
+    "tokens": [
+      {
+        "symbol": "øː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 644,
+        "timeEndMs": 725,
+        "legacyAnalysis": {
+          "f1": 530,
+          "f2": 1410,
+          "max_f": 5000,
+          "slice": [
+            644,
+            725
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "ɛ",
+    "phonemic": "/ɛ/",
+    "representative": "ɛ",
+    "audio": {
+      "soundId": 24
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 376,
+        "timeEndMs": 473,
+        "legacyAnalysis": {
+          "f1": 602,
+          "f2": 1167,
+          "max_f": 5000,
+          "slice": [
+            376,
+            473
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "es",
+    "phonemic": "/ɛs/",
+    "representative": null,
+    "audio": {
+      "soundId": 25
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Bett",
+    "phonemic": "/bɛt/",
+    "representative": null,
+    "audio": {
+      "soundId": 26
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Stelle",
+    "phonemic": "/ʃtɛlə/",
+    "representative": null,
+    "audio": {
+      "soundId": 27
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          2,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɛː",
+    "phonemic": "/ɛː/",
+    "representative": "ɛː",
+    "audio": {
+      "soundId": 28
+    },
+    "tokens": [
+      {
+        "symbol": "ɛː",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": 454,
+        "timeEndMs": 684,
+        "legacyAnalysis": {
+          "f1": 569,
+          "f2": 1430,
+          "max_f": 5000,
+          "slice": [
+            454,
+            684
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "Käse",
+    "phonemic": "/kɛːzə/",
+    "representative": null,
+    "audio": {
+      "soundId": 29
+    },
+    "tokens": [
+      {
+        "symbol": "ɛː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Hände",
+    "phonemic": "/hɛːndə/",
+    "representative": null,
+    "audio": {
+      "soundId": 30
+    },
+    "tokens": [
+      {
+        "symbol": "ɛː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "œ",
+    "phonemic": "/œ/",
+    "representative": "œ",
+    "audio": {
+      "soundId": 31
+    },
+    "tokens": [
+      {
+        "symbol": "œ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 380,
+        "timeEndMs": 454,
+        "legacyAnalysis": {
+          "f1": 629,
+          "f2": 1837,
+          "max_f": 5000,
+          "slice": [
+            380,
+            454
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "öfter",
+    "phonemic": "/œftɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 32
+    },
+    "tokens": [
+      {
+        "symbol": "œ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "zwölf",
+    "phonemic": "/t͡svœlf/",
+    "representative": null,
+    "audio": {
+      "soundId": 33
+    },
+    "tokens": [
+      {
+        "symbol": "œ",
+        "position": [
+          2,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Hölle",
+    "phonemic": "/hœlə/",
+    "representative": null,
+    "audio": {
+      "soundId": 34
+    },
+    "tokens": [
+      {
+        "symbol": "œ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "a",
+    "phonemic": "/a/",
+    "representative": "a",
+    "audio": {
+      "soundId": 35
+    },
+    "tokens": [
+      {
+        "symbol": "a",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 293,
+        "timeEndMs": 382,
+        "legacyAnalysis": {
+          "f1": 1070,
+          "f2": 1434,
+          "max_f": 5000,
+          "slice": [
+            293,
+            382
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "ab",
+    "phonemic": "/ab/",
+    "representative": null,
+    "audio": {
+      "soundId": 36
+    },
+    "tokens": [
+      {
+        "symbol": "a",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Mann",
+    "phonemic": "/man/",
+    "representative": null,
+    "audio": {
+      "soundId": 37
+    },
+    "tokens": [
+      {
+        "symbol": "a",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "das",
+    "phonemic": "/das/",
+    "representative": null,
+    "audio": {
+      "soundId": 38
+    },
+    "tokens": [
+      {
+        "symbol": "a",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Kamm",
+    "phonemic": "/kam/",
+    "representative": null,
+    "audio": {
+      "soundId": 39
+    },
+    "tokens": [
+      {
+        "symbol": "a",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "aː",
+    "phonemic": "/aː/",
+    "representative": "aː",
+    "audio": {
+      "soundId": 40
+    },
+    "tokens": [
+      {
+        "symbol": "aː",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Bahn",
+    "phonemic": "/baːn/",
+    "representative": null,
+    "audio": {
+      "soundId": 41
+    },
+    "tokens": [
+      {
+        "symbol": "aː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ja",
+    "phonemic": "/jaː/",
+    "representative": null,
+    "audio": {
+      "soundId": 42
+    },
+    "tokens": [
+      {
+        "symbol": "aː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "kam",
+    "phonemic": "/kaːm/",
+    "representative": null,
+    "audio": {
+      "soundId": 43
+    },
+    "tokens": [
+      {
+        "symbol": "aː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "oː",
+    "phonemic": "/oː/",
+    "representative": "oː",
+    "audio": {
+      "soundId": 44
+    },
+    "tokens": [
+      {
+        "symbol": "oː",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 425,
+        "timeEndMs": 675,
+        "legacyAnalysis": {
+          "f1": 434,
+          "f2": 538,
+          "max_f": 5000,
+          "slice": [
+            425,
+            675
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "groß",
+    "phonemic": "/gʁoːs/",
+    "representative": null,
+    "audio": {
+      "soundId": 45
+    },
+    "tokens": [
+      {
+        "symbol": "oː",
+        "position": [
+          2,
+          3
+        ],
+        "timeStartMs": 357,
+        "timeEndMs": 504,
+        "legacyAnalysis": {
+          "f1": 367,
+          "f2": 497,
+          "max_f": 5000,
+          "slice": [
+            357,
+            504
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "Sohn",
+    "phonemic": "/zoːn/",
+    "representative": null,
+    "audio": {
+      "soundId": 46
+    },
+    "tokens": [
+      {
+        "symbol": "oː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 686,
+        "timeEndMs": 750,
+        "legacyAnalysis": {
+          "f1": 412,
+          "f2": 798,
+          "max_f": 5000,
+          "slice": [
+            686,
+            750
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "Ofen",
+    "phonemic": "/oːfən/",
+    "representative": null,
+    "audio": {
+      "soundId": 47
+    },
+    "tokens": [
+      {
+        "symbol": "oː",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 256,
+        "timeEndMs": 369,
+        "legacyAnalysis": {
+          "f1": 523,
+          "f2": 1426,
+          "max_f": 5000,
+          "slice": [
+            256,
+            369
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "ɔ",
+    "phonemic": "/ɔ/",
+    "representative": "ɔ",
+    "audio": {
+      "soundId": 48
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ob",
+    "phonemic": "/ɔb/",
+    "representative": null,
+    "audio": {
+      "soundId": 49
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Kopf",
+    "phonemic": "/kɔp͡f/",
+    "representative": null,
+    "audio": {
+      "soundId": 50
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Post",
+    "phonemic": "/pɔst/",
+    "representative": null,
+    "audio": {
+      "soundId": 51
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "offen",
+    "phonemic": "/ɔfən/",
+    "representative": null,
+    "audio": {
+      "soundId": 52
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "uː",
+    "phonemic": "/uː/",
+    "representative": "uː",
+    "audio": {
+      "soundId": 53
+    },
+    "tokens": [
+      {
+        "symbol": "uː",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Buch",
+    "phonemic": "/buːx/",
+    "representative": null,
+    "audio": {
+      "soundId": 54
+    },
+    "tokens": [
+      {
+        "symbol": "uː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Ruhe",
+    "phonemic": "/ʁuːə/",
+    "representative": null,
+    "audio": {
+      "soundId": 55
+    },
+    "tokens": [
+      {
+        "symbol": "uː",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 562,
+        "timeEndMs": 727,
+        "legacyAnalysis": {
+          "f1": 439,
+          "f2": 1061,
+          "max_f": 5000,
+          "slice": [
+            562,
+            727
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "Mut",
+    "phonemic": "/muːt/",
+    "representative": null,
+    "audio": {
+      "soundId": 56
+    },
+    "tokens": [
+      {
+        "symbol": "uː",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʊ",
+    "phonemic": "/ʊ/",
+    "representative": "ʊ",
+    "audio": {
+      "soundId": 57
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "um",
+    "phonemic": "/ʊm/",
+    "representative": null,
+    "audio": {
+      "soundId": 58
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Mutter",
+    "phonemic": "/mʊtɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 59
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Hund",
+    "phonemic": "/hʊnt/",
+    "representative": null,
+    "audio": {
+      "soundId": 60
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ə",
+    "phonemic": "/ə/",
+    "representative": "ə",
+    "audio": {
+      "soundId": 61
+    },
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bitte",
+    "phonemic": "/bɪtə/",
+    "representative": null,
+    "audio": {
+      "soundId": 62
+    },
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [
+          4,
+          5
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bitte (2)",
+    "phonemic": "/bɪtə/",
+    "representative": null,
+    "audio": {
+      "soundId": 63
+    },
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [
+          4,
+          5
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Kette",
+    "phonemic": "/kɛtə/",
+    "representative": null,
+    "audio": {
+      "soundId": 64
+    },
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [
+          4,
+          5
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɐ",
+    "phonemic": "/ɐ/",
+    "representative": "ɐ",
+    "audio": {
+      "soundId": 65
+    },
+    "tokens": [
+      {
+        "symbol": "ɐ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "er",
+    "phonemic": "/eːɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 66
+    },
+    "tokens": [
+      {
+        "symbol": "ɐ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "wir",
+    "phonemic": "/viːɐ̯/",
+    "representative": null,
+    "audio": {
+      "soundId": 67
+    },
+    "tokens": [
+      {
+        "symbol": "ɐ",
+        "position": [
+          2,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Mieter",
+    "phonemic": "/miːtɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 4
+    },
+    "tokens": [
+      {
+        "symbol": "ɐ",
+        "position": [
+          4,
+          6
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Mutter",
+    "phonemic": "/mʊtɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 68
+    },
+    "tokens": [
+      {
+        "symbol": "ɐ",
+        "position": [
+          4,
+          6
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Oper",
+    "phonemic": "/oːpɐ/",
+    "representative": null,
+    "audio": null,
+    "tokens": [
+      {
+        "symbol": "ɐ",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "aɪ",
+    "phonemic": "/aɪ/",
+    "representative": "aɪ",
+    "audio": {
+      "soundId": 69
+    },
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "eins",
+    "phonemic": "/aɪ̯ns/",
+    "representative": null,
+    "audio": {
+      "soundId": 70
+    },
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "arbeit",
+    "phonemic": "/aɐ̯baɪ̯t/",
+    "representative": null,
+    "audio": {
+      "soundId": 71
+    },
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [
+          3,
+          5
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "eingang",
+    "phonemic": "/aɪ̯ngaŋ/",
+    "representative": null,
+    "audio": {
+      "soundId": 72
+    },
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "aʊ",
+    "phonemic": "/aʊ/",
+    "representative": "aʊ",
+    "audio": {
+      "soundId": 73
+    },
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bau",
+    "phonemic": "/baʊ̯/",
+    "representative": null,
+    "audio": {
+      "soundId": 74
+    },
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "blau",
+    "phonemic": "/blaʊ̯/",
+    "representative": null,
+    "audio": {
+      "soundId": 75
+    },
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "grau",
+    "phonemic": "/gʁaʊ̯/",
+    "representative": null,
+    "audio": {
+      "soundId": 76
+    },
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "schau",
+    "phonemic": "/ʃaʊ̯/",
+    "representative": null,
+    "audio": {
+      "soundId": 77
+    },
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [
+          3,
+          5
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɔɪ",
+    "phonemic": "/ɔɪ/",
+    "representative": "ɔɪ",
+    "audio": {
+      "soundId": 78
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "euro",
+    "phonemic": "/ɔɪʁoː/",
+    "representative": null,
+    "audio": {
+      "soundId": 79
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "europa",
+    "phonemic": "/ɔɪʁoːpa/",
+    "representative": null,
+    "audio": {
+      "soundId": 80
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          0,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "neu",
+    "phonemic": "/nɔɪ/",
+    "representative": null,
+    "audio": {
+      "soundId": 81
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Geräusch",
+    "phonemic": "/gəʁɔɪʃ/",
+    "representative": null,
+    "audio": {
+      "soundId": 82
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          3,
+          5
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "Räuber",
+    "phonemic": "/ʁɔɪbɐ/",
+    "representative": null,
+    "audio": {
+      "soundId": 83
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  }
+]

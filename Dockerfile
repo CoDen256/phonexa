@@ -15,6 +15,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Backend
 COPY formanter.py .
+COPY db/ ./db/
+COPY alembic.ini .
+COPY alembic/ ./alembic/
+COPY scripts/ ./scripts/
 
 # Frontend assets
 COPY index.html editor.html debug.html shadow.html praat.html processor.js ./

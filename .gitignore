@@ -1,1 +1,8 @@
 .venv
+__pycache__/
+*.pyc
+
+# Local-dev default audio storage root (see db/storage.py AUDIO_STORAGE_ROOT) —
+# a regenerable copy produced by scripts/migrate_legacy_to_db.py, analogous to
+# a build artifact. Audio storage in deploy is a Docker volume, never git.
+/data/audio/

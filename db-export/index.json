@@ -1,0 +1,32 @@
+[
+  {
+    "key": "de",
+    "enabled": true,
+    "sortOrder": 0
+  },
+  {
+    "key": "no",
+    "enabled": true,
+    "sortOrder": 1
+  },
+  {
+    "key": "cardinal",
+    "enabled": true,
+    "sortOrder": 2
+  },
+  {
+    "key": "ru",
+    "enabled": true,
+    "sortOrder": 3
+  },
+  {
+    "key": "en",
+    "enabled": true,
+    "sortOrder": 4
+  },
+  {
+    "key": "me",
+    "enabled": false,
+    "sortOrder": 5
+  }
+]

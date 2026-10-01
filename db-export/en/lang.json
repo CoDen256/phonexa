@@ -1,0 +1,320 @@
+{
+  "key": "en",
+  "label": "English (GA)",
+  "color": "#93c5fd",
+  "vowels": [
+    {
+      "symbols": [
+        "i"
+      ],
+      "heightBackness": [
+        0.03,
+        0.02
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Close front unrounded",
+      "f1": 343.0,
+      "f2": 2322.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɪ"
+      ],
+      "heightBackness": [
+        0.25,
+        0.2
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Near-close near-front unrounded",
+      "f1": 429.0,
+      "f2": 2033.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɛ"
+      ],
+      "heightBackness": [
+        0.6,
+        0.04
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Open-mid front unrounded",
+      "f1": 588.0,
+      "f2": 1802.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "æ"
+      ],
+      "heightBackness": [
+        0.833,
+        0.02
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Near-open front unrounded",
+      "f1": 591.0,
+      "f2": 1930.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɑ"
+      ],
+      "heightBackness": [
+        0.97,
+        0.9
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Open back unrounded",
+      "f1": 756.0,
+      "f2": 1308.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɔ"
+      ],
+      "heightBackness": [
+        0.71,
+        0.96
+      ],
+      "type": "variable",
+      "rounded": true,
+      "desc": "Open-mid back rounded",
+      "f1": 656.0,
+      "f2": 1023.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ʊ"
+      ],
+      "heightBackness": [
+        0.25,
+        0.77
+      ],
+      "type": "variable",
+      "rounded": true,
+      "desc": "Near-close near-back rounded",
+      "f1": 469.0,
+      "f2": 1122.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "u"
+      ],
+      "heightBackness": [
+        0.04,
+        0.89
+      ],
+      "type": "variable",
+      "rounded": true,
+      "desc": "Close back rounded",
+      "f1": 380.0,
+      "f2": 992.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ʌ"
+      ],
+      "heightBackness": [
+        0.73,
+        0.62
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Open-mid back unrounded",
+      "f1": 621.0,
+      "f2": 1181.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ə"
+      ],
+      "heightBackness": [
+        0.5,
+        0.5
+      ],
+      "type": "short",
+      "rounded": false,
+      "desc": "Mid central (schwa)",
+      "f1": 0.0,
+      "f2": 0.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɝ",
+        "ɛː"
+      ],
+      "heightBackness": [
+        0.47,
+        0.5
+      ],
+      "type": "long",
+      "rounded": false,
+      "desc": "Open-mid central unrounded",
+      "f1": 475.0,
+      "f2": 1379.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_central_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "eɪ"
+      ],
+      "heightBackness": [
+        0.4,
+        0.02
+      ],
+      "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphthong e → ɪ",
+      "f1": 476.0,
+      "f2": 2089.0,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.25,
+          0.2
+        ],
+        "rounded": false,
+        "f1": 429.0,
+        "f2": 2033.0
+      }
+    },
+    {
+      "symbols": [
+        "oʊ"
+      ],
+      "heightBackness": [
+        0.44,
+        0.9
+      ],
+      "type": "diphthong",
+      "rounded": true,
+      "desc": "Diphthong o → ʊ",
+      "f1": 498.0,
+      "f2": 910.0,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.25,
+          0.77
+        ],
+        "rounded": true,
+        "f1": 469.0,
+        "f2": 1122.0
+      }
+    },
+    {
+      "symbols": [
+        "aɪ"
+      ],
+      "heightBackness": [
+        0.97,
+        0.2
+      ],
+      "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphthong a → ɪ",
+      "f1": null,
+      "f2": null,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.25,
+          0.2
+        ],
+        "rounded": false,
+        "f1": 429.0,
+        "f2": 2033.0
+      }
+    },
+    {
+      "symbols": [
+        "aʊ"
+      ],
+      "heightBackness": [
+        0.97,
+        0.2
+      ],
+      "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphthong a → ʊ",
+      "f1": null,
+      "f2": null,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.25,
+          0.77
+        ],
+        "rounded": true,
+        "f1": 469.0,
+        "f2": 1122.0
+      }
+    },
+    {
+      "symbols": [
+        "ɔɪ"
+      ],
+      "heightBackness": [
+        0.71,
+        0.96
+      ],
+      "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphthong ɔ → ɪ",
+      "f1": null,
+      "f2": null,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.25,
+          0.2
+        ],
+        "rounded": false,
+        "f1": 429.0,
+        "f2": 2033.0
+      }
+    }
+  ]
+}

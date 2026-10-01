@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: phonexa
+      POSTGRES_USER: phonexa
+      POSTGRES_PASSWORD: phonexa
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"   # published for local dev (native nix-shell app connecting in); drop for a locked-down deploy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phonexa"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  adminer:
+    image: adminer
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+
+  backend:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://phonexa:phonexa@postgres:5432/phonexa
+      AUDIO_STORAGE_ROOT: /data/audio
+      AUDIO_BACKEND: local
+    volumes:
+      - audio_data:/data/audio
+    ports:
+      - "5050:5050"
+
+volumes:
+  pgdata:
+  audio_data:

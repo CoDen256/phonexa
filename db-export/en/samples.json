@@ -1,0 +1,1814 @@
+[
+  {
+    "text": "iː",
+    "phonemic": "/iː/",
+    "representative": "i",
+    "audio": {
+      "soundId": 255
+    },
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 86,
+        "timeEndMs": 474,
+        "legacyAnalysis": {
+          "f1": 251,
+          "f2": 1700,
+          "max_f": 5000,
+          "slice": [
+            86,
+            474
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 2300,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "green",
+    "phonemic": "/ɡriːn/",
+    "representative": null,
+    "audio": {
+      "soundId": 256
+    },
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": 135,
+        "timeEndMs": 250,
+        "legacyAnalysis": {
+          "f1": 321,
+          "f2": 2028,
+          "max_f": 5000,
+          "slice": [
+            135,
+            250
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 2250,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "heed",
+    "phonemic": "/hiːd/",
+    "representative": null,
+    "audio": {
+      "soundId": 257
+    },
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 253,
+        "timeEndMs": 439,
+        "legacyAnalysis": {
+          "f1": 346,
+          "f2": 2426,
+          "max_f": 5000,
+          "slice": [
+            253,
+            439
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "feet",
+    "phonemic": "/fiːt/",
+    "representative": null,
+    "audio": {
+      "soundId": 258
+    },
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "seen",
+    "phonemic": "/siːn/",
+    "representative": null,
+    "audio": {
+      "soundId": 259
+    },
+    "tokens": [
+      {
+        "symbol": "i",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɪ",
+    "phonemic": "/ɪ/",
+    "representative": "ɪ",
+    "audio": {
+      "soundId": 260
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 61,
+        "timeEndMs": 169,
+        "legacyAnalysis": {
+          "f1": 306,
+          "f2": 2395,
+          "max_f": 5000,
+          "slice": [
+            61,
+            169
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 2200,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "pink",
+    "phonemic": "/pɪŋk/",
+    "representative": null,
+    "audio": {
+      "soundId": 261
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 57,
+        "timeEndMs": 164,
+        "legacyAnalysis": {
+          "f1": 466,
+          "f2": 1980,
+          "max_f": 5000,
+          "slice": [
+            57,
+            164
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 2000,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "hid",
+    "phonemic": "/hɪd/",
+    "representative": null,
+    "audio": {
+      "soundId": 262
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 216,
+        "timeEndMs": 357,
+        "legacyAnalysis": {
+          "f1": 390,
+          "f2": 2091,
+          "max_f": 5000,
+          "slice": [
+            216,
+            357
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "kit",
+    "phonemic": "/kɪt/",
+    "representative": null,
+    "audio": {
+      "soundId": 263
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bit",
+    "phonemic": "/bɪt/",
+    "representative": null,
+    "audio": {
+      "soundId": 264
+    },
+    "tokens": [
+      {
+        "symbol": "ɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɛ",
+    "phonemic": "/ɛ/",
+    "representative": "ɛ",
+    "audio": {
+      "soundId": 265
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 65,
+        "timeEndMs": 175,
+        "legacyAnalysis": {
+          "f1": 528,
+          "f2": 1765,
+          "max_f": 5000,
+          "slice": [
+            65,
+            175
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "red",
+    "phonemic": "/rɛd/",
+    "representative": null,
+    "audio": {
+      "soundId": 266
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 66,
+        "timeEndMs": 196,
+        "legacyAnalysis": {
+          "f1": 594,
+          "f2": 1539,
+          "max_f": 5000,
+          "slice": [
+            66,
+            196
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "head",
+    "phonemic": "/hɛd/",
+    "representative": null,
+    "audio": {
+      "soundId": 267
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 231,
+        "timeEndMs": 356,
+        "legacyAnalysis": {
+          "f1": 623,
+          "f2": 1860,
+          "max_f": 5000,
+          "slice": [
+            231,
+            356
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "dress",
+    "phonemic": "/drɛs/",
+    "representative": null,
+    "audio": {
+      "soundId": 268
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          2,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bed",
+    "phonemic": "/bɛd/",
+    "representative": null,
+    "audio": {
+      "soundId": 269
+    },
+    "tokens": [
+      {
+        "symbol": "ɛ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "æ",
+    "phonemic": "/æ/",
+    "representative": "æ",
+    "audio": {
+      "soundId": 270
+    },
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 81,
+        "timeEndMs": 248,
+        "legacyAnalysis": {
+          "f1": 598,
+          "f2": 1707,
+          "max_f": 5000,
+          "slice": [
+            81,
+            248
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "sand",
+    "phonemic": "/sænd/",
+    "representative": null,
+    "audio": {
+      "soundId": 271
+    },
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 156,
+        "timeEndMs": 319,
+        "legacyAnalysis": {
+          "f1": 508,
+          "f2": 1894,
+          "max_f": 5000,
+          "slice": [
+            156,
+            319
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "had",
+    "phonemic": "/hæd/",
+    "representative": null,
+    "audio": {
+      "soundId": 272
+    },
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 235,
+        "timeEndMs": 403,
+        "legacyAnalysis": {
+          "f1": 660,
+          "f2": 1954,
+          "max_f": 5000,
+          "slice": [
+            235,
+            403
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "trap",
+    "phonemic": "/træp/",
+    "representative": null,
+    "audio": {
+      "soundId": 273
+    },
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [
+          2,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "cat",
+    "phonemic": "/kæt/",
+    "representative": null,
+    "audio": {
+      "soundId": 274
+    },
+    "tokens": [
+      {
+        "symbol": "æ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɑ",
+    "phonemic": "/ɑ/",
+    "representative": "ɑ",
+    "audio": {
+      "soundId": 275
+    },
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 152,
+        "timeEndMs": 346,
+        "legacyAnalysis": {
+          "f1": 633,
+          "f2": 1050,
+          "max_f": 5000,
+          "slice": [
+            152,
+            346
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "coffee",
+    "phonemic": "/ˈkɑːfi/",
+    "representative": null,
+    "audio": {
+      "soundId": 276
+    },
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 148,
+        "timeEndMs": 284,
+        "legacyAnalysis": {
+          "f1": 724,
+          "f2": 1078,
+          "max_f": 5000,
+          "slice": [
+            148,
+            284
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "hod",
+    "phonemic": "/hɑːd/",
+    "representative": null,
+    "audio": {
+      "soundId": 277
+    },
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 243,
+        "timeEndMs": 428,
+        "legacyAnalysis": {
+          "f1": 795,
+          "f2": 1276,
+          "max_f": 5000,
+          "slice": [
+            243,
+            428
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "father",
+    "phonemic": "/ˈfɑːðər/",
+    "representative": null,
+    "audio": {
+      "soundId": 278
+    },
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "palm",
+    "phonemic": "/pɑːm/",
+    "representative": null,
+    "audio": {
+      "soundId": 279
+    },
+    "tokens": [
+      {
+        "symbol": "ɑ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɔ",
+    "phonemic": "/ɔ/",
+    "representative": "ɔ",
+    "audio": {
+      "soundId": 280
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 101,
+        "timeEndMs": 335,
+        "legacyAnalysis": {
+          "f1": 447,
+          "f2": 718,
+          "max_f": 5000,
+          "slice": [
+            101,
+            335
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "mauve",
+    "phonemic": "/mɔːv/",
+    "representative": null,
+    "audio": {
+      "soundId": 281
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 187,
+        "timeEndMs": 383,
+        "legacyAnalysis": {
+          "f1": 631,
+          "f2": 891,
+          "max_f": 5000,
+          "slice": [
+            187,
+            383
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "hawed",
+    "phonemic": "/hɔːd/",
+    "representative": null,
+    "audio": {
+      "soundId": 282
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          1,
+          4
+        ],
+        "timeStartMs": 288,
+        "timeEndMs": 467,
+        "legacyAnalysis": {
+          "f1": 688,
+          "f2": 1051,
+          "max_f": 5000,
+          "slice": [
+            288,
+            467
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "thought",
+    "phonemic": "/θɔːt/",
+    "representative": null,
+    "audio": {
+      "soundId": 283
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          2,
+          6
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "claw",
+    "phonemic": "/klɔː/",
+    "representative": null,
+    "audio": {
+      "soundId": 284
+    },
+    "tokens": [
+      {
+        "symbol": "ɔ",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʊ",
+    "phonemic": "/ʊ/",
+    "representative": "ʊ",
+    "audio": {
+      "soundId": 285
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 74,
+        "timeEndMs": 290,
+        "legacyAnalysis": {
+          "f1": 174,
+          "f2": 1243,
+          "max_f": 5000,
+          "slice": [
+            74,
+            290
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "wood",
+    "phonemic": "/wʊd/",
+    "representative": null,
+    "audio": {
+      "soundId": 286
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 74,
+        "timeEndMs": 197,
+        "legacyAnalysis": {
+          "f1": 410,
+          "f2": 917,
+          "max_f": 5000,
+          "slice": [
+            74,
+            197
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "hood",
+    "phonemic": "/hʊd/",
+    "representative": null,
+    "audio": {
+      "soundId": 287
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 218,
+        "timeEndMs": 362,
+        "legacyAnalysis": {
+          "f1": 490,
+          "f2": 1033,
+          "max_f": 5000,
+          "slice": [
+            218,
+            362
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "foot",
+    "phonemic": "/fʊt/",
+    "representative": null,
+    "audio": {
+      "soundId": 288
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "put",
+    "phonemic": "/pʊt/",
+    "representative": null,
+    "audio": {
+      "soundId": 289
+    },
+    "tokens": [
+      {
+        "symbol": "ʊ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "u",
+    "phonemic": "/uː/",
+    "representative": "u",
+    "audio": {
+      "soundId": 290
+    },
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 171,
+        "timeEndMs": 303,
+        "legacyAnalysis": {
+          "f1": 275,
+          "f2": 576,
+          "max_f": 5000,
+          "slice": [
+            171,
+            303
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1000,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "blue",
+    "phonemic": "/bluː/",
+    "representative": null,
+    "audio": {
+      "soundId": 291
+    },
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": 142,
+        "timeEndMs": 247,
+        "legacyAnalysis": {
+          "f1": 320,
+          "f2": 821,
+          "max_f": 5000,
+          "slice": [
+            142,
+            247
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1000,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "who'd",
+    "phonemic": "/huːd/",
+    "representative": null,
+    "audio": {
+      "soundId": 292
+    },
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": 220,
+        "timeEndMs": 385,
+        "legacyAnalysis": {
+          "f1": 366,
+          "f2": 909,
+          "max_f": 5000,
+          "slice": [
+            220,
+            385
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "goose",
+    "phonemic": "/ɡuːs/",
+    "representative": null,
+    "audio": {
+      "soundId": 293
+    },
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "food",
+    "phonemic": "/fuːd/",
+    "representative": null,
+    "audio": {
+      "soundId": 294
+    },
+    "tokens": [
+      {
+        "symbol": "u",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ʌ",
+    "phonemic": "/ʌ/",
+    "representative": "ʌ",
+    "audio": {
+      "soundId": 295
+    },
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 105,
+        "timeEndMs": 392,
+        "legacyAnalysis": {
+          "f1": 627,
+          "f2": 941,
+          "max_f": 5000,
+          "slice": [
+            105,
+            392
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "cut",
+    "phonemic": "/kʌt/",
+    "representative": null,
+    "audio": {
+      "soundId": 296
+    },
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 504,
+        "timeEndMs": 603,
+        "legacyAnalysis": {
+          "f1": 646,
+          "f2": 1339,
+          "max_f": 5000,
+          "slice": [
+            504,
+            603
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "hud",
+    "phonemic": "/hʌd/",
+    "representative": null,
+    "audio": {
+      "soundId": 297
+    },
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 203,
+        "timeEndMs": 403,
+        "legacyAnalysis": {
+          "f1": 665,
+          "f2": 1291,
+          "max_f": 5000,
+          "slice": [
+            203,
+            403
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "strut",
+    "phonemic": "/strʌt/",
+    "representative": null,
+    "audio": {
+      "soundId": 298
+    },
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [
+          3,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bus",
+    "phonemic": "/bʌs/",
+    "representative": null,
+    "audio": {
+      "soundId": 299
+    },
+    "tokens": [
+      {
+        "symbol": "ʌ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ə",
+    "phonemic": "/ə/",
+    "representative": "ə",
+    "audio": {
+      "soundId": 300
+    },
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 64,
+        "timeEndMs": 205,
+        "legacyAnalysis": {
+          "f1": 569,
+          "f2": 1247,
+          "max_f": 5000,
+          "slice": [
+            64,
+            205
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "dust",
+    "phonemic": "/dəst/",
+    "representative": null,
+    "audio": {
+      "soundId": 301
+    },
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": 62,
+        "timeEndMs": 193,
+        "legacyAnalysis": {
+          "f1": 701,
+          "f2": 1250,
+          "max_f": 5000,
+          "slice": [
+            62,
+            193
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "about",
+    "phonemic": "/əˈbaʊt/",
+    "representative": null,
+    "audio": {
+      "soundId": 302
+    },
+    "tokens": [
+      {
+        "symbol": "ə",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɝ",
+    "phonemic": "/ɝː/",
+    "representative": "ɝ",
+    "audio": {
+      "soundId": 303
+    },
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": 49,
+        "timeEndMs": 197,
+        "legacyAnalysis": {
+          "f1": 420,
+          "f2": 1087,
+          "max_f": 5000,
+          "slice": [
+            49,
+            197
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "purple",
+    "phonemic": "/ˈpɜːrpl/",
+    "representative": null,
+    "audio": {
+      "soundId": 304
+    },
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 64,
+        "timeEndMs": 156,
+        "legacyAnalysis": {
+          "f1": 489,
+          "f2": 1112,
+          "max_f": 5000,
+          "slice": [
+            64,
+            156
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "heard",
+    "phonemic": "/hɜːrd/",
+    "representative": null,
+    "audio": {
+      "soundId": 305
+    },
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": 251,
+        "timeEndMs": 466,
+        "legacyAnalysis": {
+          "f1": 506,
+          "f2": 1406,
+          "max_f": 5000,
+          "slice": [
+            251,
+            466
+          ],
+          "median_n": 5,
+          "rms_floor": 0.005,
+          "window_ms": 25,
+          "n_formants": 5,
+          "back_ceiling": 1800,
+          "pre_emphasis": 50,
+          "back_front_ratio": 0.75,
+          "back_ceiling_ratio": 0.95
+        }
+      }
+    ]
+  },
+  {
+    "text": "nurse",
+    "phonemic": "/nɜːrs/",
+    "representative": null,
+    "audio": {
+      "soundId": 306
+    },
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "bird",
+    "phonemic": "/bɜːrd/",
+    "representative": null,
+    "audio": {
+      "soundId": 307
+    },
+    "tokens": [
+      {
+        "symbol": "ɝ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "eɪ",
+    "phonemic": "/eɪ/",
+    "representative": "eɪ",
+    "audio": {
+      "soundId": 308
+    },
+    "tokens": [
+      {
+        "symbol": "eɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "jade",
+    "phonemic": "/dʒeɪd/",
+    "representative": null,
+    "audio": {
+      "soundId": 309
+    },
+    "tokens": [
+      {
+        "symbol": "eɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "hayed",
+    "phonemic": "/heɪd/",
+    "representative": null,
+    "audio": {
+      "soundId": 310
+    },
+    "tokens": [
+      {
+        "symbol": "eɪ",
+        "position": [
+          1,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "oʊ",
+    "phonemic": "/oʊ/",
+    "representative": "oʊ",
+    "audio": {
+      "soundId": 311
+    },
+    "tokens": [
+      {
+        "symbol": "oʊ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "gold",
+    "phonemic": "/ɡoʊld/",
+    "representative": null,
+    "audio": {
+      "soundId": 312
+    },
+    "tokens": [
+      {
+        "symbol": "oʊ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "hoed",
+    "phonemic": "/hoʊd/",
+    "representative": null,
+    "audio": {
+      "soundId": 313
+    },
+    "tokens": [
+      {
+        "symbol": "oʊ",
+        "position": [
+          1,
+          3
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "aɪ",
+    "phonemic": "/aɪ/",
+    "representative": "aɪ",
+    "audio": {
+      "soundId": 314
+    },
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "lime",
+    "phonemic": "/laɪm/",
+    "representative": null,
+    "audio": {
+      "soundId": 315
+    },
+    "tokens": [
+      {
+        "symbol": "aɪ",
+        "position": [
+          1,
+          2
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "aʊ",
+    "phonemic": "/aʊ/",
+    "representative": "aʊ",
+    "audio": {
+      "soundId": 316
+    },
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "brown",
+    "phonemic": "/braʊn/",
+    "representative": null,
+    "audio": {
+      "soundId": 317
+    },
+    "tokens": [
+      {
+        "symbol": "aʊ",
+        "position": [
+          2,
+          4
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "ɔɪ",
+    "phonemic": "/ɔɪ/",
+    "representative": "ɔɪ",
+    "audio": {
+      "soundId": 318
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          0,
+          1
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  },
+  {
+    "text": "turquoise",
+    "phonemic": "/ˈtɜːrkwɔɪz/",
+    "representative": null,
+    "audio": {
+      "soundId": 319
+    },
+    "tokens": [
+      {
+        "symbol": "ɔɪ",
+        "position": [
+          4,
+          7
+        ],
+        "timeStartMs": null,
+        "timeEndMs": null,
+        "legacyAnalysis": null
+      }
+    ]
+  }
+]

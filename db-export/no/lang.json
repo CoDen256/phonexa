@@ -1,0 +1,422 @@
+{
+  "key": "no",
+  "label": "Norwegian",
+  "color": "#67e8f9",
+  "vowels": [
+    {
+      "symbols": [
+        "iː"
+      ],
+      "heightBackness": [
+        0.02,
+        0.045
+      ],
+      "type": "long",
+      "rounded": false,
+      "desc": "Close front unrounded",
+      "f1": 274.0,
+      "f2": 2083.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɪ"
+      ],
+      "heightBackness": [
+        0.02,
+        0.045
+      ],
+      "type": "short",
+      "rounded": false,
+      "desc": "Near-close near-front unrounded",
+      "f1": 272.0,
+      "f2": 2090.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "yː"
+      ],
+      "heightBackness": [
+        0.02,
+        0.12
+      ],
+      "type": "long",
+      "rounded": true,
+      "desc": "Close front rounded (protruded)",
+      "f1": 231.0,
+      "f2": 2091.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ʏ"
+      ],
+      "heightBackness": [
+        0.02,
+        0.2
+      ],
+      "type": "short",
+      "rounded": true,
+      "desc": "Near-close near-front rounded (protruded)",
+      "f1": 270.0,
+      "f2": 1810.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-front_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ʉː"
+      ],
+      "heightBackness": [
+        0.02,
+        0.34
+      ],
+      "type": "long",
+      "rounded": true,
+      "desc": "Close central rounded",
+      "f1": 239.0,
+      "f2": 1509.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ʉ"
+      ],
+      "heightBackness": [
+        0.02,
+        0.5
+      ],
+      "type": "short",
+      "rounded": true,
+      "desc": "Close central rounded",
+      "f1": 266.0,
+      "f2": 1337.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "uː"
+      ],
+      "heightBackness": [
+        0.02,
+        0.98
+      ],
+      "type": "long",
+      "rounded": true,
+      "desc": "Close back rounded",
+      "f1": 250.0,
+      "f2": 567.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ʊ"
+      ],
+      "heightBackness": [
+        0.02,
+        0.98
+      ],
+      "type": "short",
+      "rounded": true,
+      "desc": "Near-close near-back rounded",
+      "f1": 287.0,
+      "f2": 685.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-close_near-back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "eː"
+      ],
+      "heightBackness": [
+        0.34,
+        0.05
+      ],
+      "type": "long",
+      "rounded": false,
+      "desc": "Close-mid front unrounded",
+      "f1": 376.0,
+      "f2": 2006.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɛ"
+      ],
+      "heightBackness": [
+        0.5,
+        0.0
+      ],
+      "type": "short",
+      "rounded": false,
+      "desc": "Open-mid front unrounded",
+      "f1": 465.0,
+      "f2": 1730.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "øː"
+      ],
+      "heightBackness": [
+        0.34,
+        0.5
+      ],
+      "type": "long",
+      "rounded": true,
+      "desc": "Close-mid front rounded",
+      "f1": 337.0,
+      "f2": 1254.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_front_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɘ"
+      ],
+      "heightBackness": [
+        0.41,
+        0.5
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Close-mid central unrounded",
+      "f1": null,
+      "f2": null,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_central_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "œ"
+      ],
+      "heightBackness": [
+        0.41,
+        0.5
+      ],
+      "type": "short",
+      "rounded": true,
+      "desc": "Open-mid front rounded",
+      "f1": 400.0,
+      "f2": 1326.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ə"
+      ],
+      "heightBackness": [
+        0.5,
+        0.5
+      ],
+      "type": "short",
+      "rounded": false,
+      "desc": "Mid central (Schwa)",
+      "f1": 433.0,
+      "f2": 1334.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Mid-central_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "oː"
+      ],
+      "heightBackness": [
+        0.349,
+        0.98
+      ],
+      "type": "long",
+      "rounded": true,
+      "desc": "Close-mid back rounded",
+      "f1": 341.0,
+      "f2": 671.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close-mid_back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɔ"
+      ],
+      "heightBackness": [
+        0.38,
+        0.96
+      ],
+      "type": "short",
+      "rounded": true,
+      "desc": "Open-mid back rounded",
+      "f1": 360.0,
+      "f2": 778.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɑ"
+      ],
+      "heightBackness": [
+        0.98,
+        0.94
+      ],
+      "type": "short",
+      "rounded": false,
+      "desc": "Open back unrounded",
+      "f1": 602.0,
+      "f2": 1000.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɑː"
+      ],
+      "heightBackness": [
+        0.98,
+        0.99
+      ],
+      "type": "long",
+      "rounded": false,
+      "desc": "Open back unrounded",
+      "f1": 620.0,
+      "f2": 924.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open_back_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "æ"
+      ],
+      "heightBackness": [
+        0.98,
+        0.25
+      ],
+      "type": "short",
+      "rounded": false,
+      "desc": "Near-open front unrounded",
+      "f1": 695.0,
+      "f2": 1353.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "æː"
+      ],
+      "heightBackness": [
+        0.98,
+        0.02
+      ],
+      "type": "long",
+      "rounded": false,
+      "desc": "Near-open front unrounded",
+      "f1": 778.0,
+      "f2": 1360.0,
+      "audio": null,
+      "wikiUrl": "https://en.wikipedia.org/wiki/Near-open_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "æʉ"
+      ],
+      "heightBackness": [
+        0.98,
+        0.25
+      ],
+      "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphtong æ (○ unrounded) → ʉ (⊙ rounded)",
+      "f1": null,
+      "f2": null,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.165,
+          0.3413
+        ],
+        "rounded": true,
+        "f1": 266.0,
+        "f2": 1337.0
+      }
+    },
+    {
+      "symbols": [
+        "æɪ"
+      ],
+      "heightBackness": [
+        0.98,
+        0.25
+      ],
+      "type": "diphthong",
+      "rounded": false,
+      "desc": "Diphtong æ (○ unrounded) → ɪ (○ unrounded)",
+      "f1": null,
+      "f2": null,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.167,
+          0.1
+        ],
+        "rounded": false,
+        "f1": 272.0,
+        "f2": 2090.0
+      }
+    },
+    {
+      "symbols": [
+        "œʏ"
+      ],
+      "heightBackness": [
+        0.41,
+        0.5
+      ],
+      "type": "diphthong",
+      "rounded": true,
+      "desc": "Diphtong œ (⊙ rounded) → ʏ (⊙ rounded)",
+      "f1": null,
+      "f2": null,
+      "audio": null,
+      "wikiUrl": "",
+      "target": {
+        "heightBackness": [
+          0.167,
+          0.1
+        ],
+        "rounded": true,
+        "f1": 270.0,
+        "f2": 1810.0
+      }
+    }
+  ]
+}

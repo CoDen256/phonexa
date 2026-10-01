@@ -1,0 +1,121 @@
+{
+  "key": "me",
+  "label": "Denys",
+  "color": "#fb7185",
+  "vowels": [
+    {
+      "symbols": [
+        "i"
+      ],
+      "heightBackness": [
+        0.05,
+        0.0
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Close front unrounded",
+      "f1": 271.48,
+      "f2": 2380.4,
+      "audio": {
+        "soundId": 320
+      },
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɨ"
+      ],
+      "heightBackness": [
+        0.0,
+        0.7
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Close central unrounded",
+      "f1": 339.86,
+      "f2": 1854.85,
+      "audio": {
+        "soundId": 321
+      },
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_central_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "u"
+      ],
+      "heightBackness": [
+        0.09,
+        1.0
+      ],
+      "type": "variable",
+      "rounded": true,
+      "desc": "Close back rounded",
+      "f1": 317.03,
+      "f2": 565.81,
+      "audio": {
+        "soundId": 322
+      },
+      "wikiUrl": "https://en.wikipedia.org/wiki/Close_back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "o"
+      ],
+      "heightBackness": [
+        0.61,
+        1.0
+      ],
+      "type": "variable",
+      "rounded": true,
+      "desc": "Mid front rounded ɔ̝/o̞",
+      "f1": 526.83,
+      "f2": 803.64,
+      "audio": {
+        "soundId": 323
+      },
+      "wikiUrl": "https://en.wikipedia.org/wiki/Mid_back_rounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "ɛ"
+      ],
+      "heightBackness": [
+        0.57,
+        0.0
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Open-mid front unrounded",
+      "f1": 629.02,
+      "f2": 1830.72,
+      "audio": {
+        "soundId": 324
+      },
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open-mid_front_unrounded_vowel",
+      "target": null
+    },
+    {
+      "symbols": [
+        "a"
+      ],
+      "heightBackness": [
+        1.0,
+        0.25
+      ],
+      "type": "variable",
+      "rounded": false,
+      "desc": "Open front unrounded",
+      "f1": 853.77,
+      "f2": 1309.47,
+      "audio": {
+        "soundId": 325
+      },
+      "wikiUrl": "https://en.wikipedia.org/wiki/Open_front_unrounded_vowel",
+      "target": null
+    }
+  ]
+}
