@@ -1924,7 +1924,7 @@
     "representative": null
   },
   {
-    "text": "a",
+    "text": "ɑː",
     "audio": "lang/no/audio/pavei/a.wav",
     "phonemic": null,
     "tokens": [
@@ -1934,7 +1934,7 @@
         "analysis": {
           "slice": [195, 275],
           "f1": 634.14,
-          "f2": 912.80,
+          "f2": 912.8,
           "max_f": 5000,
           "n_formants": 5,
           "window_ms": 25,
@@ -1969,7 +1969,7 @@
     "tokens": [
       {
         "symbol": "ɑː",
-        "position": [0, 1],
+        "position": [2, 3],
         "analysis": null
       }
     ],
