@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sound Library — IPA Vowel Chart</title>
+  <link rel="stylesheet" href="css/index.css">
+  <style>
+    .sounds-wrap { width:100%; max-width:1000px; margin:0 auto; }
+    .sounds-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:.75rem; color:var(--muted); }
+    .sounds-toolbar input { background:#1a2e48; border:1px solid #2e4560; border-radius:6px; color:#d8e8f4; padding:5px 9px; font-size:.78rem; flex:1; }
+    table.sounds-table { width:100%; border-collapse:collapse; font-size:.75rem; }
+    .sounds-table th { text-align:left; color:#4a6888; font-weight:700; text-transform:uppercase; letter-spacing:.05em; font-size:.65rem; padding:6px 8px; border-bottom:1px solid var(--border); }
+    .sounds-table td { padding:6px 8px; border-bottom:1px solid #1e3048; vertical-align:middle; }
+    .sounds-table tr:hover td { background:#1a2636; }
+    .sounds-id { color:#4a7090; font-family:monospace; }
+    .sounds-key { font-family:monospace; color:#8fa8c0; word-break:break-all; }
+    .sounds-prov { font-size:.66rem; padding:1px 7px; border-radius:10px; border:1px solid #2e4560; color:var(--muted); white-space:nowrap; }
+    .sounds-missing { color:#f43f5e; font-size:.66rem; }
+    audio { height:30px; max-width:220px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Sound Library</h1>
+  <p>Every Sound row in the database — listen, check provenance, spot dangling references</p>
+  <a href="index.html"  class="editor-link">← Vowel Chart</a>
+  <a href="editor.html" class="editor-link">✎ Edit languages</a>
+</header>
+
+<div class="sounds-wrap">
+  <div class="sounds-toolbar">
+    <span id="soundCount">Loading…</span>
+    <input type="text" id="filterInput" placeholder="Filter by storage key, filename, or provenance…">
+  </div>
+  <table class="sounds-table">
+    <thead><tr><th>ID</th><th>Audio</th><th>Storage key / URL</th><th>Provenance</th><th>Duration</th></tr></thead>
+    <tbody id="soundsBody"></tbody>
+  </table>
+</div>
+
+<script src="js/sounds.js"></script>
+</body>
+</html>

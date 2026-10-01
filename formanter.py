@@ -997,6 +997,46 @@ def http_transcribe():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Phase 0 DB browsing (read-only) — lets you actually listen to what the
+# migration loaded instead of just reading storage_key strings off a table.
+# Expect this to be superseded by a real ingestion/library API in Phase 1+.
+# ══════════════════════════════════════════════════════════════════════════════
+
+from db.session import get_sessionmaker  # noqa: E402
+from db.models import Sound  # noqa: E402
+from db.storage import get_audio_store  # noqa: E402
+from flask import send_file, abort  # noqa: E402
+
+
+@app.route('/api/v1/sounds')
+def list_sounds():
+    try:
+        store = get_audio_store()
+        with get_sessionmaker()() as db:
+            sounds = db.query(Sound).order_by(Sound.id).all()
+            return jsonify([{
+                'id': s.id,
+                'storageKey': s.storage_key,
+                'sourceUrl': s.source_url,
+                'originalFilename': s.original_filename,
+                'durationMs': s.duration_ms,
+                'provenance': s.provenance,
+                'hasFile': bool(s.storage_key) and store.exists(s.storage_key),
+                'audioUrl': f'/audio/{s.storage_key}' if s.storage_key else s.source_url,
+            } for s in sounds])
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
+
+
+@app.route('/audio/<path:storage_key>')
+def serve_audio(storage_key):
+    store = get_audio_store()
+    if not store.exists(storage_key):
+        abort(404)
+    return send_file(store.get_path(storage_key), conditional=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Static frontend
 # ══════════════════════════════════════════════════════════════════════════════
 
