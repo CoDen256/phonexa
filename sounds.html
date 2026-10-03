@@ -20,6 +20,11 @@
     .sounds-prov { font-size:.66rem; padding:1px 7px; border-radius:10px; border:1px solid #2e4560; color:var(--muted); white-space:nowrap; }
     .sounds-missing { color:#f43f5e; font-size:.66rem; }
     audio { height:30px; max-width:220px; }
+    .sent-btn {
+      display:inline-block; padding:4px 10px; border-radius:7px; border:1px solid #2e4560;
+      background:#1a2e48; color:#d8e8f4; text-decoration:none; font-size:.72rem; white-space:nowrap;
+    }
+    .sent-btn:hover { background:#243c5a; border-color:#4a7098; }
   </style>
 </head>
 <body>
@@ -29,6 +34,7 @@
   <p>Every Sound row in the database — listen, check provenance, spot dangling references</p>
   <a href="index.html"  class="editor-link">← Vowel Chart</a>
   <a href="editor.html" class="editor-link">✎ Edit languages</a>
+  <a href="tokens.html" class="editor-link">⌸ Token Browser</a>
 </header>
 
 <div class="sounds-wrap">
@@ -45,6 +51,7 @@
       <th data-key="durationMs">Duration</th>
       <th data-key="createdAt">Created</th>
       <th data-key="updatedAt">Updated</th>
+      <th></th>
     </tr></thead>
     <tbody id="soundsBody"></tbody>
   </table>

@@ -854,6 +854,19 @@ def http_analyze_praat():
     except Exception:
         config = {}
 
+    try:
+        samples, sample_rate = decode_audio(uploaded_file)
+        result = run_full_praat_analysis(samples, sample_rate, config)
+        return jsonify(result)
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
+
+
+def run_full_praat_analysis(samples: np.ndarray, sample_rate: float, config: dict) -> dict:
+    """The literal-Praat-defaults analysis /analyze-praat exposes, factored out
+    so /api/v1/samples/<id>/analyze (Phase 5) can run the exact same pipeline
+    server-side against a persisted sample's own stored audio, not just a
+    client-uploaded file."""
     max_number_of_formants = float(config.get('max_number_of_formants', 5))
     maximum_formant         = float(config.get('maximum_formant', 5500))
     window_length           = float(config.get('window_length', 0.025))
@@ -863,49 +876,50 @@ def http_analyze_praat():
     pitch_ceiling           = float(config.get('pitch_ceiling', 600))
     pitch_time_step         = float(config.get('pitch_time_step', 0)) or None
 
-    try:
-        samples, sample_rate = decode_audio(uploaded_file)
-        sound = make_praat_sound(samples, sample_rate)
+    sound = make_praat_sound(samples, sample_rate)
 
-        formant = sound.to_formant_burg(
-            time_step=formant_time_step,
-            max_number_of_formants=max_number_of_formants,
-            maximum_formant=maximum_formant,
-            window_length=window_length,
-            pre_emphasis_from=pre_emphasis_from,
-        )
-        formants_out = []
-        for t in formant.xs():
-            row = {'t_ms': round(t * 1000, 1)}
-            for i in range(1, 6):
-                f = formant.get_value_at_time(i, t)
-                b = formant.get_bandwidth_at_time(i, t)
-                row[f'f{i}'] = None if math.isnan(f) else round(f, 1)
-                row[f'b{i}'] = None if math.isnan(b) else round(b, 1)
-            formants_out.append(row)
+    formant = sound.to_formant_burg(
+        time_step=formant_time_step,
+        max_number_of_formants=max_number_of_formants,
+        maximum_formant=maximum_formant,
+        window_length=window_length,
+        pre_emphasis_from=pre_emphasis_from,
+    )
+    formants_out = []
+    for t in formant.xs():
+        row = {'t_ms': round(t * 1000, 1)}
+        for i in range(1, 6):
+            f = formant.get_value_at_time(i, t)
+            b = formant.get_bandwidth_at_time(i, t)
+            row[f'f{i}'] = None if math.isnan(f) else round(f, 1)
+            row[f'b{i}'] = None if math.isnan(b) else round(b, 1)
+        formants_out.append(row)
 
-        pitch = sound.to_pitch(time_step=pitch_time_step, pitch_floor=pitch_floor, pitch_ceiling=pitch_ceiling)
-        pitch_out = [
-            {'t_ms': round(t * 1000, 1), 'f0': None if freq <= 0 else round(float(freq), 1)}
-            for t, freq in zip(pitch.xs(), pitch.selected_array['frequency'])
-        ]
+    pitch = sound.to_pitch(time_step=pitch_time_step, pitch_floor=pitch_floor, pitch_ceiling=pitch_ceiling)
+    pitch_out = [
+        {'t_ms': round(t * 1000, 1), 'f0': None if freq <= 0 else round(float(freq), 1)}
+        for t, freq in zip(pitch.xs(), pitch.selected_array['frequency'])
+    ]
 
-        spectrogram = sound.to_spectrogram()
-        power_db = 10 * np.log10(np.maximum(spectrogram.values, 1e-20) / 4e-10)   # Praat's own dB reference (2e-5 Pa)²
-        spectrogram_out = {
-            'times_ms': [round(t * 1000, 1) for t in spectrogram.xs()],
-            'freqs_hz': [round(f, 1) for f in spectrogram.ys()],
-            'power_db': [[round(v, 1) for v in column] for column in power_db.T],   # → [time][freq]
-        }
+    spectrogram = sound.to_spectrogram()
+    power_db = 10 * np.log10(np.maximum(spectrogram.values, 1e-20) / 4e-10)   # Praat's own dB reference (2e-5 Pa)²
+    spectrogram_out = {
+        'times_ms': [round(t * 1000, 1) for t in spectrogram.xs()],
+        'freqs_hz': [round(f, 1) for f in spectrogram.ys()],
+        'power_db': [[round(v, 1) for v in column] for column in power_db.T],   # → [time][freq]
+    }
 
-        return jsonify({
-            'duration_ms': round(sound.duration * 1000, 1),
-            'formants': formants_out,
-            'pitch': pitch_out,
-            'spectrogram': spectrogram_out,
-        })
-    except Exception as error:
-        return jsonify({'error': str(error)}), 500
+    return {
+        'duration_ms': round(sound.duration * 1000, 1),
+        'formants': formants_out,
+        'pitch': pitch_out,
+        'spectrogram': spectrogram_out,
+        'config': {
+            'max_number_of_formants': max_number_of_formants, 'maximum_formant': maximum_formant,
+            'window_length': window_length, 'pre_emphasis_from': pre_emphasis_from,
+            'pitch_floor': pitch_floor, 'pitch_ceiling': pitch_ceiling,
+        },
+    }
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1005,7 +1019,7 @@ def http_transcribe():
 import re  # noqa: E402
 
 from db.session import get_sessionmaker  # noqa: E402
-from db.models import Language, Sample  # noqa: E402
+from db.models import Language, Sample, SampleAnalysis, Token, Vowel  # noqa: E402
 from db.storage import get_audio_store, is_local_url, storage_key_from_url, url_from_storage_key  # noqa: E402
 from flask import send_file, abort  # noqa: E402
 
@@ -1104,6 +1118,238 @@ def ingest_sample():
             }), 201
     except Exception as error:
         return jsonify({'error': str(error)}), 500
+
+
+def normalize_to_db_url(raw: str) -> str:
+    """Mirrors migrate_legacy_to_db.py's own normalization: external links are
+    used as-is; anything else is treated as a storage key (stripping a leading
+    "/audio/" — our own serving route prefix — and/or leading slash first)."""
+    if raw.startswith(('http://', 'https://')):
+        return raw
+    key = raw
+    if key.startswith('/audio/'):
+        key = key[len('/audio/'):]
+    return url_from_storage_key(key.lstrip('/'))
+
+
+def _token_json(t: Token) -> dict:
+    return {
+        'id': t.id, 'symbol': t.symbol, 'vowelId': t.vowel_id,
+        'charStart': t.char_start, 'charEnd': t.char_end,
+        'timeStartMs': t.time_start_ms, 'timeEndMs': t.time_end_ms,
+        'activeAnalysisId': t.active_analysis_id,
+        'manualF1': t.manual_f1, 'manualF2': t.manual_f2,
+    }
+
+
+@app.route('/api/v1/samples/find-or-create', methods=['POST'])
+def find_or_create_sample():
+    """Lets Formant Lab's legacy editor-launched path (a bare audio URL, no
+    DB id) get a real Sample row to attach tokens/analyses to, without
+    requiring every sample to have gone through the ingestion endpoint."""
+    data = request.get_json(silent=True) or {}
+    raw_url = (data.get('url') or '').strip()
+    if not raw_url:
+        return jsonify({'error': 'url is required'}), 400
+    db_url = normalize_to_db_url(raw_url)
+    with get_sessionmaker()() as db:
+        existing = db.query(Sample).filter_by(url=db_url).one_or_none()
+        if existing:
+            return jsonify({'id': existing.id})
+        language_id = data.get('languageId')
+        sample = Sample(
+            url=db_url, text=data.get('text') or None,
+            language_id=int(language_id) if language_id else None,
+        )
+        db.add(sample)
+        db.commit()
+        db.refresh(sample)
+        return jsonify({'id': sample.id}), 201
+
+
+@app.route('/api/v1/samples/<int:sample_id>')
+def get_sample(sample_id):
+    with get_sessionmaker()() as db:
+        sample = db.get(Sample, sample_id)
+        if sample is None:
+            return jsonify({'error': 'not found'}), 404
+        local = bool(sample.url) and is_local_url(sample.url)
+        storage_key = storage_key_from_url(sample.url) if local else None
+        return jsonify({
+            'id': sample.id, 'url': sample.url,
+            'audioUrl': f'/audio/{storage_key}' if storage_key else sample.url,
+            'text': sample.text, 'phonemic': sample.phonemic,
+            'languageId': sample.language_id, 'durationMs': sample.duration_ms,
+            'tokens': [_token_json(t) for t in sample.tokens],
+            'analyses': [{
+                'id': a.id, 'version': a.version, 'config': a.config,
+                'createdAt': a.created_at.isoformat() if a.created_at else None,
+            } for a in sample.analyses],
+        })
+
+
+@app.route('/api/v1/samples/<int:sample_id>', methods=['PATCH'])
+def patch_sample(sample_id):
+    """Fixes up text/phonemic/language on an already-saved sample — NEVER
+    touches url/storage key, so the filename picked at ingest time stays put."""
+    data = request.get_json(silent=True) or {}
+    with get_sessionmaker()() as db:
+        sample = db.get(Sample, sample_id)
+        if sample is None:
+            return jsonify({'error': 'not found'}), 404
+        if 'text' in data:
+            sample.text = data['text'] or None
+        if 'phonemic' in data:
+            sample.phonemic = data['phonemic'] or None
+        if 'languageId' in data:
+            sample.language_id = int(data['languageId']) if data['languageId'] else None
+        db.commit()
+        return jsonify({'id': sample.id, 'text': sample.text, 'phonemic': sample.phonemic, 'languageId': sample.language_id})
+
+
+@app.route('/api/v1/samples/<int:sample_id>/analyses/<int:analysis_id>')
+def get_sample_analysis(sample_id, analysis_id):
+    with get_sessionmaker()() as db:
+        a = db.query(SampleAnalysis).filter_by(id=analysis_id, sample_id=sample_id).one_or_none()
+        if a is None:
+            return jsonify({'error': 'not found'}), 404
+        return jsonify({'id': a.id, 'version': a.version, 'config': a.config, 'formants': a.formants, 'pitch': a.pitch})
+
+
+@app.route('/api/v1/samples/<int:sample_id>/analyze', methods=['POST'])
+def analyze_sample(sample_id):
+    """The "💾 Save this analysis" action — unlike /analyze-praat (which
+    analyzes a client-uploaded ephemeral buffer for ingestion mode), this runs
+    the identical Praat pipeline against the SAMPLE'S OWN STORED AUDIO and
+    always persists a new SampleAnalysis row. There is no not-saved preview
+    variant here — once a sample is in the library, every analysis attempt is
+    real history."""
+    data = request.get_json(silent=True) or {}
+    config = data.get('config') or {}
+    try:
+        with get_sessionmaker()() as db:
+            sample = db.get(Sample, sample_id)
+            if sample is None:
+                return jsonify({'error': 'not found'}), 404
+            if not sample.url or not is_local_url(sample.url):
+                return jsonify({'error': 'sample has no locally-stored audio to analyze'}), 400
+            store = get_audio_store()
+            storage_key = storage_key_from_url(sample.url)
+            if not store.exists(storage_key):
+                return jsonify({'error': 'audio file missing from storage'}), 404
+            with open(store.get_path(storage_key), 'rb') as f:
+                raw = f.read()
+            samples_arr, sample_rate = decode_audio(raw)
+            result = run_full_praat_analysis(samples_arr, sample_rate, config)
+            analysis = SampleAnalysis(
+                sample_id=sample.id, version='praat-default-v1',
+                config=result['config'], formants=result['formants'], pitch=result['pitch'],
+            )
+            db.add(analysis)
+            db.commit()
+            db.refresh(analysis)
+            return jsonify({
+                'id': analysis.id, 'version': analysis.version, 'config': analysis.config,
+                'formants': analysis.formants, 'pitch': analysis.pitch,
+                'createdAt': analysis.created_at.isoformat() if analysis.created_at else None,
+            }), 201
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
+
+
+@app.route('/api/v1/samples/<int:sample_id>/tokens', methods=['POST'])
+def create_token(sample_id):
+    data = request.get_json(silent=True) or {}
+    with get_sessionmaker()() as db:
+        sample = db.get(Sample, sample_id)
+        if sample is None:
+            return jsonify({'error': 'not found'}), 404
+        token = Token(
+            sample_id=sample.id,
+            symbol=data.get('symbol') or '',
+            vowel_id=data.get('vowelId') or None,
+            char_start=int(data.get('charStart', 0)),
+            char_end=int(data.get('charEnd', 0)),
+            time_start_ms=data.get('timeStartMs'),
+            time_end_ms=data.get('timeEndMs'),
+        )
+        db.add(token)
+        db.commit()
+        db.refresh(token)
+        return jsonify(_token_json(token)), 201
+
+
+@app.route('/api/v1/tokens/<int:token_id>', methods=['PATCH'])
+def patch_token(token_id):
+    data = request.get_json(silent=True) or {}
+    with get_sessionmaker()() as db:
+        token = db.get(Token, token_id)
+        if token is None:
+            return jsonify({'error': 'not found'}), 404
+        if 'symbol' in data:
+            token.symbol = data['symbol'] or ''
+        if 'vowelId' in data:
+            token.vowel_id = data['vowelId'] or None
+        if 'charStart' in data:
+            token.char_start = int(data['charStart'])
+        if 'charEnd' in data:
+            token.char_end = int(data['charEnd'])
+        if 'timeStartMs' in data:
+            token.time_start_ms = data['timeStartMs']
+        if 'timeEndMs' in data:
+            token.time_end_ms = data['timeEndMs']
+        if 'activeAnalysisId' in data:
+            token.active_analysis_id = data['activeAnalysisId'] or None
+        if 'manualF1' in data:
+            token.manual_f1 = data['manualF1']
+        if 'manualF2' in data:
+            token.manual_f2 = data['manualF2']
+        db.commit()
+        db.refresh(token)
+        return jsonify(_token_json(token))
+
+
+@app.route('/api/v1/tokens/<int:token_id>', methods=['DELETE'])
+def delete_token(token_id):
+    with get_sessionmaker()() as db:
+        token = db.get(Token, token_id)
+        if token is None:
+            return jsonify({'error': 'not found'}), 404
+        db.delete(token)
+        db.commit()
+        return jsonify({'ok': True})
+
+
+@app.route('/api/v1/tokens')
+def list_tokens():
+    """Flat, joined-for-display list backing the Token Browser."""
+    with get_sessionmaker()() as db:
+        rows = (
+            db.query(Token, Sample, Language)
+            .join(Sample, Token.sample_id == Sample.id)
+            .outerjoin(Language, Sample.language_id == Language.id)
+            .order_by(Token.id)
+            .all()
+        )
+        return jsonify([{
+            'id': t.id, 'symbol': t.symbol, 'vowelId': t.vowel_id,
+            'sampleId': s.id, 'sampleText': s.text,
+            'timeStartMs': t.time_start_ms, 'timeEndMs': t.time_end_ms,
+            'languageKey': lang.key if lang else None,
+            'createdAt': t.created_at.isoformat() if t.created_at else None,
+            'updatedAt': t.updated_at.isoformat() if t.updated_at else None,
+        } for t, s, lang in rows])
+
+
+@app.route('/api/v1/vowels')
+def list_vowels():
+    language_id = request.args.get('languageId')
+    with get_sessionmaker()() as db:
+        q = db.query(Vowel)
+        if language_id:
+            q = q.filter_by(language_id=int(language_id))
+        vowels = q.order_by(Vowel.sort_order).all()
+        return jsonify([{'id': v.id, 'symbols': v.symbols, 'desc': v.desc} for v in vowels])
 
 
 @app.route('/api/v1/sounds')

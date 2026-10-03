@@ -71,6 +71,7 @@ function renderRows(sounds) {
       <td>${fmtDuration(s.durationMs)}</td>
       <td>${fmtDate(s.createdAt)}</td>
       <td>${fmtDate(s.updatedAt)}</td>
+      <td><a class="sent-btn" href="praat.html?sampleId=${s.id}" target="_blank" rel="noopener">🔬 Formant Lab</a></td>
     </tr>`;
   }).join('');
   document.getElementById('soundCount').textContent = `${sounds.length} of ${allSounds.length} sound(s)`;

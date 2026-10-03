@@ -16,47 +16,69 @@
  * with a zoomed "mini-spectrogram" (the section's range padded a bit on
  * each side, so you can drag either edge to extend/shrink right there, or
  * drag the main spectrogram's band — both write to the same section object
- * and stay in sync). Launched two ways, which decide what the sections ARE
- * and what each card's save/apply action does:
+ * and stay in sync). Three mutually exclusive launch modes decide what the
+ * sections ARE and what each card's save action does:
  *
- *  - standalone (no ?tokens= in the URL): "ingestion mode" — sections are
- *    auto-suggested from js/vad.js's detectSentences() (same heuristic
- *    Shadowing uses), adjustable/addable/removable, each independently
- *    saveable as its own library Sample via js/ingest.js's uploadSlice().
- *    The dropped file itself is never uploaded whole, only saved sections.
- *  - from the editor (editor-samples.js), via
- *    ?audio=<url>&sampleText=<text>&tokens=<json>&scrollTo=<idx>: "sample
- *    mode" — one section per token in the sample, each with a Before
- *    (existing stored value) / After (freshly computed from this section's
- *    current bounds) F1/F2/F0 readout and its own Apply button, posting
- *    that ONE token's result back via window.opener.postMessage — same
- *    payload shape as before, just sent per-card instead of from one
- *    global button. Opening it "for" one token just scrolls/highlights
- *    that token's card; every token in the sample is always shown.
+ *  - ingestMode (no ?sampleId=, no ?tokens=): sections are auto-suggested
+ *    from js/vad.js's detectSentences() (same heuristic Shadowing uses),
+ *    adjustable/addable/removable, each independently saveable as its own
+ *    library Sample via js/ingest.js's uploadSlice(). The dropped file
+ *    itself is never uploaded whole, only saved sections.
+ *  - sampleMode (?sampleId=<id>&scrollTo=<tokenId>): the rich, DB-backed
+ *    editor — used by the Sound Browser (sounds.html) and Token Browser
+ *    (tokens.html)'s "open in Formant Lab" buttons. Sections are that
+ *    Sample's real Tokens, each with an editable symbol, a vowel picker,
+ *    manual F1/F2 overrides, and a Save button doing a real
+ *    POST/PATCH /api/v1/tokens. Analysis runs server-side against the
+ *    sample's own stored audio and is explicitly saved ("💾 Save this
+ *    analysis") as a comparable SampleAnalysis history row — a dropdown
+ *    lets you switch which saved session you're "Previewing" against every
+ *    token's current bounds, separate from which session a token has
+ *    actually committed to as its "Current" (active) value.
+ *  - legacyCtx (?audio=&sampleText=&tokens=<json>&scrollTo=<idx>, from
+ *    editor-samples.js): unchanged from before — ephemeral, postMessage-only
+ *    Apply, no DB writes at all. This is how the language editor opens
+ *    Formant Lab until a later phase retires that flow in favor of sampleMode.
  */
 
 // ─── Query params / launch context ──────────────────────────────────────────────
+// Three mutually exclusive modes:
+//  - ingestMode: no sampleId, no tokens — drop a file, carve out new Samples.
+//  - sampleMode (?sampleId=): the rich, DB-backed editor — real Tokens with a
+//    vowel picker, saved+comparable analysis history, create/edit/delete.
+//    Used by the Sound Browser and Token Browser's "open in Formant Lab".
+//  - legacyCtx (?tokens=, from editor-samples.js): unchanged from before —
+//    ephemeral, postMessage-only Apply, no DB writes. Still how the language
+//    editor opens Formant Lab until a later phase retires that flow.
 const params = new URLSearchParams(location.search);
-const sampleCtx = params.has('tokens') ? {
+const dbSampleId = params.has('sampleId') ? parseInt(params.get('sampleId'), 10) : null;
+const legacyCtx = (!dbSampleId && params.has('tokens')) ? {
   audioUrl: params.get('audio') || '',
   sampleText: params.get('sampleText') || '',
   scrollTo: params.has('scrollTo') ? parseInt(params.get('scrollTo'), 10) : null,
   tokens: (() => { try { return JSON.parse(params.get('tokens') || '[]'); } catch (e) { return []; } })(),
 } : null;
+const scrollToTokenId = dbSampleId && params.has('scrollTo') ? parseInt(params.get('scrollTo'), 10) : null;
 
-const ingestMode = !sampleCtx;
+const sampleMode = !!dbSampleId;
+const ingestMode = !sampleMode && !legacyCtx;
+const tokenMode = sampleMode || !!legacyCtx;   // either flavor of token-editing mode
 
 // ─── State ──────────────────────────────────────────────────────────────────────
 let currentBuffer = null;     // decoded AudioBuffer (all channels, for display + playback)
-let analysisResult = null;    // { duration_ms, formants, pitch, spectrogram }
-let selStart = 0, selEnd = 0; // fractions of duration — scratch selection, ingest mode only (drawing a brand-new section)
-let dragging = false;         // scratch-selection drag (main spectrogram, empty space, ingest mode)
+let analysisResult = null;    // { duration_ms, formants, pitch, spectrogram } — the currently-displayed track
+let selStart = 0, selEnd = 0; // fractions of duration — scratch selection, for drawing a brand-new section
+let dragging = false;         // scratch-selection drag (main spectrogram, empty space)
 let sectionDrag = null;       // { section, mode: 'resize-start'|'resize-end'|'move', moveOffset } — main-spectrogram section drag
 let activeSource = null;
 
 let sections = [];        // unified: [{id, mode:'ingest'|'token', start, end, ...mode fields}]
 let nextSectionId = 1;
 let languagesList = [];    // [{id, key, label, color, enabled}] — ingest mode's per-section language picker
+let vowelsList = [];       // [{id, symbols, desc}] — sampleMode's per-token vowel picker (scoped to the sample's language)
+let dbSampleData = null;   // sampleMode: the GET /api/v1/samples/<id> response
+let analysesHistory = [];  // sampleMode: [{id, version, config, createdAt}] — saved analysis sessions for this sample
+let viewedAnalysisId = null; // sampleMode: which session's track is currently loaded into analysisResult (null = live unsaved preview)
 
 function setStatus(text) { const el = document.getElementById('uploadStatus'); if (el) el.textContent = text; }
 function escapeAttr(str) { return String(str ?? '').replace(/"/g, '&quot;'); }
@@ -71,6 +93,15 @@ async function loadLanguagesList() {
     languagesList = resp.ok ? await resp.json() : [];
   } catch (e) { languagesList = []; }
   renderSections();   // refresh in case sections were already drawn before this resolved
+}
+
+async function loadVowelsList(languageId) {
+  if (!languageId) { vowelsList = []; return; }
+  try {
+    const resp = await fetch('/api/v1/vowels?languageId=' + languageId);
+    vowelsList = resp.ok ? await resp.json() : [];
+  } catch (e) { vowelsList = []; }
+  renderSections();
 }
 
 // ─── Audio loading ──────────────────────────────────────────────────────────────
@@ -102,18 +133,54 @@ async function loadBuffer(buffer) {
   document.getElementById('channelInfo').textContent =
       `${buffer.numberOfChannels} ch · ${(buffer.sampleRate / 1000).toFixed(1)} kHz · ${buffer.duration.toFixed(2)}s`;
   document.getElementById('sectionsPanel').style.display = 'block';
-  document.getElementById('ingestToolbar').style.display = ingestMode ? 'flex' : 'none';
+  document.getElementById('addSectionToolbar').style.display = legacyCtx ? 'none' : 'flex';
+  document.getElementById('newSectionBtn').textContent = ingestMode ? '+ New section from selection' : '+ New token from selection';
+  document.getElementById('analysisHistoryRow').style.display = sampleMode ? 'flex' : 'none';
   document.getElementById('sectionsHint').textContent = ingestMode
     ? '(auto-suggested from silence gaps — drag a section\'s own mini-spectrogram, or its band on the main spectrogram above, to adjust)'
+    : sampleMode
+    ? '(one per token in this sample — drag to adjust its time range, assign a vowel, and Save; empty-space drag defines a new token)'
     : '(one per token in this sample — drag to adjust its time range, Apply sends that token\'s result back to the editor)';
   if (ingestMode) {
     document.getElementById('fileToolbar').style.display = 'flex';
     suggestSections();
+  } else if (sampleMode) {
+    seedSectionsFromDbSample();
   } else {
     seedSectionsFromTokens();
   }
   await runAnalyze();
-  if (sampleCtx?.scrollTo != null) scrollToSection(s => s.tokIdx === sampleCtx.scrollTo);
+  if (legacyCtx?.scrollTo != null) scrollToSection(s => s.tokIdx === legacyCtx.scrollTo);
+  if (scrollToTokenId != null) scrollToSection(s => s.dbTokenId === scrollToTokenId);
+}
+
+// ─── Sample mode: fetch the real Sample + its Tokens/analysis-history from the DB ──
+async function fetchDbSample() {
+  const resp = await fetch(`/api/v1/samples/${dbSampleId}`);
+  if (!resp.ok) throw new Error('Could not load sample #' + dbSampleId);
+  dbSampleData = await resp.json();
+  analysesHistory = dbSampleData.analyses || [];
+}
+
+function seedSectionsFromDbSample() {
+  const durationMs = currentBuffer.duration * 1000;
+  const defaultLenFrac = Math.min(1, 300 / durationMs);
+  sections = (dbSampleData.tokens || []).map(t => {
+    const hasSlice = t.timeStartMs != null && t.timeEndMs != null;
+    const start = hasSlice ? t.timeStartMs / durationMs : 0;
+    const end = hasSlice ? t.timeEndMs / durationMs : Math.min(1, defaultLenFrac);
+    return {
+      id: nextSectionId++, mode: 'token', dbTokenId: t.id,
+      symbol: t.symbol || '', vowelId: t.vowelId, start, end,
+      activeAnalysisId: t.activeAnalysisId, manualF1: t.manualF1, manualF2: t.manualF2,
+    };
+  });
+  document.getElementById('tokenContext').style.display = 'block';
+  document.getElementById('tokenSampleText').textContent =
+      `"${dbSampleData.text || '(untitled)'}" — ${sections.length} token(s)`;
+  renderAnalysisHistorySelect();
+  renderSections();
+  if (dbSampleData.languageId) loadVowelsList(dbSampleData.languageId);
 }
 
 // ─── Section model ──────────────────────────────────────────────────────────────
@@ -156,7 +223,16 @@ function suggestSections() {
 
 function commitSectionFromSelection() {
   if (selEnd <= selStart) { setStatus('Select a range first'); return; }
-  sections.push({ id: nextSectionId++, mode: 'ingest', start: selStart, end: selEnd, text: '', phonemic: '', languageId: null, savedSampleId: null });
+  if (ingestMode) {
+    sections.push({ id: nextSectionId++, mode: 'ingest', start: selStart, end: selEnd, text: '', phonemic: '', languageId: null, savedSampleId: null });
+  } else if (sampleMode) {
+    sections.push({
+      id: nextSectionId++, mode: 'token', dbTokenId: null, symbol: '', vowelId: null,
+      start: selStart, end: selEnd, activeAnalysisId: null, manualF1: null, manualF2: null,
+    });
+  } else {
+    return;   // legacy editor-launched mode: token set is fixed, nothing to add here
+  }
   selStart = 0; selEnd = 0;
   renderSections(); redrawAll();
 }
@@ -175,11 +251,24 @@ async function saveSection(s) {
   }
 }
 
+async function updateSavedSection(s) {
+  try {
+    const resp = await fetch(`/api/v1/samples/${s.savedSampleId}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: s.text, phonemic: s.phonemic }),
+    });
+    if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || 'HTTP ' + resp.status); }
+    cardStatus(s, '✓ Updated (filename unchanged)');
+  } catch (e) {
+    cardStatus(s, 'Update failed: ' + e.message);
+  }
+}
+
 // ─── Sample mode: seed one section per token, apply back per-card ──────────────
 function seedSectionsFromTokens() {
   const durationMs = currentBuffer.duration * 1000;
   const defaultLenFrac = Math.min(1, 300 / durationMs);
-  sections = sampleCtx.tokens.map((t, idx) => {
+  sections = legacyCtx.tokens.map((t, idx) => {
     const an = t.analysis || {};
     const hasSlice = Array.isArray(an.slice);
     const start = hasSlice ? an.slice[0] / durationMs : 0;
@@ -193,9 +282,9 @@ function seedSectionsFromTokens() {
   });
   document.getElementById('tokenContext').style.display = 'block';
   document.getElementById('tokenSampleText').textContent =
-      `"${sampleCtx.sampleText}" — ${sections.length} token(s)`;
+      `"${legacyCtx.sampleText}" — ${sections.length} token(s)`;
   // Seed the global analysis params from the focused (scrollTo) token's existing config, if any.
-  const focus = sections.find(s => s.tokIdx === sampleCtx.scrollTo) || sections[0];
+  const focus = sections.find(s => s.tokIdx === legacyCtx.scrollTo) || sections[0];
   const c = focus?.params || {};
   if (c.max_number_of_formants) document.getElementById('pMaxFormants').value = c.max_number_of_formants;
   if (c.maximum_formant)         document.getElementById('pMaxFreq').value = c.maximum_formant;
@@ -204,6 +293,74 @@ function seedSectionsFromTokens() {
   if (c.pitch_floor)             document.getElementById('pPitchFloor').value = c.pitch_floor;
   if (c.pitch_ceiling)           document.getElementById('pPitchCeiling').value = c.pitch_ceiling;
   renderSections();
+}
+
+// ─── Sample mode: saved analysis history — the "can I compare them" feature ────
+function renderAnalysisHistorySelect() {
+  const sel = document.getElementById('analysisHistorySelect');
+  if (!sel) return;
+  const opts = ['<option value="">Live preview (unsaved)</option>'].concat(
+    analysesHistory.map(a => {
+      const c = a.config || {};
+      const when = a.createdAt ? new Date(a.createdAt).toLocaleString() : '';
+      return `<option value="${a.id}">Session #${a.id} — ${when} (ceiling ${c.maximum_formant}Hz, window ${c.window_length}s)</option>`;
+    })
+  );
+  sel.innerHTML = opts.join('');
+  sel.value = viewedAnalysisId || '';
+}
+
+async function onAnalysisHistoryChange() {
+  const sel = document.getElementById('analysisHistorySelect');
+  const val = sel.value ? parseInt(sel.value, 10) : null;
+  viewedAnalysisId = val;
+  if (val == null) { await runAnalyze(); return; }   // back to the live preview
+  setStatus('Loading session #' + val + '…');
+  try {
+    const resp = await fetch(`/api/v1/samples/${dbSampleId}/analyses/${val}`);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const full = await resp.json();
+    analysisResult = { ...analysisResult, formants: full.formants, pitch: full.pitch };
+    drawSpectrogramOverlay();
+    refreshSectionVisuals();
+    setStatus('');
+  } catch (e) {
+    setStatus('Could not load session: ' + e.message);
+  }
+}
+
+async function saveCurrentAnalysis() {
+  const btn = document.getElementById('saveAnalysisBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  setStatus('Saving analysis session…');
+  try {
+    const config = {
+      max_number_of_formants: +(document.getElementById('pMaxFormants')?.value) || 5,
+      maximum_formant: +(document.getElementById('pMaxFreq')?.value) || 5500,
+      window_length: +(document.getElementById('pWindowLen')?.value) || 0.025,
+      pre_emphasis_from: +(document.getElementById('pPreEmph')?.value) || 50,
+      pitch_floor: +(document.getElementById('pPitchFloor')?.value) || 75,
+      pitch_ceiling: +(document.getElementById('pPitchCeiling')?.value) || 600,
+    };
+    const resp = await fetch(`/api/v1/samples/${dbSampleId}/analyze`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || 'HTTP ' + resp.status);
+    }
+    const saved = await resp.json();
+    analysesHistory.push({ id: saved.id, version: saved.version, config: saved.config, createdAt: saved.createdAt });
+    viewedAnalysisId = saved.id;
+    analysisResult = { ...analysisResult, formants: saved.formants, pitch: saved.pitch };
+    renderAnalysisHistorySelect();
+    drawSpectrogramOverlay();
+    refreshSectionVisuals();
+    setStatus(`Saved as session #${saved.id} — now the most recent in the history above.`);
+  } catch (e) {
+    setStatus('Save failed: ' + e.message);
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '💾 Save this analysis'; }
 }
 
 function computeMeansForRange(startFrac, endFrac) {
@@ -233,7 +390,7 @@ function applySection(s) {
   const payload = {
     type: 'praat-analysis-result',
     tokIdx: s.tokIdx,
-    audioUrl: sampleCtx.audioUrl,
+    audioUrl: legacyCtx.audioUrl,
     analysis: {
       slice: [t0, t1],
       f1: Math.round(means.f1), f2: Math.round(means.f2),
@@ -253,6 +410,84 @@ function applySection(s) {
   setStatus(`Applied F1 ${payload.analysis.f1} · F2 ${payload.analysis.f2} Hz to token #${s.tokIdx + 1} (/${s.symbol}/)`);
 }
 
+// ─── Sample mode: real Token CRUD against the DB ───────────────────────────────
+function cardStatus(s, text) {
+  const card = document.querySelector(`.section-card[data-id="${s.id}"]`);
+  const el = card?.querySelector('.section-card-status');
+  if (el) el.textContent = text;
+}
+
+async function saveToken(s) {
+  const [t0, t1] = sectionMs(s);
+  const body = {
+    symbol: s.symbol, vowelId: s.vowelId,
+    charStart: 0, charEnd: (s.symbol || '').length,
+    timeStartMs: t0, timeEndMs: t1,
+    manualF1: s.manualF1, manualF2: s.manualF2,
+  };
+  try {
+    let resp;
+    if (s.dbTokenId) {
+      resp = await fetch(`/api/v1/tokens/${s.dbTokenId}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      });
+    } else {
+      resp = await fetch(`/api/v1/samples/${dbSampleId}/tokens`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      });
+    }
+    if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || 'HTTP ' + resp.status); }
+    const saved = await resp.json();
+    s.dbTokenId = saved.id;
+    renderSections();
+    cardStatus(s, '✓ Saved');
+  } catch (e) {
+    cardStatus(s, 'Save failed: ' + e.message);
+  }
+}
+
+async function deleteToken(s) {
+  if (s.dbTokenId) {
+    try {
+      await fetch(`/api/v1/tokens/${s.dbTokenId}`, { method: 'DELETE' });
+    } catch (e) { setStatus('Delete failed: ' + e.message); return; }
+  }
+  sections = sections.filter(x => x.id !== s.id);
+  renderSections(); redrawAll();
+}
+
+async function useViewedAnalysisForToken(s) {
+  if (viewedAnalysisId == null) return;
+  s.activeAnalysisId = viewedAnalysisId;
+  try {
+    if (s.dbTokenId) {
+      await fetch(`/api/v1/tokens/${s.dbTokenId}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activeAnalysisId: viewedAnalysisId }),
+      });
+    }
+    refreshSectionVisuals();
+    cardStatus(s, `✓ Using session #${viewedAnalysisId}`);
+  } catch (e) {
+    cardStatus(s, 'Failed: ' + e.message);
+  }
+}
+
+function currentLabelForToken(s) {
+  if (s.manualF1 != null && s.manualF2 != null) {
+    return `F1 ${Math.round(s.manualF1)} · F2 ${Math.round(s.manualF2)} Hz (manual)`;
+  }
+  if (s.activeAnalysisId == null) return 'not analyzed yet';
+  if (s.activeAnalysisId !== viewedAnalysisId) return `from session #${s.activeAnalysisId} — switch the dropdown above to compute`;
+  const means = computeMeansForRange(s.start, s.end);
+  if (!means?.nFormantFrames) return 'no voiced frames';
+  return `F1 ${Math.round(means.f1)} · F2 ${Math.round(means.f2)}${means.f0 != null ? ` · F0 ${Math.round(means.f0)}` : ''} Hz`;
+}
+function previewLabelForToken(s) {
+  const means = computeMeansForRange(s.start, s.end);
+  if (!means?.nFormantFrames) return 'no voiced frames';
+  return `F1 ${Math.round(means.f1)} · F2 ${Math.round(means.f2)}${means.f0 != null ? ` · F0 ${Math.round(means.f0)}` : ''} Hz`;
+}
+
 // ─── Rendering: card list (structural — rebuild on add/remove only) ────────────
 function renderSections() {
   const list = document.getElementById('sectionsList');
@@ -263,25 +498,52 @@ function renderSections() {
     card.className = 'section-card';
     card.dataset.id = s.id;
 
-    const header = s.mode === 'ingest'
-      ? `<span class="section-idx">#${i + 1}</span><span class="section-time">${sectionMs(s).join('–')} ms</span>`
-      : `<span class="section-idx">/${escapeAttr(s.symbol)}/</span><span class="section-time">${sectionMs(s).join('–')} ms</span>`;
+    const isDbToken = s.mode === 'token' && s.dbTokenId !== undefined;
+    const vowel = isDbToken ? vowelsList.find(v => v.id === s.vowelId) : null;
 
-    const body = s.mode === 'ingest' ? `
-      <select class="section-lang">${['<option value="">— language —</option>']
-        .concat(languagesList.map(l => `<option value="${l.id}"${s.languageId === l.id ? ' selected' : ''}>${escapeAttr(l.label)}</option>`)).join('')}</select>
-      <input type="text" class="section-text" placeholder="text (required)" value="${escapeAttr(s.text)}">
-      <input type="text" class="section-phonemic" placeholder="phonemic" value="${escapeAttr(s.phonemic)}">
-      <button class="sent-btn section-play" type="button">▶</button>
-      ${s.savedSampleId
-        ? `<span class="section-saved">✓ Saved #${s.savedSampleId}</span>`
-        : `<button class="sent-btn primary section-save" type="button">💾 Save</button>`}
-      <button class="sent-btn section-remove" type="button">✕</button>
-    ` : `
-      <span class="section-values">—</span>
-      <button class="sent-btn section-play" type="button">▶</button>
-      <button class="sent-btn primary section-apply" type="button">✓ Apply</button>
-    `;
+    let header, body;
+    if (s.mode === 'ingest') {
+      header = `<span class="section-idx">#${i + 1}</span><span class="section-time">${sectionMs(s).join('–')} ms</span>`;
+      body = `
+        <select class="section-lang">${['<option value="">— language —</option>']
+          .concat(languagesList.map(l => `<option value="${l.id}"${s.languageId === l.id ? ' selected' : ''}>${escapeAttr(l.label)}</option>`)).join('')}</select>
+        <input type="text" class="section-text" placeholder="text (required)" value="${escapeAttr(s.text)}">
+        <input type="text" class="section-phonemic" placeholder="phonemic" value="${escapeAttr(s.phonemic)}">
+        <button class="sent-btn section-play" type="button">▶</button>
+        ${s.savedSampleId
+          ? `<span class="section-saved">✓ Saved #${s.savedSampleId}</span>
+             <button class="sent-btn section-update" type="button">✓ Update</button>`
+          : `<button class="sent-btn primary section-save" type="button">💾 Save</button>`}
+        <button class="sent-btn section-remove" type="button">✕</button>
+        <span class="section-card-status muted"></span>
+      `;
+    } else if (isDbToken) {
+      card.style.borderLeft = vowel ? '3px solid #7eb8f7' : '';
+      header = `
+        <input type="text" class="section-symbol" placeholder="symbol" value="${escapeAttr(s.symbol)}" style="width:3.5em;font-family:Georgia,serif;font-size:1rem;">
+        <select class="section-vowel"><option value="">— vowel —</option>${vowelsList.map(v =>
+          `<option value="${v.id}"${s.vowelId === v.id ? ' selected' : ''}>/${escapeAttr(v.symbols?.[0] || '?')}/ ${escapeAttr(v.desc || '')}</option>`).join('')}</select>
+        <span class="section-time">${sectionMs(s).join('–')} ms</span>
+      `;
+      body = `
+        <span class="section-values">Current: <b>${currentLabelForToken(s)}</b> &nbsp;·&nbsp; Previewing: <b>${previewLabelForToken(s)}</b>
+          ${viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : ''}
+        </span>
+        <label class="manual-f1f2">F1 <input type="number" class="section-manual-f1" value="${s.manualF1 ?? ''}" placeholder="auto" style="width:4.5em"></label>
+        <label class="manual-f1f2">F2 <input type="number" class="section-manual-f2" value="${s.manualF2 ?? ''}" placeholder="auto" style="width:4.5em"></label>
+        <button class="sent-btn section-play" type="button">▶</button>
+        <button class="sent-btn primary section-save-token" type="button">💾 Save token</button>
+        <button class="sent-btn section-remove" type="button">✕</button>
+        <span class="section-card-status muted"></span>
+      `;
+    } else {
+      header = `<span class="section-idx">/${escapeAttr(s.symbol)}/</span><span class="section-time">${sectionMs(s).join('–')} ms</span>`;
+      body = `
+        <span class="section-values">—</span>
+        <button class="sent-btn section-play" type="button">▶</button>
+        <button class="sent-btn primary section-apply" type="button">✓ Apply</button>
+      `;
+    }
 
     card.innerHTML = `
       <div class="section-header">${header}</div>
@@ -298,8 +560,19 @@ function renderSections() {
         sections = sections.filter(x => x.id !== s.id);
         renderSections(); redrawAll();
       });
-      const saveBtn = card.querySelector('.section-save');
-      if (saveBtn) saveBtn.addEventListener('click', () => saveSection(s));
+      card.querySelector('.section-save')?.addEventListener('click', () => saveSection(s));
+      card.querySelector('.section-update')?.addEventListener('click', () => updateSavedSection(s));
+    } else if (isDbToken) {
+      card.querySelector('.section-symbol').addEventListener('input', e => { s.symbol = e.target.value; });
+      card.querySelector('.section-vowel').addEventListener('change', e => {
+        s.vowelId = e.target.value ? +e.target.value : null;
+        if (s.vowelId && !s.symbol) { s.symbol = vowelsList.find(v => v.id === s.vowelId)?.symbols?.[0] || ''; renderSections(); }
+      });
+      card.querySelector('.section-manual-f1').addEventListener('input', e => { s.manualF1 = e.target.value === '' ? null : +e.target.value; });
+      card.querySelector('.section-manual-f2').addEventListener('input', e => { s.manualF2 = e.target.value === '' ? null : +e.target.value; });
+      card.querySelector('.section-save-token').addEventListener('click', () => saveToken(s));
+      card.querySelector('.section-remove').addEventListener('click', () => deleteToken(s));
+      card.querySelector('.section-use-analysis')?.addEventListener('click', () => useViewedAnalysisForToken(s));
     } else {
       card.querySelector('.section-apply').addEventListener('click', () => applySection(s));
     }
@@ -322,13 +595,22 @@ function refreshSectionVisuals() {
       const { winStart, winEnd } = sectionWindow(s);
       drawSpectrogramWindow(cv, winStart, winEnd, s.start, s.end);
     }
-    if (s.mode === 'token') {
+    const isDbToken = s.mode === 'token' && s.dbTokenId !== undefined;
+    if (s.mode === 'token' && !isDbToken) {
       const after = computeMeansForRange(s.start, s.end);
       const valuesEl = card.querySelector('.section-values');
       if (valuesEl) {
         const before = s.before ? `F1 ${Math.round(s.before.f1)} · F2 ${Math.round(s.before.f2)}` : '—';
         const afterTxt = after?.nFormantFrames ? `F1 ${Math.round(after.f1)} · F2 ${Math.round(after.f2)}${after.f0 != null ? ` · F0 ${Math.round(after.f0)}` : ''} Hz` : 'no voiced frames';
         valuesEl.innerHTML = `Before: <b>${before}</b> &nbsp;→&nbsp; After: <b>${afterTxt}</b>`;
+      }
+    } else if (isDbToken) {
+      const valuesEl = card.querySelector('.section-values');
+      if (valuesEl) {
+        const useBtn = viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId
+          ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : '';
+        valuesEl.innerHTML = `Current: <b>${currentLabelForToken(s)}</b> &nbsp;·&nbsp; Previewing: <b>${previewLabelForToken(s)}</b> ${useBtn}`;
+        valuesEl.querySelector('.section-use-analysis')?.addEventListener('click', () => useViewedAnalysisForToken(s));
       }
     }
   });
@@ -402,7 +684,7 @@ function drawSelectionBand(ctx, W, H) {
 function drawSectionBands(ctx, W, H) {
   for (const s of sections) {
     const x0 = s.start * W, x1 = s.end * W;
-    const done = s.mode === 'ingest' ? !!s.savedSampleId : !!s.before;
+    const done = s.mode === 'ingest' ? !!s.savedSampleId : (s.dbTokenId !== undefined ? !!s.dbTokenId : !!s.before);
     ctx.fillStyle = done ? 'rgba(74,222,128,0.12)' : 'rgba(216,232,244,0.07)';
     ctx.fillRect(x0, 0, x1 - x0, H);
     ctx.fillStyle = done ? '#4ade80' : '#4a6888';
@@ -428,7 +710,7 @@ function wireMainDrag(el) {
     } else {
       const inside = sectionAt(f);
       if (inside) sectionDrag = { section: inside, mode: 'move', moveOffset: f - inside.start };
-      else if (ingestMode) { dragging = true; selStart = f; selEnd = f; }
+      else { dragging = true; selStart = f; selEnd = f; }
     }
     redrawAll(); e.preventDefault();
   };
@@ -694,10 +976,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('playAllBtn').addEventListener('click', () => playRange(0, 1));
   document.getElementById('newSectionBtn')?.addEventListener('click', commitSectionFromSelection);
   document.getElementById('newFileBtn')?.addEventListener('click', resetToDropzone);
+  document.getElementById('analysisHistorySelect')?.addEventListener('change', onAnalysisHistoryChange);
+  document.getElementById('saveAnalysisBtn')?.addEventListener('click', saveCurrentAnalysis);
 
   wireMainDrag(document.getElementById('spectrogramCanvas').parentElement);
 
   window.addEventListener('resize', () => { if (currentBuffer) { drawSpectrogramBase(); drawSpectrogramOverlay(); refreshSectionVisuals(); } });
 
-  if (sampleCtx?.audioUrl) handleUrl(sampleCtx.audioUrl);
+  if (legacyCtx?.audioUrl) handleUrl(legacyCtx.audioUrl);
+  if (sampleMode) {
+    setStatus('Loading sample…');
+    fetchDbSample()
+      .then(() => handleUrl(dbSampleData.audioUrl))
+      .catch(e => setStatus('Could not load sample: ' + e.message));
+  }
 });

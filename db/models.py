@@ -181,6 +181,11 @@ class Token(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     sample_id: Mapped[int] = mapped_column(ForeignKey("samples.id", ondelete="CASCADE"), nullable=False)
     symbol: Mapped[str] = mapped_column(Text, nullable=False)
+    # The explicit sample<->vowel relationship — NOT derived from matching
+    # `symbol` text, which real data already proved ambiguous (two different
+    # `ru` samples both claiming the vowel "i"). Nullable: a token can exist
+    # before anyone's tagged which vowel it's an instance of.
+    vowel_id: Mapped[int | None] = mapped_column(ForeignKey("vowels.id", ondelete="SET NULL"))
     char_start: Mapped[int] = mapped_column(Integer, nullable=False)
     char_end: Mapped[int] = mapped_column(Integer, nullable=False)
     # A range INTO THE SAMPLE'S OWN AUDIO. Null until someone draws it — still
@@ -200,3 +205,4 @@ class Token(Base):
 
     sample: Mapped["Sample"] = relationship(back_populates="tokens")
     active_analysis: Mapped["SampleAnalysis | None"] = relationship()
+    vowel: Mapped["Vowel | None"] = relationship()

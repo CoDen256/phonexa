@@ -72,9 +72,15 @@
   </div>
   <div class="analyze-note">ⓘ Analyzing recomputes the formant/pitch track used for every section's readout below — nothing is saved or applied anywhere until you click Save/Apply on a specific section.</div>
 
+  <div class="analysis-history-row" id="analysisHistoryRow" style="display:none">
+    <span class="muted">Comparing analysis sessions:</span>
+    <select id="analysisHistorySelect"></select>
+    <button class="sent-btn primary" id="saveAnalysisBtn" type="button">💾 Save this analysis</button>
+  </div>
+
   <div class="sections-panel" id="sectionsPanel" style="display:none">
     <div class="panel-label">Sections <span class="muted" id="sectionsHint"></span></div>
-    <div class="ingest-toolbar" id="ingestToolbar" style="display:none">
+    <div class="ingest-toolbar" id="addSectionToolbar" style="display:none">
       <button class="sent-btn" id="newSectionBtn" type="button">+ New section from selection</button>
     </div>
     <div id="sectionsList" class="sections-list"></div>

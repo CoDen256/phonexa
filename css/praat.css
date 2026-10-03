@@ -94,7 +94,8 @@
   border:1px solid #1e3048; border-radius:5px; cursor:ew-resize; margin-bottom:5px;
 }
 .section-body { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.section-body input[type=text], .section-body select {
+.section-body input[type=text], .section-body select,
+.section-header input[type=text], .section-header select {
   background:#1a2e48; border:1px solid #2e4560; border-radius:5px;
   color:#d8e8f4; font-size:.72rem; padding:3px 7px; min-width:80px;
 }
@@ -102,3 +103,20 @@
 .section-saved { color:#4ade80; font-size:.68rem; white-space:nowrap; }
 .section-values { font-family:monospace; color:var(--muted); flex:1; }
 .section-values b { color:#d8e8f4; }
+.section-card-status { font-size:.68rem; color:#7eb8f7; white-space:nowrap; }
+
+/* ── Sample mode extras: vowel/symbol header, manual overrides, history row ── */
+.manual-f1f2 { display:flex; align-items:center; gap:4px; font-size:.7rem; color:var(--muted); }
+.manual-f1f2 input[type=number] {
+  background:#1a2e48; border:1px solid #2e4560; border-radius:5px;
+  color:#d8e8f4; font-size:.72rem; padding:3px 5px;
+}
+.analysis-history-row {
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  margin-top:8px; padding:7px 12px; background:var(--card);
+  border:1px solid var(--border); border-radius:8px; font-size:.72rem;
+}
+.analysis-history-row select {
+  background:#1a2e48; border:1px solid #2e4560; border-radius:5px;
+  color:#d8e8f4; font-size:.72rem; padding:3px 7px; flex:1; min-width:200px;
+}

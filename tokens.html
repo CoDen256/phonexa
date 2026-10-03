@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Browser — IPA Vowel Chart</title>
+  <link rel="stylesheet" href="css/index.css">
+  <style>
+    .tokens-wrap { width:100%; max-width:1000px; margin:0 auto; }
+    .tokens-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:.75rem; color:var(--muted); }
+    .tokens-toolbar input { background:#1a2e48; border:1px solid #2e4560; border-radius:6px; color:#d8e8f4; padding:5px 9px; font-size:.78rem; flex:1; }
+    table.tokens-table { width:100%; border-collapse:collapse; font-size:.75rem; }
+    .tokens-table th { text-align:left; color:#4a6888; font-weight:700; text-transform:uppercase; letter-spacing:.05em; font-size:.65rem; padding:6px 8px; border-bottom:1px solid var(--border); cursor:pointer; user-select:none; white-space:nowrap; }
+    .tokens-table th:hover { color:#7eb8f7; }
+    .tokens-table th .sort-arrow { opacity:.6; margin-left:3px; }
+    .tokens-table td { padding:6px 8px; border-bottom:1px solid #1e3048; vertical-align:middle; }
+    .tokens-table tr:hover td { background:#1a2636; }
+    .tokens-id { color:#4a7090; font-family:monospace; }
+    .tokens-symbol { font-family:Georgia,'Noto Serif',serif; font-size:.95rem; color:#7eb8f7; }
+    .tokens-missing { color:#3a5878; }
+    .sent-btn {
+      display:inline-block; padding:4px 10px; border-radius:7px; border:1px solid #2e4560;
+      background:#1a2e48; color:#d8e8f4; text-decoration:none; font-size:.72rem; white-space:nowrap;
+    }
+    .sent-btn:hover { background:#243c5a; border-color:#4a7098; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Token Browser</h1>
+  <p>Every Token row in the database — which vowel, which sample, which time range</p>
+  <a href="index.html"  class="editor-link">← Vowel Chart</a>
+  <a href="editor.html" class="editor-link">✎ Edit languages</a>
+  <a href="sounds.html" class="editor-link">♪ Sound Library</a>
+</header>
+
+<div class="tokens-wrap">
+  <div class="tokens-toolbar">
+    <span id="tokenCount">Loading…</span>
+    <input type="text" id="filterInput" placeholder="Filter by symbol, sample text, or language…">
+  </div>
+  <table class="tokens-table">
+    <thead><tr>
+      <th data-key="id">ID</th>
+      <th data-key="symbol">Symbol</th>
+      <th data-key="vowelId">Vowel</th>
+      <th data-key="sampleText">Sample</th>
+      <th data-key="languageKey">Lang</th>
+      <th data-key="timeStartMs">Time range</th>
+      <th data-key="createdAt">Created</th>
+      <th data-key="updatedAt">Updated</th>
+      <th></th>
+    </tr></thead>
+    <tbody id="tokensBody"></tbody>
+  </table>
+</div>
+
+<script src="js/tokens.js"></script>
+</body>
+</html>
