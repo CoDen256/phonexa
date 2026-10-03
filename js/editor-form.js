@@ -208,21 +208,17 @@ function buildInlineForm() {
   urlRow.querySelector('#fAudio').addEventListener('input', e => { v.audio = e.target.value || null; });
   urlRow.querySelector('#fWiki').addEventListener('input',  e => { v.wikiUrl = e.target.value; });
 
-  // ── Tokens + Representative sample (Phase 5d) ───────────────────────────
-  // Explicit DB relationships now — no more symbol-text matching. See
-  // js/editor-tokens.js for the actual picker logic/rendering.
+  // ── Tokens (+ representative-sample picking) — Phase 5d ─────────────────
+  // Explicit DB relationships now — no more symbol-text matching. One
+  // unified list: assign/unassign a token to this vowel, and mark any
+  // token's own sample as the representative, right from the same row.
+  // See js/editor-tokens.js for the actual picker logic/rendering.
   if (state.vowelIdx != null && state.vowelIdx >= 0) {
     sec.appendChild(makeDividerLabel('Tokens'));
     const tokensWrap = document.createElement('div'); tokensWrap.id = 'veTokensWrap';
     tokensWrap.textContent = 'Loading…';
     tokensWrap.style.cssText = 'font-size:.65rem;color:#3a5878';
     sec.appendChild(tokensWrap);
-
-    sec.appendChild(makeDividerLabel('Representative sample'));
-    const repWrap = document.createElement('div'); repWrap.id = 'veRepresentativeWrap';
-    repWrap.textContent = 'Loading…';
-    repWrap.style.cssText = 'font-size:.65rem;color:#3a5878';
-    sec.appendChild(repWrap);
 
     if (typeof renderVowelAssignmentUI === 'function') renderVowelAssignmentUI(state.vowelIdx);
   }

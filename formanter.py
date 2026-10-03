@@ -1341,6 +1341,7 @@ def list_tokens():
         return jsonify([{
             'id': t.id, 'symbol': t.symbol, 'vowelId': t.vowel_id,
             'sampleId': s.id, 'sampleText': s.text,
+            'charStart': t.char_start, 'charEnd': t.char_end,
             'timeStartMs': t.time_start_ms, 'timeEndMs': t.time_end_ms,
             'languageKey': lang.key if lang else None,
             'createdAt': t.created_at.isoformat() if t.created_at else None,

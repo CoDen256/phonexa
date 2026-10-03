@@ -64,6 +64,35 @@ function renderVowelCards(){
       ${v.f1?`<div class="vc-formants">F1 <span>${v.f1}</span> \u00b7 F2 <span>${v.f2}</span> Hz</div>`:''}`;
     card.appendChild(body);
 
+    // ── Assigned tokens preview (Phase 5d — explicit DB relationship,
+    // populated once ensureDbLanguageData() resolves; re-rendered then) ─────
+    const dbVowelId = state.dbVowelLinks?.[i]?.id;
+    const myTokens = dbVowelId != null ? (state.dbLanguageTokens || []).filter(t => t.vowelId === dbVowelId) : [];
+    if (myTokens.length) {
+      const tokDiv = document.createElement('div');
+      tokDiv.style.cssText = 'border-top:1px solid var(--border);margin-top:6px;padding-top:6px;display:flex;flex-direction:column;gap:2px';
+      myTokens.slice(0, 4).forEach(t => {
+        const row = document.createElement('div');
+        row.style.cssText = 'font-size:.68rem;color:#8fa8c0;cursor:pointer;padding:1px 3px;border-radius:3px;';
+        row.textContent = t.sampleText || '(untitled)';
+        row.addEventListener('mouseenter', () => row.style.background = '#1a2e44');
+        row.addEventListener('mouseleave', () => row.style.background = '');
+        row.addEventListener('click', e => {
+          e.stopPropagation();
+          const smp = (state.dbLanguageSamples || []).find(s => s.id === t.sampleId);
+          if (smp?.audioUrl) new Audio(smp.audioUrl).play().catch(() => {});
+        });
+        tokDiv.appendChild(row);
+      });
+      if (myTokens.length > 4) {
+        const more = document.createElement('div');
+        more.style.cssText = 'font-size:.6rem;color:#3a5878';
+        more.textContent = `+${myTokens.length - 4} more`;
+        tokDiv.appendChild(more);
+      }
+      card.appendChild(tokDiv);
+    }
+
     // Card click: play the DB-assigned representative (or vowel's own inline
     // audio as fallback — see playVowel, js/audio.js), open editor. The
     // Tokens/Representative pickers live in the full edit form now (Phase 5d).
