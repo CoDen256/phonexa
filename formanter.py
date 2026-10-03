@@ -1002,7 +1002,7 @@ def http_transcribe():
 # Expect this to be superseded by a real ingestion/library API in Phase 1+.
 # ══════════════════════════════════════════════════════════════════════════════
 
-import uuid  # noqa: E402
+import re  # noqa: E402
 
 from db.session import get_sessionmaker  # noqa: E402
 from db.models import Language, Sample  # noqa: E402
@@ -1061,13 +1061,25 @@ def ingest_sample():
         samples, sample_rate = decode_audio(raw)
         duration_ms = round(len(samples) / sample_rate * 1000)
 
-        # TODO(filename scheme): final storage path under /lang/<lang>/ingested/<text>.wav
-        # (with collision handling) is still being decided — uuid-keyed for now.
-        storage_key = f'ingested/{uuid.uuid4().hex}.wav'
         store = get_audio_store()
-        store.put_bytes(raw, storage_key)
-
         with get_sessionmaker()() as db:
+            language = db.get(Language, int(language_id))
+            if language is None:
+                return jsonify({'error': f'No language with id {language_id}'}), 400
+
+            # lang/<lang-key>/ingested/<slugified-text>.wav — auto-suffixed (-2, -3, ...)
+            # if that language+text combination is already taken, so a save never
+            # silently overwrites or blocks on a duplicate recording of the same word.
+            slug = re.sub(r'[/\\\x00-\x1f]', '_', text) or 'untitled'
+            suffix, storage_key = 0, None
+            while True:
+                suffix += 1
+                candidate = f'lang/{language.key}/ingested/{slug}{"" if suffix == 1 else f"-{suffix}"}.wav'
+                if db.query(Sample).filter_by(url=url_from_storage_key(candidate)).first() is None:
+                    storage_key = candidate
+                    break
+            store.put_bytes(raw, storage_key)
+
             sample = Sample(
                 url=url_from_storage_key(storage_key),
                 original_filename=uploaded_file.filename,

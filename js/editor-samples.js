@@ -433,22 +433,20 @@ async function playTokenResult(tokIdx) {
     src.onended = () => actx.close();
 }
 
-// ─── Formant Lab (praat.html) — opens in a new tab, posts the result back ─────
+// ─── Formant Lab (praat.html) — opens in a new tab for the WHOLE sample (every
+// token as its own section, scrolled/highlighted to the one requested), posts
+// each token's result back individually as its own "✓ Apply" is clicked ──────
 function openFormantLab(tokIdx) {
-    const s   = state.sampleDraft;
-    const tok = s?.tokens?.[tokIdx];
-    if (!tok) return;
+    const s = state.sampleDraft;
+    if (!s?.tokens?.length) return;
     if (!s.audio) { toast('Add an audio URL first'); return; }
 
     const qp = new URLSearchParams({
         audio: s.audio,
-        tokIdx: String(tokIdx),
-        symbol: tok.symbol || '',
         sampleText: s.text || '',
+        scrollTo: String(tokIdx),
+        tokens: JSON.stringify(s.tokens.map(t => ({ symbol: t.symbol || '', position: t.position, analysis: t.analysis || null }))),
     });
-    const cfg = { ...(tok.analysis || {}) };
-    if (tok.analysis?.slice) { cfg.sliceStart = tok.analysis.slice[0]; cfg.sliceEnd = tok.analysis.slice[1]; }
-    qp.set('cfg', JSON.stringify(cfg));
 
     window.open('praat.html?' + qp.toString(), '_blank');
 }

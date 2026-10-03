@@ -25,8 +25,7 @@
   </div>
 
   <div class="token-context" id="tokenContext" style="display:none">
-    Analyzing token <span id="tokenSymbol" class="token-symbol"></span> for
-    <span id="tokenSampleText"></span>
+    Editing sample <span id="tokenSampleText" class="token-symbol"></span>
   </div>
 
   <div class="file-toolbar" id="fileToolbar" style="display:none">
@@ -73,16 +72,15 @@
       <label>Ceiling (Hz) <input type="number" id="pPitchCeiling" value="600" step="25" min="100" max="1200"></label>
     </div>
     <button class="sent-btn primary" id="analyzeBtn" type="button">⚡ Analyze</button>
-    <button class="sent-btn primary" id="applyBtn" type="button" style="display:none">✓ Apply to token</button>
   </div>
+  <div class="analyze-note">ⓘ Analyzing recomputes the formant/pitch track used for every section's readout below — nothing is saved or applied anywhere until you click Save/Apply on a specific section.</div>
 
-  <div class="ingest-panel" id="ingestPanel" style="display:none">
-    <div class="panel-label">Regions <span class="muted">(auto-suggested from silence gaps — adjust, add, save each independently)</span></div>
-    <div class="ingest-toolbar">
-      <span id="regionEditingLabel" class="muted"></span>
-      <button class="sent-btn" id="newRegionBtn" type="button">+ New region from selection</button>
+  <div class="sections-panel" id="sectionsPanel" style="display:none">
+    <div class="panel-label">Sections <span class="muted" id="sectionsHint"></span></div>
+    <div class="ingest-toolbar" id="ingestToolbar" style="display:none">
+      <button class="sent-btn" id="newSectionBtn" type="button">+ New section from selection</button>
     </div>
-    <div id="regionsList" class="regions-list"></div>
+    <div id="sectionsList" class="sections-list"></div>
   </div>
 
 </div>
