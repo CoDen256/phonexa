@@ -14,11 +14,23 @@ samples.json rather than looked up via a separate sounds.json — and each
 exported sample carries its own stable "id" so lang.json's vowels can
 reference one by `representativeSampleId` (replacing the old string-based
 `representative` field on samples). Each exported sample also carries its
-own `analyses` (the SampleAnalysis history), and each token its
-`activeAnalysisId` — both ids are stable within one export, matching how a
-future import tool would need to remap them per-sample. Token mean F1/F2 are
-NOT exported (computed on read, a later phase) — only manual_f1/f2 are,
-since those can't be derived from anything else.
+own `analyses` (the SampleAnalysis history — metadata only, see below),
+and each token its `activeAnalysisId`/`vowelSymbols` — ids are stable
+within one export, matching how scripts/import_db_from_json.py remaps them
+per-sample. Token mean F1/F2 are NOT exported (computed on read) — only
+manual_f1/f2 are, since those can't be derived from anything else.
+
+Samples with no language assigned yet (ingested but not tagged — a real,
+legitimate state) don't belong to any language directory, so they get their
+own top-level `unassigned-samples.json` instead of silently being dropped.
+
+An analysis's `formants`/`pitch` arrays are large (hundreds of frames x 5
+formants+bandwidths each) and would bloat samples.json into something no
+longer git-diff-friendly for no benefit (nobody hand-reads a formant
+track). Split out: samples.json keeps only small analysis metadata
+(id/version/config/createdAt); the actual arrays live one-per-file under
+`analyses/<id>.json`, compact (no pretty-printing — this data is never
+meant to be hand-read/diffed either way).
 """
 
 from __future__ import annotations
@@ -30,7 +42,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from db.models import Language  # noqa: E402
+from db.models import Language, Sample  # noqa: E402
 from db.session import get_sessionmaker  # noqa: E402
 
 
@@ -48,19 +60,32 @@ def export_vowel(v) -> dict:
     return out
 
 
-def export_analysis(a) -> dict:
+def export_analysis_meta(a) -> dict:
     return {
         "id": a.id, "version": a.version, "config": a.config,
-        "formants": a.formants, "pitch": a.pitch,
+        "createdAt": a.created_at.isoformat() if a.created_at else None,
     }
+
+
+def write_analysis_data(analyses_dir: Path, a) -> None:
+    (analyses_dir / f"{a.id}.json").write_text(json.dumps(
+        {"formants": a.formants, "pitch": a.pitch}, separators=(",", ":"), ensure_ascii=False,
+    ))
 
 
 def export_token(t) -> dict:
     return {
         "symbol": t.symbol, "position": [t.char_start, t.char_end],
+        # Vowels don't carry a stable exported id (see export_vowel) — a
+        # restore re-resolves which vowel this is the same way the
+        # /vowels/sync endpoint does, by (language, symbols), so that's what
+        # gets exported here instead of the DB id, which RESTART IDENTITY
+        # would invalidate on import anyway.
+        "vowelSymbols": t.vowel.symbols if t.vowel else None,
         "timeStartMs": t.time_start_ms, "timeEndMs": t.time_end_ms,
         "activeAnalysisId": t.active_analysis_id,
         "manualF1": t.manual_f1, "manualF2": t.manual_f2,
+        "createdAt": t.created_at.isoformat() if t.created_at else None,
     }
 
 
@@ -71,12 +96,13 @@ def export_sample(s) -> dict:
         "originalFilename": s.original_filename, "contentType": s.content_type,
         "durationMs": s.duration_ms, "sampleRateHz": s.sample_rate_hz, "channels": s.channels,
         "text": s.text, "phonemic": s.phonemic,
-        "analyses": [export_analysis(a) for a in s.analyses],
+        "createdAt": s.created_at.isoformat() if s.created_at else None,
+        "analyses": [export_analysis_meta(a) for a in s.analyses],
         "tokens": [export_token(t) for t in s.tokens],
     }
 
 
-def export_all(out_dir: Path) -> None:
+def export_all(out_dir: Path) -> dict:
     Session = get_sessionmaker()
     with Session() as db:
         languages = db.query(Language).order_by(Language.sort_order).all()
@@ -86,8 +112,11 @@ def export_all(out_dir: Path) -> None:
             [{"key": l.key, "enabled": l.enabled, "sortOrder": l.sort_order} for l in languages],
             indent=2, ensure_ascii=False,
         ) + "\n")
+        analyses_dir = out_dir / "analyses"
+        analyses_dir.mkdir(parents=True, exist_ok=True)
 
         total_samples = 0
+        total_analyses = 0
         for language in languages:
             lang_dir = out_dir / language.key
             lang_dir.mkdir(parents=True, exist_ok=True)
@@ -100,8 +129,34 @@ def export_all(out_dir: Path) -> None:
                     [export_sample(s) for s in language.samples], indent=2, ensure_ascii=False,
                 ) + "\n")
                 total_samples += len(language.samples)
+                for s in language.samples:
+                    for a in s.analyses:
+                        write_analysis_data(analyses_dir, a)
+                        total_analyses += 1
+            else:
+                # Keep the export idempotent/clean: don't leave a stale samples.json
+                # around from a previous export if this language no longer has any.
+                (lang_dir / "samples.json").unlink(missing_ok=True)
 
-        print(f"Exported {len(languages)} language(s) and {total_samples} sample(s) to {out_dir}/")
+        # Samples with no language assigned yet — don't belong to any language
+        # directory, but are real rows that must not silently vanish from the backup.
+        unassigned = db.query(Sample).filter(Sample.language_id.is_(None)).order_by(Sample.id).all()
+        unassigned_path = out_dir / "unassigned-samples.json"
+        if unassigned:
+            unassigned_path.write_text(json.dumps(
+                [export_sample(s) for s in unassigned], indent=2, ensure_ascii=False,
+            ) + "\n")
+            for s in unassigned:
+                for a in s.analyses:
+                    write_analysis_data(analyses_dir, a)
+                    total_analyses += 1
+        else:
+            unassigned_path.unlink(missing_ok=True)
+
+        counts = {"languages": len(languages), "samples": total_samples, "unassignedSamples": len(unassigned), "analyses": total_analyses}
+        print(f"Exported {counts['languages']} language(s), {counts['samples']} sample(s), "
+              f"{counts['unassignedSamples']} unassigned sample(s), {counts['analyses']} analysis/analyses to {out_dir}/")
+        return counts
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@
     "channels": null,
     "text": "i",
     "phonemic": "/i/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -17,11 +18,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "i"
+        ],
         "timeStartMs": 532,
         "timeEndMs": 642,
         "activeAnalysisId": null,
         "manualF1": 272.0,
-        "manualF2": 2755.0
+        "manualF2": 2755.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -35,6 +40,7 @@
     "channels": null,
     "text": "мир",
     "phonemic": "/mʲir/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -43,11 +49,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "i"
+        ],
         "timeStartMs": 658,
         "timeEndMs": 994,
         "activeAnalysisId": null,
         "manualF1": 488.0,
-        "manualF2": 2188.0
+        "manualF2": 2188.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -61,6 +71,7 @@
     "channels": null,
     "text": "его",
     "phonemic": "/jɪˈvo/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -69,11 +80,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɪ"
+        ],
         "timeStartMs": 764,
         "timeEndMs": 874,
         "activeAnalysisId": null,
         "manualF1": 388.0,
-        "manualF2": 1965.0
+        "manualF2": 1965.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -87,6 +102,7 @@
     "channels": null,
     "text": "переход",
     "phonemic": "/pʲɪrʲɪˈxot/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -95,11 +111,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɪ"
+        ],
         "timeStartMs": 64,
         "timeEndMs": 121,
         "activeAnalysisId": null,
         "manualF1": 472.0,
-        "manualF2": 2533.0
+        "manualF2": 2533.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -113,6 +133,7 @@
     "channels": null,
     "text": "уже",
     "phonemic": "/ʊˈʐɛ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -121,11 +142,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": 587,
         "timeEndMs": 730,
         "activeAnalysisId": null,
         "manualF1": 383.0,
-        "manualF2": 839.0
+        "manualF2": 839.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -139,6 +164,7 @@
     "channels": null,
     "text": "тупая",
     "phonemic": "/tʊˈpajə/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -147,11 +173,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -165,6 +195,7 @@
     "channels": null,
     "text": "сразу",
     "phonemic": "/ˈsrazʊ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -173,11 +204,15 @@
           4,
           5
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": 1535,
         "timeEndMs": 1647,
         "activeAnalysisId": null,
         "manualF1": 298.0,
-        "manualF2": 669.0
+        "manualF2": 669.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -191,6 +226,7 @@
     "channels": null,
     "text": "ɨ",
     "phonemic": "/ɨ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -199,11 +235,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɨ"
+        ],
         "timeStartMs": 501,
         "timeEndMs": 748,
         "activeAnalysisId": null,
         "manualF1": 325.0,
-        "manualF2": 1637.0
+        "manualF2": 1637.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -217,6 +257,7 @@
     "channels": null,
     "text": "был",
     "phonemic": "/bɨl/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -225,11 +266,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɨ"
+        ],
         "timeStartMs": 703,
         "timeEndMs": 899,
         "activeAnalysisId": null,
         "manualF1": 286.0,
-        "manualF2": 980.0
+        "manualF2": 980.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -243,6 +288,7 @@
     "channels": null,
     "text": "ю",
     "phonemic": "/jʉ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -251,11 +297,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ʉ"
+        ],
         "timeStartMs": 574,
         "timeEndMs": 716,
         "activeAnalysisId": null,
         "manualF1": 368.0,
-        "manualF2": 516.0
+        "manualF2": 516.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -269,6 +319,7 @@
     "channels": null,
     "text": "свою",
     "phonemic": "/svɐˈjʉ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -277,11 +328,15 @@
           3,
           4
         ],
+        "vowelSymbols": [
+          "ʉ"
+        ],
         "timeStartMs": 1005,
         "timeEndMs": 1445,
         "activeAnalysisId": null,
         "manualF1": 339.0,
-        "manualF2": 905.0
+        "manualF2": 905.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -295,6 +350,7 @@
     "channels": null,
     "text": "u",
     "phonemic": "/u/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -303,11 +359,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "u"
+        ],
         "timeStartMs": 575,
         "timeEndMs": 761,
         "activeAnalysisId": null,
         "manualF1": 291.0,
-        "manualF2": 504.0
+        "manualF2": 504.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -321,6 +381,7 @@
     "channels": null,
     "text": "ему",
     "phonemic": "/jɪˈmu/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -329,11 +390,15 @@
           2,
           3
         ],
+        "vowelSymbols": [
+          "u"
+        ],
         "timeStartMs": 1033,
         "timeEndMs": 1416,
         "activeAnalysisId": null,
         "manualF1": 284.0,
-        "manualF2": 508.0
+        "manualF2": 508.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -347,6 +412,7 @@
     "channels": null,
     "text": "е",
     "phonemic": "/je/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -355,11 +421,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "e"
+        ],
         "timeStartMs": 632,
         "timeEndMs": 695,
         "activeAnalysisId": null,
         "manualF1": 381.0,
-        "manualF2": 2579.0
+        "manualF2": 2579.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -373,6 +443,7 @@
     "channels": null,
     "text": "месте",
     "phonemic": "/ˈmʲestʲɪ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -381,11 +452,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "e"
+        ],
         "timeStartMs": 156,
         "timeEndMs": 292,
         "activeAnalysisId": null,
         "manualF1": 335.0,
-        "manualF2": 2329.0
+        "manualF2": 2329.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -399,6 +474,7 @@
     "channels": null,
     "text": "ё",
     "phonemic": "/jo/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -407,11 +483,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "o"
+        ],
         "timeStartMs": 732,
         "timeEndMs": 895,
         "activeAnalysisId": null,
         "manualF1": 428.0,
-        "manualF2": 788.0
+        "manualF2": 788.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -425,6 +505,7 @@
     "channels": null,
     "text": "моё",
     "phonemic": "/mɐˈjo/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -433,11 +514,15 @@
           2,
           3
         ],
+        "vowelSymbols": [
+          "ɵ"
+        ],
         "timeStartMs": 1121,
         "timeEndMs": 1378,
         "activeAnalysisId": null,
         "manualF1": 552.0,
-        "manualF2": 826.0
+        "manualF2": 826.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -451,6 +536,7 @@
     "channels": null,
     "text": "живёт",
     "phonemic": "/ʐɨˈvot/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -459,11 +545,15 @@
           3,
           4
         ],
+        "vowelSymbols": [
+          "ɵ"
+        ],
         "timeStartMs": 1104,
         "timeEndMs": 1304,
         "activeAnalysisId": null,
         "manualF1": 530.0,
-        "manualF2": 801.0
+        "manualF2": 801.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -477,6 +567,7 @@
     "channels": null,
     "text": "мира",
     "phonemic": "/ˈmʲirə/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -485,11 +576,15 @@
           3,
           4
         ],
+        "vowelSymbols": [
+          "ə"
+        ],
         "timeStartMs": 1196,
         "timeEndMs": 1325,
         "activeAnalysisId": null,
         "manualF1": 656.0,
-        "manualF2": 1310.0
+        "manualF2": 1310.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -503,6 +598,7 @@
     "channels": null,
     "text": "этому",
     "phonemic": "/ˈetəmʊ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -511,11 +607,15 @@
           2,
           3
         ],
+        "vowelSymbols": [
+          "ə"
+        ],
         "timeStartMs": 965,
         "timeEndMs": 1092,
         "activeAnalysisId": null,
         "manualF1": 524.0,
-        "manualF2": 1352.0
+        "manualF2": 1352.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -529,6 +629,7 @@
     "channels": null,
     "text": "одновременно",
     "phonemic": "/ɐdnəvrʲɪˈmʲenə/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -537,11 +638,15 @@
           11,
           12
         ],
+        "vowelSymbols": [
+          "ə"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -555,6 +660,7 @@
     "channels": null,
     "text": "o",
     "phonemic": "/o/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -563,11 +669,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "o"
+        ],
         "timeStartMs": 717,
         "timeEndMs": 967,
         "activeAnalysisId": null,
         "manualF1": 398.0,
-        "manualF2": 767.0
+        "manualF2": 767.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -581,6 +691,7 @@
     "channels": null,
     "text": "тот",
     "phonemic": "/tot/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -589,11 +700,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "o"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -607,6 +722,7 @@
     "channels": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -615,11 +731,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɛ"
+        ],
         "timeStartMs": 370,
         "timeEndMs": 550,
         "activeAnalysisId": null,
         "manualF1": 451.0,
-        "manualF2": 1139.0
+        "manualF2": 1139.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -633,6 +753,7 @@
     "channels": null,
     "text": "этот",
     "phonemic": "/ˈetət/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -641,11 +762,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɛ"
+        ],
         "timeStartMs": 536,
         "timeEndMs": 658,
         "activeAnalysisId": null,
         "manualF1": 470.0,
-        "manualF2": 1853.0
+        "manualF2": 1853.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -659,6 +784,7 @@
     "channels": null,
     "text": "она",
     "phonemic": "/ɐˈna/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -667,11 +793,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": 54,
         "timeEndMs": 153,
         "activeAnalysisId": null,
         "manualF1": 558.0,
-        "manualF2": 1315.0
+        "manualF2": 1315.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -685,6 +815,7 @@
     "channels": null,
     "text": "хотел",
     "phonemic": "/xɐˈtʲel/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -693,11 +824,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": 550,
         "timeEndMs": 642,
         "activeAnalysisId": null,
         "manualF1": 696.0,
-        "manualF2": 1387.0
+        "manualF2": 1387.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -711,6 +846,7 @@
     "channels": null,
     "text": "стояла",
     "phonemic": "/stɐˈjalə/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -719,11 +855,15 @@
           2,
           3
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -737,6 +877,7 @@
     "channels": null,
     "text": "голова",
     "phonemic": "/ɡələˈva/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -745,11 +886,15 @@
           3,
           4
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -763,6 +908,7 @@
     "channels": null,
     "text": "a",
     "phonemic": "/a/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -771,11 +917,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "a"
+        ],
         "timeStartMs": 555,
         "timeEndMs": 624,
         "activeAnalysisId": null,
         "manualF1": 799.0,
-        "manualF2": 1134.0
+        "manualF2": 1134.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -789,6 +939,7 @@
     "channels": null,
     "text": "нами",
     "phonemic": "/ˈnamʲɪ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -797,11 +948,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "a"
+        ],
         "timeStartMs": 733,
         "timeEndMs": 1008,
         "activeAnalysisId": null,
         "manualF1": 783.0,
-        "manualF2": 1188.0
+        "manualF2": 1188.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -815,6 +970,7 @@
     "channels": null,
     "text": "ɑ",
     "phonemic": "/ɑ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -823,11 +979,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -841,6 +1001,7 @@
     "channels": null,
     "text": "палка",
     "phonemic": "/ˈpalkə/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -849,11 +1010,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": 196,
         "timeEndMs": 287,
         "activeAnalysisId": null,
         "manualF1": 531.0,
-        "manualF2": 932.0
+        "manualF2": 932.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -867,6 +1032,7 @@
     "channels": null,
     "text": "кал",
     "phonemic": "/kal/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -875,11 +1041,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": 183,
         "timeEndMs": 260,
         "activeAnalysisId": null,
         "manualF1": 592.0,
-        "manualF2": 1087.0
+        "manualF2": 1087.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -893,6 +1063,7 @@
     "channels": null,
     "text": "я",
     "phonemic": "/ja/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -901,11 +1072,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "a"
+        ],
         "timeStartMs": 650,
         "timeEndMs": 781,
         "activeAnalysisId": null,
         "manualF1": 866.0,
-        "manualF2": 1283.0
+        "manualF2": 1283.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -919,6 +1094,7 @@
     "channels": null,
     "text": "части",
     "phonemic": "/ˈtʃastʲɪ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -927,11 +1103,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "æ"
+        ],
         "timeStartMs": 673,
         "timeEndMs": 816,
         "activeAnalysisId": null,
         "manualF1": 687.0,
-        "manualF2": 1340.0
+        "manualF2": 1340.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -945,6 +1125,7 @@
     "channels": null,
     "text": "пять",
     "phonemic": "/pʲatʲ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -953,11 +1134,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "æ"
+        ],
         "timeStartMs": 329,
         "timeEndMs": 453,
         "activeAnalysisId": null,
         "manualF1": 611.0,
-        "manualF2": 1786.0
+        "manualF2": 1786.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   }

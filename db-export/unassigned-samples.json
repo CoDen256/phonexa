@@ -1,0 +1,30 @@
+[
+  {
+    "id": 330,
+    "url": "file://ingested/dec62152d2f6463eb9417efdb7297938.wav",
+    "originalFilename": "slice.wav",
+    "contentType": "audio/wav",
+    "durationMs": 660,
+    "sampleRateHz": 48000,
+    "channels": 1,
+    "text": null,
+    "phonemic": "nye",
+    "createdAt": "2026-10-03T15:01:14.760645",
+    "analyses": [],
+    "tokens": []
+  },
+  {
+    "id": 331,
+    "url": "file://ingested/b171702dfb934892b4d87a644a9de41b.wav",
+    "originalFilename": "slice.wav",
+    "contentType": "audio/wav",
+    "durationMs": 954,
+    "sampleRateHz": 48000,
+    "channels": 1,
+    "text": "nye",
+    "phonemic": null,
+    "createdAt": "2026-10-03T15:04:05.666800",
+    "analyses": [],
+    "tokens": []
+  }
+]

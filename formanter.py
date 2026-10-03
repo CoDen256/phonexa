@@ -1021,7 +1021,11 @@ import re  # noqa: E402
 from db.session import get_sessionmaker  # noqa: E402
 from db.models import Language, Sample, SampleAnalysis, Token, Vowel  # noqa: E402
 from db.storage import get_audio_store, is_local_url, storage_key_from_url, url_from_storage_key  # noqa: E402
-from flask import send_file, abort  # noqa: E402
+import tarfile  # noqa: E402
+from datetime import datetime, timezone  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+from flask import send_file, abort, after_this_request  # noqa: E402
 
 
 @app.route('/api/v1/languages')
@@ -1347,6 +1351,72 @@ def list_tokens():
             'createdAt': t.created_at.isoformat() if t.created_at else None,
             'updatedAt': t.updated_at.isoformat() if t.updated_at else None,
         } for t, s, lang in rows])
+
+
+@app.route('/api/v1/admin/export', methods=['POST'])
+def admin_export():
+    """Thin wrapper around scripts/export_db_to_json.py — writes db-export/
+    at the repo root (same path the CLI script defaults to), so the usual
+    `git status`/`git add db-export`/`git commit` promotion flow works
+    whether the export was triggered here or from the command line."""
+    from scripts.export_db_to_json import export_all
+    try:
+        counts = export_all(Path('db-export').resolve())
+        return jsonify(counts)
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
+
+
+@app.route('/api/v1/admin/import', methods=['POST'])
+def admin_import():
+    """Destructive rebuild from db-export/ — see scripts/import_db_from_json.py.
+    Requires an explicit {"confirm": true} body: a cheap guard against this
+    write endpoint (no auth exists yet, see db/models.py's module docstring
+    for why that's an accepted risk for now) being hit by accident."""
+    data = request.get_json(silent=True) or {}
+    if not data.get('confirm'):
+        return jsonify({'error': 'confirm:true is required to run a destructive import'}), 400
+    from scripts.import_db_from_json import import_all
+    try:
+        counts = import_all(Path('db-export').resolve())
+        return jsonify(counts)
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
+
+
+@app.route('/api/v1/admin/audio-backup')
+def admin_audio_backup():
+    """Streams the whole audio storage root as a .tar.gz — the DB export/
+    import above explicitly never touches audio bytes (a storageKey with no
+    file just 404s until provisioned), so this is the separate mechanism for
+    backing up the actual audio, made reachable with one request instead of
+    reaching into the Docker volume by hand."""
+    store = get_audio_store()
+    root = getattr(store, 'root', None)
+    if root is None:
+        return jsonify({'error': 'current AUDIO_BACKEND has no local root to archive'}), 400
+    tmp = tempfile.NamedTemporaryFile(suffix='.tar.gz', delete=False)
+    tmp.close()
+    try:
+        with tarfile.open(tmp.name, 'w:gz') as tar:
+            tar.add(root, arcname='audio')
+        filename = f"phonexa-audio-backup-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.tar.gz"
+
+        @after_this_request
+        def _cleanup(response):
+            try:
+                os.unlink(tmp.name)
+            except OSError:
+                pass
+            return response
+
+        return send_file(tmp.name, as_attachment=True, download_name=filename, conditional=False)
+    except Exception as error:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
+        return jsonify({'error': str(error)}), 500
 
 
 @app.route('/api/v1/vowels')

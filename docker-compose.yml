@@ -34,6 +34,10 @@ services:
       AUDIO_BACKEND: local
     volumes:
       - audio_data:/data/audio
+      # Bind mount (not a named volume): the admin export/import endpoints
+      # must read/write the host's git-tracked db-export/ directory, not an
+      # ephemeral copy baked into the image by Dockerfile's COPY.
+      - ./db-export:/app/db-export
     ports:
       - "5050:5050"
 

@@ -9,6 +9,7 @@
     "channels": null,
     "text": "iː",
     "phonemic": "/iː/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -17,11 +18,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "i"
+        ],
         "timeStartMs": 86,
         "timeEndMs": 474,
         "activeAnalysisId": null,
         "manualF1": 251.0,
-        "manualF2": 1700.0
+        "manualF2": 1700.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -35,6 +40,7 @@
     "channels": null,
     "text": "green",
     "phonemic": "/ɡriːn/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -43,11 +49,15 @@
           2,
           4
         ],
+        "vowelSymbols": [
+          "i"
+        ],
         "timeStartMs": 135,
         "timeEndMs": 250,
         "activeAnalysisId": null,
         "manualF1": 321.0,
-        "manualF2": 2028.0
+        "manualF2": 2028.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -61,6 +71,7 @@
     "channels": null,
     "text": "heed",
     "phonemic": "/hiːd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -69,11 +80,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "i"
+        ],
         "timeStartMs": 253,
         "timeEndMs": 439,
         "activeAnalysisId": null,
         "manualF1": 346.0,
-        "manualF2": 2426.0
+        "manualF2": 2426.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -87,6 +102,7 @@
     "channels": null,
     "text": "feet",
     "phonemic": "/fiːt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -95,11 +111,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "i"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -113,6 +133,7 @@
     "channels": null,
     "text": "seen",
     "phonemic": "/siːn/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -121,11 +142,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "i"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -139,6 +164,7 @@
     "channels": null,
     "text": "ɪ",
     "phonemic": "/ɪ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -147,11 +173,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɪ"
+        ],
         "timeStartMs": 61,
         "timeEndMs": 169,
         "activeAnalysisId": null,
         "manualF1": 306.0,
-        "manualF2": 2395.0
+        "manualF2": 2395.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -165,6 +195,7 @@
     "channels": null,
     "text": "pink",
     "phonemic": "/pɪŋk/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -173,11 +204,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɪ"
+        ],
         "timeStartMs": 57,
         "timeEndMs": 164,
         "activeAnalysisId": null,
         "manualF1": 466.0,
-        "manualF2": 1980.0
+        "manualF2": 1980.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -191,6 +226,7 @@
     "channels": null,
     "text": "hid",
     "phonemic": "/hɪd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -199,11 +235,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɪ"
+        ],
         "timeStartMs": 216,
         "timeEndMs": 357,
         "activeAnalysisId": null,
         "manualF1": 390.0,
-        "manualF2": 2091.0
+        "manualF2": 2091.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -217,6 +257,7 @@
     "channels": null,
     "text": "kit",
     "phonemic": "/kɪt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -225,11 +266,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -243,6 +288,7 @@
     "channels": null,
     "text": "bit",
     "phonemic": "/bɪt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -251,11 +297,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -269,6 +319,7 @@
     "channels": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -277,11 +328,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɛ"
+        ],
         "timeStartMs": 65,
         "timeEndMs": 175,
         "activeAnalysisId": null,
         "manualF1": 528.0,
-        "manualF2": 1765.0
+        "manualF2": 1765.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -295,6 +350,7 @@
     "channels": null,
     "text": "red",
     "phonemic": "/rɛd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -303,11 +359,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɛ"
+        ],
         "timeStartMs": 66,
         "timeEndMs": 196,
         "activeAnalysisId": null,
         "manualF1": 594.0,
-        "manualF2": 1539.0
+        "manualF2": 1539.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -321,6 +381,7 @@
     "channels": null,
     "text": "head",
     "phonemic": "/hɛd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -329,11 +390,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ɛ"
+        ],
         "timeStartMs": 231,
         "timeEndMs": 356,
         "activeAnalysisId": null,
         "manualF1": 623.0,
-        "manualF2": 1860.0
+        "manualF2": 1860.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -347,6 +412,7 @@
     "channels": null,
     "text": "dress",
     "phonemic": "/drɛs/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -355,11 +421,15 @@
           2,
           3
         ],
+        "vowelSymbols": [
+          "ɛ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -373,6 +443,7 @@
     "channels": null,
     "text": "bed",
     "phonemic": "/bɛd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -381,11 +452,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɛ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -399,6 +474,7 @@
     "channels": null,
     "text": "æ",
     "phonemic": "/æ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -407,11 +483,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "æ"
+        ],
         "timeStartMs": 81,
         "timeEndMs": 248,
         "activeAnalysisId": null,
         "manualF1": 598.0,
-        "manualF2": 1707.0
+        "manualF2": 1707.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -425,6 +505,7 @@
     "channels": null,
     "text": "sand",
     "phonemic": "/sænd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -433,11 +514,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "æ"
+        ],
         "timeStartMs": 156,
         "timeEndMs": 319,
         "activeAnalysisId": null,
         "manualF1": 508.0,
-        "manualF2": 1894.0
+        "manualF2": 1894.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -451,6 +536,7 @@
     "channels": null,
     "text": "had",
     "phonemic": "/hæd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -459,11 +545,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "æ"
+        ],
         "timeStartMs": 235,
         "timeEndMs": 403,
         "activeAnalysisId": null,
         "manualF1": 660.0,
-        "manualF2": 1954.0
+        "manualF2": 1954.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -477,6 +567,7 @@
     "channels": null,
     "text": "trap",
     "phonemic": "/træp/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -485,11 +576,15 @@
           2,
           3
         ],
+        "vowelSymbols": [
+          "æ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -503,6 +598,7 @@
     "channels": null,
     "text": "cat",
     "phonemic": "/kæt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -511,11 +607,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "æ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -529,6 +629,7 @@
     "channels": null,
     "text": "ɑ",
     "phonemic": "/ɑ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -537,11 +638,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": 152,
         "timeEndMs": 346,
         "activeAnalysisId": null,
         "manualF1": 633.0,
-        "manualF2": 1050.0
+        "manualF2": 1050.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -555,6 +660,7 @@
     "channels": null,
     "text": "coffee",
     "phonemic": "/ˈkɑːfi/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -563,11 +669,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": 148,
         "timeEndMs": 284,
         "activeAnalysisId": null,
         "manualF1": 724.0,
-        "manualF2": 1078.0
+        "manualF2": 1078.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -581,6 +691,7 @@
     "channels": null,
     "text": "hod",
     "phonemic": "/hɑːd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -589,11 +700,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": 243,
         "timeEndMs": 428,
         "activeAnalysisId": null,
         "manualF1": 795.0,
-        "manualF2": 1276.0
+        "manualF2": 1276.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -607,6 +722,7 @@
     "channels": null,
     "text": "father",
     "phonemic": "/ˈfɑːðər/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -615,11 +731,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -633,6 +753,7 @@
     "channels": null,
     "text": "palm",
     "phonemic": "/pɑːm/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -641,11 +762,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ɑ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -659,6 +784,7 @@
     "channels": null,
     "text": "ɔ",
     "phonemic": "/ɔ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -667,11 +793,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɔ"
+        ],
         "timeStartMs": 101,
         "timeEndMs": 335,
         "activeAnalysisId": null,
         "manualF1": 447.0,
-        "manualF2": 718.0
+        "manualF2": 718.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -685,6 +815,7 @@
     "channels": null,
     "text": "mauve",
     "phonemic": "/mɔːv/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -693,11 +824,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ɔ"
+        ],
         "timeStartMs": 187,
         "timeEndMs": 383,
         "activeAnalysisId": null,
         "manualF1": 631.0,
-        "manualF2": 891.0
+        "manualF2": 891.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -711,6 +846,7 @@
     "channels": null,
     "text": "hawed",
     "phonemic": "/hɔːd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -719,11 +855,15 @@
           1,
           4
         ],
+        "vowelSymbols": [
+          "ɔ"
+        ],
         "timeStartMs": 288,
         "timeEndMs": 467,
         "activeAnalysisId": null,
         "manualF1": 688.0,
-        "manualF2": 1051.0
+        "manualF2": 1051.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -737,6 +877,7 @@
     "channels": null,
     "text": "thought",
     "phonemic": "/θɔːt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -745,11 +886,15 @@
           2,
           6
         ],
+        "vowelSymbols": [
+          "ɔ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -763,6 +908,7 @@
     "channels": null,
     "text": "claw",
     "phonemic": "/klɔː/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -771,11 +917,15 @@
           2,
           4
         ],
+        "vowelSymbols": [
+          "ɔ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -789,6 +939,7 @@
     "channels": null,
     "text": "ʊ",
     "phonemic": "/ʊ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -797,11 +948,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": 74,
         "timeEndMs": 290,
         "activeAnalysisId": null,
         "manualF1": 174.0,
-        "manualF2": 1243.0
+        "manualF2": 1243.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -815,6 +970,7 @@
     "channels": null,
     "text": "wood",
     "phonemic": "/wʊd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -823,11 +979,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": 74,
         "timeEndMs": 197,
         "activeAnalysisId": null,
         "manualF1": 410.0,
-        "manualF2": 917.0
+        "manualF2": 917.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -841,6 +1001,7 @@
     "channels": null,
     "text": "hood",
     "phonemic": "/hʊd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -849,11 +1010,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": 218,
         "timeEndMs": 362,
         "activeAnalysisId": null,
         "manualF1": 490.0,
-        "manualF2": 1033.0
+        "manualF2": 1033.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -867,6 +1032,7 @@
     "channels": null,
     "text": "foot",
     "phonemic": "/fʊt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -875,11 +1041,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -893,6 +1063,7 @@
     "channels": null,
     "text": "put",
     "phonemic": "/pʊt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -901,11 +1072,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -919,6 +1094,7 @@
     "channels": null,
     "text": "u",
     "phonemic": "/uː/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -927,11 +1103,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "u"
+        ],
         "timeStartMs": 171,
         "timeEndMs": 303,
         "activeAnalysisId": null,
         "manualF1": 275.0,
-        "manualF2": 576.0
+        "manualF2": 576.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -945,6 +1125,7 @@
     "channels": null,
     "text": "blue",
     "phonemic": "/bluː/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -953,11 +1134,15 @@
           2,
           4
         ],
+        "vowelSymbols": [
+          "u"
+        ],
         "timeStartMs": 142,
         "timeEndMs": 247,
         "activeAnalysisId": null,
         "manualF1": 320.0,
-        "manualF2": 821.0
+        "manualF2": 821.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -971,6 +1156,7 @@
     "channels": null,
     "text": "who'd",
     "phonemic": "/huːd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -979,11 +1165,15 @@
           2,
           4
         ],
+        "vowelSymbols": [
+          "u"
+        ],
         "timeStartMs": 220,
         "timeEndMs": 385,
         "activeAnalysisId": null,
         "manualF1": 366.0,
-        "manualF2": 909.0
+        "manualF2": 909.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -997,6 +1187,7 @@
     "channels": null,
     "text": "goose",
     "phonemic": "/ɡuːs/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1005,11 +1196,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "u"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1023,6 +1218,7 @@
     "channels": null,
     "text": "food",
     "phonemic": "/fuːd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1031,11 +1227,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "u"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1049,6 +1249,7 @@
     "channels": null,
     "text": "ʌ",
     "phonemic": "/ʌ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1057,11 +1258,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": 105,
         "timeEndMs": 392,
         "activeAnalysisId": null,
         "manualF1": 627.0,
-        "manualF2": 941.0
+        "manualF2": 941.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1075,6 +1280,7 @@
     "channels": null,
     "text": "cut",
     "phonemic": "/kʌt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1083,11 +1289,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": 504,
         "timeEndMs": 603,
         "activeAnalysisId": null,
         "manualF1": 646.0,
-        "manualF2": 1339.0
+        "manualF2": 1339.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1101,6 +1311,7 @@
     "channels": null,
     "text": "hud",
     "phonemic": "/hʌd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1109,11 +1320,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": 203,
         "timeEndMs": 403,
         "activeAnalysisId": null,
         "manualF1": 665.0,
-        "manualF2": 1291.0
+        "manualF2": 1291.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1127,6 +1342,7 @@
     "channels": null,
     "text": "strut",
     "phonemic": "/strʌt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1135,11 +1351,15 @@
           3,
           4
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1153,6 +1373,7 @@
     "channels": null,
     "text": "bus",
     "phonemic": "/bʌs/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1161,11 +1382,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ʌ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1179,6 +1404,7 @@
     "channels": null,
     "text": "ə",
     "phonemic": "/ə/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1187,11 +1413,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ə"
+        ],
         "timeStartMs": 64,
         "timeEndMs": 205,
         "activeAnalysisId": null,
         "manualF1": 569.0,
-        "manualF2": 1247.0
+        "manualF2": 1247.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1205,6 +1435,7 @@
     "channels": null,
     "text": "dust",
     "phonemic": "/dəst/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1213,11 +1444,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "ə"
+        ],
         "timeStartMs": 62,
         "timeEndMs": 193,
         "activeAnalysisId": null,
         "manualF1": 701.0,
-        "manualF2": 1250.0
+        "manualF2": 1250.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1231,6 +1466,7 @@
     "channels": null,
     "text": "about",
     "phonemic": "/əˈbaʊt/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1239,11 +1475,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ə"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1257,6 +1497,7 @@
     "channels": null,
     "text": "ɝ",
     "phonemic": "/ɝː/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1265,11 +1506,16 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɝ",
+          "ɛː"
+        ],
         "timeStartMs": 49,
         "timeEndMs": 197,
         "activeAnalysisId": null,
         "manualF1": 420.0,
-        "manualF2": 1087.0
+        "manualF2": 1087.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1283,6 +1529,7 @@
     "channels": null,
     "text": "purple",
     "phonemic": "/ˈpɜːrpl/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1291,11 +1538,16 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ɝ",
+          "ɛː"
+        ],
         "timeStartMs": 64,
         "timeEndMs": 156,
         "activeAnalysisId": null,
         "manualF1": 489.0,
-        "manualF2": 1112.0
+        "manualF2": 1112.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1309,6 +1561,7 @@
     "channels": null,
     "text": "heard",
     "phonemic": "/hɜːrd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1317,11 +1570,16 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ɝ",
+          "ɛː"
+        ],
         "timeStartMs": 251,
         "timeEndMs": 466,
         "activeAnalysisId": null,
         "manualF1": 506.0,
-        "manualF2": 1406.0
+        "manualF2": 1406.0,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1335,6 +1593,7 @@
     "channels": null,
     "text": "nurse",
     "phonemic": "/nɜːrs/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1343,11 +1602,16 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ɝ",
+          "ɛː"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1361,6 +1625,7 @@
     "channels": null,
     "text": "bird",
     "phonemic": "/bɜːrd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1369,11 +1634,16 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "ɝ",
+          "ɛː"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1387,6 +1657,7 @@
     "channels": null,
     "text": "eɪ",
     "phonemic": "/eɪ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1395,11 +1666,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "eɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1413,6 +1688,7 @@
     "channels": null,
     "text": "jade",
     "phonemic": "/dʒeɪd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1421,11 +1697,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "eɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1439,6 +1719,7 @@
     "channels": null,
     "text": "hayed",
     "phonemic": "/heɪd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1447,11 +1728,15 @@
           1,
           4
         ],
+        "vowelSymbols": [
+          "eɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1465,6 +1750,7 @@
     "channels": null,
     "text": "oʊ",
     "phonemic": "/oʊ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1473,11 +1759,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "oʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1491,6 +1781,7 @@
     "channels": null,
     "text": "gold",
     "phonemic": "/ɡoʊld/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1499,11 +1790,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "oʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1517,6 +1812,7 @@
     "channels": null,
     "text": "hoed",
     "phonemic": "/hoʊd/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1525,11 +1821,15 @@
           1,
           3
         ],
+        "vowelSymbols": [
+          "oʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1543,6 +1843,7 @@
     "channels": null,
     "text": "aɪ",
     "phonemic": "/aɪ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1551,11 +1852,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "aɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1569,6 +1874,7 @@
     "channels": null,
     "text": "lime",
     "phonemic": "/laɪm/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1577,11 +1883,15 @@
           1,
           2
         ],
+        "vowelSymbols": [
+          "aɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1595,6 +1905,7 @@
     "channels": null,
     "text": "aʊ",
     "phonemic": "/aʊ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1603,11 +1914,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "aʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1621,6 +1936,7 @@
     "channels": null,
     "text": "brown",
     "phonemic": "/braʊn/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1629,11 +1945,15 @@
           2,
           4
         ],
+        "vowelSymbols": [
+          "aʊ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1647,6 +1967,7 @@
     "channels": null,
     "text": "ɔɪ",
     "phonemic": "/ɔɪ/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1655,11 +1976,15 @@
           0,
           1
         ],
+        "vowelSymbols": [
+          "ɔɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   },
@@ -1673,6 +1998,7 @@
     "channels": null,
     "text": "turquoise",
     "phonemic": "/ˈtɜːrkwɔɪz/",
+    "createdAt": "2026-10-03T14:22:28.576425",
     "analyses": [],
     "tokens": [
       {
@@ -1681,11 +2007,15 @@
           4,
           7
         ],
+        "vowelSymbols": [
+          "ɔɪ"
+        ],
         "timeStartMs": null,
         "timeEndMs": null,
         "activeAnalysisId": null,
         "manualF1": null,
-        "manualF2": null
+        "manualF2": null,
+        "createdAt": "2026-10-03T14:22:28.576425"
       }
     ]
   }
