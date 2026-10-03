@@ -12,11 +12,14 @@ a later phase).
 
 Sample now absorbs what used to be a separate Sound entity (see db/models.py
 docstring) — a Vowel's own representative audio and a text Sample's audio are
-both just Sample rows, found-or-created by storage_key/source_url, with
-language_id/text filled in as each is discovered. `legacy_analysis` on Token
-is a deliberate, temporary escape hatch for the old dual-ceiling blob — kept
-verbatim rather than discarded or faked up as a real Praat analysis, until a
-later pass re-analyzes these samples' actual audio for real.
+both just Sample rows, found-or-created by `url`, with language_id/text
+filled in as each is discovered. The old dual-ceiling pipeline's per-token
+f1/f2 (buried in each legacy token's `analysis` blob) is copied into
+Token.manual_f1/manual_f2 — not kept as a verbatim blob — since from the new
+model's point of view a legacy-pipeline number behaves exactly like a manual
+override: "a value from somewhere other than the current Praat-exact
+analysis." The rest of that blob (ceilings, window length, etc. — all
+specific to the retired pipeline) is simply not migrated.
 
 Usage:
   docker compose up -d postgres
@@ -36,7 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from db.models import Language, Sample, Token, Vowel  # noqa: E402
 from db.session import get_sessionmaker  # noqa: E402
-from db.storage import get_audio_store  # noqa: E402
+from db.storage import get_audio_store, url_from_storage_key  # noqa: E402
 
 
 def is_external_url(audio) -> bool:
@@ -110,7 +113,7 @@ def discover_language_dirs(lang_root: Path) -> list[tuple[str, bool, dict]]:
 
 
 def find_or_create_sample_for_audio(
-    db, store, audio, provenance: str, repo_root: Path, *, language_id: int | None, text: str | None,
+    db, store, audio, repo_root: Path, *, language_id: int | None, text: str | None,
 ) -> Sample | None:
     """audio: a path/URL string or None/empty, as found in today's JSON. Returns
     a Sample row (possibly reused from an earlier reference to the same audio —
@@ -119,25 +122,27 @@ def find_or_create_sample_for_audio(
         return None
 
     if is_external_url(audio):
-        existing = db.query(Sample).filter_by(source_url=audio).one_or_none()
+        existing = db.query(Sample).filter_by(url=audio).one_or_none()
         if existing:
             return existing
-        return Sample(source_url=audio, provenance=provenance, language_id=language_id, text=text)
+        return Sample(url=audio, language_id=language_id, text=text)
 
-    src_path = (repo_root / audio) if not Path(audio).is_absolute() else Path(audio)
+    # A few entries in the real data have a spurious leading "/" (e.g.
+    # "/lang/de/audio/schoen.ogg") despite meaning a path relative to the
+    # repo root like every other entry — normalize before treating it as
+    # either a filesystem path or a storage_key.
+    storage_key = audio.lstrip("/")
+    src_path = repo_root / storage_key
     if not src_path.exists():
         print(f"    WARNING: referenced audio file missing on disk, recording as a dangling reference: {audio}")
-        return Sample(source_url=audio, provenance=provenance, language_id=language_id, text=text)
+        return Sample(url=url_from_storage_key(storage_key), language_id=language_id, text=text)
 
-    storage_key = audio  # reuse today's relative path verbatim — trivially reviewable against the original tree
-    existing = db.query(Sample).filter_by(storage_key=storage_key).one_or_none()
+    url = url_from_storage_key(storage_key)
+    existing = db.query(Sample).filter_by(url=url).one_or_none()
     if existing:
         return existing
     store.put_path(str(src_path), storage_key)
-    return Sample(
-        storage_key=storage_key, provenance=provenance, original_filename=src_path.name,
-        language_id=language_id, text=text,
-    )
+    return Sample(url=url, original_filename=src_path.name, language_id=language_id, text=text)
 
 
 def migrate(lang_root: Path) -> None:
@@ -173,7 +178,7 @@ def migrate(lang_root: Path) -> None:
                 hb = v.get("heightBackness") or [0, 0]
                 target = v.get("target")
                 rep_sample = find_or_create_sample_for_audio(
-                    db, store, v.get("audio"), "legacy-migrated", repo_root,
+                    db, store, v.get("audio"), repo_root,
                     language_id=language.id, text=(v.get("symbols") or [None])[0],
                 )
                 if rep_sample is not None:
@@ -203,12 +208,12 @@ def migrate(lang_root: Path) -> None:
             print(f"[{key}] {len(samples)} sample(s)")
             for s_order, s in enumerate(samples):
                 sample = find_or_create_sample_for_audio(
-                    db, store, s.get("audio"), "legacy-migrated", repo_root,
+                    db, store, s.get("audio"), repo_root,
                     language_id=language.id, text=s.get("text"),
                 )
                 if sample is None:
                     # e.g. "Oper"/"тупая" in the real data — text was authored but no audio was ever attached
-                    sample = Sample(provenance="legacy-migrated", language_id=language.id, text=s.get("text"))
+                    sample = Sample(language_id=language.id, text=s.get("text"))
                 else:
                     # may be a reused vowel-representative stub — the fuller sample record wins
                     sample.language_id = language.id
@@ -225,15 +230,16 @@ def migrate(lang_root: Path) -> None:
 
                 for t_order, t in enumerate(s.get("tokens") or []):
                     pos = t.get("position") or [0, 0]
-                    analysis = t.get("analysis")
+                    analysis = t.get("analysis") or {}
                     time_start = time_end = None
-                    if analysis and analysis.get("slice"):
+                    if analysis.get("slice"):
                         time_start, time_end = analysis["slice"]
                     db.add(Token(
                         sample_id=sample.id, symbol=t.get("symbol", ""),
                         char_start=pos[0], char_end=pos[1],
                         time_start_ms=time_start, time_end_ms=time_end,
-                        legacy_analysis=analysis, sort_order=t_order,
+                        manual_f1=analysis.get("f1"), manual_f2=analysis.get("f2"),
+                        sort_order=t_order,
                     ))
 
         db.commit()

@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))      # for migrate_lega
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # for db.*, imported transitively
 
 from migrate_legacy_to_db import discover_language_dirs  # noqa: E402
+from db.storage import url_from_storage_key  # noqa: E402
 
 errors: list[str] = []
 notes: list[str] = []
@@ -39,16 +40,20 @@ def check(condition: bool, message: str) -> None:
         errors.append(message)
 
 
+def expected_url(original_audio: str) -> str:
+    if original_audio.startswith(("http://", "https://")):
+        return original_audio
+    return url_from_storage_key(original_audio.lstrip("/"))  # mirrors migrate_legacy_to_db's normalization
+
+
 def audio_matches(original_audio, exp_sample: dict | None, where: str) -> None:
     if not original_audio:
         return  # nothing to check — a sample with no audio in the original is fine either way
     check(exp_sample is not None, f"{where}: original had audio {original_audio!r} but no exported sample was found")
     if exp_sample is None:
         return
-    if exp_sample.get("sourceUrl") is not None:
-        check(exp_sample["sourceUrl"] == original_audio, f"{where}: sourceUrl {exp_sample['sourceUrl']!r} != original {original_audio!r}")
-    else:
-        check(exp_sample.get("storageKey") == original_audio, f"{where}: storageKey {exp_sample.get('storageKey')!r} != original {original_audio!r}")
+    want = expected_url(original_audio)
+    check(exp_sample.get("url") == want, f"{where}: url {exp_sample.get('url')!r} != expected {want!r}")
 
 
 def verify(lang_root: Path, export_dir: Path) -> None:
@@ -79,9 +84,8 @@ def verify(lang_root: Path, export_dir: Path) -> None:
         by_audio_key: dict[str, list[dict]] = {}
         by_text: dict[str | None, list[dict]] = {}
         for es in exp_samples:
-            k = es.get("storageKey") or es.get("sourceUrl")
-            if k:
-                by_audio_key.setdefault(k, []).append(es)
+            if es.get("url"):
+                by_audio_key.setdefault(es["url"], []).append(es)
             by_text.setdefault(es.get("text"), []).append(es)
 
         orig_vowels = orig_data.get("vowels", [])
@@ -130,14 +134,14 @@ def verify(lang_root: Path, export_dir: Path) -> None:
             if not rep_symbol:
                 continue
             audio = os_.get("audio")
-            candidates = by_audio_key.get(audio, []) if audio else by_text.get(os_.get("text"), [])
+            candidates = by_audio_key.get(expected_url(audio), []) if audio else by_text.get(os_.get("text"), [])
             if candidates:
                 rep_candidates.setdefault(rep_symbol, set()).add(candidates[0]["id"])
 
         for i, os_ in enumerate(orig_samples):
             where = f"[{key}] original sample[{i}] ({os_.get('text')!r})"
             audio = os_.get("audio")
-            candidates = by_audio_key.get(audio, []) if audio else by_text.get(os_.get("text"), [])
+            candidates = by_audio_key.get(expected_url(audio), []) if audio else by_text.get(os_.get("text"), [])
             check(bool(candidates), f"{where}: no exported sample found (audio={audio!r})")
             if not candidates:
                 continue
@@ -154,8 +158,10 @@ def verify(lang_root: Path, export_dir: Path) -> None:
                 check(et is not None, f"{twhere}: not found in matched exported sample's token list")
                 if et is None:
                     continue
-                check(et["legacyAnalysis"] == ot.get("analysis"), f"{twhere}: legacyAnalysis mismatch")
-                orig_slice = (ot.get("analysis") or {}).get("slice")
+                orig_analysis = ot.get("analysis") or {}
+                check(et["manualF1"] == orig_analysis.get("f1"), f"{twhere}: manualF1 mismatch")
+                check(et["manualF2"] == orig_analysis.get("f2"), f"{twhere}: manualF2 mismatch")
+                orig_slice = orig_analysis.get("slice")
                 if orig_slice:
                     check(
                         [et["timeStartMs"], et["timeEndMs"]] == orig_slice,

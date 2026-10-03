@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 61300f4cfd68
+Revision ID: 6837d97c5996
 Revises: 
-Create Date: 2026-10-01 22:02:35.672066
+Create Date: 2026-10-03 16:20:13.442670
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '61300f4cfd68'
+revision: str = '6837d97c5996'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,16 +35,12 @@ def upgrade() -> None:
     op.create_table('samples',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('language_id', sa.SmallInteger(), nullable=True),
-    sa.Column('storage_key', sa.Text(), nullable=True),
-    sa.Column('source_url', sa.Text(), nullable=True),
+    sa.Column('url', sa.Text(), nullable=True),
     sa.Column('original_filename', sa.Text(), nullable=True),
     sa.Column('content_type', sa.Text(), nullable=True),
     sa.Column('duration_ms', sa.Integer(), nullable=True),
     sa.Column('sample_rate_hz', sa.Integer(), nullable=True),
     sa.Column('channels', sa.SmallInteger(), nullable=True),
-    sa.Column('provenance', sa.Text(), nullable=False),
-    sa.Column('leading_silence_ms', sa.Integer(), nullable=True),
-    sa.Column('trimmed', sa.Boolean(), nullable=False),
     sa.Column('text', sa.Text(), nullable=True),
     sa.Column('phonemic', sa.Text(), nullable=True),
     sa.Column('sort_order', sa.Integer(), nullable=False),
@@ -52,35 +48,16 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['language_id'], ['languages.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('storage_key')
+    sa.UniqueConstraint('url')
     )
     op.create_table('sample_analyses',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('sample_id', sa.Integer(), nullable=False),
-    sa.Column('source', sa.Text(), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('version', sa.Text(), nullable=True),
     sa.Column('config', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('formants', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('pitch', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('manual_f1', sa.Float(), nullable=True),
-    sa.Column('manual_f2', sa.Float(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['sample_id'], ['samples.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('tokens',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('sample_id', sa.Integer(), nullable=False),
-    sa.Column('symbol', sa.Text(), nullable=False),
-    sa.Column('char_start', sa.Integer(), nullable=False),
-    sa.Column('char_end', sa.Integer(), nullable=False),
-    sa.Column('time_start_ms', sa.Integer(), nullable=True),
-    sa.Column('time_end_ms', sa.Integer(), nullable=True),
-    sa.Column('legacy_analysis', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-    sa.Column('sort_order', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['sample_id'], ['samples.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -109,13 +86,31 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['representative_sample_id'], ['samples.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('tokens',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('sample_id', sa.Integer(), nullable=False),
+    sa.Column('symbol', sa.Text(), nullable=False),
+    sa.Column('char_start', sa.Integer(), nullable=False),
+    sa.Column('char_end', sa.Integer(), nullable=False),
+    sa.Column('time_start_ms', sa.Integer(), nullable=True),
+    sa.Column('time_end_ms', sa.Integer(), nullable=True),
+    sa.Column('active_analysis_id', sa.Integer(), nullable=True),
+    sa.Column('manual_f1', sa.Float(), nullable=True),
+    sa.Column('manual_f2', sa.Float(), nullable=True),
+    sa.Column('sort_order', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['active_analysis_id'], ['sample_analyses.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['sample_id'], ['samples.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('vowels')
     op.drop_table('tokens')
+    op.drop_table('vowels')
     op.drop_table('sample_analyses')
     op.drop_table('samples')
     op.drop_table('languages')

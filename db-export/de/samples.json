@@ -1,18 +1,15 @@
 [
   {
     "id": 1,
-    "storageKey": "lang/de/audio/fit/i_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/i_long.mp3",
     "originalFilename": "i_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "iː",
     "phonemic": "/iː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "iː",
@@ -22,40 +19,23 @@
         ],
         "timeStartMs": 320,
         "timeEndMs": 614,
-        "legacyAnalysis": {
-          "f1": 350,
-          "f2": 2672,
-          "max_f": 5000,
-          "slice": [
-            320,
-            614
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2000,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 350.0,
+        "manualF2": 2672.0
       }
     ]
   },
   {
     "id": 2,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Liebe.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Liebe.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Liebe",
     "phonemic": "/liːbə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "iː",
@@ -65,24 +45,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 3,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-wie.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-wie.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "wie",
     "phonemic": "/viː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "iː",
@@ -92,24 +71,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 5,
-    "storageKey": "lang/de/audio/fit/y_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/y_long.mp3",
     "originalFilename": "y_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "yː",
     "phonemic": "/yː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "yː",
@@ -119,40 +97,23 @@
         ],
         "timeStartMs": 494,
         "timeEndMs": 821,
-        "legacyAnalysis": {
-          "f1": 269,
-          "f2": 1979,
-          "max_f": 5000,
-          "slice": [
-            494,
-            821
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 269.0,
+        "manualF2": 1979.0
       }
     ]
   },
   {
     "id": 6,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-über.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-über.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "über",
     "phonemic": "/yːbɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "yː",
@@ -162,24 +123,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 7,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-grün.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-grün.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "grün",
     "phonemic": "/gʁyːn/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "yː",
@@ -189,24 +149,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 8,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/De-M%C3%BChle.ogg/De-M%C3%BChle.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/De-M%C3%BChle.ogg/De-M%C3%BChle.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Mühler",
     "phonemic": "/myːlɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "yː",
@@ -216,24 +175,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 9,
-    "storageKey": "lang/de/audio/fit/i_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/i_short.mp3",
     "originalFilename": "i_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɪ",
     "phonemic": "/ɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -243,40 +201,23 @@
         ],
         "timeStartMs": 396,
         "timeEndMs": 496,
-        "legacyAnalysis": {
-          "f1": 385,
-          "f2": 1636,
-          "max_f": 5000,
-          "slice": [
-            396,
-            496
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2200,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 385.0,
+        "manualF2": 1636.0
       }
     ]
   },
   {
     "id": 10,
-    "storageKey": "lang/de/audio/in.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/in.mp3",
     "originalFilename": "in.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "in",
     "phonemic": "/in/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -286,40 +227,23 @@
         ],
         "timeStartMs": 232,
         "timeEndMs": 309,
-        "legacyAnalysis": {
-          "f1": 341,
-          "f2": 2241,
-          "max_f": 5000,
-          "slice": [
-            232,
-            309
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 341.0,
+        "manualF2": 2241.0
       }
     ]
   },
   {
     "id": 11,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-mit.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-mit.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "mit",
     "phonemic": "/mɪt/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -329,24 +253,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 12,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bitte.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bitte.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "bitte",
     "phonemic": "/bɪtə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -356,24 +279,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 13,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/De-Mitte.ogg/De-Mitte.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/De-Mitte.ogg/De-Mitte.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Mitte",
     "phonemic": "/mɪtə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -383,24 +305,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 14,
-    "storageKey": "lang/de/audio/fit/y_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/y_short.mp3",
     "originalFilename": "y_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ʏ",
     "phonemic": "/ʏ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -410,40 +331,23 @@
         ],
         "timeStartMs": 442,
         "timeEndMs": 525,
-        "legacyAnalysis": {
-          "f1": 410,
-          "f2": 1743,
-          "max_f": 5000,
-          "slice": [
-            442,
-            525
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 410.0,
+        "manualF2": 1743.0
       }
     ]
   },
   {
     "id": 15,
-    "storageKey": "lang/de/audio/duenn.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/duenn.mp3",
     "originalFilename": "duenn.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "dünn",
     "phonemic": "/dʏn/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -453,24 +357,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 16,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/De-M%C3%BCller.ogg/De-M%C3%BCller.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/De-M%C3%BCller.ogg/De-M%C3%BCller.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Müller",
     "phonemic": "/mʏlɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -480,40 +383,23 @@
         ],
         "timeStartMs": 574,
         "timeEndMs": 665,
-        "legacyAnalysis": {
-          "f1": 333,
-          "f2": 1448,
-          "max_f": 5000,
-          "slice": [
-            574,
-            665
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 333.0,
+        "manualF2": 1448.0
       }
     ]
   },
   {
     "id": 17,
-    "storageKey": "lang/de/audio/fit/ee_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/ee_long.mp3",
     "originalFilename": "ee_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "eː",
     "phonemic": "/eː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -523,40 +409,23 @@
         ],
         "timeStartMs": 341,
         "timeEndMs": 544,
-        "legacyAnalysis": {
-          "f1": 381,
-          "f2": 2699,
-          "max_f": 5000,
-          "slice": [
-            341,
-            544
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 381.0,
+        "manualF2": 2699.0
       }
     ]
   },
   {
     "id": 18,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-See.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-See.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "See",
     "phonemic": "/zeː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -566,24 +435,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 19,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-geben.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-geben.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "geben",
     "phonemic": "/geːbən/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -593,24 +461,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 20,
-    "storageKey": "lang/de/audio/fit/oe_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oe_long.mp3",
     "originalFilename": "oe_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "øː",
     "phonemic": "/øː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "øː",
@@ -620,40 +487,23 @@
         ],
         "timeStartMs": 637,
         "timeEndMs": 909,
-        "legacyAnalysis": {
-          "f1": 393,
-          "f2": 1865,
-          "max_f": 5000,
-          "slice": [
-            637,
-            909
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 393.0,
+        "manualF2": 1865.0
       }
     ]
   },
   {
     "id": 21,
-    "storageKey": null,
-    "sourceUrl": "/lang/de/audio/schoen.ogg",
-    "originalFilename": null,
+    "url": "file://lang/de/audio/schoen.ogg",
+    "originalFilename": "schoen.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "schön",
     "phonemic": "/ʃøːn/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "øː",
@@ -663,40 +513,23 @@
         ],
         "timeStartMs": 298,
         "timeEndMs": 418,
-        "legacyAnalysis": {
-          "f1": 294,
-          "f2": 1496,
-          "max_f": 5000,
-          "slice": [
-            298,
-            418
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 294.0,
+        "manualF2": 1496.0
       }
     ]
   },
   {
     "id": 22,
-    "storageKey": null,
-    "sourceUrl": "/lang/de/audio/hoeren.ogg",
-    "originalFilename": null,
+    "url": "file://lang/de/audio/hoeren.ogg",
+    "originalFilename": "hoeren.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "hören",
     "phonemic": "/høːʁən/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "øː",
@@ -706,40 +539,23 @@
         ],
         "timeStartMs": 128,
         "timeEndMs": 287,
-        "legacyAnalysis": {
-          "f1": 426,
-          "f2": 1209,
-          "max_f": 5000,
-          "slice": [
-            128,
-            287
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 426.0,
+        "manualF2": 1209.0
       }
     ]
   },
   {
     "id": 23,
-    "storageKey": null,
-    "sourceUrl": "/lang/de/audio/hoelen.ogg",
-    "originalFilename": null,
+    "url": "file://lang/de/audio/hoelen.ogg",
+    "originalFilename": "hoelen.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Höhle",
     "phonemic": "/høːlə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "øː",
@@ -749,40 +565,23 @@
         ],
         "timeStartMs": 644,
         "timeEndMs": 725,
-        "legacyAnalysis": {
-          "f1": 530,
-          "f2": 1410,
-          "max_f": 5000,
-          "slice": [
-            644,
-            725
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 530.0,
+        "manualF2": 1410.0
       }
     ]
   },
   {
     "id": 24,
-    "storageKey": "lang/de/audio/fit/e_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/e_short.mp3",
     "originalFilename": "e_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -792,40 +591,23 @@
         ],
         "timeStartMs": 376,
         "timeEndMs": 473,
-        "legacyAnalysis": {
-          "f1": 602,
-          "f2": 1167,
-          "max_f": 5000,
-          "slice": [
-            376,
-            473
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 602.0,
+        "manualF2": 1167.0
       }
     ]
   },
   {
     "id": 25,
-    "storageKey": "lang/de/audio/es.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/es.mp3",
     "originalFilename": "es.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "es",
     "phonemic": "/ɛs/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -835,24 +617,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 26,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bett.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bett.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Bett",
     "phonemic": "/bɛt/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -862,24 +643,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 27,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/De-Stelle.ogg/De-Stelle.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/De-Stelle.ogg/De-Stelle.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Stelle",
     "phonemic": "/ʃtɛlə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -889,24 +669,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 28,
-    "storageKey": "lang/de/audio/fit/e_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/e_long.mp3",
     "originalFilename": "e_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɛː",
     "phonemic": "/ɛː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛː",
@@ -916,40 +695,23 @@
         ],
         "timeStartMs": 454,
         "timeEndMs": 684,
-        "legacyAnalysis": {
-          "f1": 569,
-          "f2": 1430,
-          "max_f": 5000,
-          "slice": [
-            454,
-            684
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 569.0,
+        "manualF2": 1430.0
       }
     ]
   },
   {
     "id": 29,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/De-K%C3%A4se.ogg/De-K%C3%A4se.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/De-K%C3%A4se.ogg/De-K%C3%A4se.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Käse",
     "phonemic": "/kɛːzə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛː",
@@ -959,24 +721,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 30,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hände.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hände.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Hände",
     "phonemic": "/hɛːndə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛː",
@@ -986,24 +747,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 31,
-    "storageKey": "lang/de/audio/fit/oe_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oe_short.mp3",
     "originalFilename": "oe_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "œ",
     "phonemic": "/œ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1013,40 +773,23 @@
         ],
         "timeStartMs": 380,
         "timeEndMs": 454,
-        "legacyAnalysis": {
-          "f1": 629,
-          "f2": 1837,
-          "max_f": 5000,
-          "slice": [
-            380,
-            454
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 629.0,
+        "manualF2": 1837.0
       }
     ]
   },
   {
     "id": 32,
-    "storageKey": null,
-    "sourceUrl": "lang/de/audio/oefter.mp3",
+    "url": "file://lang/de/audio/oefter.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "öfter",
     "phonemic": "/œftɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1056,24 +799,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 33,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-zwölf.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-zwölf.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "zwölf",
     "phonemic": "/t͡svœlf/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1083,24 +825,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 34,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hölle.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hölle.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Hölle",
     "phonemic": "/hœlə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1110,24 +851,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 35,
-    "storageKey": "lang/de/audio/fit/a_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/a_short.mp3",
     "originalFilename": "a_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "a",
     "phonemic": "/a/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1137,40 +877,23 @@
         ],
         "timeStartMs": 293,
         "timeEndMs": 382,
-        "legacyAnalysis": {
-          "f1": 1070,
-          "f2": 1434,
-          "max_f": 5000,
-          "slice": [
-            293,
-            382
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 1070.0,
+        "manualF2": 1434.0
       }
     ]
   },
   {
     "id": 36,
-    "storageKey": "lang/de/audio/ab.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/ab.mp3",
     "originalFilename": "ab.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ab",
     "phonemic": "/ab/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1180,24 +903,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 37,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mann.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mann.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Mann",
     "phonemic": "/man/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1207,24 +929,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 38,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-das.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-das.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "das",
     "phonemic": "/das/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1234,24 +955,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 39,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b8/De-Kamm.ogg/De-Kamm.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b8/De-Kamm.ogg/De-Kamm.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Kamm",
     "phonemic": "/kam/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1261,24 +981,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 40,
-    "storageKey": "lang/de/audio/fit/a_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/a_long.mp3",
     "originalFilename": "a_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "aː",
     "phonemic": "/aː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aː",
@@ -1288,24 +1007,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 41,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bahn.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Bahn.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Bahn",
     "phonemic": "/baːn/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aː",
@@ -1315,24 +1033,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 42,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-ja.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-ja.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ja",
     "phonemic": "/jaː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aː",
@@ -1342,24 +1059,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 43,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ee/De-kam.ogg/De-kam.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ee/De-kam.ogg/De-kam.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "kam",
     "phonemic": "/kaːm/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aː",
@@ -1369,24 +1085,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 44,
-    "storageKey": "lang/de/audio/fit/o_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/o_long.mp3",
     "originalFilename": "o_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "oː",
     "phonemic": "/oː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "oː",
@@ -1396,40 +1111,23 @@
         ],
         "timeStartMs": 425,
         "timeEndMs": 675,
-        "legacyAnalysis": {
-          "f1": 434,
-          "f2": 538,
-          "max_f": 5000,
-          "slice": [
-            425,
-            675
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 434.0,
+        "manualF2": 538.0
       }
     ]
   },
   {
     "id": 45,
-    "storageKey": "lang/de/audio/gross.ogg",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/gross.ogg",
     "originalFilename": "gross.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "groß",
     "phonemic": "/gʁoːs/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "oː",
@@ -1439,40 +1137,23 @@
         ],
         "timeStartMs": 357,
         "timeEndMs": 504,
-        "legacyAnalysis": {
-          "f1": 367,
-          "f2": 497,
-          "max_f": 5000,
-          "slice": [
-            357,
-            504
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 367.0,
+        "manualF2": 497.0
       }
     ]
   },
   {
     "id": 46,
-    "storageKey": null,
-    "sourceUrl": "/lang/de/audio/sohn.ogg",
-    "originalFilename": null,
+    "url": "file://lang/de/audio/sohn.ogg",
+    "originalFilename": "sohn.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Sohn",
     "phonemic": "/zoːn/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "oː",
@@ -1482,40 +1163,23 @@
         ],
         "timeStartMs": 686,
         "timeEndMs": 750,
-        "legacyAnalysis": {
-          "f1": 412,
-          "f2": 798,
-          "max_f": 5000,
-          "slice": [
-            686,
-            750
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 412.0,
+        "manualF2": 798.0
       }
     ]
   },
   {
     "id": 47,
-    "storageKey": null,
-    "sourceUrl": "/lang/de/audio/ofen.ogg",
-    "originalFilename": null,
+    "url": "file://lang/de/audio/ofen.ogg",
+    "originalFilename": "ofen.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Ofen",
     "phonemic": "/oːfən/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "oː",
@@ -1525,40 +1189,23 @@
         ],
         "timeStartMs": 256,
         "timeEndMs": 369,
-        "legacyAnalysis": {
-          "f1": 523,
-          "f2": 1426,
-          "max_f": 5000,
-          "slice": [
-            256,
-            369
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 523.0,
+        "manualF2": 1426.0
       }
     ]
   },
   {
     "id": 48,
-    "storageKey": "lang/de/audio/fit/o_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/o_short.mp3",
     "originalFilename": "o_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɔ",
     "phonemic": "/ɔ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1568,24 +1215,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 49,
-    "storageKey": "lang/de/audio/ob.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/ob.mp3",
     "originalFilename": "ob.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ob",
     "phonemic": "/ɔb/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1595,24 +1241,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 50,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kopf.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kopf.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Kopf",
     "phonemic": "/kɔp͡f/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1622,24 +1267,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 51,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Post.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Post.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Post",
     "phonemic": "/pɔst/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1649,24 +1293,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 52,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d7/De-offen.ogg/De-offen.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d7/De-offen.ogg/De-offen.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "offen",
     "phonemic": "/ɔfən/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -1676,24 +1319,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 53,
-    "storageKey": "lang/de/audio/fit/u_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/u_long.mp3",
     "originalFilename": "u_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "uː",
     "phonemic": "/uː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -1703,24 +1345,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 54,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Buch.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Buch.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Buch",
     "phonemic": "/buːx/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -1730,24 +1371,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 55,
-    "storageKey": null,
-    "sourceUrl": "/lang/de/audio/ruhe.ogg",
-    "originalFilename": null,
+    "url": "file://lang/de/audio/ruhe.ogg",
+    "originalFilename": "ruhe.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Ruhe",
     "phonemic": "/ʁuːə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -1757,40 +1397,23 @@
         ],
         "timeStartMs": 562,
         "timeEndMs": 727,
-        "legacyAnalysis": {
-          "f1": 439,
-          "f2": 1061,
-          "max_f": 5000,
-          "slice": [
-            562,
-            727
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 439.0,
+        "manualF2": 1061.0
       }
     ]
   },
   {
     "id": 56,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5d/De-Mut2.oga/De-Mut2.oga.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5d/De-Mut2.oga/De-Mut2.oga.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Mut",
     "phonemic": "/muːt/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -1800,24 +1423,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 57,
-    "storageKey": "lang/de/audio/fit/u_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/u_short.mp3",
     "originalFilename": "u_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ʊ",
     "phonemic": "/ʊ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1827,24 +1449,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 58,
-    "storageKey": "lang/de/audio/um.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/um.mp3",
     "originalFilename": "um.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "um",
     "phonemic": "/ʊm/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1854,24 +1475,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 59,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mutter.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Mutter.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Mutter",
     "phonemic": "/mʊtɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1881,24 +1501,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 60,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hund.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Hund.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Hund",
     "phonemic": "/hʊnt/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1908,24 +1527,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 61,
-    "storageKey": "lang/de/audio/fit/schwa.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/schwa.mp3",
     "originalFilename": "schwa.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ə",
     "phonemic": "/ə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1935,24 +1553,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 62,
-    "storageKey": "lang/de/audio/bitte.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/bitte.mp3",
     "originalFilename": "bitte.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "bitte",
     "phonemic": "/bɪtə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1962,24 +1579,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 63,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f4/De-bitte-2.ogg/De-bitte-2.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f4/De-bitte-2.ogg/De-bitte-2.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "bitte (2)",
     "phonemic": "/bɪtə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1989,24 +1605,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 64,
-    "storageKey": null,
-    "sourceUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kette.ogg",
+    "url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/De-Kette.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Kette",
     "phonemic": "/kɛtə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -2016,24 +1631,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 65,
-    "storageKey": "lang/de/audio/fit/er.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/er.mp3",
     "originalFilename": "er.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɐ",
     "phonemic": "/ɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɐ",
@@ -2043,24 +1657,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 66,
-    "storageKey": "lang/de/audio/er.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/er.mp3",
     "originalFilename": "er.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "er",
     "phonemic": "/eːɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɐ",
@@ -2070,24 +1683,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 67,
-    "storageKey": "lang/de/audio/wir.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/wir.mp3",
     "originalFilename": "wir.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "wir",
     "phonemic": "/viːɐ̯/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɐ",
@@ -2097,24 +1709,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 4,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f8/De-Mieter.ogg/De-Mieter.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f8/De-Mieter.ogg/De-Mieter.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Mieter",
     "phonemic": "/miːtɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "iː",
@@ -2124,7 +1735,9 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       },
       {
         "symbol": "ɐ",
@@ -2134,24 +1747,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 68,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/De-Mutter.ogg/De-Mutter.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/De-Mutter.ogg/De-Mutter.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Mutter",
     "phonemic": "/mʊtɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɐ",
@@ -2161,24 +1773,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 69,
-    "storageKey": null,
-    "sourceUrl": null,
+    "url": null,
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Oper",
     "phonemic": "/oːpɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɐ",
@@ -2188,24 +1799,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 70,
-    "storageKey": "lang/de/audio/fit/ai/ai.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/ai/ai.mp3",
     "originalFilename": "ai.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "aɪ",
     "phonemic": "/aɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aɪ",
@@ -2215,24 +1825,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 71,
-    "storageKey": "lang/de/audio/fit/ai/ein.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/ai/ein.mp3",
     "originalFilename": "ein.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "eins",
     "phonemic": "/aɪ̯ns/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aɪ",
@@ -2242,24 +1851,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 72,
-    "storageKey": "lang/de/audio/fit/ai/arbeit.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/ai/arbeit.mp3",
     "originalFilename": "arbeit.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "arbeit",
     "phonemic": "/aɐ̯baɪ̯t/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aɪ",
@@ -2269,24 +1877,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 73,
-    "storageKey": "lang/de/audio/fit/ai/eingang.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/ai/eingang.mp3",
     "originalFilename": "eingang.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "eingang",
     "phonemic": "/aɪ̯ngaŋ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aɪ",
@@ -2296,24 +1903,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 74,
-    "storageKey": "lang/de/audio/fit/au/au.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/au/au.mp3",
     "originalFilename": "au.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "aʊ",
     "phonemic": "/aʊ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aʊ",
@@ -2323,24 +1929,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 75,
-    "storageKey": "lang/de/audio/fit/au/bau.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/au/bau.mp3",
     "originalFilename": "bau.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "bau",
     "phonemic": "/baʊ̯/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aʊ",
@@ -2350,24 +1955,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 76,
-    "storageKey": "lang/de/audio/fit/au/blau.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/au/blau.mp3",
     "originalFilename": "blau.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "blau",
     "phonemic": "/blaʊ̯/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aʊ",
@@ -2377,24 +1981,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 77,
-    "storageKey": "lang/de/audio/fit/au/grau.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/au/grau.mp3",
     "originalFilename": "grau.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "grau",
     "phonemic": "/gʁaʊ̯/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aʊ",
@@ -2404,24 +2007,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 78,
-    "storageKey": "lang/de/audio/fit/au/schau.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/au/schau.mp3",
     "originalFilename": "schau.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "schau",
     "phonemic": "/ʃaʊ̯/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "aʊ",
@@ -2431,24 +2033,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 79,
-    "storageKey": "lang/de/audio/fit/oi/oi.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oi/oi.mp3",
     "originalFilename": "oi.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɔɪ",
     "phonemic": "/ɔɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -2458,24 +2059,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 80,
-    "storageKey": "lang/de/audio/fit/oi/euro.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oi/euro.mp3",
     "originalFilename": "euro.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "euro",
     "phonemic": "/ɔɪʁoː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -2485,24 +2085,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 81,
-    "storageKey": "lang/de/audio/fit/oi/europa.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oi/europa.mp3",
     "originalFilename": "europa.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "europa",
     "phonemic": "/ɔɪʁoːpa/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -2512,24 +2111,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 82,
-    "storageKey": "lang/de/audio/fit/oi/neu.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oi/neu.mp3",
     "originalFilename": "neu.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "neu",
     "phonemic": "/nɔɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -2539,24 +2137,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 83,
-    "storageKey": "lang/de/audio/fit/oi/geraeusch.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oi/geraeusch.mp3",
     "originalFilename": "geraeusch.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Geräusch",
     "phonemic": "/gəʁɔɪʃ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -2566,24 +2163,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 84,
-    "storageKey": "lang/de/audio/fit/oi/raeuber.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/de/audio/fit/oi/raeuber.mp3",
     "originalFilename": "raeuber.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Räuber",
     "phonemic": "/ʁɔɪbɐ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔɪ",
@@ -2593,7 +2189,9 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   }

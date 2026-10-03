@@ -1,18 +1,15 @@
 [
   {
     "id": 85,
-    "storageKey": "lang/no/audio/auto/i_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/i_long.mp3",
     "originalFilename": "i_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "iː",
     "phonemic": "/iː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "iː",
@@ -22,40 +19,23 @@
         ],
         "timeStartMs": 329,
         "timeEndMs": 564,
-        "legacyAnalysis": {
-          "f1": 256,
-          "f2": 2410,
-          "max_f": 5000,
-          "slice": [
-            329,
-            564
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 256.0,
+        "manualF2": 2410.0
       }
     ]
   },
   {
     "id": 86,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/No-de.ogg/No-de.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/No-de.ogg/No-de.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "de",
     "phonemic": "/deː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "iː",
@@ -65,40 +45,23 @@
         ],
         "timeStartMs": 146,
         "timeEndMs": 318,
-        "legacyAnalysis": {
-          "f1": 238,
-          "f2": 2174,
-          "max_f": 5000,
-          "slice": [
-            146,
-            318
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 238.0,
+        "manualF2": 2174.0
       }
     ]
   },
   {
     "id": 87,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/36/LL-Q9043_%28nor%29-Telaneo-skive.wav/LL-Q9043_%28nor%29-Telaneo-skive.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/36/LL-Q9043_%28nor%29-Telaneo-skive.wav/LL-Q9043_%28nor%29-Telaneo-skive.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skive",
     "phonemic": "/ˈʃiːvə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "iː",
@@ -108,40 +71,23 @@
         ],
         "timeStartMs": 362,
         "timeEndMs": 462,
-        "legacyAnalysis": {
-          "f1": 295,
-          "f2": 2700,
-          "max_f": 5000,
-          "slice": [
-            362,
-            462
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 295.0,
+        "manualF2": 2700.0
       }
     ]
   },
   {
     "id": 88,
-    "storageKey": "lang/no/audio/mjolnir/i/i_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/i/i_short.mp3",
     "originalFilename": "i_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɪ",
     "phonemic": "/ɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -151,40 +97,23 @@
         ],
         "timeStartMs": 137,
         "timeEndMs": 195,
-        "legacyAnalysis": {
-          "f1": 352,
-          "f2": 2211,
-          "max_f": 5000,
-          "slice": [
-            137,
-            195
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 352.0,
+        "manualF2": 2211.0
       }
     ]
   },
   {
     "id": 89,
-    "storageKey": "lang/no/audio/mjolnir/i/ikke.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/i/ikke.mp3",
     "originalFilename": "ikke.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ikke",
     "phonemic": "/ˈɪkə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -194,40 +123,23 @@
         ],
         "timeStartMs": 115,
         "timeEndMs": 153,
-        "legacyAnalysis": {
-          "f1": 369,
-          "f2": 2288,
-          "max_f": 5000,
-          "slice": [
-            115,
-            153
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 369.0,
+        "manualF2": 2288.0
       }
     ]
   },
   {
     "id": 90,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/LL-Q9043_%28nor%29-Telaneo-skille.wav/LL-Q9043_%28nor%29-Telaneo-skille.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/LL-Q9043_%28nor%29-Telaneo-skille.wav/LL-Q9043_%28nor%29-Telaneo-skille.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skille",
     "phonemic": "/ˈʃɪlə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -237,40 +149,23 @@
         ],
         "timeStartMs": 346,
         "timeEndMs": 409,
-        "legacyAnalysis": {
-          "f1": 392,
-          "f2": 2228,
-          "max_f": 5000,
-          "slice": [
-            346,
-            409
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 392.0,
+        "manualF2": 2228.0
       }
     ]
   },
   {
     "id": 91,
-    "storageKey": "lang/no/audio/auto/y_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/y_long.mp3",
     "originalFilename": "y_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "yː",
     "phonemic": "/yː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "yː",
@@ -280,40 +175,23 @@
         ],
         "timeStartMs": 346,
         "timeEndMs": 538,
-        "legacyAnalysis": {
-          "f1": 262,
-          "f2": 2182,
-          "max_f": 5000,
-          "slice": [
-            346,
-            538
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 262.0,
+        "manualF2": 2182.0
       }
     ]
   },
   {
     "id": 92,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/50/LL-Q9043_%28nor%29-Telaneo-sky.wav/LL-Q9043_%28nor%29-Telaneo-sky.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/50/LL-Q9043_%28nor%29-Telaneo-sky.wav/LL-Q9043_%28nor%29-Telaneo-sky.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "sky",
     "phonemic": "/ʃyː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "yː",
@@ -323,40 +201,23 @@
         ],
         "timeStartMs": 401,
         "timeEndMs": 442,
-        "legacyAnalysis": {
-          "f1": 316,
-          "f2": 2372,
-          "max_f": 5000,
-          "slice": [
-            401,
-            442
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 316.0,
+        "manualF2": 2372.0
       }
     ]
   },
   {
     "id": 93,
-    "storageKey": "lang/no/audio/mjolnir/y/y_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/y/y_short.mp3",
     "originalFilename": "y_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ʏ",
     "phonemic": "/ʏ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -366,40 +227,23 @@
         ],
         "timeStartMs": 156,
         "timeEndMs": 227,
-        "legacyAnalysis": {
-          "f1": 362,
-          "f2": 2096,
-          "max_f": 5000,
-          "slice": [
-            156,
-            227
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 362.0,
+        "manualF2": 2096.0
       }
     ]
   },
   {
     "id": 94,
-    "storageKey": "lang/no/audio/mjolnir/y/unnskyld.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/y/unnskyld.mp3",
     "originalFilename": "unnskyld.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "unnskyld",
     "phonemic": "/ˈʉnʃʏl/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -409,40 +253,23 @@
         ],
         "timeStartMs": 526,
         "timeEndMs": 584,
-        "legacyAnalysis": {
-          "f1": 457,
-          "f2": 1856,
-          "max_f": 5000,
-          "slice": [
-            526,
-            584
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 457.0,
+        "manualF2": 1856.0
       }
     ]
   },
   {
     "id": 95,
-    "storageKey": "lang/no/audio/mjolnir/y/nytt.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/y/nytt.mp3",
     "originalFilename": "nytt.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "nytt",
     "phonemic": "/nʏtː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -452,40 +279,23 @@
         ],
         "timeStartMs": 231,
         "timeEndMs": 324,
-        "legacyAnalysis": {
-          "f1": 394,
-          "f2": 2258,
-          "max_f": 5000,
-          "slice": [
-            231,
-            324
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 394.0,
+        "manualF2": 2258.0
       }
     ]
   },
   {
     "id": 96,
-    "storageKey": "lang/no/audio/dict/yndi.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/yndi.mp3",
     "originalFilename": "yndi.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "yndi",
     "phonemic": "/ˈʏndɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -495,24 +305,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 97,
-    "storageKey": null,
-    "sourceUrl": "lang/no/audio/yndi.mp3",
+    "url": "file://lang/no/audio/yndi.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "yndi",
     "phonemic": "/ˈʏndɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -522,24 +331,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 98,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/LL-Q9043_%28nor%29-Telaneo-skydd.wav/LL-Q9043_%28nor%29-Telaneo-skydd.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/LL-Q9043_%28nor%29-Telaneo-skydd.wav/LL-Q9043_%28nor%29-Telaneo-skydd.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skydd",
     "phonemic": "/ʃʏdː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʏ",
@@ -549,24 +357,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 99,
-    "storageKey": "lang/no/audio/auto/u_bar_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/u_bar_long.mp3",
     "originalFilename": "u_bar_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ʉː",
     "phonemic": "/ʉː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉː",
@@ -576,40 +383,23 @@
         ],
         "timeStartMs": 337,
         "timeEndMs": 580,
-        "legacyAnalysis": {
-          "f1": 270,
-          "f2": 1908,
-          "max_f": 5000,
-          "slice": [
-            337,
-            580
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 270.0,
+        "manualF2": 1908.0
       }
     ]
   },
   {
     "id": 100,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b2/LL-Q9043_%28nor%29-Telaneo-sju.wav/LL-Q9043_%28nor%29-Telaneo-sju.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b2/LL-Q9043_%28nor%29-Telaneo-sju.wav/LL-Q9043_%28nor%29-Telaneo-sju.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "sju",
     "phonemic": "/ʃʉː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉː",
@@ -619,40 +409,23 @@
         ],
         "timeStartMs": 463,
         "timeEndMs": 593,
-        "legacyAnalysis": {
-          "f1": 242,
-          "f2": 1614,
-          "max_f": 5000,
-          "slice": [
-            463,
-            593
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 242.0,
+        "manualF2": 1614.0
       }
     ]
   },
   {
     "id": 101,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/Nb-ajourf%C3%B8re.ogg/Nb-ajourf%C3%B8re.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/Nb-ajourf%C3%B8re.ogg/Nb-ajourf%C3%B8re.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ajourføre",
     "phonemic": "/aˈʒʉːrføːrə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉː",
@@ -662,24 +435,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 102,
-    "storageKey": "lang/no/audio/mjolnir/ue/ue_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ue/ue_short.mp3",
     "originalFilename": "ue_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ʉ",
     "phonemic": "/ʉ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -689,40 +461,23 @@
         ],
         "timeStartMs": 107,
         "timeEndMs": 179,
-        "legacyAnalysis": {
-          "f1": 411,
-          "f2": 1882,
-          "max_f": 5000,
-          "slice": [
-            107,
-            179
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 411.0,
+        "manualF2": 1882.0
       }
     ]
   },
   {
     "id": 103,
-    "storageKey": "lang/no/audio/mjolnir/ue/hun.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ue/hun.mp3",
     "originalFilename": "hun.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "hun",
     "phonemic": "/hʉn/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -732,24 +487,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 104,
-    "storageKey": "lang/no/audio/mjolnir/ue/kunne.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ue/kunne.mp3",
     "originalFilename": "kunne.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "kunne",
     "phonemic": "/ˈkʉnə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -759,24 +513,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 105,
-    "storageKey": "lang/no/audio/mjolnir/ue/unnskyld.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ue/unnskyld.mp3",
     "originalFilename": "unnskyld.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "unnskyld",
     "phonemic": "/ˈʉnʃʏl/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -786,24 +539,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 106,
-    "storageKey": "lang/no/audio/dict/ull.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/ull.mp3",
     "originalFilename": "ull.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ull",
     "phonemic": "/ʉlː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -813,24 +565,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 107,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/LL-Q9043_%28nor%29-Telaneo-skuffe.wav/LL-Q9043_%28nor%29-Telaneo-skuffe.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fc/LL-Q9043_%28nor%29-Telaneo-skuffe.wav/LL-Q9043_%28nor%29-Telaneo-skuffe.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skuffe",
     "phonemic": "/ˈskʉfə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -840,24 +591,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 108,
-    "storageKey": "lang/no/audio/auto/u_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/u_long.mp3",
     "originalFilename": "u_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "uː",
     "phonemic": "/uː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -867,40 +617,23 @@
         ],
         "timeStartMs": 356,
         "timeEndMs": 570,
-        "legacyAnalysis": {
-          "f1": 384,
-          "f2": 507,
-          "max_f": 5000,
-          "slice": [
-            356,
-            570
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 384.0,
+        "manualF2": 507.0
       }
     ]
   },
   {
     "id": 109,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/01/LL-Q9043_%28nor%29-Telaneo-skog.wav/LL-Q9043_%28nor%29-Telaneo-skog.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/01/LL-Q9043_%28nor%29-Telaneo-skog.wav/LL-Q9043_%28nor%29-Telaneo-skog.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skog",
     "phonemic": "/skuːɡ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -910,40 +643,23 @@
         ],
         "timeStartMs": 433,
         "timeEndMs": 556,
-        "legacyAnalysis": {
-          "f1": 359,
-          "f2": 428,
-          "max_f": 5000,
-          "slice": [
-            433,
-            556
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 359.0,
+        "manualF2": 428.0
       }
     ]
   },
   {
     "id": 110,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav/LL-Q9043_%28nor%29-Teodor605-f%C3%B4r.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "for",
     "phonemic": "/fɔr/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -953,40 +669,23 @@
         ],
         "timeStartMs": 349,
         "timeEndMs": 469,
-        "legacyAnalysis": {
-          "f1": 280,
-          "f2": 777,
-          "max_f": 5000,
-          "slice": [
-            349,
-            469
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 280.0,
+        "manualF2": 777.0
       }
     ]
   },
   {
     "id": 111,
-    "storageKey": "lang/no/audio/mjolnir/u/u_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/u/u_short.mp3",
     "originalFilename": "u_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ʊ",
     "phonemic": "/ʊ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -996,40 +695,23 @@
         ],
         "timeStartMs": 138,
         "timeEndMs": 191,
-        "legacyAnalysis": {
-          "f1": 463,
-          "f2": 905,
-          "max_f": 5000,
-          "slice": [
-            138,
-            191
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 463.0,
+        "manualF2": 905.0
       }
     ]
   },
   {
     "id": 112,
-    "storageKey": "lang/no/audio/mjolnir/u/sukker.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/u/sukker.mp3",
     "originalFilename": "sukker.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "sukker",
     "phonemic": "/ˈsʊkər/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1039,40 +721,23 @@
         ],
         "timeStartMs": 217,
         "timeEndMs": 274,
-        "legacyAnalysis": {
-          "f1": 396,
-          "f2": 1083,
-          "max_f": 5000,
-          "slice": [
-            217,
-            274
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 396.0,
+        "manualF2": 1083.0
       }
     ]
   },
   {
     "id": 113,
-    "storageKey": "lang/no/audio/mjolnir/u/hvor.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/u/hvor.mp3",
     "originalFilename": "hvor.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "hvor",
     "phonemic": "/vʊr/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1082,40 +747,23 @@
         ],
         "timeStartMs": 167,
         "timeEndMs": 218,
-        "legacyAnalysis": {
-          "f1": 443,
-          "f2": 1269,
-          "max_f": 5000,
-          "slice": [
-            167,
-            218
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 443.0,
+        "manualF2": 1269.0
       }
     ]
   },
   {
     "id": 114,
-    "storageKey": "lang/no/audio/mjolnir/u/rom.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/u/rom.mp3",
     "originalFilename": "rom.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "rom",
     "phonemic": "/rʊm/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1125,24 +773,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 115,
-    "storageKey": "lang/no/audio/mjolnir/u/bukk.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/u/bukk.mp3",
     "originalFilename": "bukk.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "bukk",
     "phonemic": "/bʊkː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1152,24 +799,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 116,
-    "storageKey": "lang/no/audio/mjolnir/u/fordi.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/u/fordi.mp3",
     "originalFilename": "fordi.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "fordi",
     "phonemic": "/fʊrˈdiː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1179,24 +825,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 117,
-    "storageKey": "lang/no/audio/dict/loff.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/loff.mp3",
     "originalFilename": "loff.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "loff",
     "phonemic": "/lɔfː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1206,24 +851,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 118,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/No-journal.ogg/No-journal.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/No-journal.ogg/No-journal.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "journal",
     "phonemic": "/ʒʊrˈnɑːl/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -1233,24 +877,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 119,
-    "storageKey": "lang/no/audio/auto/e_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/e_long.mp3",
     "originalFilename": "e_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "eː",
     "phonemic": "/eː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -1260,40 +903,23 @@
         ],
         "timeStartMs": 324,
         "timeEndMs": 515,
-        "legacyAnalysis": {
-          "f1": 470,
-          "f2": 2147,
-          "max_f": 5000,
-          "slice": [
-            324,
-            515
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 470.0,
+        "manualF2": 2147.0
       }
     ]
   },
   {
     "id": 120,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/LL-Q9043_%28nor%29-Telaneo-skje.wav/LL-Q9043_%28nor%29-Telaneo-skje.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/LL-Q9043_%28nor%29-Telaneo-skje.wav/LL-Q9043_%28nor%29-Telaneo-skje.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skje",
     "phonemic": "/ʃeː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -1303,40 +929,23 @@
         ],
         "timeStartMs": 369,
         "timeEndMs": 512,
-        "legacyAnalysis": {
-          "f1": 450,
-          "f2": 2278,
-          "max_f": 5000,
-          "slice": [
-            369,
-            512
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2000,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 450.0,
+        "manualF2": 2278.0
       }
     ]
   },
   {
     "id": 121,
-    "storageKey": "lang/no/audio/mjolnir/e/e_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/e/e_short.mp3",
     "originalFilename": "e_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1346,40 +955,23 @@
         ],
         "timeStartMs": 143,
         "timeEndMs": 182,
-        "legacyAnalysis": {
-          "f1": 585,
-          "f2": 1908,
-          "max_f": 5000,
-          "slice": [
-            143,
-            182
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 585.0,
+        "manualF2": 1908.0
       }
     ]
   },
   {
     "id": 122,
-    "storageKey": "lang/no/audio/mjolnir/e/etter.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/e/etter.mp3",
     "originalFilename": "etter.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "etter",
     "phonemic": "/ˈɛtər/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1389,40 +981,23 @@
         ],
         "timeStartMs": 67,
         "timeEndMs": 132,
-        "legacyAnalysis": {
-          "f1": 579,
-          "f2": 1908,
-          "max_f": 5000,
-          "slice": [
-            67,
-            132
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 579.0,
+        "manualF2": 1908.0
       }
     ]
   },
   {
     "id": 123,
-    "storageKey": "lang/no/audio/mjolnir/e/menn.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/e/menn.mp3",
     "originalFilename": "menn.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "menn",
     "phonemic": "/mɛnː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1432,40 +1007,23 @@
         ],
         "timeStartMs": 161,
         "timeEndMs": 210,
-        "legacyAnalysis": {
-          "f1": 614,
-          "f2": 1759,
-          "max_f": 5000,
-          "slice": [
-            161,
-            210
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 614.0,
+        "manualF2": 1759.0
       }
     ]
   },
   {
     "id": 124,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/LL-Q9043_%28nor%29-Telaneo-skjell.wav/LL-Q9043_%28nor%29-Telaneo-skjell.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/LL-Q9043_%28nor%29-Telaneo-skjell.wav/LL-Q9043_%28nor%29-Telaneo-skjell.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skjell",
     "phonemic": "/ʃɛlː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1475,24 +1033,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 125,
-    "storageKey": "lang/no/audio/auto/oe_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/oe_long.mp3",
     "originalFilename": "oe_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "øː",
     "phonemic": "/øː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "øː",
@@ -1502,40 +1059,23 @@
         ],
         "timeStartMs": 324,
         "timeEndMs": 557,
-        "legacyAnalysis": {
-          "f1": 407,
-          "f2": 1528,
-          "max_f": 5000,
-          "slice": [
-            324,
-            557
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 407.0,
+        "manualF2": 1528.0
       }
     ]
   },
   {
     "id": 126,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1b/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1b/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav/LL-Q9043_%28nor%29-Telaneo-sj%C3%B8.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "sjø",
     "phonemic": "/ʃøː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "øː",
@@ -1545,40 +1085,23 @@
         ],
         "timeStartMs": 369,
         "timeEndMs": 534,
-        "legacyAnalysis": {
-          "f1": 500,
-          "f2": 1420,
-          "max_f": 5000,
-          "slice": [
-            369,
-            534
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 500.0,
+        "manualF2": 1420.0
       }
     ]
   },
   {
     "id": 127,
-    "storageKey": "lang/no/audio/mjolnir/er/er.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/er/er.mp3",
     "originalFilename": "er.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɘ",
     "phonemic": "/ɘ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɘ",
@@ -1588,40 +1111,23 @@
         ],
         "timeStartMs": 232,
         "timeEndMs": 286,
-        "legacyAnalysis": {
-          "f1": 445,
-          "f2": 1870,
-          "max_f": 5000,
-          "slice": [
-            232,
-            286
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 445.0,
+        "manualF2": 1870.0
       }
     ]
   },
   {
     "id": 128,
-    "storageKey": "lang/no/audio/mjolnir/er/jenter.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/er/jenter.mp3",
     "originalFilename": "jenter.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "jenter",
     "phonemic": "/ˈjɛntər/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɘ",
@@ -1631,24 +1137,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 129,
-    "storageKey": "lang/no/audio/mjolnir/er/skriver.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/er/skriver.mp3",
     "originalFilename": "skriver.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skriver",
     "phonemic": "/ˈskriːvər/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɘ",
@@ -1658,24 +1163,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 130,
-    "storageKey": "lang/no/audio/mjolnir/oe/oe_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/oe/oe_short.mp3",
     "originalFilename": "oe_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "œ",
     "phonemic": "/œ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1685,40 +1189,23 @@
         ],
         "timeStartMs": 93,
         "timeEndMs": 154,
-        "legacyAnalysis": {
-          "f1": 595,
-          "f2": 1491,
-          "max_f": 5000,
-          "slice": [
-            93,
-            154
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 595.0,
+        "manualF2": 1491.0
       }
     ]
   },
   {
     "id": 131,
-    "storageKey": "lang/no/audio/mjolnir/oe/foedt.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/oe/foedt.mp3",
     "originalFilename": "foedt.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "født",
     "phonemic": "/føtː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1728,24 +1215,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 132,
-    "storageKey": "lang/no/audio/mjolnir/oe/skjoenner.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/oe/skjoenner.mp3",
     "originalFilename": "skjoenner.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skjønner",
     "phonemic": "/ˈʃœnər/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1755,24 +1241,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 133,
-    "storageKey": "lang/no/audio/dict/oest.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/oest.mp3",
     "originalFilename": "oest.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "øst",
     "phonemic": "/œst/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1782,24 +1267,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 134,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5e/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5e/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav/LL-Q9043_%28nor%29-Telaneo-skj%C3%B8nne.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skjønne",
     "phonemic": "/ˈʃœnə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œ",
@@ -1809,24 +1293,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 135,
-    "storageKey": "lang/no/audio/mjolnir/schwa/schwa.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/schwa/schwa.mp3",
     "originalFilename": "schwa.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ə",
     "phonemic": "/ə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1836,40 +1319,23 @@
         ],
         "timeStartMs": 126,
         "timeEndMs": 175,
-        "legacyAnalysis": {
-          "f1": 633,
-          "f2": 1441,
-          "max_f": 5000,
-          "slice": [
-            126,
-            175
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 633.0,
+        "manualF2": 1441.0
       }
     ]
   },
   {
     "id": 136,
-    "storageKey": "lang/no/audio/mjolnir/schwa/bare.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/schwa/bare.mp3",
     "originalFilename": "bare.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "bare",
     "phonemic": "/ˈbɑːrə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1879,24 +1345,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 137,
-    "storageKey": "lang/no/audio/mjolnir/schwa/dette.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/schwa/dette.mp3",
     "originalFilename": "dette.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "dette",
     "phonemic": "/ˈdɛtə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1906,24 +1371,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 138,
-    "storageKey": "lang/no/audio/dict/krysse.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/krysse.mp3",
     "originalFilename": "krysse.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "krysse",
     "phonemic": "/ˈkrʏsə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1933,24 +1397,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 139,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/LL-Q9043_%28nor%29-Telaneo-berike.wav/LL-Q9043_%28nor%29-Telaneo-berike.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/LL-Q9043_%28nor%29-Telaneo-berike.wav/LL-Q9043_%28nor%29-Telaneo-berike.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "berike",
     "phonemic": "/bəˈriːkə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -1960,24 +1423,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 140,
-    "storageKey": "lang/no/audio/auto/o_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/o_long.mp3",
     "originalFilename": "o_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "oː",
     "phonemic": "/oː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "oː",
@@ -1987,40 +1449,23 @@
         ],
         "timeStartMs": 343,
         "timeEndMs": 548,
-        "legacyAnalysis": {
-          "f1": 426,
-          "f2": 765,
-          "max_f": 5000,
-          "slice": [
-            343,
-            548
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 426.0,
+        "manualF2": 765.0
       }
     ]
   },
   {
     "id": 141,
-    "storageKey": null,
-    "sourceUrl": "/lang/no/audio/slaa.mp3",
-    "originalFilename": null,
+    "url": "file://lang/no/audio/slaa.mp3",
+    "originalFilename": "slaa.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "slå",
     "phonemic": "/sloː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "oː",
@@ -2030,40 +1475,23 @@
         ],
         "timeStartMs": 410,
         "timeEndMs": 546,
-        "legacyAnalysis": {
-          "f1": 452,
-          "f2": 805,
-          "max_f": 5000,
-          "slice": [
-            410,
-            546
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 452.0,
+        "manualF2": 805.0
       }
     ]
   },
   {
     "id": 142,
-    "storageKey": "lang/no/audio/mjolnir/o/o_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/o/o_short.mp3",
     "originalFilename": "o_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɔ",
     "phonemic": "/ɔ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2073,40 +1501,23 @@
         ],
         "timeStartMs": 301,
         "timeEndMs": 339,
-        "legacyAnalysis": {
-          "f1": 610,
-          "f2": 955,
-          "max_f": 5000,
-          "slice": [
-            301,
-            339
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 610.0,
+        "manualF2": 955.0
       }
     ]
   },
   {
     "id": 143,
-    "storageKey": "lang/no/audio/mjolnir/o/for.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/o/for.mp3",
     "originalFilename": "for.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "for",
     "phonemic": "/fɔr/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2116,40 +1527,23 @@
         ],
         "timeStartMs": 258,
         "timeEndMs": 293,
-        "legacyAnalysis": {
-          "f1": 662,
-          "f2": 1216,
-          "max_f": 5000,
-          "slice": [
-            258,
-            293
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 662.0,
+        "manualF2": 1216.0
       }
     ]
   },
   {
     "id": 144,
-    "storageKey": "lang/no/audio/mjolnir/o/som.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/o/som.mp3",
     "originalFilename": "som.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "som",
     "phonemic": "/sɔm/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2159,40 +1553,23 @@
         ],
         "timeStartMs": 370,
         "timeEndMs": 441,
-        "legacyAnalysis": {
-          "f1": 535,
-          "f2": 1028,
-          "max_f": 5000,
-          "slice": [
-            370,
-            441
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 535.0,
+        "manualF2": 1028.0
       }
     ]
   },
   {
     "id": 145,
-    "storageKey": "lang/no/audio/mjolnir/o/jobb.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/o/jobb.mp3",
     "originalFilename": "jobb.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "jobb",
     "phonemic": "/jɔbː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2202,24 +1579,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 146,
-    "storageKey": "lang/no/audio/mjolnir/o/aatte.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/o/aatte.mp3",
     "originalFilename": "aatte.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "åtte",
     "phonemic": "/ˈɔtə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2229,24 +1605,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 147,
-    "storageKey": "lang/no/audio/dict/og.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/og.mp3",
     "originalFilename": "og.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "og",
     "phonemic": "/ɔɡ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2256,40 +1631,23 @@
         ],
         "timeStartMs": 998,
         "timeEndMs": 1150,
-        "legacyAnalysis": {
-          "f1": 959,
-          "f2": 2013,
-          "max_f": 5000,
-          "slice": [
-            998,
-            1150
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 959.0,
+        "manualF2": 2013.0
       }
     ]
   },
   {
     "id": 148,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2d/LL-Q9043_%28nor%29-Telaneo-skjold.wav/LL-Q9043_%28nor%29-Telaneo-skjold.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2d/LL-Q9043_%28nor%29-Telaneo-skjold.wav/LL-Q9043_%28nor%29-Telaneo-skjold.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "skjold",
     "phonemic": "/ʃɔlː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2299,24 +1657,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 149,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav/LL-Q9043_%28nor%29-Telaneo-sl%C3%A5ss.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "slåss",
     "phonemic": "/sloːsː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɔ",
@@ -2326,24 +1683,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 150,
-    "storageKey": "lang/no/audio/mjolnir/a/a_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/a/a_short.mp3",
     "originalFilename": "a_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɑ",
     "phonemic": "/ɑ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -2353,40 +1709,23 @@
         ],
         "timeStartMs": 220,
         "timeEndMs": 292,
-        "legacyAnalysis": {
-          "f1": 795,
-          "f2": 1173,
-          "max_f": 5000,
-          "slice": [
-            220,
-            292
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 795.0,
+        "manualF2": 1173.0
       }
     ]
   },
   {
     "id": 151,
-    "storageKey": "lang/no/audio/mjolnir/a/alle.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/a/alle.mp3",
     "originalFilename": "alle.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "alle",
     "phonemic": "/ˈɑlə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -2396,40 +1735,23 @@
         ],
         "timeStartMs": 74,
         "timeEndMs": 127,
-        "legacyAnalysis": {
-          "f1": 686,
-          "f2": 1042,
-          "max_f": 5000,
-          "slice": [
-            74,
-            127
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 686.0,
+        "manualF2": 1042.0
       }
     ]
   },
   {
     "id": 152,
-    "storageKey": "lang/no/audio/dict/av.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/av.mp3",
     "originalFilename": "av.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "av",
     "phonemic": "/ɑv/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -2439,24 +1761,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 153,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/38/LL-Q9043_%28nor%29-Telaneo-hagle.wav/LL-Q9043_%28nor%29-Telaneo-hagle.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/38/LL-Q9043_%28nor%29-Telaneo-hagle.wav/LL-Q9043_%28nor%29-Telaneo-hagle.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "hagle",
     "phonemic": "/ˈhɑːɡlə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -2466,24 +1787,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 154,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav/LL-Q9043_%28nor%29-Telaneo-pensjonist.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "pensjonist",
     "phonemic": "/pɑŋʃʊˈnist/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -2493,24 +1813,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 155,
-    "storageKey": "lang/no/audio/auto/a_back_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/auto/a_back_long.mp3",
     "originalFilename": "a_back_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɑː",
     "phonemic": "/ɑː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2520,40 +1839,23 @@
         ],
         "timeStartMs": 342,
         "timeEndMs": 550,
-        "legacyAnalysis": {
-          "f1": 661,
-          "f2": 967,
-          "max_f": 5000,
-          "slice": [
-            342,
-            550
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2000,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 661.0,
+        "manualF2": 967.0
       }
     ]
   },
   {
     "id": 156,
-    "storageKey": "lang/no/audio/mjolnir/a/dag.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/a/dag.mp3",
     "originalFilename": "dag.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "dag",
     "phonemic": "/dɑːɡ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2563,40 +1865,23 @@
         ],
         "timeStartMs": 183,
         "timeEndMs": 314,
-        "legacyAnalysis": {
-          "f1": 728,
-          "f2": 1056,
-          "max_f": 5000,
-          "slice": [
-            183,
-            314
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 728.0,
+        "manualF2": 1056.0
       }
     ]
   },
   {
     "id": 157,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/LL-Q9043_%28nor%29-Telaneo-hale.wav/LL-Q9043_%28nor%29-Telaneo-hale.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/LL-Q9043_%28nor%29-Telaneo-hale.wav/LL-Q9043_%28nor%29-Telaneo-hale.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "hale",
     "phonemic": "/ˈhɑːlə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑː",
@@ -2606,24 +1891,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 158,
-    "storageKey": "lang/no/audio/mjolnir/ae/ae_short.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ae/ae_short.mp3",
     "originalFilename": "ae_short.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "æ",
     "phonemic": "/æ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æ",
@@ -2633,40 +1917,23 @@
         ],
         "timeStartMs": 179,
         "timeEndMs": 248,
-        "legacyAnalysis": {
-          "f1": 941,
-          "f2": 1468,
-          "max_f": 5000,
-          "slice": [
-            179,
-            248
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 941.0,
+        "manualF2": 1468.0
       }
     ]
   },
   {
     "id": 159,
-    "storageKey": "lang/no/audio/mjolnir/ae/vaert.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ae/vaert.mp3",
     "originalFilename": "vaert.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "vært",
     "phonemic": "/væːrt/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æ",
@@ -2676,40 +1943,23 @@
         ],
         "timeStartMs": 122,
         "timeEndMs": 165,
-        "legacyAnalysis": {
-          "f1": 872,
-          "f2": 1326,
-          "max_f": 5000,
-          "slice": [
-            122,
-            165
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 872.0,
+        "manualF2": 1326.0
       }
     ]
   },
   {
     "id": 160,
-    "storageKey": "lang/no/audio/dict/aesj.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/dict/aesj.mp3",
     "originalFilename": "aesj.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "æsj",
     "phonemic": "/æʃ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æ",
@@ -2719,24 +1969,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 161,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/LL-Q9043_%28nor%29-Telaneo-kjerring.wav/LL-Q9043_%28nor%29-Telaneo-kjerring.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/91/LL-Q9043_%28nor%29-Telaneo-kjerring.wav/LL-Q9043_%28nor%29-Telaneo-kjerring.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "kjerring",
     "phonemic": "/ˈçæːrɪŋ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æ",
@@ -2746,24 +1995,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 162,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Telaneo-krasj.wav/LL-Q9043_%28nor%29-Telaneo-krasj.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Telaneo-krasj.wav/LL-Q9043_%28nor%29-Telaneo-krasj.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "krasj",
     "phonemic": "/kræʃ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æ",
@@ -2773,24 +2021,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 163,
-    "storageKey": "lang/no/audio/mjolnir/ae/ae_long.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ae/ae_long.mp3",
     "originalFilename": "ae_long.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "æː",
     "phonemic": "/æː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æː",
@@ -2800,40 +2047,23 @@
         ],
         "timeStartMs": 222,
         "timeEndMs": 448,
-        "legacyAnalysis": {
-          "f1": 921,
-          "f2": 1394,
-          "max_f": 5000,
-          "slice": [
-            222,
-            448
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 921.0,
+        "manualF2": 1394.0
       }
     ]
   },
   {
     "id": 164,
-    "storageKey": null,
-    "sourceUrl": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ",
+    "url": "https://testcalst.hf.ntnu.no/sfiles/Norwegian/Words_MP3/Bergen_Normal_AOFMF7OIAK64OB91.mp3#Æ",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "æː",
     "phonemic": "/æː/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æː",
@@ -2843,24 +2073,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 165,
-    "storageKey": "lang/no/audio/mjolnir/ae/laerer.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ae/laerer.mp3",
     "originalFilename": "laerer.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "lærer",
     "phonemic": "/ˈlæːrər/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æː",
@@ -2870,40 +2099,23 @@
         ],
         "timeStartMs": 252,
         "timeEndMs": 575,
-        "legacyAnalysis": {
-          "f1": 928,
-          "f2": 1401,
-          "max_f": 5000,
-          "slice": [
-            252,
-            575
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 928.0,
+        "manualF2": 1401.0
       }
     ]
   },
   {
     "id": 166,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Nb-kjerning.ogg/Nb-kjerning.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/Nb-kjerning.ogg/Nb-kjerning.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "kjerning",
     "phonemic": "/ˈçæːrnɪŋ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æː",
@@ -2913,24 +2125,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 167,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/ba/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav/LL-Q9043_%28nor%29-Teodor605-%C3%A6rlig.wav.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ærlig",
     "phonemic": "/ˈæːrlɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æː",
@@ -2940,24 +2151,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 168,
-    "storageKey": "lang/no/audio/mjolnir/aeue/sau.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/aeue/sau.mp3",
     "originalFilename": "sau.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "sau",
     "phonemic": "/sæʉ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æʉ",
@@ -2967,24 +2177,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 169,
-    "storageKey": "lang/no/audio/mjolnir/aeue/tau.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/aeue/tau.mp3",
     "originalFilename": "tau.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "tau",
     "phonemic": "/tæʉ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æʉ",
@@ -2994,24 +2203,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 170,
-    "storageKey": "lang/no/audio/mjolnir/aeue/europa.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/aeue/europa.mp3",
     "originalFilename": "europa.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "Europa",
     "phonemic": "/æʉˈroːpɑ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æʉ",
@@ -3021,24 +2229,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 171,
-    "storageKey": "lang/no/audio/mjolnir/aei/hei.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/aei/hei.mp3",
     "originalFilename": "hei.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "hei",
     "phonemic": "/hæɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æɪ",
@@ -3048,24 +2255,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 172,
-    "storageKey": "lang/no/audio/mjolnir/aei/nei.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/aei/nei.mp3",
     "originalFilename": "nei.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "nei",
     "phonemic": "/næɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æɪ",
@@ -3075,24 +2281,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 173,
-    "storageKey": "lang/no/audio/mjolnir/aei/bein.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/aei/bein.mp3",
     "originalFilename": "bein.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "bein",
     "phonemic": "/bæɪn/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æɪ",
@@ -3102,24 +2307,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 174,
-    "storageKey": "lang/no/audio/mjolnir/oey/goey.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/oey/goey.mp3",
     "originalFilename": "goey.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "gøy",
     "phonemic": "/ɡœʏ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œʏ",
@@ -3129,24 +2333,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 175,
-    "storageKey": "lang/no/audio/mjolnir/oey/oeye.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/oey/oeye.mp3",
     "originalFilename": "oeye.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "øye",
     "phonemic": "/ˈœʏə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œʏ",
@@ -3156,24 +2359,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 176,
-    "storageKey": "lang/no/audio/mjolnir/oey/hoeyre.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/oey/hoeyre.mp3",
     "originalFilename": "hoeyre.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "høyre",
     "phonemic": "/ˈhœʏrə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "œʏ",
@@ -3183,24 +2385,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 177,
-    "storageKey": "lang/no/audio/god_morgen.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/god_morgen.mp3",
     "originalFilename": "god_morgen.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "God morgen",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -3210,40 +2411,23 @@
         ],
         "timeStartMs": 152,
         "timeEndMs": 244,
-        "legacyAnalysis": {
-          "f1": 535,
-          "f2": 755,
-          "max_f": 5000,
-          "slice": [
-            152,
-            244
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 535.0,
+        "manualF2": 755.0
       }
     ]
   },
   {
     "id": 178,
-    "storageKey": "lang/no/audio/god_dag.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/god_dag.mp3",
     "originalFilename": "god_dag.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "God dag",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -3253,40 +2437,23 @@
         ],
         "timeStartMs": 97,
         "timeEndMs": 143,
-        "legacyAnalysis": {
-          "f1": 598,
-          "f2": 1207,
-          "max_f": 5000,
-          "slice": [
-            97,
-            143
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 598.0,
+        "manualF2": 1207.0
       }
     ]
   },
   {
     "id": 179,
-    "storageKey": null,
-    "sourceUrl": "/lang/no/audio/mot.mp3",
-    "originalFilename": null,
+    "url": "file://lang/no/audio/mot.mp3",
+    "originalFilename": "mot.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "mot",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "uː",
@@ -3296,40 +2463,23 @@
         ],
         "timeStartMs": 119,
         "timeEndMs": 262,
-        "legacyAnalysis": {
-          "f1": 533,
-          "f2": 1844,
-          "max_f": 5000,
-          "slice": [
-            119,
-            262
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 20,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 533.0,
+        "manualF2": 1844.0
       }
     ]
   },
   {
     "id": 180,
-    "storageKey": "lang/no/audio/mjolnir/mening.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/mening.mp3",
     "originalFilename": "mening.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "mening",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -3339,40 +2489,23 @@
         ],
         "timeStartMs": 486,
         "timeEndMs": 585,
-        "legacyAnalysis": {
-          "f1": 465.47,
-          "f2": 1762.98,
-          "max_f": 5000,
-          "slice": [
-            486,
-            585
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 465.47,
+        "manualF2": 1762.98
       }
     ]
   },
   {
     "id": 181,
-    "storageKey": "lang/no/audio/mjolnir/ledig.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/ledig.mp3",
     "originalFilename": "ledig.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ledig",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -3382,40 +2515,23 @@
         ],
         "timeStartMs": 243,
         "timeEndMs": 319,
-        "legacyAnalysis": {
-          "f1": 546.33,
-          "f2": 2174.04,
-          "max_f": 5000,
-          "slice": [
-            243,
-            319
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 546.33,
+        "manualF2": 2174.04
       }
     ]
   },
   {
     "id": 182,
-    "storageKey": "lang/no/audio/mjolnir/enig.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/mjolnir/enig.mp3",
     "originalFilename": "enig.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "enig",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "eː",
@@ -3425,40 +2541,23 @@
         ],
         "timeStartMs": 195,
         "timeEndMs": 275,
-        "legacyAnalysis": {
-          "f1": 487.14,
-          "f2": 2430.5,
-          "max_f": 5000,
-          "slice": [
-            195,
-            275
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 487.14,
+        "manualF2": 2430.5
       }
     ]
   },
   {
     "id": 183,
-    "storageKey": "lang/no/audio/pavei/a.wav",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/pavei/a.wav",
     "originalFilename": "a.wav",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɑː",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑː",
@@ -3468,40 +2567,23 @@
         ],
         "timeStartMs": 195,
         "timeEndMs": 275,
-        "legacyAnalysis": {
-          "f1": 634.14,
-          "f2": 912.8,
-          "max_f": 5000,
-          "slice": [
-            195,
-            275
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 634.14,
+        "manualF2": 912.8
       }
     ]
   },
   {
     "id": 184,
-    "storageKey": "lang/no/audio/pavei/asia.wav",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/pavei/asia.wav",
     "originalFilename": "asia.wav",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "asia",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑː",
@@ -3511,24 +2593,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 185,
-    "storageKey": "lang/no/audio/pavei/svar.wav",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/pavei/svar.wav",
     "originalFilename": "svar.wav",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "svar",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑː",
@@ -3538,24 +2619,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 186,
-    "storageKey": "lang/no/audio/pavei/staver.wav",
-    "sourceUrl": null,
+    "url": "file://lang/no/audio/pavei/staver.wav",
     "originalFilename": "staver.wav",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "staver",
     "phonemic": null,
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑː",
@@ -3565,7 +2645,9 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   }

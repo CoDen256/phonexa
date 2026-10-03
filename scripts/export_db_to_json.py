@@ -13,9 +13,12 @@ agreed after reviewing the real migrated data: Sound is merged into Sample
 samples.json rather than looked up via a separate sounds.json — and each
 exported sample carries its own stable "id" so lang.json's vowels can
 reference one by `representativeSampleId` (replacing the old string-based
-`representative` field on samples). Analysis is NOT exported (a later phase
-computes token values on read from the active SampleAnalysis) — only the
-raw file facts, text, and (for not-yet-migrated tokens) the legacy blob are.
+`representative` field on samples). Each exported sample also carries its
+own `analyses` (the SampleAnalysis history), and each token its
+`activeAnalysisId` — both ids are stable within one export, matching how a
+future import tool would need to remap them per-sample. Token mean F1/F2 are
+NOT exported (computed on read, a later phase) — only manual_f1/f2 are,
+since those can't be derived from anything else.
 """
 
 from __future__ import annotations
@@ -45,22 +48,30 @@ def export_vowel(v) -> dict:
     return out
 
 
+def export_analysis(a) -> dict:
+    return {
+        "id": a.id, "version": a.version, "config": a.config,
+        "formants": a.formants, "pitch": a.pitch,
+    }
+
+
 def export_token(t) -> dict:
     return {
         "symbol": t.symbol, "position": [t.char_start, t.char_end],
         "timeStartMs": t.time_start_ms, "timeEndMs": t.time_end_ms,
-        "legacyAnalysis": t.legacy_analysis,
+        "activeAnalysisId": t.active_analysis_id,
+        "manualF1": t.manual_f1, "manualF2": t.manual_f2,
     }
 
 
 def export_sample(s) -> dict:
     return {
         "id": s.id,
-        "storageKey": s.storage_key, "sourceUrl": s.source_url,
+        "url": s.url,
         "originalFilename": s.original_filename, "contentType": s.content_type,
         "durationMs": s.duration_ms, "sampleRateHz": s.sample_rate_hz, "channels": s.channels,
-        "provenance": s.provenance, "trimmed": s.trimmed, "leadingSilenceMs": s.leading_silence_ms,
         "text": s.text, "phonemic": s.phonemic,
+        "analyses": [export_analysis(a) for a in s.analyses],
         "tokens": [export_token(t) for t in s.tokens],
     }
 

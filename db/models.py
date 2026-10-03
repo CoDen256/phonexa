@@ -10,14 +10,27 @@ into one `Sample` table: a row progresses from "just uploaded audio" to
 "fully tokenized sample" by having more of its nullable fields filled in
 over time, not by moving between tables.
 
-Core principle, preserved from the original design: a Sample's own audio is
-analyzed once per analysis attempt (`SampleAnalysis` — kept as *history*,
-not overwritten, so re-analyzing with different settings never destroys a
-previous result; exactly one row per sample is flagged `is_active` for
-whichever one derivation should use). A `Token` only stores a time range
-into its sample's audio — no F1/F2/F0 of its own; those are DERIVED on read
-from the active analysis's frame track restricted to that range, so there
-is no stale-cached-value problem to get wrong.
+Core principle, preserved from the original design: a Sample's own audio can
+be analyzed more than once (`SampleAnalysis` — kept as *history*, not
+overwritten, so re-analyzing with different settings never destroys a
+previous result). What changed after further discussion: "one active
+analysis per sample" turned out to be the wrong granularity — a Token (a
+slice of the sample) is what actually needs to point at a specific analysis
+run, not the sample as a whole. So `Token.active_analysis_id` picks, per
+token, which of its sample's `SampleAnalysis` rows to derive mean F1/F2 from
+over its own [time_start_ms, time_end_ms] range (computed on read — a later
+phase — never cached on the token, so there's no stale-value problem).
+Re-analyzing just one token with different Praat settings means: add a new
+SampleAnalysis row for the sample, then repoint only that token's
+active_analysis_id at it; every other token keeps using whatever analysis
+it was already pointing at.
+
+`Token.manual_f1/f2` is a direct override — someone measured this exact
+slice in their own (e.g. desktop) Praat session and typed the numbers in.
+When present, it wins over the active-analysis-derived mean; this is a
+per-token value because manual measurement is inherently about one slice,
+never "the whole sample" (hence manual_f1/f2 live on Token, not
+SampleAnalysis, unlike an earlier draft of this schema).
 
 F0/pitch: real signal (e.g. Norwegian tonemes are a pitch-contour pattern,
 not a vowel-quality feature) — kept as the raw curve inside a Praat-sourced
@@ -25,10 +38,14 @@ SampleAnalysis row, but deliberately NOT promoted to a per-vowel or
 per-token "value" the way F1/F2 are. A sample-level contour/toneme
 descriptor is a plausible future feature, not built now.
 
-legacy_analysis on Token is a deliberate, temporary escape hatch: the old
-dual-ceiling pipeline's blob is kept verbatim for tokens migrated from the
-pre-DB JSON files, until a later pass re-analyzes them through the real
-Praat pipeline and attaches a proper SampleAnalysis-derived range instead.
+Sample.url is a single column, not a storage_key/source_url pair: a local
+file is "file://<storage_key>" (see db/storage.py's is_local_url/
+storage_key_from_url), anything else (http/https) is an unmirrored external
+link. Leading-silence trimming is NOT modeled as sample-level metadata
+(leading_silence_ms/trimmed fields existed in an earlier draft) — ingestion
+trims the audio bytes themselves at save time instead, so there's nothing
+left to describe afterwards. `provenance` was dropped too: it was tracking
+"how did this row come to exist," which nothing yet reads.
 """
 
 from __future__ import annotations
@@ -72,7 +89,7 @@ class Sample(Base):
     """
     A single piece of audio plus whatever is known about it so far — file
     facts, which language/text it belongs to (if assigned yet), and its
-    tokens. `language_id`/`text`/`storage_key` are all nullable because a
+    tokens. `language_id`/`text`/`url` are all nullable because a
     freshly-ingested recording legitimately exists before any of those are
     decided (see the module docstring) — this one table covers the whole
     lifecycle from "just uploaded" to "fully tokenized library entry."
@@ -83,16 +100,12 @@ class Sample(Base):
     language_id: Mapped[int | None] = mapped_column(ForeignKey("languages.id", ondelete="CASCADE"))
 
     # File facts
-    storage_key: Mapped[str | None] = mapped_column(Text, unique=True)
-    source_url: Mapped[str | None] = mapped_column(Text)
+    url: Mapped[str | None] = mapped_column(Text, unique=True)  # "file://<storage_key>" or an external http(s) URL
     original_filename: Mapped[str | None] = mapped_column(Text)
     content_type: Mapped[str | None] = mapped_column(Text)
     duration_ms: Mapped[int | None] = mapped_column(Integer)
     sample_rate_hz: Mapped[int | None] = mapped_column(Integer)
     channels: Mapped[int | None] = mapped_column(SmallInteger)
-    provenance: Mapped[str] = mapped_column(Text, nullable=False)  # 'uploaded'|'shadowing-segment'|'legacy-migrated'|'external-link'
-    leading_silence_ms: Mapped[int | None] = mapped_column(Integer)
-    trimmed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # What's being said
     text: Mapped[str | None] = mapped_column(Text)
@@ -109,27 +122,21 @@ class Sample(Base):
 
 class SampleAnalysis(Base):
     """
-    One analysis ATTEMPT over a sample's full audio — kept as history (not
-    overwritten) so re-analyzing with different settings never destroys a
-    previous result. Exactly one row per sample should be `is_active` at a
-    time; that's the one token-value derivation (a later phase) reads from.
+    One Praat analysis ATTEMPT over a sample's full audio for a given config
+    — kept as history (not overwritten), so re-analyzing with different
+    settings never destroys a previous result. Which analysis a given token
+    should derive its mean F1/F2 from is decided per-token (see
+    Token.active_analysis_id), not by one global flag here.
     """
     __tablename__ = "sample_analyses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     sample_id: Mapped[int] = mapped_column(ForeignKey("samples.id", ondelete="CASCADE"), nullable=False)
-    source: Mapped[str] = mapped_column(Text, nullable=False)  # 'praat' | 'manual'
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    # Praat-sourced fields
     version: Mapped[str | None] = mapped_column(Text)   # e.g. 'praat-default-v1'
     config: Mapped[dict | None] = mapped_column(JSONB)  # {max_number_of_formants, maximum_formant, window_length, ...}
     formants: Mapped[list | None] = mapped_column(JSONB)  # [{t_ms, f1..f5, b1..b5}, ...]
     pitch: Mapped[list | None] = mapped_column(JSONB)     # [{t_ms, f0}, ...] — real signal (e.g. tonemes), not a per-vowel value
-
-    # Manual-override fields (only meaningful when source='manual', e.g. values measured in desktop Praat)
-    manual_f1: Mapped[float | None] = mapped_column()
-    manual_f2: Mapped[float | None] = mapped_column()
 
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
 
@@ -176,14 +183,20 @@ class Token(Base):
     symbol: Mapped[str] = mapped_column(Text, nullable=False)
     char_start: Mapped[int] = mapped_column(Integer, nullable=False)
     char_end: Mapped[int] = mapped_column(Integer, nullable=False)
-    # A range INTO THE SAMPLE'S OWN AUDIO. Null until someone draws it.
+    # A range INTO THE SAMPLE'S OWN AUDIO. Null until someone draws it — still
+    # needed even for a manual-only token, so the slice remains playable.
     time_start_ms: Mapped[int | None] = mapped_column(Integer)
     time_end_ms: Mapped[int | None] = mapped_column(Integer)
-    # TEMPORARY escape hatch — see module docstring. Never written to by new
-    # code; only ever set by the legacy migration script.
-    legacy_analysis: Mapped[dict | None] = mapped_column(JSONB)
+    # Which of the sample's SampleAnalysis rows this token's mean F1/F2 is
+    # derived from on read (a later phase) — restricted to [time_start_ms,
+    # time_end_ms]. Null if nothing's been analyzed for this token yet.
+    active_analysis_id: Mapped[int | None] = mapped_column(ForeignKey("sample_analyses.id", ondelete="SET NULL"))
+    # Direct override — wins over the active-analysis-derived mean when set.
+    manual_f1: Mapped[float | None] = mapped_column()
+    manual_f2: Mapped[float | None] = mapped_column()
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     sample: Mapped["Sample"] = relationship(back_populates="tokens")
+    active_analysis: Mapped["SampleAnalysis | None"] = relationship()

@@ -14,6 +14,23 @@ import os
 import shutil
 from pathlib import Path
 
+# Sample.url convention: a local file is "file://<storage_key>" (storage_key is
+# always relative to AUDIO_STORAGE_ROOT); anything else (http/https) is an
+# external link and is used as-is, unmirrored.
+LOCAL_URL_PREFIX = "file://"
+
+
+def is_local_url(url: str) -> bool:
+    return url.startswith(LOCAL_URL_PREFIX)
+
+
+def storage_key_from_url(url: str) -> str:
+    return url[len(LOCAL_URL_PREFIX):]
+
+
+def url_from_storage_key(storage_key: str) -> str:
+    return LOCAL_URL_PREFIX + storage_key
+
 
 class AudioStore:
     def put_path(self, src_path: str, suggested_key: str) -> str:

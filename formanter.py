@@ -1004,7 +1004,7 @@ def http_transcribe():
 
 from db.session import get_sessionmaker  # noqa: E402
 from db.models import Sample  # noqa: E402
-from db.storage import get_audio_store  # noqa: E402
+from db.storage import get_audio_store, is_local_url, storage_key_from_url  # noqa: E402
 from flask import send_file, abort  # noqa: E402
 
 
@@ -1017,17 +1017,21 @@ def list_sounds():
         store = get_audio_store()
         with get_sessionmaker()() as db:
             samples = db.query(Sample).order_by(Sample.id).all()
-            return jsonify([{
-                'id': s.id,
-                'storageKey': s.storage_key,
-                'sourceUrl': s.source_url,
-                'originalFilename': s.original_filename,
-                'durationMs': s.duration_ms,
-                'provenance': s.provenance,
-                'text': s.text,
-                'hasFile': bool(s.storage_key) and store.exists(s.storage_key),
-                'audioUrl': f'/audio/{s.storage_key}' if s.storage_key else s.source_url,
-            } for s in samples])
+            rows = []
+            for s in samples:
+                local = bool(s.url) and is_local_url(s.url)
+                storage_key = storage_key_from_url(s.url) if local else None
+                rows.append({
+                    'id': s.id,
+                    'storageKey': storage_key,
+                    'sourceUrl': None if local else s.url,
+                    'originalFilename': s.original_filename,
+                    'durationMs': s.duration_ms,
+                    'text': s.text,
+                    'hasFile': bool(storage_key) and store.exists(storage_key),
+                    'audioUrl': f'/audio/{storage_key}' if storage_key else s.url,
+                })
+            return jsonify(rows)
     except Exception as error:
         return jsonify({'error': str(error)}), 500
 

@@ -1,18 +1,15 @@
 [
   {
     "id": 220,
-    "storageKey": "lang/ru/audio/auto/i.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/auto/i.mp3",
     "originalFilename": "i.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "i",
     "phonemic": "/i/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "i",
@@ -22,40 +19,23 @@
         ],
         "timeStartMs": 532,
         "timeEndMs": 642,
-        "legacyAnalysis": {
-          "f1": 272,
-          "f2": 2755,
-          "max_f": 5000,
-          "slice": [
-            532,
-            642
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 272.0,
+        "manualF2": 2755.0
       }
     ]
   },
   {
     "id": 221,
-    "storageKey": "lang/ru/audio/easy/mir.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/mir.mp3",
     "originalFilename": "mir.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "мир",
     "phonemic": "/mʲir/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "i",
@@ -65,40 +45,23 @@
         ],
         "timeStartMs": 658,
         "timeEndMs": 994,
-        "legacyAnalysis": {
-          "f1": 488,
-          "f2": 2188,
-          "max_f": 5000,
-          "slice": [
-            658,
-            994
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2150,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 488.0,
+        "manualF2": 2188.0
       }
     ]
   },
   {
     "id": 222,
-    "storageKey": "lang/ru/audio/easy/ego.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/ego.mp3",
     "originalFilename": "ego.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "его",
     "phonemic": "/jɪˈvo/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -108,40 +71,23 @@
         ],
         "timeStartMs": 764,
         "timeEndMs": 874,
-        "legacyAnalysis": {
-          "f1": 388,
-          "f2": 1965,
-          "max_f": 5000,
-          "slice": [
-            764,
-            874
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 388.0,
+        "manualF2": 1965.0
       }
     ]
   },
   {
     "id": 223,
-    "storageKey": "lang/ru/audio/forvo/perehod.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/forvo/perehod.mp3",
     "originalFilename": "perehod.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "переход",
     "phonemic": "/pʲɪrʲɪˈxot/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɪ",
@@ -151,40 +97,23 @@
         ],
         "timeStartMs": 64,
         "timeEndMs": 121,
-        "legacyAnalysis": {
-          "f1": 472,
-          "f2": 2533,
-          "max_f": 5000,
-          "slice": [
-            64,
-            121
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 472.0,
+        "manualF2": 2533.0
       }
     ]
   },
   {
     "id": 224,
-    "storageKey": "lang/ru/audio/easy/uje.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/uje.mp3",
     "originalFilename": "uje.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "уже",
     "phonemic": "/ʊˈʐɛ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -194,40 +123,23 @@
         ],
         "timeStartMs": 587,
         "timeEndMs": 730,
-        "legacyAnalysis": {
-          "f1": 383,
-          "f2": 839,
-          "max_f": 5000,
-          "slice": [
-            587,
-            730
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 383.0,
+        "manualF2": 839.0
       }
     ]
   },
   {
     "id": 225,
-    "storageKey": null,
-    "sourceUrl": null,
+    "url": null,
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "тупая",
     "phonemic": "/tʊˈpajə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -237,24 +149,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 226,
-    "storageKey": "lang/ru/audio/easy/srazu.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/srazu.mp3",
     "originalFilename": "srazu.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "сразу",
     "phonemic": "/ˈsrazʊ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʊ",
@@ -264,40 +175,23 @@
         ],
         "timeStartMs": 1535,
         "timeEndMs": 1647,
-        "legacyAnalysis": {
-          "f1": 298,
-          "f2": 669,
-          "max_f": 5000,
-          "slice": [
-            1535,
-            1647
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 298.0,
+        "manualF2": 669.0
       }
     ]
   },
   {
     "id": 227,
-    "storageKey": "lang/ru/audio/auto/i_bar.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/auto/i_bar.mp3",
     "originalFilename": "i_bar.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɨ",
     "phonemic": "/ɨ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɨ",
@@ -307,40 +201,23 @@
         ],
         "timeStartMs": 501,
         "timeEndMs": 748,
-        "legacyAnalysis": {
-          "f1": 325,
-          "f2": 1637,
-          "max_f": 5000,
-          "slice": [
-            501,
-            748
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 325.0,
+        "manualF2": 1637.0
       }
     ]
   },
   {
     "id": 228,
-    "storageKey": "lang/ru/audio/easy/byl.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/byl.mp3",
     "originalFilename": "byl.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "был",
     "phonemic": "/bɨl/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɨ",
@@ -350,40 +227,23 @@
         ],
         "timeStartMs": 703,
         "timeEndMs": 899,
-        "legacyAnalysis": {
-          "f1": 286,
-          "f2": 980,
-          "max_f": 5000,
-          "slice": [
-            703,
-            899
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 286.0,
+        "manualF2": 980.0
       }
     ]
   },
   {
     "id": 229,
-    "storageKey": "lang/ru/audio/rufe/yu.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/rufe/yu.mp3",
     "originalFilename": "yu.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ю",
     "phonemic": "/jʉ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -393,40 +253,23 @@
         ],
         "timeStartMs": 574,
         "timeEndMs": 716,
-        "legacyAnalysis": {
-          "f1": 368,
-          "f2": 516,
-          "max_f": 5000,
-          "slice": [
-            574,
-            716
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 368.0,
+        "manualF2": 516.0
       }
     ]
   },
   {
     "id": 230,
-    "storageKey": "lang/ru/audio/easy/svou.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/svou.mp3",
     "originalFilename": "svou.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "свою",
     "phonemic": "/svɐˈjʉ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʉ",
@@ -436,40 +279,23 @@
         ],
         "timeStartMs": 1005,
         "timeEndMs": 1445,
-        "legacyAnalysis": {
-          "f1": 339,
-          "f2": 905,
-          "max_f": 5000,
-          "slice": [
-            1005,
-            1445
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 339.0,
+        "manualF2": 905.0
       }
     ]
   },
   {
     "id": 231,
-    "storageKey": "lang/ru/audio/auto/u.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/auto/u.mp3",
     "originalFilename": "u.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "u",
     "phonemic": "/u/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "u",
@@ -479,40 +305,23 @@
         ],
         "timeStartMs": 575,
         "timeEndMs": 761,
-        "legacyAnalysis": {
-          "f1": 291,
-          "f2": 504,
-          "max_f": 5250,
-          "slice": [
-            575,
-            761
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 3,
-          "back_ceiling": 2000,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 291.0,
+        "manualF2": 504.0
       }
     ]
   },
   {
     "id": 232,
-    "storageKey": "lang/ru/audio/easy/emu.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/emu.mp3",
     "originalFilename": "emu.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ему",
     "phonemic": "/jɪˈmu/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "u",
@@ -522,40 +331,23 @@
         ],
         "timeStartMs": 1033,
         "timeEndMs": 1416,
-        "legacyAnalysis": {
-          "f1": 284,
-          "f2": 508,
-          "max_f": 5000,
-          "slice": [
-            1033,
-            1416
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 284.0,
+        "manualF2": 508.0
       }
     ]
   },
   {
     "id": 233,
-    "storageKey": "lang/ru/audio/rufe/ye.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/rufe/ye.mp3",
     "originalFilename": "ye.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "е",
     "phonemic": "/je/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "e",
@@ -565,40 +357,23 @@
         ],
         "timeStartMs": 632,
         "timeEndMs": 695,
-        "legacyAnalysis": {
-          "f1": 381,
-          "f2": 2579,
-          "max_f": 5500,
-          "slice": [
-            632,
-            695
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1500,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 381.0,
+        "manualF2": 2579.0
       }
     ]
   },
   {
     "id": 234,
-    "storageKey": "lang/ru/audio/forvo/meste.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/forvo/meste.mp3",
     "originalFilename": "meste.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "месте",
     "phonemic": "/ˈmʲestʲɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "e",
@@ -608,40 +383,23 @@
         ],
         "timeStartMs": 156,
         "timeEndMs": 292,
-        "legacyAnalysis": {
-          "f1": 335,
-          "f2": 2329,
-          "max_f": 5000,
-          "slice": [
-            156,
-            292
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2000,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 335.0,
+        "manualF2": 2329.0
       }
     ]
   },
   {
     "id": 235,
-    "storageKey": "lang/ru/audio/rufe/yo.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/rufe/yo.mp3",
     "originalFilename": "yo.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ё",
     "phonemic": "/jo/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "o",
@@ -651,40 +409,23 @@
         ],
         "timeStartMs": 732,
         "timeEndMs": 895,
-        "legacyAnalysis": {
-          "f1": 428,
-          "f2": 788,
-          "max_f": 5000,
-          "slice": [
-            732,
-            895
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2050,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 428.0,
+        "manualF2": 788.0
       }
     ]
   },
   {
     "id": 236,
-    "storageKey": "lang/ru/audio/easy/moe.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/moe.mp3",
     "originalFilename": "moe.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "моё",
     "phonemic": "/mɐˈjo/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɵ",
@@ -694,40 +435,23 @@
         ],
         "timeStartMs": 1121,
         "timeEndMs": 1378,
-        "legacyAnalysis": {
-          "f1": 552,
-          "f2": 826,
-          "max_f": 5000,
-          "slice": [
-            1121,
-            1378
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 552.0,
+        "manualF2": 826.0
       }
     ]
   },
   {
     "id": 237,
-    "storageKey": "lang/ru/audio/easy/jivet.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/jivet.mp3",
     "originalFilename": "jivet.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "живёт",
     "phonemic": "/ʐɨˈvot/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɵ",
@@ -737,40 +461,23 @@
         ],
         "timeStartMs": 1104,
         "timeEndMs": 1304,
-        "legacyAnalysis": {
-          "f1": 530,
-          "f2": 801,
-          "max_f": 5000,
-          "slice": [
-            1104,
-            1304
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 530.0,
+        "manualF2": 801.0
       }
     ]
   },
   {
     "id": 238,
-    "storageKey": "lang/ru/audio/easy/mira.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/mira.mp3",
     "originalFilename": "mira.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "мира",
     "phonemic": "/ˈmʲirə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -780,40 +487,23 @@
         ],
         "timeStartMs": 1196,
         "timeEndMs": 1325,
-        "legacyAnalysis": {
-          "f1": 656,
-          "f2": 1310,
-          "max_f": 5000,
-          "slice": [
-            1196,
-            1325
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 656.0,
+        "manualF2": 1310.0
       }
     ]
   },
   {
     "id": 239,
-    "storageKey": "lang/ru/audio/easy/etomu.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/etomu.mp3",
     "originalFilename": "etomu.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "этому",
     "phonemic": "/ˈetəmʊ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -823,40 +513,23 @@
         ],
         "timeStartMs": 965,
         "timeEndMs": 1092,
-        "legacyAnalysis": {
-          "f1": 524,
-          "f2": 1352,
-          "max_f": 5000,
-          "slice": [
-            965,
-            1092
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 524.0,
+        "manualF2": 1352.0
       }
     ]
   },
   {
     "id": 240,
-    "storageKey": "lang/ru/audio/easy/odnovremenno.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/odnovremenno.mp3",
     "originalFilename": "odnovremenno.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "одновременно",
     "phonemic": "/ɐdnəvrʲɪˈmʲenə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ə",
@@ -866,24 +539,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 241,
-    "storageKey": "lang/ru/audio/auto/o.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/auto/o.mp3",
     "originalFilename": "o.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "o",
     "phonemic": "/o/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "o",
@@ -893,40 +565,23 @@
         ],
         "timeStartMs": 717,
         "timeEndMs": 967,
-        "legacyAnalysis": {
-          "f1": 398,
-          "f2": 767,
-          "max_f": 5000,
-          "slice": [
-            717,
-            967
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 398.0,
+        "manualF2": 767.0
       }
     ]
   },
   {
     "id": 242,
-    "storageKey": "lang/ru/audio/easy/tot.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/tot.mp3",
     "originalFilename": "tot.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "тот",
     "phonemic": "/tot/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "o",
@@ -936,24 +591,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 243,
-    "storageKey": "lang/ru/audio/auto/e_open.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/auto/e_open.mp3",
     "originalFilename": "e_open.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɛ",
     "phonemic": "/ɛ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -963,40 +617,23 @@
         ],
         "timeStartMs": 370,
         "timeEndMs": 550,
-        "legacyAnalysis": {
-          "f1": 451,
-          "f2": 1139,
-          "max_f": 5000,
-          "slice": [
-            370,
-            550
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 451.0,
+        "manualF2": 1139.0
       }
     ]
   },
   {
     "id": 244,
-    "storageKey": "lang/ru/audio/easy/etot.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/etot.mp3",
     "originalFilename": "etot.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "этот",
     "phonemic": "/ˈetət/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɛ",
@@ -1006,40 +643,23 @@
         ],
         "timeStartMs": 536,
         "timeEndMs": 658,
-        "legacyAnalysis": {
-          "f1": 470,
-          "f2": 1853,
-          "max_f": 5000,
-          "slice": [
-            536,
-            658
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 470.0,
+        "manualF2": 1853.0
       }
     ]
   },
   {
     "id": 245,
-    "storageKey": "lang/ru/audio/forvo/ona.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/forvo/ona.mp3",
     "originalFilename": "ona.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "она",
     "phonemic": "/ɐˈna/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1049,40 +669,23 @@
         ],
         "timeStartMs": 54,
         "timeEndMs": 153,
-        "legacyAnalysis": {
-          "f1": 558,
-          "f2": 1315,
-          "max_f": 5000,
-          "slice": [
-            54,
-            153
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 558.0,
+        "manualF2": 1315.0
       }
     ]
   },
   {
     "id": 246,
-    "storageKey": "lang/ru/audio/easy/hotel.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/hotel.mp3",
     "originalFilename": "hotel.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "хотел",
     "phonemic": "/xɐˈtʲel/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1092,40 +695,23 @@
         ],
         "timeStartMs": 550,
         "timeEndMs": 642,
-        "legacyAnalysis": {
-          "f1": 696,
-          "f2": 1387,
-          "max_f": 5000,
-          "slice": [
-            550,
-            642
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 696.0,
+        "manualF2": 1387.0
       }
     ]
   },
   {
     "id": 247,
-    "storageKey": "lang/ru/audio/easy/stoyala.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/stoyala.mp3",
     "originalFilename": "stoyala.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "стояла",
     "phonemic": "/stɐˈjalə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1135,24 +721,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 248,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/da/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/da/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg/Ru-%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%B0.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "голова",
     "phonemic": "/ɡələˈva/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ʌ",
@@ -1162,24 +747,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 249,
-    "storageKey": "lang/ru/audio/auto/a.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/auto/a.mp3",
     "originalFilename": "a.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "a",
     "phonemic": "/a/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1189,40 +773,23 @@
         ],
         "timeStartMs": 555,
         "timeEndMs": 624,
-        "legacyAnalysis": {
-          "f1": 799,
-          "f2": 1134,
-          "max_f": 5000,
-          "slice": [
-            555,
-            624
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 799.0,
+        "manualF2": 1134.0
       }
     ]
   },
   {
     "id": 250,
-    "storageKey": "lang/ru/audio/easy/nami.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/nami.mp3",
     "originalFilename": "nami.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "нами",
     "phonemic": "/ˈnamʲɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1232,40 +799,23 @@
         ],
         "timeStartMs": 733,
         "timeEndMs": 1008,
-        "legacyAnalysis": {
-          "f1": 783,
-          "f2": 1188,
-          "max_f": 5000,
-          "slice": [
-            733,
-            1008
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 783.0,
+        "manualF2": 1188.0
       }
     ]
   },
   {
     "id": 251,
-    "storageKey": "lang/ru/audio/auto/a_back.ogg",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/auto/a_back.ogg",
     "originalFilename": "a_back.ogg",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "ɑ",
     "phonemic": "/ɑ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1275,24 +825,23 @@
         ],
         "timeStartMs": null,
         "timeEndMs": null,
-        "legacyAnalysis": null
+        "activeAnalysisId": null,
+        "manualF1": null,
+        "manualF2": null
       }
     ]
   },
   {
     "id": 252,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Ru-%D0%BF%D0%B0%D0%BB%D0%BA%D0%B0.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Ru-%D0%BF%D0%B0%D0%BB%D0%BA%D0%B0.ogg",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "палка",
     "phonemic": "/ˈpalkə/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1302,40 +851,23 @@
         ],
         "timeStartMs": 196,
         "timeEndMs": 287,
-        "legacyAnalysis": {
-          "f1": 531,
-          "f2": 932,
-          "max_f": 5000,
-          "slice": [
-            196,
-            287
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 2050,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 531.0,
+        "manualF2": 932.0
       }
     ]
   },
   {
     "id": 253,
-    "storageKey": "lang/ru/audio/forvo/kal.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/forvo/kal.mp3",
     "originalFilename": "kal.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "кал",
     "phonemic": "/kal/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "ɑ",
@@ -1345,40 +877,23 @@
         ],
         "timeStartMs": 183,
         "timeEndMs": 260,
-        "legacyAnalysis": {
-          "f1": 592,
-          "f2": 1087,
-          "max_f": 5000,
-          "slice": [
-            183,
-            260
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 592.0,
+        "manualF2": 1087.0
       }
     ]
   },
   {
     "id": 254,
-    "storageKey": "lang/ru/audio/rufe/ya.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/rufe/ya.mp3",
     "originalFilename": "ya.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "я",
     "phonemic": "/ja/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "a",
@@ -1388,40 +903,23 @@
         ],
         "timeStartMs": 650,
         "timeEndMs": 781,
-        "legacyAnalysis": {
-          "f1": 866,
-          "f2": 1283,
-          "max_f": 5000,
-          "slice": [
-            650,
-            781
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 866.0,
+        "manualF2": 1283.0
       }
     ]
   },
   {
     "id": 255,
-    "storageKey": "lang/ru/audio/easy/chasti.mp3",
-    "sourceUrl": null,
+    "url": "file://lang/ru/audio/easy/chasti.mp3",
     "originalFilename": "chasti.mp3",
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "части",
     "phonemic": "/ˈtʃastʲɪ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æ",
@@ -1431,40 +929,23 @@
         ],
         "timeStartMs": 673,
         "timeEndMs": 816,
-        "legacyAnalysis": {
-          "f1": 687,
-          "f2": 1340,
-          "max_f": 5000,
-          "slice": [
-            673,
-            816
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 687.0,
+        "manualF2": 1340.0
       }
     ]
   },
   {
     "id": 256,
-    "storageKey": null,
-    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg/Ru-%D0%BF%D1%8F%D1%82%D1%8C.ogg.mp3",
     "originalFilename": null,
     "contentType": null,
     "durationMs": null,
     "sampleRateHz": null,
     "channels": null,
-    "provenance": "legacy-migrated",
-    "trimmed": false,
-    "leadingSilenceMs": null,
     "text": "пять",
     "phonemic": "/pʲatʲ/",
+    "analyses": [],
     "tokens": [
       {
         "symbol": "æ",
@@ -1474,23 +955,9 @@
         ],
         "timeStartMs": 329,
         "timeEndMs": 453,
-        "legacyAnalysis": {
-          "f1": 611,
-          "f2": 1786,
-          "max_f": 5000,
-          "slice": [
-            329,
-            453
-          ],
-          "median_n": 5,
-          "rms_floor": 0.005,
-          "window_ms": 25,
-          "n_formants": 5,
-          "back_ceiling": 1800,
-          "pre_emphasis": 50,
-          "back_front_ratio": 0.75,
-          "back_ceiling_ratio": 0.95
-        }
+        "activeAnalysisId": null,
+        "manualF1": 611.0,
+        "manualF2": 1786.0
       }
     ]
   }
