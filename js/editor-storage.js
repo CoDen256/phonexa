@@ -44,12 +44,11 @@ async function loadFromFolder(h){
           if(!state.langOrder.includes(data.key))state.langOrder.push(data.key);
           if(!enabledKeys.includes(data.key))state.langDisabled.add(data.key);
           else state.langDisabled.delete(data.key);
-          // Load samples.json alongside lang.json
-          try{
-            const sf=await entry.getFileHandle('samples.json');
-            state.langSamples[data.key]=JSON.parse(await(await sf.getFile()).text());
-          }catch(e){ state.langSamples[data.key]=[]; }
-          if(typeof setLangSamples==='function') setLangSamples(data.key, state.langSamples[data.key]);
+          // DB-resolved representative-sample audio (Phase 5d) — the editor's
+          // own embedded chart preview needs this the same way the public
+          // viewer does (see js/lang.js), now that sample/token authoring no
+          // longer happens here at all.
+          if (typeof attachRepresentativeAudio === 'function') await attachRepresentativeAudio(data.key, data.vowels);
           loaded++;
         }
       }catch(e){/* no lang.json in this subdir */}
@@ -83,17 +82,14 @@ function formatLangJson(data) {
 
 // ─── Write one language to a folder ──────────────────────────────────────────
 async function writeToFolder(handle,data){
+  // Phase 5d: samples/tokens are no longer authored here at all (ingestion +
+  // Formant Lab + the Sound/Token browsers own that now) — this only ever
+  // writes lang.json. samples.json is left untouched on disk if present
+  // (e.g. from before this phase); this editor just never writes it again.
   const key=data.key; if(!key)throw new Error('Language key required');
   const subDir=await handle.getDirectoryHandle(key,{create:true});
-  // Write lang.json
   const lfh=await subDir.getFileHandle('lang.json',{create:true});
   const lw=await lfh.createWritable(); await lw.write(formatLangJson(data)); await lw.close();
-  // Write samples.json if there are samples
-  const samples=state.langSamples[key]||[];
-  if(samples.length>0){
-    const sfh=await subDir.getFileHandle('samples.json',{create:true});
-    const sw=await sfh.createWritable(); await sw.write(formatLangJson(samples)); await sw.close();
-  }
   return key;
 }
 
@@ -118,13 +114,6 @@ function flushCurrentDraft(){
     else state.langDraft.vowels[state.vowelIdx]=state.vowelDraft;
   }
   state.langs[state.langDraft.key]=clone(state.langDraft);
-  // Flush sample draft
-  if(state.sampleIdx!==null&&state.sampleDraft){
-    if(!state.samplesDraft)state.samplesDraft=[];
-    if(state.sampleIdx<0)state.samplesDraft.push(state.sampleDraft);
-    else state.samplesDraft[state.sampleIdx]=state.sampleDraft;
-  }
-  if(state.samplesDraft) state.langSamples[state.langDraft.key]=clone(state.samplesDraft);
 }
 
 // ─── Save all languages to the connected folder ───────────────────────────────

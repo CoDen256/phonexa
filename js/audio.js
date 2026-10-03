@@ -81,6 +81,22 @@ async function playTokenSlice(sample, tok) {
     }
 }
 
+// ─── DB-resolved representative-sample audio (Phase 5d) ───────────────────────
+// Zips `representativeAudioUrl` onto a lang.json-shaped vowel array by
+// `symbols` equality — shared by the viewer (js/lang.js) and the editor
+// (editor-storage.js), both of which otherwise only know the old file-based
+// `v.audio`/samples.json representation.
+async function attachRepresentativeAudio(langKey, vowels) {
+  try {
+    const dbVowels = await fetch(`/api/v1/languages/${langKey}/vowels`).then(r => r.ok ? r.json() : []);
+    const bySymbols = new Map(dbVowels.map(dv => [JSON.stringify(dv.symbols), dv]));
+    (vowels || []).forEach(v => {
+      const match = bySymbols.get(JSON.stringify(v.symbols));
+      if (match?.representativeAudioUrl) v.representativeAudioUrl = match.representativeAudioUrl;
+    });
+  } catch (_) { /* DB optional — falls back to samples.json/v.audio */ }
+}
+
 // ─── Vowel synthesis ──────────────────────────────────────────────────────────
 function synthesizeVowel(f1, f2, duration = 0.65) {
     try {
@@ -116,7 +132,10 @@ function synthesizeVowel(f1, f2, duration = 0.65) {
 function playVowel(v, svgId, lk) {
     // Formant chart: always synthesize at the exact plotted F1/F2
     if (svgId === 'chartFormant' && v.f1 && v.f2) { synthesizeVowel(v.f1, v.f2); return; }
-    // IPA chart / other: use representative sample audio, then own audio
+    // IPA chart / other: DB-assigned representative sample (Phase 5d) first,
+    // then the vowel's own inline audio, then the old samples.json-based
+    // lookup — kept only as a last resort for anything not yet DB-assigned.
+    if (v.representativeAudioUrl) { playUrl(v.representativeAudioUrl); return; }
     if (v.audio) { playUrl(v.audio); return; }
     if (lk) {
         const rep = findRepresentativeSample(v.symbols, lk);

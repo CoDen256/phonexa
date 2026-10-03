@@ -87,10 +87,6 @@
     </div>
 
     <div class="content-section" id="contentSection" style="display:none">
-      <div class="section-tabs-bar">
-        <button class="section-tab-btn active" id="tabVowelsList" type="button">Vowels</button>
-        <button class="section-tab-btn" id="tabSamplesList" type="button">Samples</button>
-      </div>
       <!-- Vowels panel -->
       <div id="vowelPanel">
         <div class="section-head">
@@ -98,14 +94,6 @@
           <button class="btn btn-secondary btn-sm" id="addVowelBtn" type="button">+ Add Vowel</button>
         </div>
         <div class="vowel-cards" id="vowelCards"></div>
-      </div>
-      <!-- Samples panel -->
-      <div id="samplesPanel" style="display:none">
-        <div class="section-head">
-          <span class="section-title" id="samplesSectionTitle">Samples</span>
-          <button class="btn btn-secondary btn-sm" id="addSampleBtn" type="button">+ Add Sample</button>
-        </div>
-        <div class="sample-list" id="sampleList"></div>
       </div>
     </div>
   </div>
@@ -124,7 +112,6 @@
       </div>
     </div>
     <div id="veInline" class="ve-inline" style="display:none"></div>
-    <div id="seInline" class="ve-inline" style="display:none"></div>
     <div class="editor-pane-hint" id="editorPaneHint">Select a vowel on the chart or card to edit</div>
   </div>
 
@@ -144,7 +131,7 @@
 <script src="js/editor-storage.js"></script>
 <script src="js/editor-vowels.js"></script>
 <script src="js/editor-lang.js"></script>
-<script src="js/editor-samples.js"></script>
+<script src="js/editor-tokens.js"></script>
 <script src="js/editor-form.js"></script>
 
 <script>
@@ -159,12 +146,11 @@
     langSources: {},
     langOrder: [],
     langDisabled: new Set(),
-    // Samples
-    langSamples:  {},     // key → samples array (all loaded langs)
-    samplesDraft: [],     // current lang samples (mutable draft)
-    sampleIdx:    null,   // null | -1 (new) | 0..n
-    sampleDraft:  null,   // edited sample copy
-    samplesTab:   false,  // true = samples panel active
+    // Phase 5d: per-language DB cache (tokens/samples/vowel links) — see
+    // js/editor-tokens.js's ensureDbLanguageData().
+    dbVowelLinks: null,   // [{id, representativeSampleId, representativeAudioUrl}, ...] parallel to langDraft.vowels
+    dbLanguageTokens: null,  // all DB tokens for the selected language
+    dbLanguageSamples: null, // all DB samples for the selected language
   };
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }

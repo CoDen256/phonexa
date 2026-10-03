@@ -208,49 +208,23 @@ function buildInlineForm() {
   urlRow.querySelector('#fAudio').addEventListener('input', e => { v.audio = e.target.value || null; });
   urlRow.querySelector('#fWiki').addEventListener('input',  e => { v.wikiUrl = e.target.value; });
 
-  // ── Linked samples strip ──────────────────────────────────────────────────
-  const linked = (state.samplesDraft || []).filter(s =>
-      s.tokens?.some(t => v.symbols?.includes(t.symbol))
-  );
-  const c2 = state.langDraft?.color || '#7eb8f7';
-  sec.appendChild(makeDividerLabel(`Samples (${linked.length})`));
-  const strip = document.createElement('div'); strip.style.cssText = 'display:flex;flex-direction:column;gap:3px';
-  if (linked.length === 0) {
-    const hint = document.createElement('div'); hint.style.cssText = 'font-size:.65rem;color:#3a5878';
-    hint.textContent = 'No samples linked to this vowel yet.'; strip.appendChild(hint);
-  } else {
-    linked.slice(0, 6).forEach(smp => {
-      const row = document.createElement('div'); row.style.cssText = 'font-size:.72rem;color:#8fa8c0;cursor:pointer;padding:2px 4px;border-radius:4px;display:flex;justify-content:space-between;transition:background .1s';
-      const myToks = smp.tokens.filter(t => v.symbols?.includes(t.symbol));
-      const okToks = myToks.filter(t => t.analysis?.f1).length;
-      row.innerHTML = `<span><span style='font-family:Georgia,serif'>${smp.text||'?'}</span>${smp.phonemic?` <span style='opacity:.5;font-style:italic'>${smp.phonemic}</span>`:''}</span><span style='font-size:.6rem;color:#4a6888'>${okToks}/${myToks.length} ⚡</span>`;
-      row.addEventListener('mouseenter', () => row.style.background='#1a2e44');
-      row.addEventListener('mouseleave', () => row.style.background='');
-      row.addEventListener('click', () => {
-        const idx = state.samplesDraft.indexOf(smp);
-        if (idx >= 0) openSampleInVowelEditor(idx);
-      });
-      strip.appendChild(row);
-    });
-    if (linked.length > 6) { const more = document.createElement('div'); more.style.cssText = 'font-size:.6rem;color:#3a5878'; more.textContent = `+${linked.length-6} more`; strip.appendChild(more); }
-  }
-  // Add sample for this vowel
-  const addSmpBtn = document.createElement('button'); addSmpBtn.className='btn btn-secondary btn-sm'; addSmpBtn.type='button'; addSmpBtn.style.marginTop='4px';
-  addSmpBtn.textContent = '+ Add sample for /' + (v.symbols?.[0]||'?') + '/';
-  addSmpBtn.addEventListener('click', () => {
-    state.samplesDraft = state.samplesDraft || [];
-    openSampleInVowelEditor(-1);
-    if (state.sampleDraft) { state.sampleDraft.tokens = [{symbol:v.symbols?.[0]||'', position:[0,0], analysis:null}]; buildSampleForm(document.getElementById('seVowelInline'), true); }
-  });
-  strip.appendChild(addSmpBtn);
-  sec.appendChild(strip);
+  // ── Tokens + Representative sample (Phase 5d) ───────────────────────────
+  // Explicit DB relationships now — no more symbol-text matching. See
+  // js/editor-tokens.js for the actual picker logic/rendering.
+  if (state.vowelIdx != null && state.vowelIdx >= 0) {
+    sec.appendChild(makeDividerLabel('Tokens'));
+    const tokensWrap = document.createElement('div'); tokensWrap.id = 'veTokensWrap';
+    tokensWrap.textContent = 'Loading…';
+    tokensWrap.style.cssText = 'font-size:.65rem;color:#3a5878';
+    sec.appendChild(tokensWrap);
 
-  // Container for inline sample editing (within vowel form)
-  let sv = document.getElementById('seVowelInline');
-  if (!sv) {
-    sv = document.createElement('div'); sv.id = 'seVowelInline';
-    sv.style.cssText = 'display:none;border-top:1px solid var(--border);margin-top:8px;padding-top:8px';
-    sec.appendChild(sv);
+    sec.appendChild(makeDividerLabel('Representative sample'));
+    const repWrap = document.createElement('div'); repWrap.id = 'veRepresentativeWrap';
+    repWrap.textContent = 'Loading…';
+    repWrap.style.cssText = 'font-size:.65rem;color:#3a5878';
+    sec.appendChild(repWrap);
+
+    if (typeof renderVowelAssignmentUI === 'function') renderVowelAssignmentUI(state.vowelIdx);
   }
 }
 
@@ -266,6 +240,10 @@ function applyVowel() {
   closeVowelEditor();
   updateSectionTitle();
   toast(`Vowel "${applied}" applied`);
+  // Re-sync so a brand-new vowel gets a DB id immediately (Phase 5d) —
+  // otherwise its Tokens/Representative sections stay unavailable until the
+  // language is reselected.
+  if (typeof ensureDbLanguageData === 'function') ensureDbLanguageData();
 }
 
 

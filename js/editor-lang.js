@@ -8,16 +8,11 @@ async function loadLanguages(){
     await Promise.all(names.map(name=>
         fetch(`lang/${name}/lang.json?t=${Date.now()}`)
             .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
-            .then(async d=>{
+            .then(d=>{
               if(d&&d.key&&!state.langSources[d.key]){
                 state.langs[d.key]=d;
                 state.langSources[d.key]='builtin';
                 if(!state.langOrder.includes(d.key)) state.langOrder.push(d.key);
-                // Try loading samples.json for this language
-                try{
-                  const sData=await fetch(`lang/${name}/samples.json?t=${Date.now()}`).then(r=>r.ok?r.json():[]);
-                  state.langSamples[d.key]=sData;
-                }catch(e){ state.langSamples[d.key]=[]; }
               }
             })
             .catch(e=>console.warn(`Skip ${name}:`,e.message))
@@ -128,12 +123,11 @@ function selectLang(key){
   state.selKey=key; state.langDraft=clone(state.langs[key]);
   state.unsaved=false;
   state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
-  state.sampleIdx=null; state.sampleDraft=null; state.samplesTab=false;
-  state.samplesDraft=clone(state.langSamples[key]||[]);
-  if(typeof setLangSamples==='function') setLangSamples(key, state.samplesDraft);
+  state.dbVowelLinks=null; state.dbLanguageTokens=null; state.dbLanguageSamples=null;
   renderLangList();
   showLangPanel();
   updateSaveButtons();
+  if (typeof ensureDbLanguageData === 'function') ensureDbLanguageData();
 }
 
 // ─── Show/populate the lang panel (runs once per language selection) ──────────
@@ -154,11 +148,8 @@ function showLangPanel(){
 
   updateSaveButtons();
 
-  // Content section (vowels + samples tabs)
   const cs=document.getElementById('contentSection');
   if(cs) cs.style.display='block';
-  // Restore correct tab
-  if(state.samplesTab) switchToSamplesTab(); else switchToVowelsTab();
 
   refreshCharts();
   renderVowelCards();
@@ -212,18 +203,9 @@ function initEditorUI(){
   const saveAsBtn=document.getElementById('saveAsLangBtn');
   if(saveAsBtn) saveAsBtn.addEventListener('click',saveAsLang);
 
-  // Vowels / Samples tabs
-  document.getElementById('tabVowelsList')?.addEventListener('click',()=>switchToVowelsTab());
-  document.getElementById('tabSamplesList')?.addEventListener('click',()=>switchToSamplesTab());
-
   // Add vowel button
   const addBtn=document.getElementById('addVowelBtn');
   if(addBtn) addBtn.addEventListener('click',()=>openVowelEditor(-1));
-
-  // Add sample button
-  document.getElementById('addSampleBtn')?.addEventListener('click',()=>{
-    switchToSamplesTab(); openSampleEditor(-1);
-  });
 
   // Cardinal vowels toggle
   // Averages toggle
@@ -325,16 +307,6 @@ function syncCoordsToForm(){
 
 // ─── Open vowel editor ────────────────────────────────────────────────────────
 function openVowelEditor(idx){
-  // Flush any pending sample analysis so it persists when switching vowels
-  if(state.sampleIdx!=null && state.sampleIdx>=0 && state.sampleDraft){
-    const prev=state.samplesDraft[state.sampleIdx];
-    if(JSON.stringify(prev)!==JSON.stringify(state.sampleDraft)){
-      state.samplesDraft[state.sampleIdx]=clone(state.sampleDraft);
-      if(typeof setLangSamples==='function') setLangSamples(state.selKey,state.samplesDraft);
-      if(typeof markUnsaved==='function') markUnsaved();
-    }
-  }
-  if(typeof closeSampleEditor==='function') closeSampleEditor();
   state.vowelIdx=idx;
   state.pickingMode=null;
   const existing=(idx>=0&&state.langDraft?.vowels)?state.langDraft.vowels[idx]:null;
@@ -347,11 +319,6 @@ function openVowelEditor(idx){
 }
 
 function closeVowelEditor(){
-  // Flush any open sample draft before closing the vowel editor
-  if(state.sampleIdx!=null && state.sampleIdx>=0 && state.sampleDraft){
-    state.samplesDraft[state.sampleIdx]=clone(state.sampleDraft);
-    if(typeof setLangSamples==='function') setLangSamples(state.selKey,state.samplesDraft);
-  }
   state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
   state.showOtherVowels=true;
   const st=document.getElementById('soloToggle');

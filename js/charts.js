@@ -460,25 +460,6 @@ function showTokenContextMenu(e, sample, tok, lang, lk) {
   item('◉', 'Play token slice',  () => playTokenSlice(sample, tok));
   item('⬤', 'Trace token slice',      () => traceOnFormantChart(sample, tok, lang, lk, false));
   item('⬤', 'Trace full audio',       () => traceOnFormantChart(sample, tok, lang, lk, true));
-  // Only offer 'Open' when this token's language is the one currently being edited
-  const _st = typeof state !== 'undefined' ? state : null;
-  if (_st && lk === _st.selKey && typeof openSampleInVowelEditor === 'function') {
-    item('↗', `Open "${esc(sample.text||'?')}"`, () => {
-      // LANG_SAMPLES[lk] was set to state.samplesDraft by setLangSamples — same array
-      const smpIdx = (_st.samplesDraft||[]).indexOf(sample);
-      if (smpIdx < 0) return;
-      // Open the vowel that owns this token first
-      const vowelIdx = (_st.langDraft?.vowels||[]).findIndex(v => v.symbols?.includes(tok.symbol));
-      if (vowelIdx >= 0 && typeof openVowelEditor === 'function') {
-        openVowelEditor(vowelIdx);
-        openSampleInVowelEditor(smpIdx);
-      } else {
-        // Vowel not found — fall back to the samples panel
-        if (typeof switchToSamplesTab === 'function') switchToSamplesTab();
-        if (typeof openSampleEditor  === 'function') openSampleEditor(smpIdx);
-      }
-    });
-  }
 
   document.body.appendChild(menu);
   const pw = menu.offsetWidth||195, ph = menu.offsetHeight||130;

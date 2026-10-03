@@ -21,6 +21,10 @@ async function loadLanguages() {
             const samples = await fetch(`lang/${name}/samples.json`).then(r => r.ok ? r.json() : []);
             if (typeof setLangSamples === 'function') setLangSamples(data.key, samples);
           } catch (_) { /* samples optional */ }
+          // DB-resolved representative-sample audio (Phase 5d) — samples.json
+          // above stays only as a last-resort fallback for anything not yet
+          // DB-assigned (see attachRepresentativeAudio, js/audio.js).
+          await attachRepresentativeAudio(data.key, data.vowels);
         }
       } catch (e) {
         console.warn(`Skipped lang/${name}:`, e.message);
