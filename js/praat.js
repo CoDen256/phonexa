@@ -1,9 +1,10 @@
 /**
  * praat.js — Formant Lab (praat.html).
  *
- * Standalone page replicating Praat's own Sound/Spectrogram editor window:
- * waveform (per channel) on top, derived spectrogram below with formant
- * dots (red) and a pitch curve (blue, own right-axis scale) overlaid.
+ * Standalone page replicating Praat's own Spectrogram editor window: the
+ * derived spectrogram with formant dots (red) and a pitch curve (blue, own
+ * right-axis scale) overlaid — no separate amplitude waveform panel; the
+ * spectrogram IS the main view here, same as every per-section mini view.
  *
  * Analysis is done by /analyze-praat on formanter.py — parselmouth's bare
  * default Burg formant / autocorrelation pitch / spectrogram calls, with
@@ -11,12 +12,12 @@
  * practice panel's /frames pipeline uses. See formanter.py for why.
  *
  * One unified concept — a SECTION — is a labeled sub-range of whatever's
- * loaded, shown as a band on the main waveform AND as its own small card
- * with a zoomed "mini-waveform" (the section's range padded a bit on each
- * side, so you can drag either edge to extend/shrink right there, or drag
- * the main waveform's band — both write to the same section object and
- * stay in sync). Launched two ways, which decide what the sections ARE and
- * what each card's save/apply action does:
+ * loaded, shown as a band on the main spectrogram AND as its own small card
+ * with a zoomed "mini-spectrogram" (the section's range padded a bit on
+ * each side, so you can drag either edge to extend/shrink right there, or
+ * drag the main spectrogram's band — both write to the same section object
+ * and stay in sync). Launched two ways, which decide what the sections ARE
+ * and what each card's save/apply action does:
  *
  *  - standalone (no ?tokens= in the URL): "ingestion mode" — sections are
  *    auto-suggested from js/vad.js's detectSentences() (same heuristic
@@ -49,8 +50,8 @@ const ingestMode = !sampleCtx;
 let currentBuffer = null;     // decoded AudioBuffer (all channels, for display + playback)
 let analysisResult = null;    // { duration_ms, formants, pitch, spectrogram }
 let selStart = 0, selEnd = 0; // fractions of duration — scratch selection, ingest mode only (drawing a brand-new section)
-let dragging = false;         // scratch-selection drag (main waveform, empty space, ingest mode)
-let sectionDrag = null;       // { section, mode: 'resize-start'|'resize-end'|'move', moveOffset } — main-waveform section drag
+let dragging = false;         // scratch-selection drag (main spectrogram, empty space, ingest mode)
+let sectionDrag = null;       // { section, mode: 'resize-start'|'resize-end'|'move', moveOffset } — main-spectrogram section drag
 let activeSource = null;
 
 let sections = [];        // unified: [{id, mode:'ingest'|'token', start, end, ...mode fields}]
@@ -103,7 +104,7 @@ async function loadBuffer(buffer) {
   document.getElementById('sectionsPanel').style.display = 'block';
   document.getElementById('ingestToolbar').style.display = ingestMode ? 'flex' : 'none';
   document.getElementById('sectionsHint').textContent = ingestMode
-    ? '(auto-suggested from silence gaps — drag a section\'s own mini-waveform, or its band on the main waveform above, to adjust)'
+    ? '(auto-suggested from silence gaps — drag a section\'s own mini-spectrogram, or its band on the main spectrogram above, to adjust)'
     : '(one per token in this sample — drag to adjust its time range, Apply sends that token\'s result back to the editor)';
   if (ingestMode) {
     document.getElementById('fileToolbar').style.display = 'flex';
@@ -111,8 +112,6 @@ async function loadBuffer(buffer) {
   } else {
     seedSectionsFromTokens();
   }
-  buildWaveLanes();
-  drawWaveLanes();
   await runAnalyze();
   if (sampleCtx?.scrollTo != null) scrollToSection(s => s.tokIdx === sampleCtx.scrollTo);
 }
@@ -321,7 +320,7 @@ function refreshSectionVisuals() {
     const cv = card.querySelector('.section-mini');
     if (cv) {
       const { winStart, winEnd } = sectionWindow(s);
-      drawWaveformWindow(cv, winStart, winEnd, s.start, s.end);
+      drawSpectrogramWindow(cv, winStart, winEnd, s.start, s.end);
     }
     if (s.mode === 'token') {
       const after = computeMeansForRange(s.start, s.end);
@@ -344,24 +343,13 @@ function scrollToSection(predicate) {
   card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// ─── Mini-waveform (zoomed, per-section) ───────────────────────────────────────
-function drawWaveformWindow(cv, winStart, winEnd, selStartFrac, selEndFrac) {
-  const data = currentBuffer.getChannelData(0);
-  const W = cv.width = cv.offsetWidth || 260, H = cv.height = 40;
+// ─── Mini-spectrogram (zoomed, per-section) — shares the crop/overlay helpers
+// below with the main spectrogram view (winStart=0, winEnd=1 there). ──────────
+function drawSpectrogramWindow(cv, winStart, winEnd, selStartFrac, selEndFrac) {
+  const W = cv.width = cv.offsetWidth || 260, H = cv.height = cv.offsetHeight || 60;
+  drawSpectrogramCrop(cv, W, H, winStart, winEnd);
   const ctx = cv.getContext('2d');
-  ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H);
-  const n = data.length;
-  const i0 = Math.floor(winStart * n), i1 = Math.max(i0 + 1, Math.ceil(winEnd * n));
-  const span = i1 - i0;
-  const step = Math.max(1, Math.ceil(span / W));
-  for (let x = 0; x < W; x++) {
-    let mn = 0, mx = 0;
-    const s0 = i0 + x * step, s1 = Math.min(i1, s0 + step);
-    for (let i = s0; i < s1; i++) { if (data[i] < mn) mn = data[i]; if (data[i] > mx) mx = data[i]; }
-    const yT = Math.floor((1 - mx) * H / 2), yB = Math.ceil((1 - mn) * H / 2);
-    ctx.fillStyle = '#4a90c8';
-    ctx.fillRect(x, yT, 1, Math.max(1, yB - yT));
-  }
+  drawFormantPitchOverlay(ctx, W, H, winStart, winEnd);
   const winSpan = Math.max(1e-9, winEnd - winStart);
   const toX = f => ((f - winStart) / winSpan) * W;
   const x0 = toX(Math.max(winStart, selStartFrac)), x1 = toX(Math.min(winEnd, selEndFrac));
@@ -405,40 +393,6 @@ function wireMiniDrag(el, s) {
   document.addEventListener('touchend', end);
 }
 
-// ─── Main waveform lanes (one per channel) ─────────────────────────────────────
-function buildWaveLanes() {
-  const wrap = document.getElementById('waveLanes');
-  wrap.innerHTML = '';
-  for (let ch = 0; ch < currentBuffer.numberOfChannels; ch++) {
-    const cv = document.createElement('canvas');
-    cv.className = 'wave-lane';
-    cv.dataset.channel = ch;
-    wrap.appendChild(cv);
-  }
-  wireMainDrag(wrap);
-}
-function drawWaveLanes() {
-  document.querySelectorAll('.wave-lane').forEach(cv => {
-    const ch = +cv.dataset.channel;
-    const data = currentBuffer.getChannelData(ch);
-    const W = cv.width = cv.offsetWidth || 600, H = cv.height = 64;
-    const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H);
-    const step = Math.max(1, Math.ceil(data.length / W));
-    for (let x = 0; x < W; x++) {
-      let mn = 0, mx = 0;
-      for (let i = x * step; i < Math.min((x + 1) * step, data.length); i++) {
-        if (data[i] < mn) mn = data[i];
-        if (data[i] > mx) mx = data[i];
-      }
-      const yT = Math.floor((1 - mx) * H / 2), yB = Math.ceil((1 - mn) * H / 2);
-      ctx.fillStyle = '#4a90c8';
-      ctx.fillRect(x, yT, 1, Math.max(1, yB - yT));
-    }
-    drawSectionBands(ctx, W, H);
-    drawSelectionBand(ctx, W, H);
-  });
-}
 function drawSelectionBand(ctx, W, H) {
   if (selEnd <= selStart) return;
   const x0 = selStart * W, x1 = selEnd * W;
@@ -456,8 +410,8 @@ function drawSectionBands(ctx, W, H) {
   }
 }
 
-// ─── Main-waveform dragging: resize/move an existing section, or (ingest mode,
-// empty space) draw a brand-new scratch selection for "+ New section" ─────────
+// ─── Main-spectrogram dragging: resize/move an existing section, or (ingest
+// mode, empty space) draw a brand-new scratch selection for "+ New section" ──
 function wireMainDrag(el) {
   const toFrac = e => {
     const rect = el.getBoundingClientRect();
@@ -509,18 +463,16 @@ function wireMainDrag(el) {
 }
 
 function redrawAll() {
-  drawWaveLanes();
   drawSpectrogramOverlay();
   updateSelectionReadout();
 }
 
-// ─── Spectrogram + formant/pitch overlay ───────────────────────────────────────
-function drawSpectrogramBase() {
-  const sg = analysisResult?.spectrogram;
-  const cv = document.getElementById('spectrogramCanvas');
-  if (!sg || !cv) return;
-  const W = cv.width = cv.offsetWidth || 600, H = cv.height = cv.offsetHeight || 220;
+// ─── Spectrogram rendering — shared by the main view (winStart=0, winEnd=1)
+// and each section's mini view (its own padded window). ────────────────────────
+function drawSpectrogramCrop(cv, W, H, winStart, winEnd) {
   const ctx = cv.getContext('2d');
+  const sg = analysisResult?.spectrogram;
+  if (!sg) { ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H); return; }
   const nT = sg.times_ms.length, nF = sg.freqs_hz.length;
   if (!nT || !nF) { ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H); return; }
 
@@ -529,10 +481,12 @@ function drawSpectrogramBase() {
   for (const col of sg.power_db) for (const v of col) if (v > maxDb) maxDb = v;
   const dynamicRangeDb = 60;
   const minDb = maxDb - dynamicRangeDb;
+  const winSpan = Math.max(1e-9, winEnd - winStart);
 
   const img = ctx.createImageData(W, H);
   for (let x = 0; x < W; x++) {
-    const ti = Math.min(nT - 1, Math.floor((x / W) * nT));
+    const frac = winStart + (x / W) * winSpan;
+    const ti = Math.max(0, Math.min(nT - 1, Math.floor(frac * nT)));
     const col = sg.power_db[ti];
     for (let y = 0; y < H; y++) {
       // y=0 is the top of the canvas (high frequency); invert to match freq axis (0 at bottom)
@@ -551,23 +505,21 @@ function freqAxisMax() {
   const sg = analysisResult?.spectrogram;
   return sg?.freqs_hz?.length ? sg.freqs_hz[sg.freqs_hz.length - 1] : 5000;
 }
-function drawSpectrogramOverlay() {
-  const cv = document.getElementById('overlayCanvas');
-  if (!cv || !currentBuffer) return;
-  const W = cv.width = cv.offsetWidth || 600, H = cv.height = cv.offsetHeight || 220;
-  const ctx = cv.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-  if (!analysisResult) return;
-
+function drawFormantPitchOverlay(ctx, W, H, winStart, winEnd) {
+  if (!analysisResult || !currentBuffer) return;
   const durationMs = currentBuffer.duration * 1000;
   const maxFreq = freqAxisMax();
   const pitchFloor = +(document.getElementById('pPitchFloor')?.value) || 75;
   const pitchCeil  = +(document.getElementById('pPitchCeiling')?.value) || 600;
+  const winSpan = Math.max(1e-9, winEnd - winStart);
+  const toX = frac => ((frac - winStart) / winSpan) * W;
 
   // Formant dots (red) — left axis, 0..maxFreq
   ctx.fillStyle = '#e8536b';
   for (const row of analysisResult.formants) {
-    const x = (row.t_ms / durationMs) * W;
+    const frac = row.t_ms / durationMs;
+    if (frac < winStart || frac > winEnd) continue;
+    const x = toX(frac);
     for (let i = 1; i <= 5; i++) {
       const hz = row['f' + i];
       if (hz == null || hz > maxFreq) continue;
@@ -581,14 +533,28 @@ function drawSpectrogramOverlay() {
   ctx.beginPath();
   let drawing = false;
   for (const row of analysisResult.pitch) {
-    const x = (row.t_ms / durationMs) * W;
-    if (row.f0 == null) { drawing = false; continue; }
+    const frac = row.t_ms / durationMs;
+    if (frac < winStart || frac > winEnd || row.f0 == null) { drawing = false; continue; }
+    const x = toX(frac);
     const clamped = Math.max(pitchFloor, Math.min(pitchCeil, row.f0));
     const y = H * (1 - (clamped - pitchFloor) / (pitchCeil - pitchFloor));
     if (!drawing) { ctx.moveTo(x, y); drawing = true; } else ctx.lineTo(x, y);
   }
   ctx.stroke();
-
+}
+function drawSpectrogramBase() {
+  const cv = document.getElementById('spectrogramCanvas');
+  if (!cv) return;
+  const W = cv.width = cv.offsetWidth || 600, H = cv.height = cv.offsetHeight || 220;
+  drawSpectrogramCrop(cv, W, H, 0, 1);
+}
+function drawSpectrogramOverlay() {
+  const cv = document.getElementById('overlayCanvas');
+  if (!cv || !currentBuffer) return;
+  const W = cv.width = cv.offsetWidth || 600, H = cv.height = cv.offsetHeight || 220;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  drawFormantPitchOverlay(ctx, W, H, 0, 1);
   drawSectionBands(ctx, W, H);
   drawSelectionBand(ctx, W, H);
 }
@@ -729,7 +695,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('newSectionBtn')?.addEventListener('click', commitSectionFromSelection);
   document.getElementById('newFileBtn')?.addEventListener('click', resetToDropzone);
 
-  window.addEventListener('resize', () => { if (currentBuffer) { drawWaveLanes(); drawSpectrogramBase(); drawSpectrogramOverlay(); refreshSectionVisuals(); } });
+  wireMainDrag(document.getElementById('spectrogramCanvas').parentElement);
+
+  window.addEventListener('resize', () => { if (currentBuffer) { drawSpectrogramBase(); drawSpectrogramOverlay(); refreshSectionVisuals(); } });
 
   if (sampleCtx?.audioUrl) handleUrl(sampleCtx.audioUrl);
 });

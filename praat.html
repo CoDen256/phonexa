@@ -11,7 +11,7 @@
 
 <header>
   <h1>Formant Lab</h1>
-  <p>Praat-faithful static analysis — waveform, spectrogram, formants, pitch</p>
+  <p>Praat-faithful static analysis — spectrogram, formants, pitch</p>
   <a href="index.html"  class="editor-link">← Vowel Chart</a>
   <a href="editor.html" class="editor-link">✎ Edit languages</a>
 </header>
@@ -35,11 +35,8 @@
   <div id="uploadStatus"></div>
 
   <div class="praat-panels" id="praatPanels" style="display:none">
-    <div class="panel-label">Sound <span id="channelInfo"></span></div>
-    <div class="wave-lanes" id="waveLanes"></div>
-
     <div class="panel-label">
-      Spectrogram <span class="muted">(+ formants in red, pitch in blue)</span>
+      Spectrogram <span id="channelInfo"></span> <span class="muted">(+ formants in red, pitch in blue)</span>
     </div>
     <div class="spectrogram-wrap">
       <canvas id="spectrogramCanvas"></canvas>
