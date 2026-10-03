@@ -64,33 +64,52 @@ function renderVowelCards(){
       ${v.f1?`<div class="vc-formants">F1 <span>${v.f1}</span> \u00b7 F2 <span>${v.f2}</span> Hz</div>`:''}`;
     card.appendChild(body);
 
-    // ── Assigned tokens preview (Phase 5d — explicit DB relationship,
-    // populated once ensureDbLanguageData() resolves; re-rendered then) ─────
+    // ── Linked samples strip — same look/interaction as the public viewer's
+    // vowel-detail cards (js/charts.js's renderDetail/buildDetailHighlightedText):
+    // token-highlighted sample text, hover darken, click-to-play-slice. Built
+    // from the DB relationship (Phase 5d) instead of charts.js's own
+    // LANG_SAMPLES/symbol-matching, via a pseudo-sample adapter so the exact
+    // same shared function can be reused untouched. ─────────────────────────
     const dbVowelId = state.dbVowelLinks?.[i]?.id;
     const myTokens = dbVowelId != null ? (state.dbLanguageTokens || []).filter(t => t.vowelId === dbVowelId) : [];
-    if (myTokens.length) {
-      const tokDiv = document.createElement('div');
-      tokDiv.style.cssText = 'border-top:1px solid var(--border);margin-top:6px;padding-top:6px;display:flex;flex-direction:column;gap:2px';
-      myTokens.slice(0, 4).forEach(t => {
-        const row = document.createElement('div');
-        row.style.cssText = 'font-size:.68rem;color:#8fa8c0;cursor:pointer;padding:1px 3px;border-radius:3px;';
-        row.textContent = t.sampleText || '(untitled)';
-        row.addEventListener('mouseenter', () => row.style.background = '#1a2e44');
-        row.addEventListener('mouseleave', () => row.style.background = '');
-        row.addEventListener('click', e => {
-          e.stopPropagation();
-          const smp = (state.dbLanguageSamples || []).find(s => s.id === t.sampleId);
-          if (smp?.audioUrl) new Audio(smp.audioUrl).play().catch(() => {});
+    const repSampleId = state.dbVowelLinks?.[i]?.representativeSampleId;
+    const bySample = new Map();
+    myTokens.forEach(t => {
+      if (!bySample.has(t.sampleId)) {
+        const smpMeta = (state.dbLanguageSamples || []).find(s => s.id === t.sampleId);
+        bySample.set(t.sampleId, {
+          text: t.sampleText, audio: smpMeta?.audioUrl,
+          representative: t.sampleId === repSampleId ? sym : null,
+          tokens: [],
         });
-        tokDiv.appendChild(row);
-      });
-      if (myTokens.length > 4) {
-        const more = document.createElement('div');
-        more.style.cssText = 'font-size:.6rem;color:#3a5878';
-        more.textContent = `+${myTokens.length - 4} more`;
-        tokDiv.appendChild(more);
       }
-      card.appendChild(tokDiv);
+      bySample.get(t.sampleId).tokens.push({
+        symbol: t.symbol, position: [t.charStart ?? 0, t.charEnd ?? 0],
+        analysis: (t.timeStartMs != null && t.timeEndMs != null) ? { slice: [t.timeStartMs, t.timeEndMs] } : null,
+      });
+    });
+    const linked = Array.from(bySample.values())
+      .sort((a, b) => (b.representative ? 1 : 0) - (a.representative ? 1 : 0));
+    if (linked.length && typeof buildDetailHighlightedText === 'function') {
+      const strip = document.createElement('div');
+      strip.style.cssText = 'margin-top:6px;padding-top:6px;border-top:1px solid #1e3048;display:flex;flex-direction:column;gap:3px';
+      for (const smp of linked.slice(0, 4)) {
+        const chip = document.createElement('div');
+        chip.style.cssText = `background:#0d1a28;border:1px solid #1e3048;border-radius:5px;padding:3px 7px;cursor:pointer`;
+        chip.addEventListener('mouseenter', () => chip.style.borderColor = c + '55');
+        chip.addEventListener('mouseleave', () => chip.style.borderColor = '#1e3048');
+        const play = () => { if (smp.audio) new Audio(smp.audio).play().catch(() => {}); };
+        chip.appendChild(buildDetailHighlightedText(smp, v.symbols, c, play));
+        chip.addEventListener('click', e => { e.stopPropagation(); play(); });
+        strip.appendChild(chip);
+      }
+      if (linked.length > 4) {
+        const more = document.createElement('div');
+        more.style.cssText = 'font-size:.6rem;color:#3a5878;text-align:center';
+        more.textContent = `+${linked.length - 4} more`;
+        strip.appendChild(more);
+      }
+      card.appendChild(strip);
     }
 
     // Card click: play the DB-assigned representative (or vowel's own inline
