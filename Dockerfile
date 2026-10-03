@@ -21,7 +21,7 @@ COPY alembic/ ./alembic/
 COPY scripts/ ./scripts/
 
 # Frontend assets
-COPY index.html editor.html debug.html shadow.html praat.html sounds.html tokens.html processor.js ./
+COPY index.html editor.html debug.html shadow.html praat.html sounds.html tokens.html drill.html processor.js ./
 COPY js/ ./js/
 COPY css/ ./css/
 COPY lang/ ./lang/

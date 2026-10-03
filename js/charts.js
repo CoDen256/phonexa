@@ -460,6 +460,7 @@ function showTokenContextMenu(e, sample, tok, lang, lk) {
   item('◉', 'Play token slice',  () => playTokenSlice(sample, tok));
   item('⬤', 'Trace token slice',      () => traceOnFormantChart(sample, tok, lang, lk, false));
   item('⬤', 'Trace full audio',       () => traceOnFormantChart(sample, tok, lang, lk, true));
+  item('🎙', 'Practice this vowel',   () => window.open(`drill.html?lang=${encodeURIComponent(lk)}&symbol=${encodeURIComponent(tok.symbol)}`, '_blank'));
 
   document.body.appendChild(menu);
   const pw = menu.offsetWidth||195, ph = menu.offsetHeight||130;
