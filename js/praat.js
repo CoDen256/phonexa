@@ -64,6 +64,11 @@ const sampleMode = !!dbSampleId;
 const ingestMode = !sampleMode && !legacyCtx;
 const tokenMode = sampleMode || !!legacyCtx;   // either flavor of token-editing mode
 
+// Ingestion mode, pre-loaded with a chunk handed over by an opener tab (e.g.
+// Shadowing's "open in Formant Lab" per-segment button) instead of a
+// drag-and-dropped file — otherwise behaves exactly like ingestMode.
+const ingestFromOpener = ingestMode && params.has('ingestFromOpener');
+
 // ─── State ──────────────────────────────────────────────────────────────────────
 let currentBuffer = null;     // decoded AudioBuffer (all channels, for display + playback)
 let analysisResult = null;    // { duration_ms, formants, pitch, spectrogram } — the currently-displayed track
@@ -989,5 +994,15 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchDbSample()
       .then(() => handleUrl(dbSampleData.audioUrl))
       .catch(e => setStatus('Could not load sample: ' + e.message));
+  }
+  if (ingestFromOpener && window.opener) {
+    window.addEventListener('message', e => {
+      if (e.origin !== location.origin || e.data?.type !== 'load-audio-blob') return;
+      setStatus('Decoding…');
+      decodeArrayBuffer(e.data.buffer).then(buf => loadBuffer(buf)).then(() => setStatus(''))
+        .catch(err => setStatus('Could not decode: ' + err.message));
+    });
+    window.opener.postMessage({ type: 'praat-ready-for-blob' }, location.origin);
+    setStatus('Waiting for the audio chunk from the opener tab…');
   }
 });

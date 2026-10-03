@@ -721,7 +721,7 @@ function renderSentenceList() {
         <button class="sent-btn play-mine" disabled title="Play your recording">▶ You</button>
         <button class="sent-btn compare-btn" disabled title="Play reference then yours">⇄ Compare</button>
         <button class="sent-btn transcribe-btn" title="Transcribe this sentence (local Whisper server)">📝</button>
-        <button class="sent-btn save-to-library-btn" title="Save this sentence to the library as a new Sample">💾</button>
+        <button class="sent-btn open-formant-lab-btn" title="Open this trimmed chunk in Formant Lab, to split/edit/save like a drag-and-dropped file">🔬</button>
         <span class="sent-status">Not recorded</span>
       </div>`;
     container.appendChild(row);
@@ -742,46 +742,35 @@ function renderSentenceList() {
     row.querySelector('.play-mine').addEventListener('click', () => playMine(idx));
     row.querySelector('.compare-btn').addEventListener('click', () => compareSeg(idx));
     row.querySelector('.transcribe-btn').addEventListener('click', () => transcribeSentence(idx, row));
-    row.querySelector('.save-to-library-btn').addEventListener('click', () => saveSegmentToLibrary(idx, row));
+    row.querySelector('.open-formant-lab-btn').addEventListener('click', () => openSegmentInFormantLab(idx, row));
   });
 }
 
-// ─── Save a detected segment to the library (reuses Phase 1's ingestion
-// pipeline — js/ingest.js's uploadSlice() — unchanged, same as Formant Lab's
-// ingestion mode) ───────────────────────────────────────────────────────────
-let languagesList = [];
-async function loadLanguagesList() {
-  try {
-    const resp = await fetch('/api/v1/languages');
-    languagesList = resp.ok ? await resp.json() : [];
-  } catch (e) { languagesList = []; }
-  const sel = document.getElementById('saveLanguageSelect');
-  if (sel) {
-    sel.innerHTML = '<option value="">— pick a language —</option>' +
-      languagesList.map(l => `<option value="${l.id}">${escapeHtml(l.label)}</option>`).join('');
-  }
-}
-
-async function saveSegmentToLibrary(idx, row) {
-  const languageId = document.getElementById('saveLanguageSelect')?.value;
-  if (!languageId) { row.querySelector('.sent-status').textContent = 'Pick a language above first'; return; }
-  const text = (currentTranscripts[idx] || '').trim();
-  if (!text) { row.querySelector('.sent-status').textContent = 'Transcribe this sentence first — text is required to save'; return; }
-
-  const btn = row.querySelector('.save-to-library-btn');
-  btn.disabled = true;
+// ─── Open a detected segment in Formant Lab's ingestion mode, pre-loaded with
+// just that trimmed chunk — exactly as if it had been drag-and-dropped there,
+// so it can be split into multiple sections/samples, edited, and saved from
+// there. Nothing is uploaded here; a plain ArrayBuffer is handed to the new
+// tab via postMessage (structured-clone transfer), same-origin only. ────────
+async function openSegmentInFormantLab(idx, row) {
   const status = row.querySelector('.sent-status');
   const prevStatus = status.textContent;
-  status.textContent = 'Saving…';
-  try {
-    const seg = currentSegments[idx];
-    const result = await uploadSlice(currentBuffer, seg.start, seg.end, { languageId, text });
-    status.textContent = `Saved as Sample #${result.id}`;
-  } catch (e) {
-    status.textContent = 'Save failed: ' + e.message;
-  }
-  btn.disabled = false;
-  setTimeout(() => { if (status.textContent.startsWith('Saved') || status.textContent.startsWith('Save failed')) status.textContent = prevStatus; }, 4000);
+  const seg = currentSegments[idx];
+  const { samples, sampleRate } = extractMonoSlice(currentBuffer, seg.start, seg.end);
+  const blob = encodeWavBlob(samples, sampleRate);
+  const buffer = await blob.arrayBuffer();
+
+  const win = window.open('praat.html?ingestFromOpener=1', '_blank');
+  if (!win) { status.textContent = 'Popup blocked — allow popups for this site and try again'; return; }
+
+  status.textContent = 'Opening in Formant Lab…';
+  const onMessage = e => {
+    if (e.origin !== location.origin || e.source !== win) return;
+    if (e.data?.type !== 'praat-ready-for-blob') return;
+    window.removeEventListener('message', onMessage);
+    win.postMessage({ type: 'load-audio-blob', buffer }, location.origin, [buffer]);
+    status.textContent = prevStatus;
+  };
+  window.addEventListener('message', onMessage);
 }
 
 /** One row per (file, silence-sensitivity) analysis — a file can have several. */
@@ -1194,8 +1183,6 @@ async function openRecentFile(id) {
 document.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
   const fileInput = document.getElementById('audioFile');
-
-  loadLanguagesList();
 
   dz.addEventListener('click', () => fileInput.click());
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
