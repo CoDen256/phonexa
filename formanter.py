@@ -1002,10 +1002,74 @@ def http_transcribe():
 # Expect this to be superseded by a real ingestion/library API in Phase 1+.
 # ══════════════════════════════════════════════════════════════════════════════
 
+import uuid  # noqa: E402
+
 from db.session import get_sessionmaker  # noqa: E402
 from db.models import Sample  # noqa: E402
-from db.storage import get_audio_store, is_local_url, storage_key_from_url  # noqa: E402
+from db.storage import get_audio_store, is_local_url, storage_key_from_url, url_from_storage_key  # noqa: E402
 from flask import send_file, abort  # noqa: E402
+
+
+@app.route('/api/v1/samples', methods=['POST'])
+def ingest_sample():
+    """
+    Phase 1 of the ingestion redesign: the one place new audio enters the
+    library from here on. Always a SLICE — the caller (Formant Lab's
+    ingestion mode, Shadowing's "save to library") already decoded the
+    source file client-side and extracted exactly the range it wants kept,
+    so there's no separate "trim on save" step here: the uploaded bytes ARE
+    the sample, start to finish.
+
+    Request (multipart/form-data)
+    ------------------------------
+    file        — audio bytes (any format decode_audio() can read; the
+                  ingestion UIs always send WAV from encodeWavBlob())
+    languageId  — optional int
+    text        — optional str
+    phonemic    — optional str
+
+    Response: the created Sample's library-browser shape (same fields
+    /api/v1/sounds returns per row) plus 201.
+    """
+    uploaded_file = request.files.get('file')
+    if not uploaded_file:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    try:
+        raw = uploaded_file.read()
+        samples, sample_rate = decode_audio(raw)
+        duration_ms = round(len(samples) / sample_rate * 1000)
+
+        storage_key = f'ingested/{uuid.uuid4().hex}.wav'
+        store = get_audio_store()
+        store.put_bytes(raw, storage_key)
+
+        language_id = request.form.get('languageId')
+        with get_sessionmaker()() as db:
+            sample = Sample(
+                url=url_from_storage_key(storage_key),
+                original_filename=uploaded_file.filename,
+                content_type=uploaded_file.content_type,
+                duration_ms=duration_ms,
+                sample_rate_hz=sample_rate,
+                channels=1,
+                language_id=int(language_id) if language_id else None,
+                text=request.form.get('text') or None,
+                phonemic=request.form.get('phonemic') or None,
+            )
+            db.add(sample)
+            db.commit()
+            db.refresh(sample)
+            return jsonify({
+                'id': sample.id,
+                'url': sample.url,
+                'audioUrl': f'/audio/{storage_key}',
+                'durationMs': sample.duration_ms,
+                'text': sample.text,
+                'phonemic': sample.phonemic,
+            }), 201
+    except Exception as error:
+        return jsonify({'error': str(error)}), 500
 
 
 @app.route('/api/v1/sounds')

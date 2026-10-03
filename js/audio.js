@@ -124,7 +124,7 @@ function playVowel(v, svgId, lk) {
     }
 }
 
-// ─── WAV blob encoder (shared: editor + viewer trace) ─────────────────────────
+// ─── WAV blob encoder (shared: editor + viewer trace + shadow.js + ingest.js) ──
 function encodeWavBlob(samples, sr) {
     const buf = new ArrayBuffer(44 + samples.length * 2);
     const v   = new DataView(buf);
@@ -141,4 +141,24 @@ function encodeWavBlob(samples, sr) {
         v.setInt16(offset,s16,true); offset+=2;
     }
     return new Blob([buf],{type:'audio/wav'});
+}
+
+// ─── Mono slice extraction (shared: shadow.js has its own identical copies
+// today — js/vad.js, a later phase, will consolidate those too) ───────────────
+function computeMonoData(buffer) {
+    if (buffer.numberOfChannels === 1) return buffer.getChannelData(0);
+    const n = buffer.length;
+    const out = new Float32Array(n);
+    for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+        const data = buffer.getChannelData(ch);
+        for (let i = 0; i < n; i++) out[i] += data[i] / buffer.numberOfChannels;
+    }
+    return out;
+}
+
+function extractMonoSlice(buffer, startMs, endMs) {
+    const sr = buffer.sampleRate;
+    const data = computeMonoData(buffer);
+    const i0 = Math.floor(startMs / 1000 * sr), i1 = Math.min(data.length, Math.ceil(endMs / 1000 * sr));
+    return { samples: data.slice(i0, i1), sampleRate: sr };
 }
