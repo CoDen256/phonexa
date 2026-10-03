@@ -80,3 +80,21 @@
 @media (max-width:700px) {
   .params-row { flex-direction:column; }
 }
+
+/* ── Ingestion mode: multi-region list ──────────────────────────── */
+.ingest-panel { margin-top:14px; }
+.ingest-toolbar { display:flex; align-items:center; gap:10px; margin:4px 0 8px; font-size:.72rem; }
+.regions-list { display:flex; flex-direction:column; gap:6px; }
+.region-row {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:7px 10px; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; font-size:.72rem;
+}
+.region-row.active { border-color:#7eb8f7; background:#1a2e48; }
+.region-row .region-idx { font-family:monospace; color:#4a6888; min-width:1.4em; }
+.region-row .region-time { font-family:monospace; color:var(--muted); white-space:nowrap; }
+.region-row input[type=text] {
+  background:#1a2e48; border:1px solid #2e4560; border-radius:5px;
+  color:#d8e8f4; font-size:.72rem; padding:3px 7px; min-width:80px; flex:1;
+}
+.region-row .region-saved { color:#4ade80; font-size:.68rem; white-space:nowrap; }

@@ -72,8 +72,20 @@
     <button class="sent-btn primary" id="applyBtn" type="button" style="display:none">✓ Apply to token</button>
   </div>
 
+  <div class="ingest-panel" id="ingestPanel" style="display:none">
+    <div class="panel-label">Regions <span class="muted">(auto-suggested from silence gaps — adjust, add, save each independently)</span></div>
+    <div class="ingest-toolbar">
+      <span id="regionEditingLabel" class="muted"></span>
+      <button class="sent-btn" id="newRegionBtn" type="button">+ New region from selection</button>
+    </div>
+    <div id="regionsList" class="regions-list"></div>
+  </div>
+
 </div>
 
+<script src="js/audio.js"></script>
+<script src="js/vad.js"></script>
+<script src="js/ingest.js"></script>
 <script src="js/praat.js"></script>
 </body>
 </html>

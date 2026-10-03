@@ -13,11 +13,19 @@
  * practice panel's /frames pipeline uses. See formanter.py for why.
  *
  * Launched two ways:
- *  - standalone: drag/drop or pick a file.
+ *  - standalone, no tokIdx in the URL: "ingestion mode" — besides the usual
+ *    single scratch selection, auto-suggested slice REGIONS (from
+ *    js/vad.js's detectSentences, same heuristic Shadowing uses) are drawn
+ *    on load; each is independently adjustable and saveable as its own
+ *    library Sample via js/ingest.js's uploadSlice() (see db/models.py —
+ *    Phase 1/2 of the ingestion redesign). The dropped file itself is never
+ *    uploaded whole, only the regions you choose to save.
  *  - from the editor (editor-samples.js), as a new tab/window via
  *    ?audio=<url>&tokIdx=<i>&symbol=<sym>&sampleText=<text>&cfg=<json>.
  *    "Apply to token" posts the result back via window.opener.postMessage
  *    instead of the editor having to embed any of this analysis UI itself.
+ *    Ingestion-mode regions are NOT shown here — this path keeps its
+ *    original single-selection behavior untouched.
  */
 
 // ─── Query params / token context ──────────────────────────────────────────────
@@ -33,30 +41,20 @@ const tokenCtx = params.has('tokIdx') ? {
 // ─── State ──────────────────────────────────────────────────────────────────────
 let currentBuffer = null;     // decoded AudioBuffer (all channels, for display + playback)
 let analysisResult = null;    // { duration_ms, formants, pitch, spectrogram }
-let selStart = 0, selEnd = 0; // fractions of duration
+let selStart = 0, selEnd = 0; // fractions of duration — the scratch/working selection
 let dragging = false;
 let activeSource = null;
 
+// Ingestion mode (standalone, i.e. not opened from the editor for a single token)
+const ingestMode = !tokenCtx;
+let regions = [];          // [{id, start, end (fractions), text, phonemic, savedSampleId}]
+let editingRegionId = null; // which region the scratch selection is currently editing, if any
+let nextRegionId = 1;
+
 function setStatus(text) { const el = document.getElementById('uploadStatus'); if (el) el.textContent = text; }
 
-// ─── WAV encoder (mono, channel 0 — matches what formanter.py's decode_audio
-// already does server-side for any multi-channel input, so sending anything
-// more than one channel there would be pointless) ──────────────────────────────
-function encodeWavBlob(samples, sampleRate) {
-  const buf = new ArrayBuffer(44 + samples.length * 2);
-  const view = new DataView(buf);
-  const writeStr = (off, str) => { for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i)); };
-  writeStr(0, 'RIFF'); view.setUint32(4, 36 + samples.length * 2, true); writeStr(8, 'WAVE');
-  writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
-  view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true); view.setUint16(34, 16, true);
-  writeStr(36, 'data'); view.setUint32(40, samples.length * 2, true);
-  for (let i = 0, off = 44; i < samples.length; i++, off += 2) {
-    const s = Math.max(-1, Math.min(1, samples[i]));
-    view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-  }
-  return new Blob([buf], { type: 'audio/wav' });
-}
+// encodeWavBlob()/extractMonoSlice()/computeMonoData() come from js/audio.js
+// (loaded before this file); detectSentences() from js/vad.js.
 
 // ─── Audio loading ──────────────────────────────────────────────────────────────
 async function decodeArrayBuffer(ab) {
@@ -78,16 +76,129 @@ function fetchArrayBuffer(url) {
 
 async function loadBuffer(buffer) {
   currentBuffer = buffer;
-  selStart = 0; selEnd = 1;
+  selStart = 0; selEnd = ingestMode ? 0 : 1;   // ingestion mode starts with no scratch selection — regions carry the content instead
   analysisResult = null;
+  regions = []; editingRegionId = null;
   document.getElementById('dropzone').style.display = 'none';
   document.getElementById('praatPanels').style.display = 'block';
   document.getElementById('paramsRow').style.display = 'flex';
   document.getElementById('channelInfo').textContent =
       `${buffer.numberOfChannels} ch · ${(buffer.sampleRate / 1000).toFixed(1)} kHz · ${buffer.duration.toFixed(2)}s`;
+  if (ingestMode) {
+    document.getElementById('ingestPanel').style.display = 'block';
+    suggestRegions();
+    updateRegionEditingLabel();
+  }
   buildWaveLanes();
   drawWaveLanes();
   await runAnalyze();
+}
+
+// ─── Ingestion mode: region suggestion, list, save ──────────────────────────────
+function suggestRegions() {
+  const mono = computeMonoData(currentBuffer);
+  const { segments } = detectSentences(mono, currentBuffer.sampleRate);
+  const durationMs = currentBuffer.duration * 1000;
+  regions = segments.map(s => ({
+    id: nextRegionId++, start: s.start / durationMs, end: s.end / durationMs,
+    text: '', phonemic: '', savedSampleId: null,
+  }));
+  renderRegionsList();
+}
+
+function regionMs(r) {
+  const durationMs = currentBuffer.duration * 1000;
+  return [Math.round(r.start * durationMs), Math.round(r.end * durationMs)];
+}
+
+function renderRegionsList() {
+  const list = document.getElementById('regionsList');
+  if (!list) return;
+  list.innerHTML = '';
+  regions.forEach((r, i) => {
+    const [t0, t1] = regionMs(r);
+    const row = document.createElement('div');
+    row.className = 'region-row' + (editingRegionId === r.id ? ' active' : '');
+    row.innerHTML = `
+      <span class="region-idx">#${i + 1}</span>
+      <span class="region-time">${t0}–${t1} ms</span>
+      <input type="text" class="region-text" placeholder="text" value="${r.text.replace(/"/g, '&quot;')}">
+      <input type="text" class="region-phonemic" placeholder="phonemic" value="${r.phonemic.replace(/"/g, '&quot;')}">
+      <button class="sent-btn region-play" type="button">▶</button>
+      <button class="sent-btn region-edit" type="button">✎ Edit bounds</button>
+      ${r.savedSampleId
+        ? `<span class="region-saved">✓ Saved #${r.savedSampleId}</span>`
+        : `<button class="sent-btn primary region-save" type="button">💾 Save</button>`}
+      <button class="sent-btn region-remove" type="button">✕</button>
+    `;
+    row.querySelector('.region-text').addEventListener('input', e => { r.text = e.target.value; });
+    row.querySelector('.region-phonemic').addEventListener('input', e => { r.phonemic = e.target.value; });
+    row.querySelector('.region-play').addEventListener('click', () => playRange(r.start, r.end));
+    row.querySelector('.region-edit').addEventListener('click', () => {
+      editingRegionId = r.id;
+      selStart = r.start; selEnd = r.end;
+      redrawAll(); renderRegionsList(); updateRegionEditingLabel();
+    });
+    row.querySelector('.region-remove').addEventListener('click', () => {
+      regions = regions.filter(x => x.id !== r.id);
+      if (editingRegionId === r.id) { editingRegionId = null; updateRegionEditingLabel(); }
+      renderRegionsList(); redrawAll();
+    });
+    const saveBtn = row.querySelector('.region-save');
+    if (saveBtn) saveBtn.addEventListener('click', () => saveRegion(r));
+    list.appendChild(row);
+  });
+}
+
+function updateRegionEditingLabel() {
+  const el = document.getElementById('regionEditingLabel');
+  const btn = document.getElementById('newRegionBtn');
+  if (!el || !btn) return;
+  if (editingRegionId != null) {
+    const idx = regions.findIndex(r => r.id === editingRegionId);
+    el.textContent = idx >= 0 ? `Editing region #${idx + 1} — adjust the selection above, then Update.` : '';
+    btn.textContent = '✓ Update region';
+  } else {
+    el.textContent = '';
+    btn.textContent = '+ New region from selection';
+  }
+}
+
+function commitRegionFromSelection() {
+  if (selEnd <= selStart) { setStatus('Select a range first'); return; }
+  if (editingRegionId != null) {
+    const r = regions.find(x => x.id === editingRegionId);
+    if (r) { r.start = selStart; r.end = selEnd; }
+    editingRegionId = null;
+  } else {
+    regions.push({ id: nextRegionId++, start: selStart, end: selEnd, text: '', phonemic: '', savedSampleId: null });
+  }
+  updateRegionEditingLabel();
+  renderRegionsList();
+  redrawAll();
+}
+
+async function saveRegion(r) {
+  const [t0, t1] = regionMs(r);
+  try {
+    const result = await uploadSlice(currentBuffer, t0, t1, { text: r.text || undefined, phonemic: r.phonemic || undefined });
+    r.savedSampleId = result.id;
+    renderRegionsList();
+    setStatus(`Saved region as Sample #${result.id}`);
+  } catch (e) {
+    setStatus('Save failed: ' + e.message);
+  }
+}
+
+function drawRegionBands(ctx, W, H) {
+  for (const r of regions) {
+    const x0 = r.start * W, x1 = r.end * W;
+    const active = editingRegionId === r.id;
+    ctx.fillStyle = r.savedSampleId ? 'rgba(74,222,128,0.12)' : (active ? 'rgba(126,184,247,0.10)' : 'rgba(216,232,244,0.07)');
+    ctx.fillRect(x0, 0, x1 - x0, H);
+    ctx.fillStyle = r.savedSampleId ? '#4ade80' : (active ? '#7eb8f7' : '#4a6888');
+    ctx.fillRect(x0, 0, 1, H); ctx.fillRect(x1 - 1, 0, 1, H);
+  }
 }
 
 async function handleFile(file) {
@@ -143,6 +254,7 @@ function drawWaveLanes() {
       ctx.fillStyle = '#4a90c8';
       ctx.fillRect(x, yT, 1, Math.max(1, yB - yT));
     }
+    if (ingestMode) drawRegionBands(ctx, W, H);
     drawSelectionBand(ctx, W, H);
   });
 }
@@ -268,7 +380,8 @@ function drawSpectrogramOverlay() {
   }
   ctx.stroke();
 
-  // Selection band
+  // Regions + selection band
+  if (ingestMode) drawRegionBands(ctx, W, H);
   drawSelectionBand(ctx, W, H);
 }
 
@@ -410,6 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('playSelectionBtn').addEventListener('click', () => playRange(selEnd > selStart ? selStart : 0, selEnd > selStart ? selEnd : 1));
   document.getElementById('playAllBtn').addEventListener('click', () => playRange(0, 1));
   document.getElementById('applyBtn').addEventListener('click', applyToToken);
+  document.getElementById('newRegionBtn')?.addEventListener('click', commitRegionFromSelection);
 
   window.addEventListener('resize', () => { if (currentBuffer) { drawWaveLanes(); drawSpectrogramBase(); drawSpectrogramOverlay(); } });
 

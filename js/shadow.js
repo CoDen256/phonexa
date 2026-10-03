@@ -301,120 +301,9 @@ function concatAudioBuffers(bufA, bufB, ctx) {
   return out;
 }
 
-// ─── Sentence boundary detection (energy-based silence gaps) ──────────────────
-function computeMonoData(buffer) {
-  if (buffer.numberOfChannels === 1) return buffer.getChannelData(0);
-  const n = buffer.length;
-  const out = new Float32Array(n);
-  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
-    const data = buffer.getChannelData(ch);
-    for (let i = 0; i < n; i++) out[i] += data[i] / buffer.numberOfChannels;
-  }
-  return out;
-}
-
-/** Same energy-threshold heuristic as detectSentences, but just the onset of the first speech. */
-function detectLeadingSilenceMs(buffer) {
-  const windowMs = 20;
-  const sr = buffer.sampleRate;
-  const data = computeMonoData(buffer);
-  const winSize = Math.max(1, Math.round(sr * windowMs / 1000));
-  const nWin = Math.ceil(data.length / winSize);
-  const rms = new Float32Array(nWin);
-  for (let w = 0; w < nWin; w++) {
-    const start = w * winSize, end = Math.min(start + winSize, data.length);
-    let sum = 0;
-    for (let i = start; i < end; i++) sum += data[i] * data[i];
-    rms[w] = Math.sqrt(sum / Math.max(1, end - start));
-  }
-  const sorted = Float32Array.from(rms).sort();
-  const floor = sorted[Math.floor(sorted.length * 0.15)] || 0;
-  const peak = sorted[sorted.length - 1] || 0.0001;
-  const threshold = Math.max(floor * 2.5, peak * 0.035, 0.0025);
-  for (let w = 0; w < nWin; w++) {
-    if (rms[w] > threshold) return Math.max(0, w * windowMs - 40);   // small pad-back so the onset isn't clipped
-  }
-  return 0;   // all silence — nothing to trim
-}
-
-/**
- * Splits mono samples into speech segments separated by silence gaps of at
- * least `minSilenceMs`. Shorter gaps (e.g. between words) are merged into
- * the surrounding speech, so a "sentence" can contain internal pauses.
- *
- * Takes raw samples (not an AudioBuffer) so a short in-memory sub-range —
- * e.g. the tail of an already-decoded buffer plus a freshly-decoded
- * extension — can be re-analysed without constructing a full AudioBuffer.
- *
- * The energy threshold is normally derived from this call's own sample
- * percentile stats, but extending a session's range must reuse the
- * ORIGINAL threshold (pass `params.threshold`) rather than recompute it —
- * recomputing from a longer (or shorter) buffer shifts the percentile
- * stats and can silently redraw old, already-cached sentence boundaries.
- * Always returns the threshold actually used, so callers can cache it.
- */
-function detectSentences(monoSamples, sampleRate, params = {}) {
-  const windowMs      = 20;
-  const minSilenceMs  = params.minSilenceMs  ?? 300;
-  const minSentenceMs = params.minSentenceMs ?? 350;
-  const padMs         = params.padMs         ?? 70;
-
-  const winSize = Math.max(1, Math.round(sampleRate * windowMs / 1000));
-  const nWin = Math.ceil(monoSamples.length / winSize);
-  const rms = new Float32Array(nWin);
-  for (let w = 0; w < nWin; w++) {
-    const start = w * winSize, end = Math.min(start + winSize, monoSamples.length);
-    let sum = 0;
-    for (let i = start; i < end; i++) sum += monoSamples[i] * monoSamples[i];
-    rms[w] = Math.sqrt(sum / Math.max(1, end - start));
-  }
-
-  let threshold = params.threshold;
-  if (threshold == null) {
-    const sorted = Float32Array.from(rms).sort();
-    const floor  = sorted[Math.floor(sorted.length * 0.15)] || 0;
-    const peak   = sorted[sorted.length - 1] || 0.0001;
-    threshold = Math.max(floor * 2.5, peak * 0.035, 0.0025);
-  }
-
-  const isSpeech = new Uint8Array(nWin);
-  for (let w = 0; w < nWin; w++) isSpeech[w] = rms[w] > threshold ? 1 : 0;
-
-  const minSilenceWin = Math.max(1, Math.round(minSilenceMs / windowMs));
-  let i = 0;
-  while (i < nWin) {
-    if (!isSpeech[i]) {
-      let j = i; while (j < nWin && !isSpeech[j]) j++;
-      if (j - i < minSilenceWin) for (let k = i; k < j; k++) isSpeech[k] = 1;
-      i = j;
-    } else i++;
-  }
-
-  const rawSegments = [];
-  i = 0;
-  while (i < nWin) {
-    if (isSpeech[i]) {
-      let j = i; while (j < nWin && isSpeech[j]) j++;
-      rawSegments.push({ start: i * windowMs, end: j * windowMs });
-      i = j;
-    } else i++;
-  }
-
-  const durMs = monoSamples.length / sampleRate * 1000;
-  const padded = rawSegments
-      .map(s => ({ start: Math.max(0, s.start - padMs), end: Math.min(durMs, s.end + padMs) }))
-      .filter(s => s.end - s.start >= minSentenceMs);
-
-  const merged = [];
-  for (const s of padded) {
-    const last = merged[merged.length - 1];
-    if (last && s.start <= last.end) last.end = Math.max(last.end, s.end);
-    else merged.push({ ...s });
-  }
-
-  const segments = merged.map((s, idx) => ({ index: idx, start: Math.round(s.start), end: Math.round(s.end) }));
-  return { segments, threshold };
-}
+// ─── Sentence boundary detection — see js/vad.js (detectSentences,
+// detectLeadingSilenceMs) and js/audio.js (computeMonoData), both loaded
+// before this file in shadow.html.
 
 // ─── Session state ─────────────────────────────────────────────────────────────
 // currentAnalysis is one entry of a file's session (see sessionGet/saveSession);
@@ -532,13 +421,8 @@ function setRowRecordingState(row, active) {
 }
 
 // ─── Transcription (optional local /transcribe server — see formanter.py) ─────
-// encodeWavBlob() is now shared — see js/audio.js (loaded before this file in shadow.html).
-function extractMonoSlice(buffer, startMs, endMs) {
-  const sr = buffer.sampleRate;
-  const data = computeMonoData(buffer);
-  const i0 = Math.floor(startMs / 1000 * sr), i1 = Math.min(data.length, Math.ceil(endMs / 1000 * sr));
-  return { samples: data.slice(i0, i1), sampleRate: sr };
-}
+// encodeWavBlob()/extractMonoSlice() are now shared — see js/audio.js (loaded
+// before this file in shadow.html).
 // formanter.py always runs its HTTP server on :5050 (see its __main__ block),
 // regardless of what serves shadow.html itself — so just always talk to that.
 // CORS is already enabled there, so this works even when shadow.html is
