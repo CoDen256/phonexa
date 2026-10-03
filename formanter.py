@@ -1005,9 +1005,22 @@ def http_transcribe():
 import uuid  # noqa: E402
 
 from db.session import get_sessionmaker  # noqa: E402
-from db.models import Sample  # noqa: E402
+from db.models import Language, Sample  # noqa: E402
 from db.storage import get_audio_store, is_local_url, storage_key_from_url, url_from_storage_key  # noqa: E402
 from flask import send_file, abort  # noqa: E402
+
+
+@app.route('/api/v1/languages')
+def list_languages():
+    """Read-only — just enough for an ingestion UI's language picker. Full
+    CRUD (add/reorder/disable) is a later phase; languages themselves are
+    still edited via editor.html's File System Access flow for now."""
+    with get_sessionmaker()() as db:
+        langs = db.query(Language).order_by(Language.sort_order).all()
+        return jsonify([{
+            'id': lang.id, 'key': lang.key, 'label': lang.label,
+            'color': lang.color, 'enabled': lang.enabled,
+        } for lang in langs])
 
 
 @app.route('/api/v1/samples', methods=['POST'])
@@ -1024,8 +1037,10 @@ def ingest_sample():
     ------------------------------
     file        — audio bytes (any format decode_audio() can read; the
                   ingestion UIs always send WAV from encodeWavBlob())
-    languageId  — optional int
-    text        — optional str
+    languageId  — required int — which Language this sample belongs to
+    text        — required str — what's being said; also becomes part of
+                  the storage filename, so it's mandatory up front rather
+                  than something you can leave blank and fill in later
     phonemic    — optional str
 
     Response: the created Sample's library-browser shape (same fields
@@ -1034,17 +1049,24 @@ def ingest_sample():
     uploaded_file = request.files.get('file')
     if not uploaded_file:
         return jsonify({'error': 'No file uploaded'}), 400
+    language_id = request.form.get('languageId')
+    text = (request.form.get('text') or '').strip()
+    if not language_id:
+        return jsonify({'error': 'languageId is required'}), 400
+    if not text:
+        return jsonify({'error': 'text is required'}), 400
 
     try:
         raw = uploaded_file.read()
         samples, sample_rate = decode_audio(raw)
         duration_ms = round(len(samples) / sample_rate * 1000)
 
+        # TODO(filename scheme): final storage path under /lang/<lang>/ingested/<text>.wav
+        # (with collision handling) is still being decided — uuid-keyed for now.
         storage_key = f'ingested/{uuid.uuid4().hex}.wav'
         store = get_audio_store()
         store.put_bytes(raw, storage_key)
 
-        language_id = request.form.get('languageId')
         with get_sessionmaker()() as db:
             sample = Sample(
                 url=url_from_storage_key(storage_key),
@@ -1053,8 +1075,8 @@ def ingest_sample():
                 duration_ms=duration_ms,
                 sample_rate_hz=sample_rate,
                 channels=1,
-                language_id=int(language_id) if language_id else None,
-                text=request.form.get('text') or None,
+                language_id=int(language_id),
+                text=text,
                 phonemic=request.form.get('phonemic') or None,
             )
             db.add(sample)
@@ -1094,6 +1116,8 @@ def list_sounds():
                     'text': s.text,
                     'hasFile': bool(storage_key) and store.exists(storage_key),
                     'audioUrl': f'/audio/{storage_key}' if storage_key else s.url,
+                    'createdAt': s.created_at.isoformat() if s.created_at else None,
+                    'updatedAt': s.updated_at.isoformat() if s.updated_at else None,
                 })
             return jsonify(rows)
     except Exception as error:

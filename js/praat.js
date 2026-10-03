@@ -47,9 +47,18 @@ let activeSource = null;
 
 // Ingestion mode (standalone, i.e. not opened from the editor for a single token)
 const ingestMode = !tokenCtx;
-let regions = [];          // [{id, start, end (fractions), text, phonemic, savedSampleId}]
+let regions = [];          // [{id, start, end (fractions), text, phonemic, languageId, savedSampleId}]
 let editingRegionId = null; // which region the scratch selection is currently editing, if any
 let nextRegionId = 1;
+let languagesList = [];    // [{id, key, label, color, enabled}] — for the per-region language picker
+
+async function loadLanguagesList() {
+  try {
+    const resp = await fetch('/api/v1/languages');
+    languagesList = resp.ok ? await resp.json() : [];
+  } catch (e) { languagesList = []; }
+  renderRegionsList();   // refresh in case regions were already drawn before this resolved
+}
 
 function setStatus(text) { const el = document.getElementById('uploadStatus'); if (el) el.textContent = text; }
 
@@ -86,6 +95,7 @@ async function loadBuffer(buffer) {
       `${buffer.numberOfChannels} ch · ${(buffer.sampleRate / 1000).toFixed(1)} kHz · ${buffer.duration.toFixed(2)}s`;
   if (ingestMode) {
     document.getElementById('ingestPanel').style.display = 'block';
+    document.getElementById('fileToolbar').style.display = 'flex';
     suggestRegions();
     updateRegionEditingLabel();
   }
@@ -101,7 +111,7 @@ function suggestRegions() {
   const durationMs = currentBuffer.duration * 1000;
   regions = segments.map(s => ({
     id: nextRegionId++, start: s.start / durationMs, end: s.end / durationMs,
-    text: '', phonemic: '', savedSampleId: null,
+    text: '', phonemic: '', languageId: null, savedSampleId: null,
   }));
   renderRegionsList();
 }
@@ -119,11 +129,15 @@ function renderRegionsList() {
     const [t0, t1] = regionMs(r);
     const row = document.createElement('div');
     row.className = 'region-row' + (editingRegionId === r.id ? ' active' : '');
+    const langOptions = ['<option value="">— language —</option>']
+      .concat(languagesList.map(l => `<option value="${l.id}"${r.languageId === l.id ? ' selected' : ''}>${escapeAttr(l.label)}</option>`))
+      .join('');
     row.innerHTML = `
       <span class="region-idx">#${i + 1}</span>
       <span class="region-time">${t0}–${t1} ms</span>
-      <input type="text" class="region-text" placeholder="text" value="${r.text.replace(/"/g, '&quot;')}">
-      <input type="text" class="region-phonemic" placeholder="phonemic" value="${r.phonemic.replace(/"/g, '&quot;')}">
+      <select class="region-lang">${langOptions}</select>
+      <input type="text" class="region-text" placeholder="text (required)" value="${escapeAttr(r.text)}">
+      <input type="text" class="region-phonemic" placeholder="phonemic" value="${escapeAttr(r.phonemic)}">
       <button class="sent-btn region-play" type="button">▶</button>
       <button class="sent-btn region-edit" type="button">✎ Edit bounds</button>
       ${r.savedSampleId
@@ -131,6 +145,7 @@ function renderRegionsList() {
         : `<button class="sent-btn primary region-save" type="button">💾 Save</button>`}
       <button class="sent-btn region-remove" type="button">✕</button>
     `;
+    row.querySelector('.region-lang').addEventListener('change', e => { r.languageId = e.target.value ? +e.target.value : null; });
     row.querySelector('.region-text').addEventListener('input', e => { r.text = e.target.value; });
     row.querySelector('.region-phonemic').addEventListener('input', e => { r.phonemic = e.target.value; });
     row.querySelector('.region-play').addEventListener('click', () => playRange(r.start, r.end));
@@ -171,17 +186,21 @@ function commitRegionFromSelection() {
     if (r) { r.start = selStart; r.end = selEnd; }
     editingRegionId = null;
   } else {
-    regions.push({ id: nextRegionId++, start: selStart, end: selEnd, text: '', phonemic: '', savedSampleId: null });
+    regions.push({ id: nextRegionId++, start: selStart, end: selEnd, text: '', phonemic: '', languageId: null, savedSampleId: null });
   }
   updateRegionEditingLabel();
   renderRegionsList();
   redrawAll();
 }
 
+function escapeAttr(str) { return String(str ?? '').replace(/"/g, '&quot;'); }
+
 async function saveRegion(r) {
+  if (!r.text.trim()) { setStatus('Text is required before saving a region'); return; }
+  if (!r.languageId) { setStatus('Pick a language before saving a region'); return; }
   const [t0, t1] = regionMs(r);
   try {
-    const result = await uploadSlice(currentBuffer, t0, t1, { text: r.text || undefined, phonemic: r.phonemic || undefined });
+    const result = await uploadSlice(currentBuffer, t0, t1, { languageId: r.languageId, text: r.text, phonemic: r.phonemic || undefined });
     r.savedSampleId = result.id;
     renderRegionsList();
     setStatus(`Saved region as Sample #${result.id}`);
@@ -199,6 +218,23 @@ function drawRegionBands(ctx, W, H) {
     ctx.fillStyle = r.savedSampleId ? '#4ade80' : (active ? '#7eb8f7' : '#4a6888');
     ctx.fillRect(x0, 0, 1, H); ctx.fillRect(x1 - 1, 0, 1, H);
   }
+}
+
+// Only offered in ingestion mode (see fileToolbar wiring) — editor-launched
+// (tokenCtx) mode is locked to its one launch-time audioUrl, since Apply to
+// token always reports that fixed URL back regardless of what's loaded.
+function resetToDropzone() {
+  stopPlayback();
+  currentBuffer = null;
+  analysisResult = null;
+  regions = []; editingRegionId = null;
+  selStart = 0; selEnd = 0;
+  document.getElementById('dropzone').style.display = '';
+  document.getElementById('fileToolbar').style.display = 'none';
+  document.getElementById('praatPanels').style.display = 'none';
+  document.getElementById('paramsRow').style.display = 'none';
+  document.getElementById('ingestPanel').style.display = 'none';
+  setStatus('');
 }
 
 async function handleFile(file) {
@@ -518,12 +554,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   wireSelectionDrag(document.getElementById('spectrogramCanvas').parentElement);
+  if (ingestMode) loadLanguagesList();
 
   document.getElementById('analyzeBtn').addEventListener('click', () => runAnalyze());
   document.getElementById('playSelectionBtn').addEventListener('click', () => playRange(selEnd > selStart ? selStart : 0, selEnd > selStart ? selEnd : 1));
   document.getElementById('playAllBtn').addEventListener('click', () => playRange(0, 1));
   document.getElementById('applyBtn').addEventListener('click', applyToToken);
   document.getElementById('newRegionBtn')?.addEventListener('click', commitRegionFromSelection);
+  document.getElementById('newFileBtn')?.addEventListener('click', resetToDropzone);
 
   window.addEventListener('resize', () => { if (currentBuffer) { drawWaveLanes(); drawSpectrogramBase(); drawSpectrogramOverlay(); } });
 

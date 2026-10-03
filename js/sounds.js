@@ -8,6 +8,8 @@
  */
 
 let allSounds = [];
+let sortKey = 'id';
+let sortDir = 1; // 1 = asc, -1 = desc
 
 function escapeHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -19,9 +21,41 @@ function fmtDuration(ms) {
   return s >= 60 ? `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}` : `${s.toFixed(2)}s`;
 }
 
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function sortedSounds(sounds) {
+  const dir = sortDir;
+  return [...sounds].sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;   // nulls last regardless of direction
+    if (bv == null) return -1;
+    if (typeof av === 'string') { av = av.toLowerCase(); bv = bv.toLowerCase(); }
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
+  });
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll('.sounds-table th[data-key]').forEach(th => {
+    th.querySelector('.sort-arrow')?.remove();
+    if (th.dataset.key === sortKey) {
+      const arrow = document.createElement('span');
+      arrow.className = 'sort-arrow';
+      arrow.textContent = sortDir === 1 ? '▲' : '▼';
+      th.appendChild(arrow);
+    }
+  });
+}
+
 function renderRows(sounds) {
   const body = document.getElementById('soundsBody');
-  body.innerHTML = sounds.map(s => {
+  body.innerHTML = sortedSounds(sounds).map(s => {
     const player = s.audioUrl
       ? `<audio controls preload="none" src="${escapeHtml(s.audioUrl)}"></audio>`
       : '<span class="sounds-missing">no audio location</span>';
@@ -35,9 +69,12 @@ function renderRows(sounds) {
       <td>${escapeHtml(s.text || '—')}</td>
       <td>${location}</td>
       <td>${fmtDuration(s.durationMs)}</td>
+      <td>${fmtDate(s.createdAt)}</td>
+      <td>${fmtDate(s.updatedAt)}</td>
     </tr>`;
   }).join('');
   document.getElementById('soundCount').textContent = `${sounds.length} of ${allSounds.length} sound(s)`;
+  updateSortIndicators();
 }
 
 function applyFilter() {
@@ -67,5 +104,12 @@ async function load() {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('filterInput').addEventListener('input', applyFilter);
+  document.querySelectorAll('.sounds-table th[data-key]').forEach(th => {
+    th.addEventListener('click', () => {
+      if (sortKey === th.dataset.key) sortDir *= -1;
+      else { sortKey = th.dataset.key; sortDir = 1; }
+      applyFilter();
+    });
+  });
   load();
 });
