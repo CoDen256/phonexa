@@ -210,9 +210,8 @@ function renderFormant() {
   // Reference analyzed dot
   if(refAnalyzed&&refVowelMeta){
     const{x,y}=formantPos(refAnalyzed.f1,refAnalyzed.f2);
-    svg.appendChild($s('circle',{cx:x,cy:y,r:9,fill:'none',stroke:'#fbbf24',opacity:0.7,'stroke-width':2,style:'pointer-events:none'}));
-    svg.appendChild($s('circle',{cx:x,cy:y,r:5,fill:'#fbbf24',opacity:0.9,style:'pointer-events:none'}));
-    svg.appendChild($t('Ref⚡',{x:x+10,y,dy:'0.36em','font-size':11,fill:'#fbbf24',opacity:0.9,'font-family':'system-ui,sans-serif','font-weight':'700',style:'pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))'}));
+    svg.appendChild($s('circle',{cx:x,cy:y,r:6,fill:'none',stroke:'#fbbf24',opacity:0.7,'stroke-width':1.5,style:'pointer-events:none'}));
+    svg.appendChild($s('circle',{cx:x,cy:y,r:3,fill:'#fbbf24',opacity:0.9,style:'pointer-events:none'}));
   }
 }
 

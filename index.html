@@ -26,32 +26,28 @@
 
 <!-- ── Practice panel (bottom bar) ──────────────────────────────── -->
 <div id="practicePanel">
-  <div class="pp-topbar">
-    <span class="pp-topbar-title">🎤 Practice</span>
-    <span id="ppHint" style="font-size:.62rem;color:#4a6888;margin-left:6px;display:none">· click a vowel to compare &amp; load reference</span>
-    <span class="pp-server" id="ppServer">Server offline</span>
-    <button class="pp-btn" id="ppLive" type="button" title="Real-time formant trail on formant chart">⬤ Live</button>
-    <button class="pp-close" id="ppClose">✕</button>
-  </div>
   <!-- Real-time stats (shown when Live is active) -->
   <div id="rtStats" style="display:none;font-size:.6rem;color:#34d399;padding:2px 14px;background:#0a1520;border-bottom:1px solid #1a2e44;font-family:monospace"></div>
   <div class="pp-columns">
     <!-- ── Left: Your recording ── -->
     <div class="pp-col">
       <div class="pp-row">
+        <span class="pp-server" id="ppServer">Server offline</span>
+        <button class="pp-btn" id="ppLive" type="button" title="Real-time formant trail on formant chart">⬤ Live</button>
         <button class="pp-btn" id="ppRecord">● Rec</button>
         <span class="rec-dot" id="recDot"></span>
         <button class="pp-btn" id="ppPlay" disabled>▶</button>
         <button class="pp-btn" id="ppCompare" disabled title="Play reference, then yours — silence-trimmed">⇄</button>
         <button class="pp-btn" id="ppClear" disabled>✕</button>
+        <button class="pp-close" id="ppClose" style="margin-left:auto">✕</button>
       </div>
       <div class="pp-status" id="ppStatus">Record a vowel</div>
+      <div id="waveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
       <div class="pp-spectro-wrap" id="waveWrap" style="display:none">
         <canvas id="waveCanvas"></canvas>
         <canvas id="waveOverlay"></canvas>
         <div id="ppLiveMeans" class="pp-live-label"></div>
       </div>
-      <div id="waveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
     </div>
     <!-- ── Right: Reference vowel ── -->
     <div class="pp-col">
@@ -60,12 +56,12 @@
         <button class="pp-btn" id="refPlay" disabled>▶</button>
       </div>
       <div class="pp-status" id="refStatus">Click a vowel on the chart</div>
+      <div id="refWaveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
       <div class="pp-spectro-wrap" id="refWaveWrap" style="display:none">
         <canvas id="refWaveCanvas"></canvas>
         <canvas id="refWaveOverlay"></canvas>
         <div id="refLiveMeans" class="pp-live-label"></div>
       </div>
-      <div id="refWaveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
     </div>
   </div>
 </div>

@@ -567,7 +567,6 @@ function renderSections() {
     if (s.mode === 'ingest') {
       header = `<span class="section-idx">#${i + 1}</span><span class="section-time">${sectionMs(s).join('–')} ms</span>`;
       body = `
-        <span class="section-values">${ingestSectionMeansLabel(s)}</span>
         <select class="section-lang">${['<option value="">— language —</option>']
           .concat(languagesList.map(l => `<option value="${l.id}"${s.languageId === l.id ? ' selected' : ''}>${escapeAttr(l.label)}</option>`)).join('')}</select>
         <input type="text" class="section-text" placeholder="text (required)" value="${escapeAttr(s.text)}">
@@ -592,8 +591,7 @@ function renderSections() {
       body = `
         <div class="section-charsel" data-charsel="${s.id}"></div>
         <span class="section-values" style="display:block">
-          <div>Current: <b>${currentLabelForToken(s)}</b></div>
-          <div>Previewing: <b>${previewLabelForToken(s)}</b>
+          <div>Current: <b>${currentLabelForToken(s)}</b>
             ${viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : ''}
           </div>
         </span>
@@ -616,7 +614,10 @@ function renderSections() {
 
     card.innerHTML = `
       <div class="section-header">${header}</div>
-      <canvas class="section-mini"></canvas>
+      <div class="section-mini-wrap">
+        <canvas class="section-mini"></canvas>
+        <div class="section-mini-label"></div>
+      </div>
       <div class="section-body">${body}</div>
     `;
     list.appendChild(card);
@@ -735,25 +736,25 @@ function refreshSectionVisuals() {
       drawSpectrogramWindow(cv, winStart, winEnd, s.start, s.end);
     }
     const isDbToken = s.mode === 'token' && s.dbTokenId !== undefined;
+    const miniLabel = card.querySelector('.section-mini-label');
     if (s.mode === 'ingest') {
-      const valuesEl = card.querySelector('.section-values');
-      if (valuesEl) valuesEl.innerHTML = ingestSectionMeansLabel(s);
+      if (miniLabel) miniLabel.innerHTML = ingestSectionMeansLabel(s);
     } else if (s.mode === 'token' && !isDbToken) {
       const after = computeMeansForRange(s.start, s.end);
       const valuesEl = card.querySelector('.section-values');
-      if (valuesEl) {
-        const before = s.before ? `F1 ${Math.round(s.before.f1)} · F2 ${Math.round(s.before.f2)}` : '—';
-        const afterTxt = after?.nFormantFrames ? `F1 ${Math.round(after.f1)} · F2 ${Math.round(after.f2)}${after.f0 != null ? ` · F0 ${Math.round(after.f0)}` : ''} Hz` : 'no voiced frames';
-        valuesEl.innerHTML = `Before: <b>${before}</b> &nbsp;→&nbsp; After: <b>${afterTxt}</b>`;
-      }
+      const before = s.before ? `F1 ${Math.round(s.before.f1)} · F2 ${Math.round(s.before.f2)}` : '—';
+      if (valuesEl) valuesEl.innerHTML = `Before: <b>${before}</b>`;
+      const afterTxt = after?.nFormantFrames ? `F1 ${Math.round(after.f1)} · F2 ${Math.round(after.f2)}${after.f0 != null ? ` · F0 ${Math.round(after.f0)}` : ''} Hz` : 'no voiced frames';
+      if (miniLabel) miniLabel.innerHTML = afterTxt;
     } else if (isDbToken) {
       const valuesEl = card.querySelector('.section-values');
       if (valuesEl) {
         const useBtn = viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId
           ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : '';
-        valuesEl.innerHTML = `<div>Current: <b>${currentLabelForToken(s)}</b></div><div>Previewing: <b>${previewLabelForToken(s)}</b> ${useBtn}</div>`;
+        valuesEl.innerHTML = `<div>Current: <b>${currentLabelForToken(s)}</b> ${useBtn}</div>`;
         valuesEl.querySelector('.section-use-analysis')?.addEventListener('click', () => useViewedAnalysisForToken(s));
       }
+      if (miniLabel) miniLabel.innerHTML = `Previewing: ${previewLabelForToken(s)}`;
       const badge = card.querySelector('.section-dirty-badge');
       if (badge) badge.style.display = s.dirty ? 'inline' : 'none';
     }

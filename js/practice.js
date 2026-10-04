@@ -175,20 +175,29 @@ async function analyzeRecordingSpectrogram(){
     if(el) el.textContent='Spectrogram analysis failed: '+e.message;
   }
 }
-async function analyzeReferenceSpectrogram(){
+async function analyzeReferenceSpectrogram(myToken){
   const el=document.getElementById('refLiveMeans'); if(el) el.textContent='Analyzing spectrogram…';
   try{
-    refAnalysisResult=await SpectroLib.runPraatAnalysis({getChannelData:()=>refSamples, sampleRate:refSampleRate}, {});
+    const result=await SpectroLib.runPraatAnalysis({getChannelData:()=>refSamples, sampleRate:refSampleRate}, {});
+    if(myToken!==refLoadToken)return;   // superseded by a later vowel click — don't let a stale result win
+    refAnalysisResult=result;
     drawRefSpectrogram(); drawRefOverlay(); updateLiveMeansRef();
   }catch(e){
+    if(myToken!==refLoadToken)return;
     if(el) el.textContent='Spectrogram analysis failed: '+e.message;
   }
 }
 
 // ── Vowel click hook (fires when a vowel is clicked anywhere on the chart) ────
+// refLoadToken guards against a race: clicking vowel B while vowel A's audio
+// fetch/decode/analysis is still in flight must never let A's later-arriving
+// result overwrite B's (dot would otherwise flicker back to the wrong vowel,
+// or linger after switching) — every async step below checks it's still current.
+let refLoadToken=0;
 function onVowelClicked(v, lang, lk){
   if(!document.getElementById('practicePanel').classList.contains('open'))return;
   if(!v.audio)return;
+  const myToken=++refLoadToken;
   refVowelMeta={v,lang,lk};
   refAnalyzed=null; refAnalysisResult=null; refCursorFrac=null;
   renderFormant();
@@ -198,16 +207,17 @@ function onVowelClicked(v, lang, lk){
   document.getElementById('refLiveMeans').textContent='';
   document.getElementById('refWaveWrap').style.display='none';
   document.getElementById('refWaveInfo').style.display='none';
-  loadRefAudio(v.audio, lang);
+  loadRefAudio(v.audio, lang, myToken);
 }
 
-async function loadRefAudio(url, lang){
+async function loadRefAudio(url, lang, myToken){
   try{
     const resp=await fetch(url,{mode:'cors'});
     if(!resp.ok) throw new Error(resp.status);
     const arrayBuf=await resp.arrayBuffer();
     const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     const audioBuf=await audioCtx.decodeAudioData(arrayBuf);
+    if(myToken!==refLoadToken)return;   // superseded while fetching/decoding
     // Always the FULL sample now (Compare needs real, natural-context audio
     // to play) — a token click's own [timeStartMs,timeEndMs] just positions
     // the adjustable analysis slice below, instead of pre-cropping the buffer.
@@ -226,12 +236,13 @@ async function loadRefAudio(url, lang){
       : 0)/durationMs);
     document.getElementById('refWaveWrap').style.display='block';
     document.getElementById('refWaveInfo').style.display='block';
-    const specified=refVowelMeta?.v?.f1?` · Specified: F1 ${refVowelMeta.v.f1} F2 ${refVowelMeta.v.f2} Hz`:'';
-    document.getElementById('refStatus').textContent=`${durationMs.toFixed(0)} ms — drag the slice to set the analysis window${specified}`;
+    document.getElementById('refStatus').textContent=refVowelMeta?.v?.f1
+      ? `Specified: F1 ${refVowelMeta.v.f1} F2 ${refVowelMeta.v.f2} Hz` : '';
     document.getElementById('refPlay').disabled=false;
     drawRefOverlay();
-    analyzeReferenceSpectrogram();
+    analyzeReferenceSpectrogram(myToken);
   }catch(e){
+    if(myToken!==refLoadToken)return;
     document.getElementById('refStatus').textContent='Could not load: '+e.message;
   }
 }
@@ -239,23 +250,17 @@ async function loadRefAudio(url, lang){
 document.getElementById('refPlay').addEventListener('click',()=>playRefSelection());
 
 // ── Toggle panel ──────────────────────────────────────────────────────────────
-function updateHint(){
-  const hint=document.getElementById('ppHint');
-  if(hint) hint.style.display=(recObjectURL&&document.getElementById('practicePanel').classList.contains('open'))?'inline':'none';
-}
 document.getElementById('practiceTrigger').addEventListener('click',()=>{
   const p=document.getElementById('practicePanel'), b=document.getElementById('practiceTrigger');
   const open=p.classList.toggle('open');
   b.classList.toggle('open',open);
   document.body.classList.toggle('practice-open',open);
-  if(open){checkServer();updateHint();if(recSamples){drawRecSpectrogram();drawRecOverlay();}if(refSamples){drawRefSpectrogram();drawRefOverlay();}}
-  else updateHint();
+  if(open){checkServer();if(recSamples){drawRecSpectrogram();drawRecOverlay();}if(refSamples){drawRefSpectrogram();drawRefOverlay();}}
 });
 document.getElementById('ppClose').addEventListener('click',()=>{
   document.getElementById('practicePanel').classList.remove('open');
   document.getElementById('practiceTrigger').classList.remove('open');
   document.body.classList.remove('practice-open');
-  updateHint();
 });
 
 // ── WAV encoder ───────────────────────────────────────────────────────────────
@@ -319,13 +324,13 @@ function stopRec(){
   document.getElementById('ppRecord').textContent='● Record';
   document.getElementById('ppRecord').classList.remove('rec-active');
   document.getElementById('recDot').classList.remove('on');
-  document.getElementById('ppStatus').textContent=`${durationMs.toFixed(0)} ms — drag the slice to set the analysis window`;
+  document.getElementById('ppStatus').textContent='';
   document.getElementById('ppPlay').disabled=false;
   document.getElementById('ppCompare').disabled=false;
   document.getElementById('ppClear').disabled=false;
   document.getElementById('waveWrap').style.display='block';
   document.getElementById('waveInfo').style.display='block';
-  drawRecOverlay(); updateHint();
+  drawRecOverlay();
   recAnalysisResult=null;
   analyzeRecordingSpectrogram();
 }
@@ -339,7 +344,7 @@ document.getElementById('ppClear').addEventListener('click',()=>{
   document.getElementById('ppLiveMeans').textContent='';
   document.getElementById('waveWrap').style.display='none';
   document.getElementById('waveInfo').style.display='none';
-  updateHint(); renderFormant();
+  renderFormant();
 });
 
 // ── Server check ──────────────────────────────────────────────────────────────

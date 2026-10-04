@@ -238,10 +238,8 @@
     flex-direction:column;
   }
   #practicePanel.open { display:flex; }
-  body.practice-open #app { padding-bottom:155px; }
-  .pp-topbar { display:flex; align-items:center; gap:10px; padding:5px 14px; border-bottom:1px solid #1a2e44; flex-shrink:0; }
-  .pp-topbar-title { font-size:.76rem; font-weight:700; color:#7eb8f7; }
-  .pp-server { font-size:.62rem; color:#3a5878; margin-left:auto; }
+  body.practice-open #app { padding-bottom:215px; }
+  .pp-server { font-size:.62rem; color:#3a5878; }
   .pp-server.ok { color:#34d399; }
   .pp-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:.9rem; margin-left:8px; }
   .pp-columns { display:flex; min-height:0; }
@@ -258,7 +256,7 @@
   @keyframes recpulse { 0%,100%{opacity:1} 50%{opacity:.2} }
   .pp-status { font-size:.66rem; color:var(--muted); }
   .pp-spectro-wrap {
-    position:relative; width:100%; height:120px; margin-top:3px;
+    position:relative; width:100%; height:88px; margin-top:3px;
     background:#0a1520; border:1px solid #1e3048; border-radius:4px;
     overflow:hidden; cursor:col-resize; touch-action:none;
   }
