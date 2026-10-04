@@ -19,7 +19,7 @@ function renderVowelCards(){
   let dragSrcIdx=null;
   function localPlay(url){if(!url)return;if(curAudio){curAudio.pause();curAudio.currentTime=0;}curAudio=new Audio(url);curAudio.play().catch(()=>{});}
 
-  (state.langDraft.vowels||[]).forEach((v,i)=>{
+  (state.langDraft?.vowels||[]).forEach((v,i)=>{
     const isActive=state.vowelIdx===i;
     const card=document.createElement('div');
     card.className='vowel-card'+(isActive?' active':'');
@@ -38,19 +38,29 @@ function renderVowelCards(){
       if(state.vowelIdx===dragSrcIdx) state.vowelIdx=i;
       else if(state.vowelIdx>dragSrcIdx&&state.vowelIdx<=i) state.vowelIdx--;
       else if(state.vowelIdx<dragSrcIdx&&state.vowelIdx>=i) state.vowelIdx++;
-      markUnsaved(); renderVowelCards(); refreshCharts();
+      // Persist the new order immediately \u2014 there's no separate "Save" step anymore.
+      state.langDraft.vowels.forEach((vv,idx)=>{
+        if(vv.id==null||vv.sortOrder===idx)return;
+        vv.sortOrder=idx;
+        fetch(`/api/v1/vowels/${vv.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({sortOrder:idx})});
+      });
+      renderVowelCards(); refreshCharts();
     });
 
     // Delete button (top-right)
     const delBtn=document.createElement('button');
     delBtn.className='vc-del-btn'; delBtn.title='Delete vowel'; delBtn.textContent='\u2715';
-    delBtn.addEventListener('click',e=>{
+    delBtn.addEventListener('click',async e=>{
       e.stopPropagation();
-      if(!confirm(`Delete vowel "${v.symbols?.[0]}"?`))return;
+      if(!confirm(`Delete vowel "${v.symbols?.[0]}"? Any tokens assigned to it just become unassigned.`))return;
+      if(v.id!=null){
+        const resp=await fetch(`/api/v1/vowels/${v.id}`,{method:'DELETE'});
+        if(!resp.ok){toast('Delete failed');return;}
+      }
       state.langDraft.vowels.splice(i,1);
       if(state.vowelIdx===i)closeVowelEditor();
       else if(state.vowelIdx>i)state.vowelIdx--;
-      markUnsaved(); renderVowelCards(); refreshCharts(); updateSectionTitle();
+      renderVowelCards(); refreshCharts(); updateSectionTitle();
     });
     card.appendChild(delBtn);
 
@@ -70,9 +80,9 @@ function renderVowelCards(){
     // from the DB relationship (Phase 5d) instead of charts.js's own
     // LANG_SAMPLES/symbol-matching, via a pseudo-sample adapter so the exact
     // same shared function can be reused untouched. ─────────────────────────
-    const dbVowelId = state.dbVowelLinks?.[i]?.id;
+    const dbVowelId = v.id;
     const myTokens = dbVowelId != null ? (state.dbLanguageTokens || []).filter(t => t.vowelId === dbVowelId) : [];
-    const repSampleId = state.dbVowelLinks?.[i]?.representativeSampleId;
+    const repSampleId = v.representativeSampleId;
     const bySample = new Map();
     myTokens.forEach(t => {
       if (!bySample.has(t.sampleId)) {
@@ -124,4 +134,3 @@ function renderVowelCards(){
 }
 
 function updateSectionTitle(){const el=document.getElementById('sectionTitle');if(el)el.textContent=`Vowels (${(state.langDraft?.vowels||[]).length})`;}
-function markUnsaved(){state.unsaved=true;const n=document.getElementById('unsavedNote');if(n)n.style.display='inline';}

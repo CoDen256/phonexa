@@ -71,11 +71,28 @@ function renderRows(sounds) {
       <td>${fmtDuration(s.durationMs)}</td>
       <td>${fmtDate(s.createdAt)}</td>
       <td>${fmtDate(s.updatedAt)}</td>
-      <td><a class="sent-btn" href="praat.html?sampleId=${s.id}" target="_blank" rel="noopener">🔬 Formant Lab</a></td>
+      <td>
+        <a class="sent-btn" href="praat.html?sampleId=${s.id}" target="_blank" rel="noopener">🔬 Formant Lab</a>
+        <button class="sent-btn del-btn" type="button" data-id="${s.id}" title="Delete this sample and all its tokens">🗑</button>
+      </td>
     </tr>`;
   }).join('');
   document.getElementById('soundCount').textContent = `${sounds.length} of ${allSounds.length} sound(s)`;
   updateSortIndicators();
+  body.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteSound(+btn.dataset.id)));
+}
+
+async function deleteSound(id) {
+  const smp = allSounds.find(s => s.id === id);
+  if (!confirm(`Delete sample #${id} ("${smp?.text || 'untitled'}")? This also deletes all its tokens and analysis history, and removes the audio file. This cannot be undone.`)) return;
+  try {
+    const resp = await fetch(`/api/v1/samples/${id}`, { method: 'DELETE' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    allSounds = allSounds.filter(s => s.id !== id);
+    applyFilter();
+  } catch (e) {
+    alert('Delete failed: ' + e.message);
+  }
 }
 
 function applyFilter() {

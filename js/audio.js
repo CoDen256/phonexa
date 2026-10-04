@@ -81,20 +81,42 @@ async function playTokenSlice(sample, tok) {
     }
 }
 
-// ─── DB-resolved representative-sample audio (Phase 5d) ───────────────────────
-// Zips `representativeAudioUrl` onto a lang.json-shaped vowel array by
-// `symbols` equality — shared by the viewer (js/lang.js) and the editor
-// (editor-storage.js), both of which otherwise only know the old file-based
-// `v.audio`/samples.json representation.
-async function attachRepresentativeAudio(langKey, vowels) {
-  try {
-    const dbVowels = await fetch(`/api/v1/languages/${langKey}/vowels`).then(r => r.ok ? r.json() : []);
-    const bySymbols = new Map(dbVowels.map(dv => [JSON.stringify(dv.symbols), dv]));
-    (vowels || []).forEach(v => {
-      const match = bySymbols.get(JSON.stringify(v.symbols));
-      if (match?.representativeAudioUrl) v.representativeAudioUrl = match.representativeAudioUrl;
+// ─── Build the old samples.json-shaped array straight from the DB ─────────────
+// js/lang.js's bootstrap fetches `/api/v1/tokens?languageId=`/`/api/v1/sounds`
+// instead of a static samples.json now — this adapts that DB shape back into
+// exactly what LANG_SAMPLES/findRepresentativeSample/renderTokenLayer/
+// buildDetailHighlightedText already expect, so none of those (proven,
+// shared) consumers need to change at all. `sampleId`s with no token yet but
+// that ARE some vowel's representative are still included (representative-
+// only playback must work even before anyone's tagged a token in it).
+function buildPseudoSamplesFromDb(tokens, sounds, vowels) {
+  const soundsById = new Map((sounds || []).map(s => [s.id, s]));
+  const bySample = new Map();
+  const ensure = (sampleId, fallbackText, fallbackAudio) => {
+    if (bySample.has(sampleId)) return bySample.get(sampleId);
+    const smp = soundsById.get(sampleId);
+    const entry = {
+      id: sampleId, text: smp?.text ?? fallbackText ?? '', audio: smp?.audioUrl ?? fallbackAudio ?? null,
+      phonemic: smp?.phonemic || null, representative: null, tokens: [],
+    };
+    bySample.set(sampleId, entry);
+    return entry;
+  };
+  for (const t of (tokens || [])) {
+    const smp = ensure(t.sampleId, t.sampleText, t.audioUrl);
+    smp.tokens.push({
+      symbol: t.symbol, position: [t.charStart ?? 0, t.charEnd ?? 0],
+      analysis: (t.f1 != null && t.f2 != null)
+        ? { f1: t.f1, f2: t.f2, slice: (t.timeStartMs != null && t.timeEndMs != null) ? [t.timeStartMs, t.timeEndMs] : null }
+        : null,
     });
-  } catch (_) { /* DB optional — falls back to samples.json/v.audio */ }
+  }
+  for (const v of (vowels || [])) {
+    if (v.representativeSampleId == null) continue;
+    const smp = ensure(v.representativeSampleId);
+    smp.representative = v.symbols?.[0] || smp.representative;
+  }
+  return Array.from(bySample.values());
 }
 
 // ─── Vowel synthesis ──────────────────────────────────────────────────────────

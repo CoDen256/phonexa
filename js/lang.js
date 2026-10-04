@@ -1,37 +1,35 @@
-// ─── Language loading ────────────────────────────────────────────────────────
+// ─── Language loading — 100% DB-backed ─────────────────────────────────────
+// Used to fetch lang/index.json + lang/<key>/lang.json + lang/<key>/samples.json
+// (static files); now reads the DB throughout — /api/v1/languages for the
+// list, /api/v1/languages/<key>/full for vowel geometry (replaces lang.json),
+// /api/v1/tokens + /api/v1/sounds for token-scatter data (replaces
+// samples.json, via buildPseudoSamplesFromDb — js/audio.js — so
+// charts.js/diphthong.js's consumers need no changes at all).
 const LANGS = {};   // populated by loadLanguages()
 
 async function loadLanguages() {
   try {
-    // 1. Load the language list
-    const idx = await fetch('lang/index.json').then(r => r.json());
-    const names = (idx.languages || []).filter(n => n && n.length > 0 && !n.startsWith('_'));
-
-    // 2. Fetch lang.json + samples.json for every language in parallel,
-    //    awaiting both before calling init() so LANG_SAMPLES is ready.
-    await Promise.all(names.map(async name => {
+    const [languages, sounds] = await Promise.all([
+      fetch('/api/v1/languages').then(r => r.json()),
+      fetch('/api/v1/sounds').then(r => r.ok ? r.json() : []).catch(() => []),
+    ]);
+    await Promise.all(languages.filter(l => l.enabled).map(async lang => {
       try {
-        const r = await fetch(`lang/${name}/lang.json`);
-        if (!r.ok) throw new Error(r.status);
-        const data = await r.json();
-        if (data && data.key) {
-          LANGS[data.key] = data;
-          // Load samples — use data.key so it matches LANGS key
-          try {
-            const samples = await fetch(`lang/${name}/samples.json`).then(r => r.ok ? r.json() : []);
-            if (typeof setLangSamples === 'function') setLangSamples(data.key, samples);
-          } catch (_) { /* samples optional */ }
-          // DB-resolved representative-sample audio (Phase 5d) — samples.json
-          // above stays only as a last-resort fallback for anything not yet
-          // DB-assigned (see attachRepresentativeAudio, js/audio.js).
-          await attachRepresentativeAudio(data.key, data.vowels);
+        const data = await fetch(`/api/v1/languages/${lang.key}/full`).then(r => r.ok ? r.json() : null);
+        if (!data) return;
+        LANGS[data.key] = data;
+
+        const tokens = await fetch(`/api/v1/tokens?languageId=${lang.id}`).then(r => r.ok ? r.json() : []).catch(() => []);
+        const mySounds = sounds.filter(s => s.languageId === lang.id);
+        if (typeof setLangSamples === 'function') {
+          setLangSamples(data.key, buildPseudoSamplesFromDb(tokens, mySounds, data.vowels));
         }
       } catch (e) {
-        console.warn(`Skipped lang/${name}:`, e.message);
+        console.warn(`Skipped language ${lang.key}:`, e.message);
       }
     }));
   } catch (e) {
-    console.error('Failed to load lang/index.json:', e);
+    console.error('Failed to load /api/v1/languages:', e);
   }
 
   init();

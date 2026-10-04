@@ -119,8 +119,13 @@ function playSlice(samples, sr, getStart, getEnd, setCursor, redraw, onEnded){
 function playSelection(onEnded){
   return playSlice(recSamples, recSampleRate, ()=>waveStart, ()=>waveEnd, v=>waveCursorPos=v, drawWave, onEnded);
 }
-function playRefSelection(){
-  return playSlice(refSamples, refSampleRate, ()=>refStart, ()=>refEnd, v=>refCursorPos=v, drawRefWave);
+function playRefSelection(onEnded){
+  return playSlice(refSamples, refSampleRate, ()=>refStart, ()=>refEnd, v=>refCursorPos=v, drawRefWave, onEnded);
+}
+/** Reference (if loaded), then your recording — same "compare" intent as js/drill.js's compareToken(), built on this panel's own (more capable, drag-adjustable) playback primitives rather than re-deriving drill.js's simpler version. */
+function playCompare(){
+  if(!refSamples){ playSelection(); return; }
+  playRefSelection(()=>setTimeout(()=>playSelection(),250));
 }
 
 // ── Vowel click hook (fires when a vowel is clicked anywhere on the chart) ────
@@ -146,12 +151,21 @@ async function loadRefAudio(url, lang){
     const arrayBuf=await resp.arrayBuffer();
     const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     const audioBuf=await audioCtx.decodeAudioData(arrayBuf);
-    refSamples=audioBuf.getChannelData(0).slice();
+    // A token click (not a plain vowel-dot click) carries its own precise
+    // [timeStartMs,timeEndMs] — slice to that instead of the whole sample.
+    const v=refVowelMeta?.v;
+    if(v?.timeStartMs!=null&&v?.timeEndMs!=null){
+      const sr=audioBuf.sampleRate;
+      const i0=Math.floor(v.timeStartMs/1000*sr), i1=Math.ceil(v.timeEndMs/1000*sr);
+      refSamples=audioBuf.getChannelData(0).slice(i0,i1);
+    } else {
+      refSamples=audioBuf.getChannelData(0).slice();
+    }
     refSampleRate=audioBuf.sampleRate;
     refStart=0.33; refEnd=0.67; refCursorPos=null;
     document.getElementById('refWaveCanvas').style.display='block';
     document.getElementById('refWaveInfo').style.display='block';
-    document.getElementById('refStatus').textContent=`${(audioBuf.duration*1000).toFixed(0)} ms — drag handles to set window`;
+    document.getElementById('refStatus').textContent=`${(refSamples.length/refSampleRate*1000).toFixed(0)} ms — drag handles to set window`;
     document.getElementById('refPlay').disabled=false;
     document.getElementById('refAnalyse').disabled=false;
     if(refVowelMeta?.v?.f1){
@@ -274,13 +288,20 @@ function stopRec(){
   recBlob=encodeWAV(recSamples,recSampleRate);
   if(recObjectURL)URL.revokeObjectURL(recObjectURL);
   recObjectURL=URL.createObjectURL(recBlob);
-  waveStart=0.33; waveEnd=0.67; waveCursorPos=null;
+  // Default the analysis window to start after any leading silence, instead
+  // of a fixed 0.33 — same detection js/drill.js/js/shadow.js already use.
+  const durationMs=total/recSampleRate*1000;
+  const trimStartMs=typeof detectLeadingSilenceMs==='function'
+    ? detectLeadingSilenceMs({sampleRate:recSampleRate,numberOfChannels:1,getChannelData:()=>recSamples})
+    : 0;
+  waveStart=Math.min(0.9,trimStartMs/durationMs); waveEnd=Math.min(1,waveStart+0.34); waveCursorPos=null;
   recState='ready';
   document.getElementById('ppRecord').textContent='● Record';
   document.getElementById('ppRecord').classList.remove('rec-active');
   document.getElementById('recDot').classList.remove('on');
-  document.getElementById('ppStatus').textContent=`${(total/recSampleRate*1000).toFixed(0)} ms — drag handles to set analysis window`;
+  document.getElementById('ppStatus').textContent=`${durationMs.toFixed(0)} ms — drag handles to set analysis window`;
   document.getElementById('ppPlay').disabled=false;
+  document.getElementById('ppCompare').disabled=false;
   document.getElementById('ppClear').disabled=false;
   document.getElementById('ppAnalyse').disabled=false;
   document.getElementById('waveCanvas').style.display='block';
@@ -288,11 +309,12 @@ function stopRec(){
   requestAnimationFrame(drawWave); updateHint();
 }
 document.getElementById('ppPlay').addEventListener('click',()=>playSelection());
+document.getElementById('ppCompare').addEventListener('click',()=>playCompare());
 document.getElementById('ppClear').addEventListener('click',()=>{
   recBlob=null; recSamples=null; if(recObjectURL){URL.revokeObjectURL(recObjectURL);recObjectURL=null;}
   recState='idle'; recordedVowel=null;
   document.getElementById('ppStatus').textContent='Press Record and say a vowel';
-  ['ppPlay','ppClear','ppAnalyse'].forEach(id=>document.getElementById(id).disabled=true);
+  ['ppPlay','ppCompare','ppClear','ppAnalyse'].forEach(id=>document.getElementById(id).disabled=true);
   document.getElementById('ppFormants').textContent='';
   document.getElementById('waveCanvas').style.display='none';
   document.getElementById('waveInfo').style.display='none';

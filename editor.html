@@ -52,13 +52,7 @@
 
 <div class="lang-tab-bar" id="langTabBar">
   <div id="langTabs" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap"></div>
-  <button class="btn btn-secondary btn-sm" id="newLangBtn" type="button">+ New</button>
-  <div class="lang-tab-sep"></div>
-  <button class="folder-btn" id="folderBtn" type="button">📂 Load lang folder</button>
-  <div class="lang-tab-sep"></div>
-  <button class="btn btn-primary btn-sm" id="saveLangBtn" type="button" style="display:none">💾 Save</button>
-  <button class="btn btn-secondary btn-sm" id="saveAsLangBtn" type="button" style="display:none">💾 Save As</button>
-  <span class="unsaved-note" id="unsavedNote" style="display:none">● unsaved</span>
+  <button class="btn btn-secondary btn-sm" id="newLangBtn" type="button">+ New language</button>
 </div>
 
 <div class="editor-body">
@@ -103,7 +97,7 @@
   <div class="editor-pane" id="editorPane">
     <div class="lang-meta-form" id="langMetaForm" style="display:none">
       <div style="display:flex;gap:6px;align-items:flex-end;flex-wrap:wrap">
-        <div class="field" style="flex:none;width:72px"><label>Key <span style="font-weight:400;opacity:.55;font-size:.55rem">a-z 0-9</span></label><input type="text" id="fKey" placeholder="en" pattern="[-a-z0-9_]+" style="width:100%"></div>
+        <div class="field" style="flex:none;width:72px"><label>Key</label><input type="text" id="fKey" style="width:100%" disabled title="Set at creation — not editable"></div>
         <div class="field" style="flex:none;width:128px"><label>Label</label><input type="text" id="fLabel" style="width:100%"></div>
         <div style="display:flex;flex-direction:column;gap:3px;padding-bottom:2px">
           <label style="font-size:.62rem;color:var(--muted)">Color</label>
@@ -128,7 +122,6 @@
 <script src="js/charts.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/editor-geometry.js"></script>
-<script src="js/editor-storage.js"></script>
 <script src="js/editor-vowels.js"></script>
 <script src="js/editor-lang.js"></script>
 <script src="js/editor-tokens.js"></script>
@@ -138,19 +131,19 @@
   // ─── State ────────────────────────────────────────────────────────────────────
   const state = {
     langs:{}, selKey:null, langDraft:null,
-    vowelIdx:null, vowelDraft:null,
-    dirHandle:null, unsaved:false, chartTab:'ipa',
+    vowelIdx:null, vowelDraft:null, vowelDirty:false,
+    chartTab:'ipa',
     pickingMode: null,  // null | 'ipa' | 'ipa-target' | 'formant'
     showCardinals: false,
     showOtherVowels: true,
-    langSources: {},
     langOrder: [],
-    langDisabled: new Set(),
-    // Phase 5d: per-language DB cache (tokens/samples/vowel links) — see
-    // js/editor-tokens.js's ensureDbLanguageData().
-    dbVowelLinks: null,   // [{id, representativeSampleId, representativeAudioUrl}, ...] parallel to langDraft.vowels
-    dbLanguageTokens: null,  // all DB tokens for the selected language
-    dbLanguageSamples: null, // all DB samples for the selected language
+    cardinalLangData: null,  // {key,label,color,vowels} for the Cardinals overlay — fetched on demand
+    // Per-language DB cache (tokens/samples) for the token-assignment picker
+    // — see js/editor-tokens.js's ensureDbLanguageData(). Vowels themselves
+    // now live directly on state.langDraft.vowels (each already carries its
+    // own DB `id`/representativeSampleId/representativeAudioUrl).
+    dbLanguageTokens: null,
+    dbLanguageSamples: null,
   };
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function toast(msg,dur=2200){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),dur); }
@@ -245,6 +238,7 @@
         svg.style.cursor = '';
         svg.removeEventListener('click', handler);
         svg._pickHandler = null;
+        markUnsaved();
         syncCoordsToForm();
         renderEditorAll();
         renderVowelCards();
@@ -258,8 +252,8 @@
   function renderEditorAll() {
     Object.keys(LANGS).forEach(k => delete LANGS[k]);
 
-    if (state.showCardinals && state.langs?.cardinal)
-      LANGS.cardinal = state.langs.cardinal;
+    if (state.showCardinals && state.cardinalLangData)
+      LANGS.cardinal = state.cardinalLangData;
 
     if (state.langDraft?.key) {
       let vowels = [...(state.langDraft.vowels || [])];
@@ -294,7 +288,6 @@
 <script>
   async function init() {
     initEditorUI();
-    await tryRestoreHandle();
     await loadLanguages();
     renderEditorAll();
   }

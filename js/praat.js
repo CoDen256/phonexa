@@ -109,6 +109,33 @@ async function loadVowelsList(languageId) {
   renderSections();
 }
 
+// ─── Ingest landing: pick an existing sample instead of drag-and-drop ──────────
+let existingSamples = [];
+function renderExistingSamplesList() {
+  const q = (document.getElementById('espFilter')?.value || '').trim().toLowerCase();
+  const list = document.getElementById('espList');
+  if (!list) return;
+  list.innerHTML = existingSamples
+    .filter(s => !q || (s.text || '').toLowerCase().includes(q) || (s.originalFilename || '').toLowerCase().includes(q))
+    .slice(0, 100)
+    .map(s => `<div class="esp-row" data-id="${s.id}" style="font-size:.78rem;color:#c8d8e8;padding:5px 9px;border-radius:5px;background:#0d1a28;border:1px solid #1e3048;cursor:pointer;display:flex;justify-content:space-between;gap:8px">
+        <span style="font-family:Georgia,serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeAttr(s.text || s.originalFilename || '(untitled)')}</span>
+        <span style="color:#4a6888;flex-shrink:0">#${s.id}</span>
+      </div>`).join('') || '<div style="font-size:.72rem;color:#3a5878;text-align:center;padding:8px">No samples match.</div>';
+  list.querySelectorAll('.esp-row').forEach(row => {
+    row.addEventListener('mouseenter', () => row.style.borderColor = '#4a7098');
+    row.addEventListener('mouseleave', () => row.style.borderColor = '#1e3048');
+    row.addEventListener('click', () => { location.href = `praat.html?sampleId=${row.dataset.id}`; });
+  });
+}
+async function loadExistingSamplePicker() {
+  try {
+    const resp = await fetch('/api/v1/sounds');
+    existingSamples = resp.ok ? await resp.json() : [];
+  } catch (e) { existingSamples = []; }
+  renderExistingSamplesList();
+}
+
 // ─── Audio loading ──────────────────────────────────────────────────────────────
 async function decodeArrayBuffer(ab) {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -133,6 +160,7 @@ async function loadBuffer(buffer) {
   analysisResult = null;
   sections = [];
   document.getElementById('dropzone').style.display = 'none';
+  document.getElementById('existingSamplePicker').style.display = 'none';
   document.getElementById('praatPanels').style.display = 'block';
   document.getElementById('paramsRow').style.display = 'flex';
   document.getElementById('channelInfo').textContent =
@@ -177,7 +205,9 @@ function seedSectionsFromDbSample() {
     return {
       id: nextSectionId++, mode: 'token', dbTokenId: t.id,
       symbol: t.symbol || '', vowelId: t.vowelId, start, end,
+      charStart: t.charStart ?? 0, charEnd: t.charEnd ?? (t.symbol || '').length,
       activeAnalysisId: t.activeAnalysisId, manualF1: t.manualF1, manualF2: t.manualF2,
+      dirty: false,
     };
   });
   document.getElementById('tokenContext').style.display = 'block';
@@ -426,7 +456,7 @@ async function saveToken(s) {
   const [t0, t1] = sectionMs(s);
   const body = {
     symbol: s.symbol, vowelId: s.vowelId,
-    charStart: 0, charEnd: (s.symbol || '').length,
+    charStart: s.charStart ?? 0, charEnd: s.charEnd ?? (s.symbol || '').length,
     timeStartMs: t0, timeEndMs: t1,
     manualF1: s.manualF1, manualF2: s.manualF2,
   };
@@ -444,6 +474,7 @@ async function saveToken(s) {
     if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || 'HTTP ' + resp.status); }
     const saved = await resp.json();
     s.dbTokenId = saved.id;
+    s.dirty = false;
     renderSections();
     cardStatus(s, '✓ Saved');
   } catch (e) {
@@ -453,6 +484,7 @@ async function saveToken(s) {
 
 async function deleteToken(s) {
   if (s.dbTokenId) {
+    if (!confirm('Delete this saved token? This cannot be undone.')) return;
     try {
       await fetch(`/api/v1/tokens/${s.dbTokenId}`, { method: 'DELETE' });
     } catch (e) { setStatus('Delete failed: ' + e.message); return; }
@@ -531,6 +563,7 @@ function renderSections() {
         <span class="section-time">${sectionMs(s).join('–')} ms</span>
       `;
       body = `
+        <div class="section-charsel" data-charsel="${s.id}"></div>
         <span class="section-values">Current: <b>${currentLabelForToken(s)}</b> &nbsp;·&nbsp; Previewing: <b>${previewLabelForToken(s)}</b>
           ${viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : ''}
         </span>
@@ -539,6 +572,7 @@ function renderSections() {
         <button class="sent-btn section-play" type="button">▶</button>
         <button class="sent-btn primary section-save-token" type="button">💾 Save token</button>
         <button class="sent-btn section-remove" type="button">✕</button>
+        <span class="section-dirty-badge" style="display:${s.dirty ? 'inline' : 'none'};color:#fbbf24;font-size:.68rem">● unsaved</span>
         <span class="section-card-status muted"></span>
       `;
     } else {
@@ -568,16 +602,19 @@ function renderSections() {
       card.querySelector('.section-save')?.addEventListener('click', () => saveSection(s));
       card.querySelector('.section-update')?.addEventListener('click', () => updateSavedSection(s));
     } else if (isDbToken) {
-      card.querySelector('.section-symbol').addEventListener('input', e => { s.symbol = e.target.value; });
+      const markDirty = () => { s.dirty = true; const b = card.querySelector('.section-dirty-badge'); if (b) b.style.display = 'inline'; };
+      card.querySelector('.section-symbol').addEventListener('input', e => { s.symbol = e.target.value; markDirty(); });
       card.querySelector('.section-vowel').addEventListener('change', e => {
         s.vowelId = e.target.value ? +e.target.value : null;
         if (s.vowelId && !s.symbol) { s.symbol = vowelsList.find(v => v.id === s.vowelId)?.symbols?.[0] || ''; renderSections(); }
+        markDirty();
       });
-      card.querySelector('.section-manual-f1').addEventListener('input', e => { s.manualF1 = e.target.value === '' ? null : +e.target.value; });
-      card.querySelector('.section-manual-f2').addEventListener('input', e => { s.manualF2 = e.target.value === '' ? null : +e.target.value; });
+      card.querySelector('.section-manual-f1').addEventListener('input', e => { s.manualF1 = e.target.value === '' ? null : +e.target.value; markDirty(); });
+      card.querySelector('.section-manual-f2').addEventListener('input', e => { s.manualF2 = e.target.value === '' ? null : +e.target.value; markDirty(); });
       card.querySelector('.section-save-token').addEventListener('click', () => saveToken(s));
       card.querySelector('.section-remove').addEventListener('click', () => deleteToken(s));
       card.querySelector('.section-use-analysis')?.addEventListener('click', () => useViewedAnalysisForToken(s));
+      buildTokCharSel(card.querySelector('.section-charsel'), s);
     } else {
       card.querySelector('.section-apply').addEventListener('click', () => applySection(s));
     }
@@ -586,6 +623,73 @@ function renderSections() {
     wireMiniDrag(card.querySelector('.section-mini'), s);
   });
   refreshSectionVisuals();
+}
+
+// ─── Char-range drag-select (DB tokens only) — restores the pre-Phase-5d
+// editor-samples.js UI: render the sample text as one span per character,
+// drag the nearer edge of the current [charStart,charEnd) range. Pure DOM
+// geometry (span midpoint vs. cursor x) — no Range/Selection API needed. ───
+let _charDrag = null;
+function hitTestChar(container, clientX) {
+  const spans = [...container.querySelectorAll('.tc[data-i]')];
+  for (const sp of spans) {
+    const rect = sp.getBoundingClientRect();
+    if (clientX < rect.left + rect.width / 2) return +sp.dataset.i;
+  }
+  return (dbSampleData?.text || '').length;
+}
+function updateTokCharSel(container, s) {
+  const c = vowelsList.find(v => v.id === s.vowelId) ? '#7eb8f7' : '#8fa8c0';
+  container.querySelectorAll('.tc[data-i]').forEach(sp => {
+    const ci = +sp.dataset.i;
+    const inSel = ci >= s.charStart && ci < s.charEnd;
+    sp.style.background = inSel ? c + '33' : '';
+    sp.style.color = inSel ? c : '';
+    sp.style.borderLeft = ci === s.charStart ? `2px solid ${c}` : '';
+    sp.style.borderRight = ci === s.charEnd - 1 ? `2px solid ${c}` : '';
+  });
+}
+function buildTokCharSel(container, s) {
+  if (!container) return;
+  container.style.cssText = 'font-family:Georgia,"Noto Serif",serif;font-size:.88rem;padding:4px 6px;line-height:1.6;cursor:col-resize;user-select:none;background:#0d1a28;border:1px solid #1e3048;border-radius:5px;margin-bottom:4px;overflow-x:auto;white-space:nowrap';
+  container.innerHTML = '';
+  const text = dbSampleData?.text || '';
+  if (!text) { container.innerHTML = '<span style="font-size:.65rem;color:#3a5878">(sample has no text — char range unavailable)</span>'; return; }
+  [...text].forEach((ch, ci) => {
+    const sp = document.createElement('span');
+    sp.className = 'tc'; sp.dataset.i = ci;
+    sp.style.cssText = 'padding:0 1px;border-radius:2px;white-space:pre;display:inline-block;transition:background .08s,color .08s';
+    sp.textContent = ch === ' ' ? ' ' : ch;
+    container.appendChild(sp);
+  });
+  const end = document.createElement('span');
+  end.className = 'tc'; end.dataset.i = text.length;
+  end.style.cssText = 'display:inline-block;min-width:6px';
+  end.textContent = '​';
+  container.appendChild(end);
+  updateTokCharSel(container, s);
+
+  container.addEventListener('mousedown', e => {
+    const ci = hitTestChar(container, e.clientX);
+    const distS = Math.abs(ci - s.charStart), distE = Math.abs(ci - s.charEnd);
+    _charDrag = { s, which: distS <= distE ? 'start' : 'end', container };
+    e.preventDefault();
+  });
+}
+if (!document._praatCharDragBound) {
+  document._praatCharDragBound = true;
+  document.addEventListener('mousemove', e => {
+    if (!_charDrag) return;
+    const { s, which, container } = _charDrag;
+    const ci = hitTestChar(container, e.clientX);
+    if (which === 'start') s.charStart = Math.min(ci, Math.max(0, s.charEnd - 1));
+    else s.charEnd = Math.max(ci, s.charStart + 1);
+    s.dirty = true;
+    const badge = document.querySelector(`.section-card[data-id="${s.id}"] .section-dirty-badge`);
+    if (badge) badge.style.display = 'inline';
+    updateTokCharSel(container, s);
+  });
+  document.addEventListener('mouseup', () => { _charDrag = null; });
 }
 
 // ─── Rendering: cheap per-tick visual refresh (canvases + text only, no DOM rebuild) ──
@@ -617,6 +721,8 @@ function refreshSectionVisuals() {
         valuesEl.innerHTML = `Current: <b>${currentLabelForToken(s)}</b> &nbsp;·&nbsp; Previewing: <b>${previewLabelForToken(s)}</b> ${useBtn}`;
         valuesEl.querySelector('.section-use-analysis')?.addEventListener('click', () => useViewedAnalysisForToken(s));
       }
+      const badge = card.querySelector('.section-dirty-badge');
+      if (badge) badge.style.display = s.dirty ? 'inline' : 'none';
     }
   });
 }
@@ -668,6 +774,7 @@ function wireMiniDrag(el, s) {
     if (mode === 'resize-start') s.start = Math.max(0, Math.min(f, s.end - 0.0005));
     else if (mode === 'resize-end') s.end = Math.min(1, Math.max(f, s.start + 0.0005));
     else { const newStart = Math.max(0, Math.min(1 - len, f - moveOffset)); s.start = newStart; s.end = newStart + len; }
+    if (s.mode === 'token' && s.dbTokenId !== undefined) s.dirty = true;
     refreshSectionVisuals(); redrawAll();
     e.preventDefault();
   };
@@ -727,6 +834,7 @@ function wireMainDrag(el) {
       if (mode === 'resize-start') s.start = Math.max(0, Math.min(f, s.end - 0.0005));
       else if (mode === 'resize-end') s.end = Math.min(1, Math.max(f, s.start + 0.0005));
       else { const newStart = Math.max(0, Math.min(1 - len, f - sectionDrag.moveOffset)); s.start = newStart; s.end = newStart + len; }
+      if (s.mode === 'token' && s.dbTokenId !== undefined) s.dirty = true;
       refreshSectionVisuals(); redrawAll();
       e.preventDefault();
       return;
@@ -927,6 +1035,7 @@ function resetToDropzone() {
   sections = [];
   selStart = 0; selEnd = 0;
   document.getElementById('dropzone').style.display = '';
+  document.getElementById('existingSamplePicker').style.display = ingestMode ? '' : 'none';
   document.getElementById('fileToolbar').style.display = 'none';
   document.getElementById('praatPanels').style.display = 'none';
   document.getElementById('paramsRow').style.display = 'none';
@@ -974,7 +1083,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (f) handleFile(f);
   });
 
-  if (ingestMode) loadLanguagesList();
+  if (ingestMode) {
+    loadLanguagesList();
+    document.getElementById('existingSamplePicker').style.display = '';
+    document.getElementById('espFilter').addEventListener('input', renderExistingSamplesList);
+    loadExistingSamplePicker();
+  }
 
   document.getElementById('analyzeBtn').addEventListener('click', () => runAnalyze());
   document.getElementById('playSelectionBtn').addEventListener('click', () => playRange(selEnd > selStart ? selStart : 0, selEnd > selStart ? selEnd : 1));

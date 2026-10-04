@@ -309,7 +309,8 @@ function renderTokenLayer(svg) {
         pulse('chartFormant',pos.x,pos.y,c);
         // Update practice panel reference with this token's audio + F1/F2
         if(typeof onVowelClicked==='function'){
-          const tv={..._sv,f1:tok.analysis?.f1||_sv?.f1,f2:tok.analysis?.f2||_sv?.f2,audio:sample.audio};
+          const tv={..._sv,f1:tok.analysis?.f1||_sv?.f1,f2:tok.analysis?.f2||_sv?.f2,audio:sample.audio,
+            timeStartMs:tok.analysis?.slice?.[0]??null,timeEndMs:tok.analysis?.slice?.[1]??null};
           onVowelClicked(tv,lang,lk);
         }
       });
@@ -333,7 +334,8 @@ function renderTokenLayer(svg) {
         if(sample.audio) new Audio(sample.audio).play().catch(()=>{});
         pulse('chartFormant',pos.x,pos.y,c);
         if(typeof onVowelClicked==='function'){
-          const tv={..._hv,f1:tok.analysis?.f1||_hv?.f1,f2:tok.analysis?.f2||_hv?.f2,audio:sample.audio};
+          const tv={..._hv,f1:tok.analysis?.f1||_hv?.f1,f2:tok.analysis?.f2||_hv?.f2,audio:sample.audio,
+            timeStartMs:tok.analysis?.slice?.[0]??null,timeEndMs:tok.analysis?.slice?.[1]??null};
           onVowelClicked(tv,lang,lk);
         }
       });

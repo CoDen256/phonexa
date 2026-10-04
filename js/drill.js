@@ -36,7 +36,8 @@ function stopDrillActiveSource() {
   if (drillActiveSource) { try { drillActiveSource.stop(); } catch (e) {} drillActiveSource = null; }
 }
 
-async function playRefToken(tok) {
+/** Plays just the token's own time-range slice — for listening to the isolated vowel sound, not for Compare (see playFullSample). */
+async function playTokenOnly(tok) {
   if (!tok.audioUrl || tok.timeStartMs == null || tok.timeEndMs == null) {
     if (tok.audioUrl) new Audio(tok.audioUrl).play().catch(() => {});
     return;
@@ -52,7 +53,24 @@ async function playRefToken(tok) {
     const src = ctx.createBufferSource();
     src.buffer = buf; src.connect(ctx.destination); src.start();
     drillActiveSource = src;
-    src.onended = () => { if (drillActiveSource === src) drillActiveSource = null; };
+    return new Promise(resolve => { src.onended = () => { if (drillActiveSource === src) drillActiveSource = null; resolve(); }; });
+  } catch (e) {
+    new Audio(tok.audioUrl).play().catch(() => {});
+  }
+}
+
+/** Plays the token's FULL sample (natural context, not clipped to the token's own slice) — the actual reference for Compare. */
+async function playFullSample(tok) {
+  if (!tok.audioUrl) return;
+  try {
+    const wav = await fetchDecodeAudio(tok.audioUrl);
+    stopDrillActiveSource();
+    const ctx = getDrillPlayCtx();
+    const buf = ctx.createBuffer(1, wav.samples.length, wav.sampleRate);
+    buf.getChannelData(0).set(wav.samples);
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.connect(ctx.destination); src.start();
+    drillActiveSource = src;
     return new Promise(resolve => { src.onended = () => { if (drillActiveSource === src) drillActiveSource = null; resolve(); }; });
   } catch (e) {
     new Audio(tok.audioUrl).play().catch(() => {});
@@ -84,8 +102,8 @@ function playMine(tokenId) { playRecording(drillState.recordings[tokenId]); }
 
 async function compareToken(tok) {
   const rec = drillState.recordings[tok.id];
-  if (!rec) { await playRefToken(tok); return; }
-  await playRefToken(tok);
+  if (!rec) { await playFullSample(tok); return; }
+  await playFullSample(tok);
   setTimeout(() => playRecording(rec), 300);
 }
 
@@ -162,14 +180,16 @@ function renderDrillRow(tok) {
   const controls = document.createElement('div');
   controls.className = 'drill-controls';
   controls.innerHTML = `
-    <button class="drill-btn drill-play-ref" type="button" title="Play reference">▶ Ref</button>
+    <button class="drill-btn drill-play-token" type="button" title="Play just this token's slice">◉ Token</button>
+    <button class="drill-btn drill-play-sample" type="button" title="Play the full sample (the actual reference for Compare)">▶ Sample</button>
     <button class="drill-btn drill-rec-btn" type="button" title="Record your voice">● Rec</button>
     <button class="drill-btn drill-play-mine" type="button" title="Play your recording" ${rec ? '' : 'disabled'}>▶ You</button>
-    <button class="drill-btn drill-compare" type="button" title="Play reference then yours" ${rec ? '' : 'disabled'}>⇄ Compare</button>
+    <button class="drill-btn drill-compare" type="button" title="Play the full sample, then yours" ${rec ? '' : 'disabled'}>⇄ Compare</button>
     <span class="drill-status">${rec ? 'Recorded ✓' : 'Not recorded'}</span>`;
   row.appendChild(controls);
 
-  controls.querySelector('.drill-play-ref').addEventListener('click', () => playRefToken(tok));
+  controls.querySelector('.drill-play-token').addEventListener('click', () => playTokenOnly(tok));
+  controls.querySelector('.drill-play-sample').addEventListener('click', () => playFullSample(tok));
   controls.querySelector('.drill-rec-btn').addEventListener('click', () => toggleDrillRecord(tok, row));
   controls.querySelector('.drill-play-mine').addEventListener('click', () => playMine(tok.id));
   controls.querySelector('.drill-compare').addEventListener('click', () => compareToken(tok));

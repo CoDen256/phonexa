@@ -62,10 +62,27 @@ function renderRows(tokens) {
     <td>${fmtRange(t)}</td>
     <td>${fmtDate(t.createdAt)}</td>
     <td>${fmtDate(t.updatedAt)}</td>
-    <td><a class="sent-btn" href="praat.html?sampleId=${t.sampleId}&scrollTo=${t.id}" target="_blank" rel="noopener">🔬 Formant Lab</a></td>
+    <td>
+      <a class="sent-btn" href="praat.html?sampleId=${t.sampleId}&scrollTo=${t.id}" target="_blank" rel="noopener">🔬 Formant Lab</a>
+      <button class="sent-btn del-btn" type="button" data-id="${t.id}" title="Delete this token">🗑</button>
+    </td>
   </tr>`).join('');
   document.getElementById('tokenCount').textContent = `${tokens.length} of ${allTokens.length} token(s)`;
   updateSortIndicators();
+  body.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteTokenRow(+btn.dataset.id)));
+}
+
+async function deleteTokenRow(id) {
+  const tok = allTokens.find(t => t.id === id);
+  if (!confirm(`Delete token /${tok?.symbol || '?'}/ (#${id})? This cannot be undone.`)) return;
+  try {
+    const resp = await fetch(`/api/v1/tokens/${id}`, { method: 'DELETE' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    allTokens = allTokens.filter(t => t.id !== id);
+    applyFilter();
+  } catch (e) {
+    alert('Delete failed: ' + e.message);
+  }
 }
 
 function applyFilter() {

@@ -46,6 +46,9 @@ class AudioStore:
     def exists(self, storage_key: str) -> bool:
         raise NotImplementedError
 
+    def delete(self, storage_key: str) -> None:
+        raise NotImplementedError
+
 
 class LocalFsAudioStore(AudioStore):
     def __init__(self, root: str | None = None):
@@ -76,6 +79,12 @@ class LocalFsAudioStore(AudioStore):
 
     def exists(self, storage_key: str) -> bool:
         return self._resolve(storage_key).exists()
+
+    def delete(self, storage_key: str) -> None:
+        try:
+            self._resolve(storage_key).unlink()
+        except FileNotFoundError:
+            pass
 
 
 _store: AudioStore | None = None

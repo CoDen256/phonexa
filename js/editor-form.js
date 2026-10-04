@@ -23,7 +23,13 @@ function buildInlineForm() {
 
   // ── Header ─────────────────────────────────────────────────────────────────
   const hdr = document.createElement('div'); hdr.className = 've-inline-header';
-  hdr.innerHTML = `<span class="ve-inline-title" id="veTitle">${state.vowelIdx < 0 ? 'New Vowel' : 'Edit: ' + (sym || '?')}</span>`;
+  hdr.innerHTML = `<span class="ve-inline-title" id="veTitle">${state.vowelIdx < 0 ? 'New Vowel' : 'Edit: ' + (sym || '?')}</span>`
+    + `<span class="unsaved-note" id="unsavedNote" style="display:${state.vowelDirty ? 'inline' : 'none'}">● unsaved</span>`;
+  if (state.vowelIdx >= 0) {
+    const delBtn = document.createElement('button'); delBtn.className = 'btn btn-secondary btn-sm'; delBtn.textContent = '🗑'; delBtn.type = 'button'; delBtn.title = 'Delete this vowel';
+    delBtn.addEventListener('click', deleteVowel);
+    hdr.appendChild(delBtn);
+  }
   const cancelBtn = document.createElement('button'); cancelBtn.className = 'btn btn-secondary btn-sm'; cancelBtn.textContent = 'Cancel'; cancelBtn.type = 'button';
   const applyBtn  = document.createElement('button'); applyBtn.className  = 'btn btn-primary btn-sm';   applyBtn.textContent = 'Apply';  applyBtn.type = 'button';
   hdr.appendChild(cancelBtn); hdr.appendChild(applyBtn);
@@ -65,7 +71,7 @@ function buildInlineForm() {
       chip.addEventListener('mouseleave', ()=>chip.style.borderColor='');
       chip.addEventListener('click', () => openIPAPickerPopup(altSym, newSym => {
         if (newSym) v.symbols[ai+1] = newSym; else v.symbols.splice(ai+1,1);
-        renderAltChips(); refreshCharts(); renderVowelCards();
+        markUnsaved(); renderAltChips(); refreshCharts(); renderVowelCards();
       }));
       altChipsWrap.appendChild(chip);
     });
@@ -75,7 +81,7 @@ function buildInlineForm() {
     addAlt.addEventListener('click', () => openIPAPickerPopup('', newSym => {
       if (!newSym) return;
       v.symbols = [...(v.symbols||[sym]), newSym];
-      renderAltChips(); refreshCharts(); renderVowelCards();
+      markUnsaved(); renderAltChips(); refreshCharts(); renderVowelCards();
     }));
     altChipsWrap.appendChild(addAlt);
   };
@@ -88,6 +94,7 @@ function buildInlineForm() {
   const openMainEdit = () => openIPAPickerPopup(v.symbols?.[0]||'', newSym => {
     if (!newSym) return;
     v.symbols = [newSym, ...(v.symbols?.slice(1)||[])];
+    markUnsaved();
     ipaPreview.textContent = newSym;
     document.getElementById('veTitle').textContent = (state.vowelIdx<0?'New Vowel':'Edit: ')+newSym;
     refreshCharts(); renderVowelCards();
@@ -116,14 +123,15 @@ function buildInlineForm() {
       </div>
     </div>`;
   sec.appendChild(metaRow);
-  metaRow.querySelector('#fDesc').addEventListener('input', e => { v.desc = e.target.value; renderVowelCards(); });
+  metaRow.querySelector('#fDesc').addEventListener('input', e => { v.desc = e.target.value; markUnsaved(); renderVowelCards(); });
   metaRow.querySelector('#fType').addEventListener('change', e => {
     v.type = e.target.value;
     if (v.type !== 'diphthong') { v.target = null; }
     else if (!v.target) { v.target = {heightBackness: [...(v.heightBackness || [0.5, 0.5])], rounded: v.rounded, f1: null, f2: null}; }
+    markUnsaved();
     buildInlineForm(); renderVowelCards(); refreshCharts();
   });
-  metaRow.querySelector('#fRounded').addEventListener('change', e => { v.rounded = e.target.checked; refreshCharts(); renderVowelCards(); });
+  metaRow.querySelector('#fRounded').addEventListener('change', e => { v.rounded = e.target.checked; markUnsaved(); refreshCharts(); renderVowelCards(); });
 
   // ── Source vowel section ────────────────────────────────────────────────────
   const hb = v.heightBackness || [0.5, 0.5];
@@ -143,10 +151,10 @@ function buildInlineForm() {
     </div>`;
   sec.appendChild(srcRow);
 
-  srcRow.querySelector('#veH').addEventListener('input', e => { v.heightBackness = [+e.target.value, v.heightBackness?.[1] ?? 0.5]; refreshCharts(); });
-  srcRow.querySelector('#veB').addEventListener('input', e => { v.heightBackness = [v.heightBackness?.[0] ?? 0.5, +e.target.value]; refreshCharts(); });
-  srcRow.querySelector('#veF1').addEventListener('input', e => { v.f1 = +e.target.value || null; refreshCharts(); renderVowelCards(); });
-  srcRow.querySelector('#veF2').addEventListener('input', e => { v.f2 = +e.target.value || null; refreshCharts(); renderVowelCards(); });
+  srcRow.querySelector('#veH').addEventListener('input', e => { v.heightBackness = [+e.target.value, v.heightBackness?.[1] ?? 0.5]; markUnsaved(); refreshCharts(); });
+  srcRow.querySelector('#veB').addEventListener('input', e => { v.heightBackness = [v.heightBackness?.[0] ?? 0.5, +e.target.value]; markUnsaved(); refreshCharts(); });
+  srcRow.querySelector('#veF1').addEventListener('input', e => { v.f1 = +e.target.value || null; markUnsaved(); refreshCharts(); renderVowelCards(); });
+  srcRow.querySelector('#veF2').addEventListener('input', e => { v.f2 = +e.target.value || null; markUnsaved(); refreshCharts(); renderVowelCards(); });
   srcRow.querySelector('#pickIpa').addEventListener('click', () => { state.pickingMode = 'ipa'; document.getElementById('tabIpa').click(); refreshCharts(); });
   srcRow.querySelector('#pickFormant').addEventListener('click', () => { state.pickingMode = 'formant'; document.getElementById('tabFormant').click(); refreshCharts(); });
 
@@ -177,36 +185,34 @@ function buildInlineForm() {
 
     tgtRow.querySelector('#veH2').addEventListener('input', e => {
       if (!v.target) v.target = {heightBackness:[0.5,0.5],rounded:false,f1:null,f2:null};
-      v.target.heightBackness = [+e.target.value, v.target.heightBackness?.[1] ?? 0.5]; refreshCharts();
+      v.target.heightBackness = [+e.target.value, v.target.heightBackness?.[1] ?? 0.5]; markUnsaved(); refreshCharts();
     });
     tgtRow.querySelector('#veB2').addEventListener('input', e => {
       if (!v.target) v.target = {heightBackness:[0.5,0.5],rounded:false,f1:null,f2:null};
-      v.target.heightBackness = [v.target.heightBackness?.[0] ?? 0.5, +e.target.value]; refreshCharts();
+      v.target.heightBackness = [v.target.heightBackness?.[0] ?? 0.5, +e.target.value]; markUnsaved(); refreshCharts();
     });
     tgtRow.querySelector('#veTF1').addEventListener('input', e => {
       if (!v.target) v.target = {heightBackness:[...(v.heightBackness||[0.5,0.5])],rounded:false,f1:null,f2:null};
-      v.target.f1 = +e.target.value || null; renderVowelCards();
+      v.target.f1 = +e.target.value || null; markUnsaved(); renderVowelCards();
     });
     tgtRow.querySelector('#veTF2').addEventListener('input', e => {
       if (!v.target) v.target = {heightBackness:[...(v.heightBackness||[0.5,0.5])],rounded:false,f1:null,f2:null};
-      v.target.f2 = +e.target.value || null; renderVowelCards();
+      v.target.f2 = +e.target.value || null; markUnsaved(); renderVowelCards();
     });
     tgtRow.querySelector('#fTargetRounded').addEventListener('change', e => {
       if (!v.target) v.target = {heightBackness:[...(v.heightBackness||[0.5,0.5])],rounded:false,f1:null,f2:null};
-      v.target.rounded = e.target.checked; renderVowelCards(); refreshCharts();
+      v.target.rounded = e.target.checked; markUnsaved(); renderVowelCards(); refreshCharts();
     });
     tgtRow.querySelector('#pickIpaTarget').addEventListener('click', () => { state.pickingMode = 'ipa-target'; document.getElementById('tabIpa').click(); refreshCharts(); });
     tgtRow.querySelector('#pickTargetFormant').addEventListener('click', () => { state.pickingMode = 'formant-target'; document.getElementById('tabFormant').click(); refreshCharts(); });
   }
 
-  // ── Audio + wiki ────────────────────────────────────────────────────────────
+  // ── Wiki ─────────────────────────────────────────────────────────────────────
   const urlRow = document.createElement('div'); urlRow.className = 've-meta';
   urlRow.innerHTML = `
-    <div class="field"><label>Audio URL <span style="font-weight:400;opacity:.55;font-size:.55rem">(average sound · synthesized from F1/F2 if absent)</span></label><input type="url" id="fAudio" value="${v.audio || ''}" placeholder="https://… or lang/…/audio/…"></div>
     <div class="field"><label>Wikipedia URL</label><input type="url" id="fWiki" value="${v.wikiUrl || ''}" placeholder="https://en.wikipedia.org/…"></div>`;
   sec.appendChild(urlRow);
-  urlRow.querySelector('#fAudio').addEventListener('input', e => { v.audio = e.target.value || null; });
-  urlRow.querySelector('#fWiki').addEventListener('input',  e => { v.wikiUrl = e.target.value; });
+  urlRow.querySelector('#fWiki').addEventListener('input',  e => { v.wikiUrl = e.target.value; markUnsaved(); });
 
   // ── Tokens (+ representative-sample picking) — Phase 5d ─────────────────
   // Explicit DB relationships now — no more symbol-text matching. One
@@ -224,22 +230,52 @@ function buildInlineForm() {
   }
 }
 
-// ─── Apply vowel to draft ─────────────────────────────────────────────────────
-function applyVowel() {
+// ─── Apply vowel — persists straight to the DB (create or update) ────────────
+async function applyVowel() {
   if (!state.vowelDraft) return;
   if (!state.vowelDraft.symbols?.[0]?.trim()) { toast('IPA symbol is required'); return; }
-  if (!state.langDraft.vowels) state.langDraft.vowels = [];
-  if (state.vowelIdx < 0) state.langDraft.vowels.push(state.vowelDraft);
-  else state.langDraft.vowels[state.vowelIdx] = state.vowelDraft;
-  markUnsaved();
-  const applied = state.vowelDraft.symbols[0];
-  closeVowelEditor();
-  updateSectionTitle();
-  toast(`Vowel "${applied}" applied`);
-  // Re-sync so a brand-new vowel gets a DB id immediately (Phase 5d) —
-  // otherwise its Tokens/Representative sections stay unavailable until the
-  // language is reselected.
-  if (typeof ensureDbLanguageData === 'function') ensureDbLanguageData();
+  const v = state.vowelDraft;
+  const body = {
+    symbols: v.symbols, heightBackness: v.heightBackness, type: v.type, rounded: v.rounded,
+    desc: v.desc, f1: v.f1, f2: v.f2, wikiUrl: v.wikiUrl, target: v.target,
+  };
+  try {
+    let resp;
+    if (v.id) {
+      resp = await fetch(`/api/v1/vowels/${v.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    } else {
+      resp = await fetch(`/api/v1/languages/${state.langDraft.id}/vowels`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    }
+    if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || 'HTTP ' + resp.status); }
+    const saved = await resp.json();
+    if (!state.langDraft.vowels) state.langDraft.vowels = [];
+    if (state.vowelIdx < 0) state.langDraft.vowels.push(saved);
+    else state.langDraft.vowels[state.vowelIdx] = saved;
+    markSaved();
+    const applied = saved.symbols[0];
+    closeVowelEditor();
+    updateSectionTitle();
+    toast(`Vowel "${applied}" saved`);
+  } catch (e) {
+    toast('Save failed: ' + e.message);
+  }
+}
+
+// ─── Delete vowel — only for already-saved (has an id) vowels ────────────────
+async function deleteVowel() {
+  const v = state.vowelDraft;
+  if (!v?.id) return;
+  if (!confirm(`Delete vowel "${v.symbols?.[0] || '?'}"? Any tokens assigned to it just become unassigned — they aren't deleted.`)) return;
+  try {
+    const resp = await fetch(`/api/v1/vowels/${v.id}`, { method: 'DELETE' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    state.langDraft.vowels.splice(state.vowelIdx, 1);
+    closeVowelEditor();
+    updateSectionTitle();
+    toast('Vowel deleted');
+  } catch (e) {
+    toast('Delete failed: ' + e.message);
+  }
 }
 
 

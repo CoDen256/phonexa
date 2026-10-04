@@ -1018,6 +1018,8 @@ def http_transcribe():
 
 import re  # noqa: E402
 
+from sqlalchemy import func  # noqa: E402
+
 from db.session import get_sessionmaker  # noqa: E402
 from db.models import Language, Sample, SampleAnalysis, Token, Vowel  # noqa: E402
 from db.storage import get_audio_store, is_local_url, storage_key_from_url, url_from_storage_key  # noqa: E402
@@ -1028,17 +1030,83 @@ from pathlib import Path  # noqa: E402
 from flask import send_file, abort, after_this_request  # noqa: E402
 
 
+def _language_json(lang: Language) -> dict:
+    return {
+        'id': lang.id, 'key': lang.key, 'label': lang.label,
+        'color': lang.color, 'sortOrder': lang.sort_order, 'enabled': lang.enabled,
+    }
+
+
 @app.route('/api/v1/languages')
 def list_languages():
-    """Read-only — just enough for an ingestion UI's language picker. Full
-    CRUD (add/reorder/disable) is a later phase; languages themselves are
-    still edited via editor.html's File System Access flow for now."""
     with get_sessionmaker()() as db:
         langs = db.query(Language).order_by(Language.sort_order).all()
-        return jsonify([{
-            'id': lang.id, 'key': lang.key, 'label': lang.label,
-            'color': lang.color, 'enabled': lang.enabled,
-        } for lang in langs])
+        return jsonify([_language_json(lang) for lang in langs])
+
+
+@app.route('/api/v1/languages', methods=['POST'])
+def create_language():
+    data = request.get_json(silent=True) or {}
+    key = (data.get('key') or '').strip()
+    label = (data.get('label') or '').strip()
+    if not key or not re.match(r'^[a-z0-9][a-z0-9-]*$', key):
+        return jsonify({'error': 'key is required and must be lowercase alphanumeric/hyphen'}), 400
+    if not label:
+        return jsonify({'error': 'label is required'}), 400
+    with get_sessionmaker()() as db:
+        if db.query(Language).filter_by(key=key).first() is not None:
+            return jsonify({'error': f'a language with key {key!r} already exists'}), 400
+        max_order = db.query(func.max(Language.sort_order)).scalar() or 0
+        lang = Language(key=key, label=label, color=data.get('color') or '#7eb8f7', sort_order=max_order + 1)
+        db.add(lang)
+        db.commit()
+        db.refresh(lang)
+        return jsonify(_language_json(lang)), 201
+
+
+@app.route('/api/v1/languages/<int:language_id>', methods=['PATCH'])
+def patch_language(language_id):
+    data = request.get_json(silent=True) or {}
+    with get_sessionmaker()() as db:
+        lang = db.get(Language, language_id)
+        if lang is None:
+            return jsonify({'error': 'not found'}), 404
+        if 'label' in data:
+            lang.label = data['label']
+        if 'color' in data:
+            lang.color = data['color']
+        if 'sortOrder' in data:
+            lang.sort_order = int(data['sortOrder'])
+        if 'enabled' in data:
+            lang.enabled = bool(data['enabled'])
+        db.commit()
+        db.refresh(lang)
+        return jsonify(_language_json(lang))
+
+
+@app.route('/api/v1/languages/<int:language_id>', methods=['DELETE'])
+def delete_language(language_id):
+    """Destructive — cascades to every Vowel/Sample (and in turn every
+    Token/SampleAnalysis) under this language, per db/models.py's
+    relationship cascades. Audio bytes aren't part of that DB cascade, so
+    collect each local sample's storage_key before the commit and delete the
+    files afterward (best-effort — never risk orphaning a successful DB
+    commit on a filesystem error, and never delete files ahead of a commit
+    that might still roll back)."""
+    with get_sessionmaker()() as db:
+        lang = db.get(Language, language_id)
+        if lang is None:
+            return jsonify({'error': 'not found'}), 404
+        storage_keys = [storage_key_from_url(s.url) for s in lang.samples if s.url and is_local_url(s.url)]
+        db.delete(lang)
+        db.commit()
+    store = get_audio_store()
+    for key in storage_keys:
+        try:
+            store.delete(key)
+        except Exception:
+            pass
+    return jsonify({'ok': True, 'deletedSamples': len(storage_keys)})
 
 
 @app.route('/api/v1/samples', methods=['POST'])
@@ -1211,6 +1279,28 @@ def patch_sample(sample_id):
         return jsonify({'id': sample.id, 'text': sample.text, 'phonemic': sample.phonemic, 'languageId': sample.language_id})
 
 
+@app.route('/api/v1/samples/<int:sample_id>', methods=['DELETE'])
+def delete_sample(sample_id):
+    """Cascades to the sample's Tokens/SampleAnalyses per db/models.py's
+    relationship cascades; any vowel that had this sample as its
+    representative just loses that pointer (ON DELETE SET NULL). Commit the
+    DB delete first, then best-effort remove the audio file — same ordering
+    rationale as DELETE /api/v1/languages/<id>."""
+    with get_sessionmaker()() as db:
+        sample = db.get(Sample, sample_id)
+        if sample is None:
+            return jsonify({'error': 'not found'}), 404
+        storage_key = storage_key_from_url(sample.url) if sample.url and is_local_url(sample.url) else None
+        db.delete(sample)
+        db.commit()
+    if storage_key:
+        try:
+            get_audio_store().delete(storage_key)
+        except Exception:
+            pass
+    return jsonify({'ok': True})
+
+
 @app.route('/api/v1/samples/<int:sample_id>/analyses/<int:analysis_id>')
 def get_sample_analysis(sample_id, analysis_id):
     with get_sessionmaker()() as db:
@@ -1324,11 +1414,31 @@ def delete_token(token_id):
         return jsonify({'ok': True})
 
 
+def _token_mean_f1_f2(t: Token) -> tuple[float | None, float | None]:
+    """Mean F1/F2 over the token's own [time_start_ms, time_end_ms] range,
+    derived from its active analysis's formant track — manual_f1/f2 (a
+    direct human measurement) wins when present. Same logic as
+    js/praat.js's computeMeansForRange(), ported server-side so index.html
+    doesn't need to fetch/decode full analysis tracks just to plot a dot."""
+    if t.manual_f1 is not None and t.manual_f2 is not None:
+        return t.manual_f1, t.manual_f2
+    if t.active_analysis is None or t.time_start_ms is None or t.time_end_ms is None:
+        return None, None
+    formants = t.active_analysis.formants or []
+    f1s = [r['f1'] for r in formants if r.get('f1') is not None and t.time_start_ms <= r.get('t_ms', -1) <= t.time_end_ms]
+    f2s = [r['f2'] for r in formants if r.get('f2') is not None and t.time_start_ms <= r.get('t_ms', -1) <= t.time_end_ms]
+    f1 = sum(f1s) / len(f1s) if f1s else None
+    f2 = sum(f2s) / len(f2s) if f2s else None
+    return f1, f2
+
+
 @app.route('/api/v1/tokens')
 def list_tokens():
     """Flat, joined-for-display list backing the Token Browser — also used
-    by the editor's vowel-assignment picker (?languageId=) and to list a
-    vowel's currently-assigned tokens (?vowelId=)."""
+    by the editor's vowel-assignment picker (?languageId=), to list a
+    vowel's currently-assigned tokens (?vowelId=), and by index.html's chart
+    bootstrap (which also needs the computed f1/f2 and the sample's audioUrl,
+    since it no longer reads static samples.json for token-scatter data)."""
     language_id = request.args.get('languageId')
     vowel_id = request.args.get('vowelId')
     with get_sessionmaker()() as db:
@@ -1342,15 +1452,22 @@ def list_tokens():
         if vowel_id:
             q = q.filter(Token.vowel_id == int(vowel_id))
         rows = q.order_by(Token.id).all()
-        return jsonify([{
-            'id': t.id, 'symbol': t.symbol, 'vowelId': t.vowel_id,
-            'sampleId': s.id, 'sampleText': s.text,
-            'charStart': t.char_start, 'charEnd': t.char_end,
-            'timeStartMs': t.time_start_ms, 'timeEndMs': t.time_end_ms,
-            'languageKey': lang.key if lang else None,
-            'createdAt': t.created_at.isoformat() if t.created_at else None,
-            'updatedAt': t.updated_at.isoformat() if t.updated_at else None,
-        } for t, s, lang in rows])
+        out = []
+        for t, s, lang in rows:
+            f1, f2 = _token_mean_f1_f2(t)
+            local = bool(s.url) and is_local_url(s.url)
+            audio_url = f'/audio/{storage_key_from_url(s.url)}' if local else s.url
+            out.append({
+                'id': t.id, 'symbol': t.symbol, 'vowelId': t.vowel_id,
+                'sampleId': s.id, 'sampleText': s.text, 'audioUrl': audio_url,
+                'charStart': t.char_start, 'charEnd': t.char_end,
+                'timeStartMs': t.time_start_ms, 'timeEndMs': t.time_end_ms,
+                'f1': round(f1) if f1 is not None else None, 'f2': round(f2) if f2 is not None else None,
+                'languageKey': lang.key if lang else None,
+                'createdAt': t.created_at.isoformat() if t.created_at else None,
+                'updatedAt': t.updated_at.isoformat() if t.updated_at else None,
+            })
+        return jsonify(out)
 
 
 @app.route('/api/v1/admin/export', methods=['POST'])
@@ -1419,17 +1536,6 @@ def admin_audio_backup():
         return jsonify({'error': str(error)}), 500
 
 
-@app.route('/api/v1/vowels')
-def list_vowels():
-    language_id = request.args.get('languageId')
-    with get_sessionmaker()() as db:
-        q = db.query(Vowel)
-        if language_id:
-            q = q.filter_by(language_id=int(language_id))
-        vowels = q.order_by(Vowel.sort_order).all()
-        return jsonify([{'id': v.id, 'symbols': v.symbols, 'desc': v.desc} for v in vowels])
-
-
 def _representative_audio_url(v: Vowel) -> str | None:
     rep = v.representative_sample
     if rep is None or not rep.url:
@@ -1439,12 +1545,112 @@ def _representative_audio_url(v: Vowel) -> str | None:
     return rep.url
 
 
-def _vowel_sync_json(v: Vowel) -> dict:
-    return {
-        'id': v.id, 'symbols': v.symbols,
+def _vowel_full_json(v: Vowel) -> dict:
+    out = {
+        'id': v.id, 'languageId': v.language_id, 'symbols': v.symbols,
+        'heightBackness': [v.height, v.backness], 'type': v.type, 'rounded': v.rounded,
+        'desc': v.desc, 'f1': v.f1, 'f2': v.f2, 'wikiUrl': v.wiki_url,
         'representativeSampleId': v.representative_sample_id,
         'representativeAudioUrl': _representative_audio_url(v),
+        'sortOrder': v.sort_order, 'target': None,
     }
+    if v.target_height is not None or v.target_backness is not None:
+        out['target'] = {
+            'heightBackness': [v.target_height, v.target_backness],
+            'rounded': v.target_rounded, 'f1': v.target_f1, 'f2': v.target_f2,
+        }
+    return out
+
+
+def _apply_vowel_fields(v: Vowel, data: dict) -> None:
+    """Shared field-assignment for create/patch — only touches keys present in `data`."""
+    if 'symbols' in data:
+        v.symbols = data['symbols'] or []
+    if 'heightBackness' in data:
+        hb = data['heightBackness'] or [0, 0]
+        v.height, v.backness = hb[0], hb[1]
+    if 'type' in data:
+        v.type = data['type'] or 'short'
+    if 'rounded' in data:
+        v.rounded = bool(data['rounded'])
+    if 'desc' in data:
+        v.desc = data['desc']
+    if 'f1' in data:
+        v.f1 = data['f1']
+    if 'f2' in data:
+        v.f2 = data['f2']
+    if 'wikiUrl' in data:
+        v.wiki_url = data['wikiUrl']
+    if 'sortOrder' in data:
+        v.sort_order = int(data['sortOrder'])
+    if 'representativeSampleId' in data:
+        v.representative_sample_id = data['representativeSampleId'] or None
+    if 'target' in data:
+        target = data['target']
+        if target:
+            v.target_height, v.target_backness = target['heightBackness'][0], target['heightBackness'][1]
+            v.target_rounded = target.get('rounded')
+            v.target_f1, v.target_f2 = target.get('f1'), target.get('f2')
+        else:
+            v.target_height = v.target_backness = v.target_rounded = v.target_f1 = v.target_f2 = None
+
+
+@app.route('/api/v1/vowels')
+def list_vowels():
+    language_id = request.args.get('languageId')
+    with get_sessionmaker()() as db:
+        q = db.query(Vowel)
+        if language_id:
+            q = q.filter_by(language_id=int(language_id))
+        vowels = q.order_by(Vowel.sort_order).all()
+        return jsonify([_vowel_full_json(v) for v in vowels])
+
+
+@app.route('/api/v1/languages/<int:language_id>/vowels', methods=['POST'])
+def create_vowel(language_id):
+    data = request.get_json(silent=True) or {}
+    with get_sessionmaker()() as db:
+        language = db.get(Language, language_id)
+        if language is None:
+            return jsonify({'error': 'not found'}), 404
+        max_order = db.query(func.max(Vowel.sort_order)).filter_by(language_id=language_id).scalar() or 0
+        hb = data.get('heightBackness') or [0, 0]
+        v = Vowel(
+            language_id=language_id, symbols=data.get('symbols') or [],
+            height=hb[0], backness=hb[1], type=data.get('type', 'short'),
+            rounded=bool(data.get('rounded')), sort_order=max_order + 1,
+        )
+        _apply_vowel_fields(v, data)
+        db.add(v)
+        db.commit()
+        db.refresh(v)
+        return jsonify(_vowel_full_json(v)), 201
+
+
+@app.route('/api/v1/vowels/<int:vowel_id>', methods=['PATCH'])
+def patch_vowel(vowel_id):
+    data = request.get_json(silent=True) or {}
+    with get_sessionmaker()() as db:
+        v = db.get(Vowel, vowel_id)
+        if v is None:
+            return jsonify({'error': 'not found'}), 404
+        _apply_vowel_fields(v, data)
+        db.commit()
+        db.refresh(v)
+        return jsonify(_vowel_full_json(v))
+
+
+@app.route('/api/v1/vowels/<int:vowel_id>', methods=['DELETE'])
+def delete_vowel(vowel_id):
+    """Tokens pointing at this vowel just become unassigned (Token.vowel_id
+    is ON DELETE SET NULL) — they aren't deleted."""
+    with get_sessionmaker()() as db:
+        v = db.get(Vowel, vowel_id)
+        if v is None:
+            return jsonify({'error': 'not found'}), 404
+        db.delete(v)
+        db.commit()
+        return jsonify({'ok': True})
 
 
 @app.route('/api/v1/languages/<key>/vowels')
@@ -1456,71 +1662,22 @@ def get_language_vowels(key):
         if language is None:
             return jsonify({'error': 'not found'}), 404
         vowels = db.query(Vowel).filter_by(language_id=language.id).order_by(Vowel.sort_order).all()
-        return jsonify([_vowel_sync_json(v) for v in vowels])
+        return jsonify([_vowel_full_json(v) for v in vowels])
 
 
-@app.route('/api/v1/languages/<key>/vowels/sync', methods=['POST'])
-def sync_language_vowels(key):
-    """Upserts DB Vowel rows for a language from the editor's in-memory (file-
-    based) vowel list, matched by `symbols` array equality — so every
-    file-defined vowel has a DB id to attach Token.vowel_id/
-    representative_sample_id to. Never deletes: a vowel removed file-side
-    just leaves its DB row unreferenced. Returns one entry per INPUT vowel,
-    in the same order, so the caller can zip by index."""
-    data = request.get_json(silent=True) or []
-    if not isinstance(data, list):
-        return jsonify({'error': 'expected a JSON array of vowels'}), 400
+@app.route('/api/v1/languages/<key>/full')
+def get_language_full(key):
+    """DB-sourced equivalent of the old static lang/<key>/lang.json — what
+    index.html's chart bootstrap reads instead of that static file."""
     with get_sessionmaker()() as db:
         language = db.query(Language).filter_by(key=key).one_or_none()
         if language is None:
-            return jsonify({'error': f'no language with key {key!r}'}), 404
-
-        existing = db.query(Vowel).filter_by(language_id=language.id).all()
-        by_symbols = {tuple(v.symbols or []): v for v in existing}
-
-        results = []
-        for i, vd in enumerate(data):
-            symbols = vd.get('symbols') or []
-            hb = vd.get('heightBackness') or [0, 0]
-            target = vd.get('target')
-            v = by_symbols.get(tuple(symbols))
-            if v is None:
-                v = Vowel(language_id=language.id, symbols=symbols, height=hb[0], backness=hb[1],
-                           type=vd.get('type', 'short'), rounded=bool(vd.get('rounded')), sort_order=i)
-                db.add(v)
-                by_symbols[tuple(symbols)] = v
-            v.height, v.backness = hb[0], hb[1]
-            v.type = vd.get('type', 'short')
-            v.rounded = bool(vd.get('rounded'))
-            v.desc = vd.get('desc')
-            v.f1, v.f2 = vd.get('f1'), vd.get('f2')
-            v.wiki_url = vd.get('wikiUrl')
-            v.sort_order = i
-            if target:
-                v.target_height, v.target_backness = target['heightBackness'][0], target['heightBackness'][1]
-                v.target_rounded = target.get('rounded')
-                v.target_f1, v.target_f2 = target.get('f1'), target.get('f2')
-            else:
-                v.target_height = v.target_backness = v.target_rounded = v.target_f1 = v.target_f2 = None
-            results.append(v)
-        db.commit()
-        for v in results:
-            db.refresh(v)
-        return jsonify([_vowel_sync_json(v) for v in results])
-
-
-@app.route('/api/v1/vowels/<int:vowel_id>', methods=['PATCH'])
-def patch_vowel(vowel_id):
-    data = request.get_json(silent=True) or {}
-    with get_sessionmaker()() as db:
-        v = db.get(Vowel, vowel_id)
-        if v is None:
             return jsonify({'error': 'not found'}), 404
-        if 'representativeSampleId' in data:
-            v.representative_sample_id = data['representativeSampleId'] or None
-        db.commit()
-        db.refresh(v)
-        return jsonify(_vowel_sync_json(v))
+        vowels = db.query(Vowel).filter_by(language_id=language.id).order_by(Vowel.sort_order).all()
+        return jsonify({
+            'key': language.key, 'label': language.label, 'color': language.color,
+            'vowels': [_vowel_full_json(v) for v in vowels],
+        })
 
 
 @app.route('/api/v1/sounds')
@@ -1543,6 +1700,7 @@ def list_sounds():
                     'originalFilename': s.original_filename,
                     'durationMs': s.duration_ms,
                     'text': s.text,
+                    'phonemic': s.phonemic,
                     'languageId': s.language_id,
                     'hasFile': bool(storage_key) and store.exists(storage_key),
                     'audioUrl': f'/audio/{storage_key}' if storage_key else s.url,

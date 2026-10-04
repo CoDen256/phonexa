@@ -19,6 +19,7 @@
   <a href="shadow.html"    class="editor-link">🗣 Shadowing</a>
   <a href="praat.html"     class="editor-link" target="_blank">🔬 Formant Lab</a>
   <a href="sounds.html"    class="editor-link" target="_blank">🔊 Sound Library</a>
+  <a href="tokens.html"    class="editor-link" target="_blank">⌸ Token Browser</a>
   <a href="drill.html"     class="editor-link" target="_blank">🎙 Token Drill</a>
   <button class="practice-btn" id="practiceTrigger" type="button">🎤 Practice</button>
 </header>
@@ -41,6 +42,7 @@
         <button class="pp-btn" id="ppRecord">● Rec</button>
         <span class="rec-dot" id="recDot"></span>
         <button class="pp-btn" id="ppPlay" disabled>▶</button>
+        <button class="pp-btn" id="ppCompare" disabled title="Play reference, then yours">⇄</button>
         <button class="pp-btn" id="ppClear" disabled>✕</button>
         <button class="pp-btn" id="ppAnalyse" disabled>⚡</button>
         <span class="pp-formants" id="ppFormants" style="margin-left:4px"></span>
@@ -122,6 +124,7 @@
 <script src="js/geometry.js"></script>
 <script src="js/filters.js"></script>
 <script src="js/audio.js"></script>
+<script src="js/vad.js"></script>
 <script src="js/tooltip.js"></script>
 <script src="js/diphthong.js"></script>
 <script src="js/charts.js"></script>
@@ -134,45 +137,28 @@
 <script>
   function init() {
     if (!Object.keys(LANGS).length) {
-      console.warn('No languages loaded — check lang/index.json and lang/*/lang.json');
+      console.warn('No languages loaded — check the backend / DB connection');
     }
     document.getElementById('loading').style.display = 'none';
     buildSidebar();
     renderAll();
   }
 
-  // ─── Reload button ────────────────────────────────────────────────────────────
+  // ─── Reload button — re-runs the same DB-backed bootstrap as page load ────────
   document.getElementById('reloadBtn').addEventListener('click', async () => {
-    const btn  = document.getElementById('reloadBtn');
-    const icon = btn.querySelector('.reload-icon');
+    const btn = document.getElementById('reloadBtn');
     btn.classList.add('spinning');
     btn.disabled = true;
 
-    // Clear existing language data
     for (const key of Object.keys(LANGS)) delete LANGS[key];
-
     try {
-      // Add cache-busting param so browsers re-fetch even if cached
-      const ts  = Date.now();
-      const idx = await fetch(`lang/index.json?t=${ts}`).then(r => r.json());
-      const names = (idx.languages || []).filter(n => !n.startsWith('_'));
-
-      await Promise.all(
-              names.map(name =>
-                      fetch(`lang/${name}/lang.json?t=${ts}`)
-                              .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-                              .then(data => { if (data && data.key) LANGS[data.key] = data; })
-                              .catch(e => console.warn(`Skipped lang/${name}:`, e.message))
-              )
-      );
+      await loadLanguages();  // already calls init()/buildSidebar()/renderAll() when done
     } catch (e) {
       console.error('Reload failed:', e);
     }
 
     btn.classList.remove('spinning');
     btn.disabled = false;
-    buildSidebar();
-    renderAll();
   });
 </script>
 

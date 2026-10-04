@@ -17,39 +17,26 @@ function escapeHtmlEt(str) {
   return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-// ─── Per-language DB cache — fetched once per language select, re-synced
-// whenever a vowel is added/applied (see editor-form.js's applyVowel) ─────────
+// ─── Per-language DB cache (tokens/samples) — fetched once per language
+// select. Vowels themselves no longer need a separate sync step: each vowel
+// object in state.langDraft.vowels already IS its own DB row (fetched
+// straight from GET /api/v1/vowels?languageId=, carrying its own `id`). ────
 async function ensureDbLanguageData() {
-  if (!state.langDraft) return;
-  const vowels = state.langDraft.vowels || [];
+  if (!state.langDraft?.id) return;
+  const langId = state.langDraft.id;
 
-  try {
-    const resp = await fetch(`/api/v1/languages/${state.langDraft.key}/vowels/sync`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vowels),
-    });
-    state.dbVowelLinks = resp.ok ? await resp.json() : null;
-  } catch (e) { state.dbVowelLinks = null; }
-
-  let dbLang = null;
-  try {
-    const langs = await fetch('/api/v1/languages').then(r => r.ok ? r.json() : []);
-    dbLang = langs.find(l => l.key === state.langDraft.key) || null;
-  } catch (e) { /* ignore */ }
-
-  if (!dbLang) { state.dbLanguageTokens = []; state.dbLanguageSamples = []; return; }
-
-  state.dbLanguageTokens = await fetch(`/api/v1/tokens?languageId=${dbLang.id}`)
+  state.dbLanguageTokens = await fetch(`/api/v1/tokens?languageId=${langId}`)
     .then(r => r.ok ? r.json() : []).catch(() => []);
   state.dbLanguageSamples = await fetch('/api/v1/sounds')
     .then(r => r.ok ? r.json() : []).catch(() => [])
-    .then(all => all.filter(s => s.languageId === dbLang.id));
+    .then(all => all.filter(s => s.languageId === langId));
 
   if (state.vowelIdx != null && state.vowelIdx >= 0) renderVowelAssignmentUI(state.vowelIdx);
   if (typeof renderVowelCards === 'function') renderVowelCards();
 }
 
 function dbVowelIdFor(vowelIdx) {
-  return state.dbVowelLinks?.[vowelIdx]?.id ?? null;
+  return state.langDraft?.vowels?.[vowelIdx]?.id ?? null;
 }
 
 // ─── Render the merged Tokens list for the currently-open vowel ────────────
@@ -102,10 +89,30 @@ function statusLine(wrap, text) {
   if (el) { el.textContent = text; setTimeout(() => { if (el.textContent === text) el.textContent = ''; }, 3000); }
 }
 
+function iconBtn(icon, title) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.title = title;
+  b.style.cssText = 'padding:1px 5px;font-size:.78rem;line-height:1.4;border-radius:4px;border:1px solid #2e4560;background:#1a2e48;color:#d8e8f4;cursor:pointer;flex-shrink:0';
+  b.textContent = icon;
+  return b;
+}
+
+/** Which OTHER vowel (if any) this token is currently assigned to, for the "used elsewhere" hint. */
+function vowelSymbolFor(vowelId) {
+  const v = (state.langDraft?.vowels || []).find(v => v.id === vowelId);
+  return v?.symbols?.[0] || null;
+}
+
 function renderTokensSection(wrap, dbVowelId, vowelIdx) {
+  // Only the first render needs the full skeleton (filter input etc.) — the
+  // list itself is torn down/rebuilt on every star/assign click, which used
+  // to reset its scrollbar to the top every time; preserve it across rebuilds.
+  const prevList = wrap.querySelector('.ve-tok-list');
+  const savedScrollTop = prevList ? prevList.scrollTop : 0;
+
   wrap.innerHTML = '';
   wrap.style.cssText = '';
-  const link = state.dbVowelLinks[vowelIdx];
+  const link = state.langDraft.vowels[vowelIdx];
 
   const current = document.createElement('div');
   current.style.cssText = 'font-size:.72rem;color:#8fa8c0;margin-bottom:6px;display:flex;align-items:center;gap:6px';
@@ -113,8 +120,7 @@ function renderTokensSection(wrap, dbVowelId, vowelIdx) {
     const smp = (state.dbLanguageSamples || []).find(s => s.id === link.representativeSampleId);
     current.innerHTML = `★ Representative: <b style="color:#d8e8f4">${escapeHtmlEt(smp ? (smp.text || '(untitled)') : '#' + link.representativeSampleId)}</b>`;
     if (link.representativeAudioUrl) {
-      const playBtn = document.createElement('button');
-      playBtn.className = 'btn btn-secondary btn-sm'; playBtn.type = 'button'; playBtn.textContent = '▶';
+      const playBtn = iconBtn('▶', 'Play representative sample');
       playBtn.addEventListener('click', () => playUrl(link.representativeAudioUrl));
       current.appendChild(playBtn);
     }
@@ -135,6 +141,7 @@ function renderTokensSection(wrap, dbVowelId, vowelIdx) {
   wrap.appendChild(status);
 
   const list = document.createElement('div');
+  list.className = 've-tok-list';
   list.style.cssText = 'display:flex;flex-direction:column;gap:3px;max-height:260px;overflow-y:auto';
   wrap.appendChild(list);
 
@@ -143,48 +150,48 @@ function renderTokensSection(wrap, dbVowelId, vowelIdx) {
     list.innerHTML = '';
     state.dbLanguageTokens
       .filter(t => !q || (t.symbol || '').toLowerCase().includes(q) || (t.sampleText || '').toLowerCase().includes(q))
+      // Assigned-to-this-vowel first, then unassigned, then assigned elsewhere.
+      .slice().sort((a, b) => {
+        const rank = t => t.vowelId === dbVowelId ? 0 : (t.vowelId == null ? 1 : 2);
+        return rank(a) - rank(b);
+      })
       .slice(0, 50)
       .forEach(t => {
         const assigned = t.vowelId === dbVowelId;
+        const assignedElsewhere = t.vowelId != null && !assigned;
         const isRepresentative = link?.representativeSampleId === t.sampleId;
         const row = document.createElement('div');
-        row.style.cssText = `font-size:.72rem;color:#8fa8c0;display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:5px;${assigned ? 'background:#16321f;border:1px solid #2a5a3a' : 'background:#0d1a28'}`;
+        row.style.cssText = `font-size:.72rem;color:#8fa8c0;display:flex;align-items:center;gap:4px;padding:3px 5px;border-radius:5px;${assigned ? 'background:#16321f;border:1px solid #2a5a3a' : 'background:#0d1a28'}`;
 
         const label = document.createElement('span');
-        label.style.cssText = 'flex:1;font-family:Georgia,serif';
-        label.innerHTML = `<span style="color:#7eb8f7">/${escapeHtmlEt(t.symbol || '?')}/</span> ${highlightedSampleText(t)}`;
+        label.style.cssText = 'flex:1;min-width:0;font-family:Georgia,serif;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+        label.title = 'Open in Formant Lab';
+        label.innerHTML = `<span style="color:#7eb8f7">/${escapeHtmlEt(t.symbol || '?')}/</span> ${highlightedSampleText(t)}`
+          + (assignedElsewhere ? ` <span style="color:#6a8298;font-style:italic">— used by /${escapeHtmlEt(vowelSymbolFor(t.vowelId) || '?')}/</span>` : '');
+        label.addEventListener('click', () => window.open(`praat.html?sampleId=${t.sampleId}&scrollTo=${t.id}`, '_blank'));
         row.appendChild(label);
 
-        const playTokBtn = document.createElement('button');
-        playTokBtn.className = 'btn btn-secondary btn-sm'; playTokBtn.type = 'button'; playTokBtn.title = 'Play token slice';
-        playTokBtn.textContent = '▶ tok';
+        const playTokBtn = iconBtn('◉', 'Play token slice');
         playTokBtn.addEventListener('click', () => playTokenSliceRange(t));
         row.appendChild(playTokBtn);
 
-        const playSmpBtn = document.createElement('button');
-        playSmpBtn.className = 'btn btn-secondary btn-sm'; playSmpBtn.type = 'button'; playSmpBtn.title = 'Play full sample';
-        playSmpBtn.textContent = '▶ smp';
+        const playSmpBtn = iconBtn('▶', 'Play full sample');
         playSmpBtn.addEventListener('click', () => playSample(t));
         row.appendChild(playSmpBtn);
 
-        const starBtn = document.createElement('button');
-        starBtn.className = 'btn btn-secondary btn-sm'; starBtn.type = 'button';
-        starBtn.title = isRepresentative ? 'This sample is the representative' : 'Set this token\'s sample as the representative';
-        starBtn.textContent = isRepresentative ? '★' : '☆';
+        const starBtn = iconBtn(isRepresentative ? '★' : '☆', isRepresentative ? 'This sample is the representative' : 'Set this token\'s sample as the representative');
         starBtn.style.color = isRepresentative ? '#ffd166' : '';
         starBtn.addEventListener('click', async () => {
           const resp = await fetch(`/api/v1/vowels/${dbVowelId}`, {
             method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ representativeSampleId: t.sampleId }),
           });
-          if (resp.ok) state.dbVowelLinks[vowelIdx] = await resp.json();
+          if (resp.ok) Object.assign(state.langDraft.vowels[vowelIdx], await resp.json());
           renderTokensSection(wrap, dbVowelId, vowelIdx);
           statusLine(wrap, `★ Representative set to "${t.sampleText || '(untitled)'}"`);
         });
         row.appendChild(starBtn);
 
-        const assignBtn = document.createElement('button');
-        assignBtn.className = 'btn btn-secondary btn-sm'; assignBtn.type = 'button';
-        assignBtn.textContent = assigned ? '✕ Unassign' : '+ Assign';
+        const assignBtn = iconBtn(assigned ? '✕' : '+', assigned ? 'Unassign from this vowel' : (assignedElsewhere ? `Reassign from /${vowelSymbolFor(t.vowelId)}/ to this vowel` : 'Assign to this vowel'));
         assignBtn.addEventListener('click', async () => {
           const newVowelId = assigned ? null : dbVowelId;
           await fetch(`/api/v1/tokens/${t.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vowelId: newVowelId }) });
@@ -200,4 +207,8 @@ function renderTokensSection(wrap, dbVowelId, vowelIdx) {
   };
   filterInput.addEventListener('input', renderList);
   renderList();
+  // Restore scroll position only for THIS render pass (e.g. after a star/
+  // assign click re-invokes renderTokensSection) — not on every filter
+  // keystroke, where resetting to the top of the new result set is correct.
+  list.scrollTop = savedScrollTop;
 }
