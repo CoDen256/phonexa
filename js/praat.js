@@ -72,6 +72,7 @@ const ingestFromOpener = ingestMode && params.has('ingestFromOpener');
 // ─── State ──────────────────────────────────────────────────────────────────────
 let currentBuffer = null;     // decoded AudioBuffer (all channels, for display + playback)
 let analysisResult = null;    // { duration_ms, formants, pitch, spectrogram } — the currently-displayed track
+let playbackCursorFrac = null;  // absolute fraction (of the whole buffer) currently playing — null when idle
 let selStart = 0, selEnd = 0; // fractions of duration — scratch selection, for drawing a brand-new section
 let dragging = false;         // scratch-selection drag (main spectrogram, empty space)
 let sectionDrag = null;       // { section, mode: 'resize-start'|'resize-end'|'move', moveOffset } — main-spectrogram section drag
@@ -162,13 +163,16 @@ async function loadBuffer(buffer) {
   document.getElementById('dropzone').style.display = 'none';
   document.getElementById('existingSamplePicker').style.display = 'none';
   document.getElementById('praatPanels').style.display = 'block';
-  document.getElementById('paramsRow').style.display = 'flex';
+  document.getElementById('paramsRow').style.display = ingestMode ? 'none' : 'flex';
+  document.getElementById('analyzeBtn').style.display = ingestMode ? 'none' : '';
   document.getElementById('channelInfo').textContent =
       `${buffer.numberOfChannels} ch · ${(buffer.sampleRate / 1000).toFixed(1)} kHz · ${buffer.duration.toFixed(2)}s`;
   document.getElementById('sectionsPanel').style.display = 'block';
   document.getElementById('addSectionToolbar').style.display = legacyCtx ? 'none' : 'flex';
   document.getElementById('newSectionBtn').textContent = ingestMode ? '+ New section from selection' : '+ New token from selection';
   document.getElementById('analysisHistoryRow').style.display = sampleMode ? 'flex' : 'none';
+  document.getElementById('trimBtn').style.display = sampleMode ? '' : 'none';
+  document.getElementById('trimConfirmRow').style.display = 'none';
   document.getElementById('sectionsHint').textContent = ingestMode
     ? '(auto-suggested from silence gaps — drag a section\'s own mini-spectrogram, or its band on the main spectrogram above, to adjust)'
     : sampleMode
@@ -193,6 +197,32 @@ async function fetchDbSample() {
   if (!resp.ok) throw new Error('Could not load sample #' + dbSampleId);
   dbSampleData = await resp.json();
   analysesHistory = dbSampleData.analyses || [];
+}
+
+// ─── Sample mode: trim the sample's audio to the current selection ─────────
+async function trimAudioToSelection() {
+  if (!currentBuffer || selEnd <= selStart || !sampleMode) return;
+  const durationMs = currentBuffer.duration * 1000;
+  const trimStartMs = selStart * durationMs, trimEndMs = selEnd * durationMs;
+  document.getElementById('trimConfirmRow').style.display = 'none';
+  setStatus('Trimming…');
+  try {
+    const { samples, sampleRate } = extractMonoSlice(currentBuffer, trimStartMs, trimEndMs);
+    const blob = encodeWavBlob(samples, sampleRate);
+    const form = new FormData();
+    form.append('file', blob, 'trimmed.wav');
+    form.append('trimStartMs', String(trimStartMs));
+    const resp = await fetch(`/api/v1/samples/${dbSampleId}/trim`, { method: 'POST', body: form });
+    if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || 'HTTP ' + resp.status); }
+    await fetchDbSample();
+    // Cache-bust — same storage_key/URL as before the trim, so a cached
+    // response for this exact URL must not be allowed to win.
+    const bustedUrl = dbSampleData.audioUrl + (dbSampleData.audioUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+    await handleUrl(bustedUrl);
+    setStatus('Trimmed — every token shifted to match the new timeline.');
+  } catch (e) {
+    setStatus('Trim failed: ' + e.message);
+  }
 }
 
 function seedSectionsFromDbSample() {
@@ -398,23 +428,11 @@ async function saveCurrentAnalysis() {
   if (btn) { btn.disabled = false; btn.textContent = '💾 Save this analysis'; }
 }
 
+// Thin wrapper over js/spectro.js's generic version — see that file for the
+// real implementation, now shared with js/practice.js.
 function computeMeansForRange(startFrac, endFrac) {
-  if (!analysisResult || !currentBuffer || endFrac <= startFrac) return null;
-  const durationMs = currentBuffer.duration * 1000;
-  const t0 = startFrac * durationMs, t1 = endFrac * durationMs;
-  const inRange = t => t >= t0 && t <= t1;
-  const f1s = [], f2s = [], f0s = [];
-  for (const row of analysisResult.formants) {
-    if (!inRange(row.t_ms)) continue;
-    if (row.f1 != null) f1s.push(row.f1);
-    if (row.f2 != null) f2s.push(row.f2);
-  }
-  for (const row of analysisResult.pitch) {
-    if (!inRange(row.t_ms)) continue;
-    if (row.f0 != null) f0s.push(row.f0);
-  }
-  const mean = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
-  return { f1: mean(f1s), f2: mean(f2s), f0: mean(f0s), nFormantFrames: f1s.length };
+  if (!currentBuffer) return null;
+  return SpectroLib.computeMeansForRange(analysisResult, currentBuffer.duration * 1000, startFrac, endFrac);
 }
 function computeSelectionMeans() { return computeMeansForRange(selStart, selEnd); }
 
@@ -524,6 +542,13 @@ function previewLabelForToken(s) {
   if (!means?.nFormantFrames) return 'no voiced frames';
   return `F1 ${Math.round(means.f1)} · F2 ${Math.round(means.f2)}${means.f0 != null ? ` · F0 ${Math.round(means.f0)}` : ''} Hz`;
 }
+// Ingest mode: read-only — no manual re-analyze there, this just shows what
+// the one auto-run default-params analysis found over this section's range.
+function ingestSectionMeansLabel(s) {
+  const means = computeMeansForRange(s.start, s.end);
+  if (!means?.nFormantFrames) return 'no voiced frames in this section';
+  return `F1 <b>${Math.round(means.f1)}</b> · F2 <b>${Math.round(means.f2)}</b>${means.f0 != null ? ` · F0 <b>${Math.round(means.f0)}</b>` : ''} Hz`;
+}
 
 // ─── Rendering: card list (structural — rebuild on add/remove only) ────────────
 function renderSections() {
@@ -542,6 +567,7 @@ function renderSections() {
     if (s.mode === 'ingest') {
       header = `<span class="section-idx">#${i + 1}</span><span class="section-time">${sectionMs(s).join('–')} ms</span>`;
       body = `
+        <span class="section-values">${ingestSectionMeansLabel(s)}</span>
         <select class="section-lang">${['<option value="">— language —</option>']
           .concat(languagesList.map(l => `<option value="${l.id}"${s.languageId === l.id ? ' selected' : ''}>${escapeAttr(l.label)}</option>`)).join('')}</select>
         <input type="text" class="section-text" placeholder="text (required)" value="${escapeAttr(s.text)}">
@@ -549,7 +575,8 @@ function renderSections() {
         <button class="sent-btn section-play" type="button">▶</button>
         ${s.savedSampleId
           ? `<span class="section-saved">✓ Saved #${s.savedSampleId}</span>
-             <button class="sent-btn section-update" type="button">✓ Update</button>`
+             <button class="sent-btn section-update" type="button">✓ Update</button>
+             <a class="sent-btn" href="praat.html?sampleId=${s.savedSampleId}" target="_blank" rel="noopener">🔬 Open as sample</a>`
           : `<button class="sent-btn primary section-save" type="button">💾 Save</button>`}
         <button class="sent-btn section-remove" type="button">✕</button>
         <span class="section-card-status muted"></span>
@@ -564,8 +591,11 @@ function renderSections() {
       `;
       body = `
         <div class="section-charsel" data-charsel="${s.id}"></div>
-        <span class="section-values">Current: <b>${currentLabelForToken(s)}</b> &nbsp;·&nbsp; Previewing: <b>${previewLabelForToken(s)}</b>
-          ${viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : ''}
+        <span class="section-values" style="display:block">
+          <div>Current: <b>${currentLabelForToken(s)}</b></div>
+          <div>Previewing: <b>${previewLabelForToken(s)}</b>
+            ${viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : ''}
+          </div>
         </span>
         <label class="manual-f1f2">F1 <input type="number" class="section-manual-f1" value="${s.manualF1 ?? ''}" placeholder="auto" style="width:4.5em"></label>
         <label class="manual-f1f2">F2 <input type="number" class="section-manual-f2" value="${s.manualF2 ?? ''}" placeholder="auto" style="width:4.5em"></label>
@@ -705,7 +735,10 @@ function refreshSectionVisuals() {
       drawSpectrogramWindow(cv, winStart, winEnd, s.start, s.end);
     }
     const isDbToken = s.mode === 'token' && s.dbTokenId !== undefined;
-    if (s.mode === 'token' && !isDbToken) {
+    if (s.mode === 'ingest') {
+      const valuesEl = card.querySelector('.section-values');
+      if (valuesEl) valuesEl.innerHTML = ingestSectionMeansLabel(s);
+    } else if (s.mode === 'token' && !isDbToken) {
       const after = computeMeansForRange(s.start, s.end);
       const valuesEl = card.querySelector('.section-values');
       if (valuesEl) {
@@ -718,7 +751,7 @@ function refreshSectionVisuals() {
       if (valuesEl) {
         const useBtn = viewedAnalysisId != null && viewedAnalysisId !== s.activeAnalysisId
           ? '<button class="sent-btn section-use-analysis" type="button">Use this</button>' : '';
-        valuesEl.innerHTML = `Current: <b>${currentLabelForToken(s)}</b> &nbsp;·&nbsp; Previewing: <b>${previewLabelForToken(s)}</b> ${useBtn}`;
+        valuesEl.innerHTML = `<div>Current: <b>${currentLabelForToken(s)}</b></div><div>Previewing: <b>${previewLabelForToken(s)}</b> ${useBtn}</div>`;
         valuesEl.querySelector('.section-use-analysis')?.addEventListener('click', () => useViewedAnalysisForToken(s));
       }
       const badge = card.querySelector('.section-dirty-badge');
@@ -748,6 +781,7 @@ function drawSpectrogramWindow(cv, winStart, winEnd, selStartFrac, selEndFrac) {
   const x0 = toX(Math.max(winStart, selStartFrac)), x1 = toX(Math.min(winEnd, selEndFrac));
   ctx.fillStyle = 'rgba(126,184,247,0.18)'; ctx.fillRect(x0, 0, x1 - x0, H);
   ctx.fillStyle = '#7eb8f7'; ctx.fillRect(x0, 0, 1.5, H); ctx.fillRect(x1 - 1.5, 0, 1.5, H);
+  if (playbackCursorFrac != null) SpectroLib.drawPlaybackCursor(ctx, W, H, winStart, winEnd, playbackCursorFrac);
 }
 
 function wireMiniDrag(el, s) {
@@ -862,80 +896,20 @@ function redrawAll() {
   updateSelectionReadout();
 }
 
-// ─── Spectrogram rendering — shared by the main view (winStart=0, winEnd=1)
-// and each section's mini view (its own padded window). ────────────────────────
+// ─── Spectrogram rendering — thin wrappers over js/spectro.js's shared
+// implementation (also used by js/practice.js) — shared by the main view
+// (winStart=0, winEnd=1) and each section's mini view (its own padded window).
 function drawSpectrogramCrop(cv, W, H, winStart, winEnd) {
-  const ctx = cv.getContext('2d');
-  const sg = analysisResult?.spectrogram;
-  if (!sg) { ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H); return; }
-  const nT = sg.times_ms.length, nF = sg.freqs_hz.length;
-  if (!nT || !nF) { ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H); return; }
-
-  // Praat convention: louder = darker, on a fixed dynamic range below this clip's own peak.
-  let maxDb = -Infinity;
-  for (const col of sg.power_db) for (const v of col) if (v > maxDb) maxDb = v;
-  const dynamicRangeDb = 60;
-  const minDb = maxDb - dynamicRangeDb;
-  const winSpan = Math.max(1e-9, winEnd - winStart);
-
-  const img = ctx.createImageData(W, H);
-  for (let x = 0; x < W; x++) {
-    const frac = winStart + (x / W) * winSpan;
-    const ti = Math.max(0, Math.min(nT - 1, Math.floor(frac * nT)));
-    const col = sg.power_db[ti];
-    for (let y = 0; y < H; y++) {
-      // y=0 is the top of the canvas (high frequency); invert to match freq axis (0 at bottom)
-      const freqFrac = 1 - y / H;
-      const fi = Math.min(nF - 1, Math.floor(freqFrac * nF));
-      const db = col[fi];
-      const t = Math.max(0, Math.min(1, (db - minDb) / dynamicRangeDb));
-      const gray = Math.round(255 * (1 - t));   // loud → dark
-      const off = (y * W + x) * 4;
-      img.data[off] = gray; img.data[off + 1] = gray; img.data[off + 2] = gray; img.data[off + 3] = 255;
-    }
-  }
-  ctx.putImageData(img, 0, 0);
+  SpectroLib.drawSpectrogramCrop(cv, W, H, winStart, winEnd, analysisResult);
 }
 function freqAxisMax() {
-  const sg = analysisResult?.spectrogram;
-  return sg?.freqs_hz?.length ? sg.freqs_hz[sg.freqs_hz.length - 1] : 5000;
+  return SpectroLib.freqAxisMax(analysisResult);
 }
 function drawFormantPitchOverlay(ctx, W, H, winStart, winEnd) {
   if (!analysisResult || !currentBuffer) return;
-  const durationMs = currentBuffer.duration * 1000;
-  const maxFreq = freqAxisMax();
   const pitchFloor = +(document.getElementById('pPitchFloor')?.value) || 75;
   const pitchCeil  = +(document.getElementById('pPitchCeiling')?.value) || 600;
-  const winSpan = Math.max(1e-9, winEnd - winStart);
-  const toX = frac => ((frac - winStart) / winSpan) * W;
-
-  // Formant dots (red) — left axis, 0..maxFreq
-  ctx.fillStyle = '#e8536b';
-  for (const row of analysisResult.formants) {
-    const frac = row.t_ms / durationMs;
-    if (frac < winStart || frac > winEnd) continue;
-    const x = toX(frac);
-    for (let i = 1; i <= 5; i++) {
-      const hz = row['f' + i];
-      if (hz == null || hz > maxFreq) continue;
-      const y = H * (1 - hz / maxFreq);
-      ctx.fillRect(x - 1, y - 1, 2, 2);
-    }
-  }
-
-  // Pitch curve (blue) — own right axis, pitchFloor..pitchCeiling
-  ctx.strokeStyle = '#4db8ff'; ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
-  ctx.beginPath();
-  let drawing = false;
-  for (const row of analysisResult.pitch) {
-    const frac = row.t_ms / durationMs;
-    if (frac < winStart || frac > winEnd || row.f0 == null) { drawing = false; continue; }
-    const x = toX(frac);
-    const clamped = Math.max(pitchFloor, Math.min(pitchCeil, row.f0));
-    const y = H * (1 - (clamped - pitchFloor) / (pitchCeil - pitchFloor));
-    if (!drawing) { ctx.moveTo(x, y); drawing = true; } else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
+  SpectroLib.drawFormantPitchOverlay(ctx, W, H, winStart, winEnd, analysisResult, currentBuffer.duration * 1000, pitchFloor, pitchCeil);
 }
 function drawSpectrogramBase() {
   const cv = document.getElementById('spectrogramCanvas');
@@ -952,6 +926,7 @@ function drawSpectrogramOverlay() {
   drawFormantPitchOverlay(ctx, W, H, 0, 1);
   drawSectionBands(ctx, W, H);
   drawSelectionBand(ctx, W, H);
+  if (playbackCursorFrac != null) SpectroLib.drawPlaybackCursor(ctx, W, H, 0, 1, playbackCursorFrac);
 }
 
 // ─── Selection readout (ingest mode's scratch selection, for drawing new sections) ──
@@ -972,33 +947,24 @@ function updateSelectionReadout() {
 }
 
 // ─── Analyze ───────────────────────────────────────────────────────────────────
-// Same-origin, relative URL — matches editor-samples.js's SAMPLE_SERVER convention
-// (this page is reached from the editor, which already assumes formanter.py serves it).
-const ANALYZE_SERVER = '';
 async function runAnalyze() {
   if (!currentBuffer) return;
   const btn = document.getElementById('analyzeBtn');
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  // Ingest mode has no params row (no manual re-analyze there), so there's
+  // nothing to read from inputs — {} runs with Praat's own defaults, same as
+  // every other mode's default values.
+  const config = ingestMode ? {} : {
+    max_number_of_formants: +(document.getElementById('pMaxFormants')?.value) || 5,
+    maximum_formant: +(document.getElementById('pMaxFreq')?.value) || 5500,
+    window_length: +(document.getElementById('pWindowLen')?.value) || 0.025,
+    pre_emphasis_from: +(document.getElementById('pPreEmph')?.value) || 50,
+    pitch_floor: +(document.getElementById('pPitchFloor')?.value) || 75,
+    pitch_ceiling: +(document.getElementById('pPitchCeiling')?.value) || 600,
+  };
   setStatus('Analyzing (Praat defaults)…');
   try {
-    const mono = currentBuffer.getChannelData(0);
-    const blob = encodeWavBlob(mono, currentBuffer.sampleRate);
-    const form = new FormData();
-    form.append('file', blob, 'audio.wav');
-    form.append('config', JSON.stringify({
-      max_number_of_formants: +(document.getElementById('pMaxFormants')?.value) || 5,
-      maximum_formant: +(document.getElementById('pMaxFreq')?.value) || 5500,
-      window_length: +(document.getElementById('pWindowLen')?.value) || 0.025,
-      pre_emphasis_from: +(document.getElementById('pPreEmph')?.value) || 50,
-      pitch_floor: +(document.getElementById('pPitchFloor')?.value) || 75,
-      pitch_ceiling: +(document.getElementById('pPitchCeiling')?.value) || 600,
-    }));
-    const resp = await fetch(ANALYZE_SERVER + '/analyze-praat', { method: 'POST', body: form, signal: AbortSignal.timeout(30000) });
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error || ('HTTP ' + resp.status));
-    }
-    analysisResult = await resp.json();
+    analysisResult = await SpectroLib.runPraatAnalysis(currentBuffer, config);
     drawSpectrogramBase();
     drawSpectrogramOverlay();
     updateSelectionReadout();
@@ -1011,7 +977,14 @@ async function runAnalyze() {
 }
 
 // ─── Playback ───────────────────────────────────────────────────────────────────
-function stopPlayback() { if (activeSource) { try { activeSource.stop(); } catch (e) {} activeSource = null; } }
+function stopPlayback() {
+  if (activeSource) { try { activeSource.stop(); } catch (e) {} activeSource = null; }
+  playbackCursorFrac = null;
+}
+function redrawCursorViews() {
+  drawSpectrogramOverlay();
+  refreshSectionVisuals();
+}
 function playRange(fracStart, fracEnd) {
   if (!currentBuffer) return;
   stopPlayback();
@@ -1023,6 +996,12 @@ function playRange(fracStart, fracEnd) {
   src.start(0, fracStart * dur, Math.max(0.001, (fracEnd - fracStart) * dur));
   activeSource = src;
   src.onended = () => { if (activeSource === src) activeSource = null; ctx.close(); };
+  SpectroLib.animatePlaybackCursor({
+    startFrac: fracStart, endFrac: fracEnd, durationSec: dur,
+    onFrame: f => { playbackCursorFrac = f; redrawCursorViews(); },
+    onDone: () => { playbackCursorFrac = null; redrawCursorViews(); },
+    isStopped: () => activeSource !== src,
+  });
 }
 
 // Only offered in ingestion mode (see fileToolbar wiring) — editor-launched
@@ -1093,6 +1072,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('analyzeBtn').addEventListener('click', () => runAnalyze());
   document.getElementById('playSelectionBtn').addEventListener('click', () => playRange(selEnd > selStart ? selStart : 0, selEnd > selStart ? selEnd : 1));
   document.getElementById('playAllBtn').addEventListener('click', () => playRange(0, 1));
+  document.getElementById('trimBtn').addEventListener('click', () => {
+    if (!currentBuffer || selEnd <= selStart) { setStatus('Drag a selection on the spectrogram first (empty space, not on a section).'); return; }
+    const durationMs = currentBuffer.duration * 1000;
+    const t0 = Math.round(selStart * durationMs), t1 = Math.round(selEnd * durationMs);
+    document.getElementById('trimConfirmText').textContent =
+      `Trim to keep ${t0}–${t1} ms (discarding the rest)? This overwrites the audio file — every token's time range shifts to match.`;
+    document.getElementById('trimConfirmRow').style.display = 'flex';
+  });
+  document.getElementById('trimCancelBtn').addEventListener('click', () => {
+    document.getElementById('trimConfirmRow').style.display = 'none';
+  });
+  document.getElementById('trimConfirmBtn').addEventListener('click', () => trimAudioToSelection());
   document.getElementById('newSectionBtn')?.addEventListener('click', commitSectionFromSelection);
   document.getElementById('newFileBtn')?.addEventListener('click', resetToDropzone);
   document.getElementById('analysisHistorySelect')?.addEventListener('change', onAnalysisHistoryChange);

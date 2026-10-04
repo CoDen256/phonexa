@@ -59,6 +59,12 @@
       <span id="selectionMeans" class="selection-means">—</span>
       <button class="sent-btn" id="playSelectionBtn" type="button">▶ Play selection</button>
       <button class="sent-btn" id="playAllBtn" type="button">▶ Play all</button>
+      <button class="sent-btn" id="trimBtn" type="button" style="display:none">✂ Trim audio to selection</button>
+    </div>
+    <div class="selection-row" id="trimConfirmRow" style="display:none">
+      <span id="trimConfirmText" class="muted"></span>
+      <button class="sent-btn primary" id="trimConfirmBtn" type="button">✓ Confirm trim</button>
+      <button class="sent-btn" id="trimCancelBtn" type="button">Cancel</button>
     </div>
   </div>
 
@@ -97,6 +103,7 @@
 
 <script src="js/audio.js"></script>
 <script src="js/vad.js"></script>
+<script src="js/spectro.js"></script>
 <script src="js/ingest.js"></script>
 <script src="js/praat.js"></script>
 </body>

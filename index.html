@@ -42,14 +42,15 @@
         <button class="pp-btn" id="ppRecord">● Rec</button>
         <span class="rec-dot" id="recDot"></span>
         <button class="pp-btn" id="ppPlay" disabled>▶</button>
-        <button class="pp-btn" id="ppCompare" disabled title="Play reference, then yours">⇄</button>
+        <button class="pp-btn" id="ppCompare" disabled title="Play reference, then yours — silence-trimmed">⇄</button>
         <button class="pp-btn" id="ppClear" disabled>✕</button>
-        <button class="pp-btn" id="ppAnalyse" disabled>⚡</button>
-        <span class="pp-formants" id="ppFormants" style="margin-left:4px"></span>
       </div>
       <div class="pp-status" id="ppStatus">Record a vowel</div>
-      <canvas id="waveCanvas" height="36"
-              style="display:none;width:100%;border-radius:4px;margin-top:3px;cursor:col-resize;touch-action:none"></canvas>
+      <div class="pp-spectro-wrap" id="waveWrap" style="display:none">
+        <canvas id="waveCanvas"></canvas>
+        <canvas id="waveOverlay"></canvas>
+        <div id="ppLiveMeans" class="pp-live-label"></div>
+      </div>
       <div id="waveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
     </div>
     <!-- ── Right: Reference vowel ── -->
@@ -57,12 +58,13 @@
       <div class="pp-row">
         <span class="pp-col-title" id="refColTitle" style="flex:0;white-space:nowrap">Reference</span>
         <button class="pp-btn" id="refPlay" disabled>▶</button>
-        <button class="pp-btn" id="refAnalyse" disabled>⚡</button>
-        <span class="pp-formants" id="refFormants" style="margin-left:4px"></span>
       </div>
       <div class="pp-status" id="refStatus">Click a vowel on the chart</div>
-      <canvas id="refWaveCanvas" height="36"
-              style="display:none;width:100%;border-radius:4px;margin-top:3px;cursor:col-resize;touch-action:none"></canvas>
+      <div class="pp-spectro-wrap" id="refWaveWrap" style="display:none">
+        <canvas id="refWaveCanvas"></canvas>
+        <canvas id="refWaveOverlay"></canvas>
+        <div id="refLiveMeans" class="pp-live-label"></div>
+      </div>
       <div id="refWaveInfo" style="display:none;font-size:.58rem;color:var(--muted);text-align:center"></div>
     </div>
   </div>
@@ -125,6 +127,7 @@
 <script src="js/filters.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/vad.js"></script>
+<script src="js/spectro.js"></script>
 <script src="js/tooltip.js"></script>
 <script src="js/diphthong.js"></script>
 <script src="js/charts.js"></script>

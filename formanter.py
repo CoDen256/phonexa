@@ -1301,6 +1301,79 @@ def delete_sample(sample_id):
     return jsonify({'ok': True})
 
 
+@app.route('/api/v1/samples/<int:sample_id>/trim', methods=['POST'])
+def trim_sample(sample_id):
+    """Overwrites the sample's stored audio with a client-trimmed version
+    (multipart: file=<trimmed wav>, trimStartMs=<how much was cut from the
+    front>). Every Token's time_start_ms/time_end_ms and every
+    SampleAnalysis's formants/pitch t_ms get shifted by -trimStartMs (and
+    dropped if they fall outside the new, shorter duration) — this is what
+    "preserves F1/F2": the same analysis data, just re-indexed to match the
+    new timeline, never recomputed or approximated. Destructive — the
+    original untrimmed bytes are gone; confirmed client-side before this is
+    called."""
+    uploaded_file = request.files.get('file')
+    if not uploaded_file:
+        return jsonify({'error': 'file is required'}), 400
+    try:
+        trim_start_ms = float(request.form.get('trimStartMs', 0))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'trimStartMs must be a number'}), 400
+
+    with get_sessionmaker()() as db:
+        sample = db.get(Sample, sample_id)
+        if sample is None:
+            return jsonify({'error': 'not found'}), 404
+        if not sample.url or not is_local_url(sample.url):
+            return jsonify({'error': 'only locally-stored audio can be trimmed'}), 400
+        storage_key = storage_key_from_url(sample.url)
+
+        raw = uploaded_file.read()
+        samples_arr, sample_rate = decode_audio(raw)
+        new_duration_ms = len(samples_arr) / sample_rate * 1000
+
+        get_audio_store().put_bytes(raw, storage_key)   # overwrite in place — same storage_key
+
+        sample.duration_ms = round(new_duration_ms)
+        sample.sample_rate_hz = int(sample_rate)
+        sample.channels = 1
+
+        def shift_ms(ms):
+            if ms is None:
+                return None
+            return max(0.0, min(new_duration_ms, ms - trim_start_ms))
+
+        tokens_updated = 0
+        for token in sample.tokens:
+            token.time_start_ms = shift_ms(token.time_start_ms)
+            token.time_end_ms = shift_ms(token.time_end_ms)
+            tokens_updated += 1
+
+        def shift_rows(rows):
+            out = []
+            for row in rows or []:
+                t_ms = row.get('t_ms')
+                if t_ms is None:
+                    continue
+                new_t = t_ms - trim_start_ms
+                if new_t < 0 or new_t > new_duration_ms:
+                    continue
+                out.append({**row, 't_ms': round(new_t, 1)})
+            return out
+
+        analyses_updated = 0
+        for analysis in sample.analyses:
+            analysis.formants = shift_rows(analysis.formants)
+            analysis.pitch = shift_rows(analysis.pitch)
+            analyses_updated += 1
+
+        db.commit()
+        return jsonify({
+            'ok': True, 'durationMs': sample.duration_ms,
+            'tokensUpdated': tokens_updated, 'analysesUpdated': analyses_updated,
+        })
+
+
 @app.route('/api/v1/samples/<int:sample_id>/analyses/<int:analysis_id>')
 def get_sample_analysis(sample_id, analysis_id):
     with get_sessionmaker()() as db:
@@ -1414,22 +1487,29 @@ def delete_token(token_id):
         return jsonify({'ok': True})
 
 
-def _token_mean_f1_f2(t: Token) -> tuple[float | None, float | None]:
-    """Mean F1/F2 over the token's own [time_start_ms, time_end_ms] range,
-    derived from its active analysis's formant track — manual_f1/f2 (a
-    direct human measurement) wins when present. Same logic as
-    js/praat.js's computeMeansForRange(), ported server-side so index.html
-    doesn't need to fetch/decode full analysis tracks just to plot a dot."""
-    if t.manual_f1 is not None and t.manual_f2 is not None:
-        return t.manual_f1, t.manual_f2
-    if t.active_analysis is None or t.time_start_ms is None or t.time_end_ms is None:
+def _mean_f1_f2_for_range(analysis, time_start_ms, time_end_ms) -> tuple[float | None, float | None]:
+    """Mean F1/F2 over [time_start_ms, time_end_ms] from one SampleAnalysis's
+    formant track — same logic as js/praat.js's computeMeansForRange(),
+    parameterized by analysis so it can be reused across ANY of a sample's
+    analyses, not just the token's currently-active one (see list_tokens'
+    per-token `analyses[]`, which lets the Token Browser preview what each
+    analysis session would give before switching to it)."""
+    if analysis is None or time_start_ms is None or time_end_ms is None:
         return None, None
-    formants = t.active_analysis.formants or []
-    f1s = [r['f1'] for r in formants if r.get('f1') is not None and t.time_start_ms <= r.get('t_ms', -1) <= t.time_end_ms]
-    f2s = [r['f2'] for r in formants if r.get('f2') is not None and t.time_start_ms <= r.get('t_ms', -1) <= t.time_end_ms]
+    formants = analysis.formants or []
+    f1s = [r['f1'] for r in formants if r.get('f1') is not None and time_start_ms <= r.get('t_ms', -1) <= time_end_ms]
+    f2s = [r['f2'] for r in formants if r.get('f2') is not None and time_start_ms <= r.get('t_ms', -1) <= time_end_ms]
     f1 = sum(f1s) / len(f1s) if f1s else None
     f2 = sum(f2s) / len(f2s) if f2s else None
     return f1, f2
+
+
+def _token_mean_f1_f2(t: Token) -> tuple[float | None, float | None]:
+    """The token's "current" F1/F2 — manual_f1/f2 (a direct human
+    measurement) wins when present, else the mean over its active analysis."""
+    if t.manual_f1 is not None and t.manual_f2 is not None:
+        return t.manual_f1, t.manual_f2
+    return _mean_f1_f2_for_range(t.active_analysis, t.time_start_ms, t.time_end_ms)
 
 
 @app.route('/api/v1/tokens')
@@ -1457,12 +1537,22 @@ def list_tokens():
             f1, f2 = _token_mean_f1_f2(t)
             local = bool(s.url) and is_local_url(s.url)
             audio_url = f'/audio/{storage_key_from_url(s.url)}' if local else s.url
+            analyses = []
+            for a in s.analyses:
+                af1, af2 = _mean_f1_f2_for_range(a, t.time_start_ms, t.time_end_ms)
+                analyses.append({
+                    'id': a.id, 'version': a.version,
+                    'f1': round(af1) if af1 is not None else None, 'f2': round(af2) if af2 is not None else None,
+                })
             out.append({
                 'id': t.id, 'symbol': t.symbol, 'vowelId': t.vowel_id,
+                'vowelSymbol': t.vowel.symbols[0] if t.vowel and t.vowel.symbols else None,
                 'sampleId': s.id, 'sampleText': s.text, 'audioUrl': audio_url,
                 'charStart': t.char_start, 'charEnd': t.char_end,
                 'timeStartMs': t.time_start_ms, 'timeEndMs': t.time_end_ms,
                 'f1': round(f1) if f1 is not None else None, 'f2': round(f2) if f2 is not None else None,
+                'manualF1': t.manual_f1, 'manualF2': t.manual_f2,
+                'activeAnalysisId': t.active_analysis_id, 'analyses': analyses,
                 'languageKey': lang.key if lang else None,
                 'createdAt': t.created_at.isoformat() if t.created_at else None,
                 'updatedAt': t.updated_at.isoformat() if t.updated_at else None,

@@ -81,6 +81,48 @@ async function playTokenSlice(sample, tok) {
     }
 }
 
+/**
+ * Builds a DOM node rendering a sample's text with its tokens' char ranges
+ * highlighted (hover-darken, click-to-play-that-token's-slice); clicking
+ * anywhere else in the text calls onFullPlay (if given). Originally the
+ * public viewer/language-editor's shared card-rendering helper (js/charts.js's
+ * renderDetail/editor-vowels.js's pseudo-sample cards) — moved here so the
+ * Sound/Token browsers can reuse the exact same thing without pulling in
+ * charts.js's page-specific globals (LANGS, filters, etc).
+ * @param {object} smp — {text, tokens:[{symbol, position:[start,end], analysis:{f1,f2}}]}
+ * @param {string[]|null} filterSymbols — only highlight tokens whose symbol is in this list (null = all)
+ * @param {string} langColor — hex color for the highlight tint
+ * @param {function} [onFullPlay] — called when a non-token character is clicked
+ */
+function buildDetailHighlightedText(smp, filterSymbols, langColor, onFullPlay) {
+  const text=smp.text||''; const c=langColor;
+  const div=document.createElement('div');
+  div.style.cssText='font-family:Georgia,serif;line-height:1.65;word-break:break-word';
+  const toks=(smp.tokens||[]).filter(t=>!filterSymbols||filterSymbols.includes(t.symbol));
+  if (!text) { div.textContent='?'; return div; }
+  const charTok=new Array(text.length).fill(null);
+  toks.forEach(tok=>{ const [ps,pe]=tok.position||[0,0]; for(let i=ps;i<Math.min(pe,text.length);i++) charTok[i]=tok; });
+  let i=0;
+  while (i<text.length) {
+    const tok=charTok[i]; let j=i+1;
+    while (j<text.length&&charTok[j]===tok) j++;
+    const seg=document.createElement('span'); seg.textContent=text.slice(i,j);
+    if (tok) {
+      seg.style.cssText=`background:${c}28;color:${c};border-radius:2px;padding:0 1px;cursor:pointer;transition:background .1s`;
+      seg.addEventListener('mouseenter',()=>seg.style.background=c+'50');
+      seg.addEventListener('mouseleave',()=>seg.style.background=c+'28');
+      const f=tok.analysis;
+      seg.title=f?.f1?`/${tok.symbol}/  F1 ${f.f1} · F2 ${f.f2} Hz`:`/${tok.symbol}/`;
+      seg.addEventListener('click',e=>{e.stopPropagation();playTokenSlice(smp,tok);});
+    } else if (onFullPlay) {
+      seg.style.cursor='pointer';
+      seg.addEventListener('click',e=>{e.stopPropagation();onFullPlay();});
+    }
+    div.appendChild(seg); i=j;
+  }
+  return div;
+}
+
 // ─── Build the old samples.json-shaped array straight from the DB ─────────────
 // js/lang.js's bootstrap fetches `/api/v1/tokens?languageId=`/`/api/v1/sounds`
 // instead of a static samples.json now — this adapts that DB shape back into

@@ -5,9 +5,17 @@
  * listen to what scripts/migrate_legacy_to_db.py loaded instead of just
  * reading storage_key strings off a table. Expect this to be superseded by
  * a real ingestion/library UI in a later phase.
+ *
+ * Text column uses buildDetailHighlightedText (js/audio.js) — same card the
+ * language editor's vowel cards and Token Browser use, here with ALL of a
+ * sample's tokens highlighted. Clicking a token plays it; clicking the rest
+ * of the text opens the sample in Formant Lab (a dedicated "open in lab"
+ * button would be redundant with that, so there isn't one here).
  */
 
 let allSounds = [];
+let tokensBySample = {};
+let langsById = {};
 let sortKey = 'id';
 let sortDir = 1; // 1 = asc, -1 = desc
 
@@ -66,13 +74,12 @@ function renderRows(sounds) {
     return `<tr>
       <td class="sounds-id">${s.id}</td>
       <td>${player}${missing}</td>
-      <td>${escapeHtml(s.text || '—')}</td>
+      <td class="sounds-text" data-id="${s.id}"></td>
       <td>${location}</td>
       <td>${fmtDuration(s.durationMs)}</td>
       <td>${fmtDate(s.createdAt)}</td>
       <td>${fmtDate(s.updatedAt)}</td>
       <td>
-        <a class="sent-btn" href="praat.html?sampleId=${s.id}" target="_blank" rel="noopener">🔬 Formant Lab</a>
         <button class="sent-btn del-btn" type="button" data-id="${s.id}" title="Delete this sample and all its tokens">🗑</button>
       </td>
     </tr>`;
@@ -80,6 +87,18 @@ function renderRows(sounds) {
   document.getElementById('soundCount').textContent = `${sounds.length} of ${allSounds.length} sound(s)`;
   updateSortIndicators();
   body.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteSound(+btn.dataset.id)));
+  body.querySelectorAll('.sounds-text').forEach(td => {
+    const s = allSounds.find(s => s.id === +td.dataset.id);
+    if (!s) return;
+    const color = langsById[s.languageId]?.color || '#7eb8f7';
+    const tokens = (tokensBySample[s.id] || []).map(t => ({
+      symbol: t.symbol, position: [t.charStart ?? 0, t.charEnd ?? 0],
+      analysis: { f1: t.f1, f2: t.f2, slice: (t.timeStartMs != null && t.timeEndMs != null) ? [t.timeStartMs, t.timeEndMs] : null },
+    }));
+    const pseudoSample = { text: s.text, audio: s.audioUrl, tokens };
+    const openInLab = () => { window.location.href = `praat.html?sampleId=${s.id}`; };
+    td.appendChild(buildDetailHighlightedText(pseudoSample, null, color, openInLab));
+  });
 }
 
 async function deleteSound(id) {
@@ -108,11 +127,18 @@ function applyFilter() {
 
 async function load() {
   try {
-    const resp = await fetch('/api/v1/sounds');
+    const [resp, tokens, langs] = await Promise.all([
+      fetch('/api/v1/sounds'),
+      fetch('/api/v1/tokens').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch('/api/v1/languages').then(r => r.ok ? r.json() : []).catch(() => []),
+    ]);
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({}));
       throw new Error(err.error || ('HTTP ' + resp.status));
     }
+    langsById = Object.fromEntries(langs.map(l => [l.id, l]));
+    tokensBySample = {};
+    tokens.forEach(t => { (tokensBySample[t.sampleId] ??= []).push(t); });
     allSounds = await resp.json();
     renderRows(allSounds);
   } catch (e) {

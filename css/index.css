@@ -257,6 +257,17 @@
   .rec-dot.on { display:inline-block; animation:recpulse 1s ease-in-out infinite; }
   @keyframes recpulse { 0%,100%{opacity:1} 50%{opacity:.2} }
   .pp-status { font-size:.66rem; color:var(--muted); }
+  .pp-spectro-wrap {
+    position:relative; width:100%; height:120px; margin-top:3px;
+    background:#0a1520; border:1px solid #1e3048; border-radius:4px;
+    overflow:hidden; cursor:col-resize; touch-action:none;
+  }
+  .pp-spectro-wrap canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .pp-live-label {
+    position:absolute; top:3px; left:50%; transform:translateX(-50%);
+    font-size:.62rem; color:#4ade80; background:#0a1520cc; padding:1px 7px;
+    border-radius:4px; white-space:nowrap; pointer-events:none; z-index:2;
+  }
   .pp-formants { font-size:.74rem; }
   .pp-formants b { color:#7eb8f7; }
   .pp-hint-bar { padding:4px 14px; font-size:.65rem; color:#4a6888; border-top:1px solid #1a2e44; flex-shrink:0; }

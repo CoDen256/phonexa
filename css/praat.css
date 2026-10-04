@@ -90,7 +90,7 @@
 .section-idx { font-family:Georgia,'Noto Serif',serif; color:#7eb8f7; min-width:1.4em; }
 .section-time { font-family:monospace; color:var(--muted); white-space:nowrap; }
 .section-mini {
-  display:block; width:100%; height:60px; background:#0a1520;
+  display:block; width:100%; height:110px; background:#0a1520;
   border:1px solid #1e3048; border-radius:5px; cursor:ew-resize; margin-bottom:5px;
 }
 .section-body { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
