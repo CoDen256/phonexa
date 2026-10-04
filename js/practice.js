@@ -298,21 +298,23 @@ document.getElementById('ppRecord').addEventListener('click', async()=>{
 function stopRec(){
   recProcessor?.disconnect(); recStream?.getTracks().forEach(t=>t.stop());
   const total=recChunks.reduce((s,c)=>s+c.length,0);
-  recSamples=new Float32Array(total);
-  let off=0; for(const c of recChunks){recSamples.set(c,off);off+=c.length;}
+  const rawSamples=new Float32Array(total);
+  let off=0; for(const c of recChunks){rawSamples.set(c,off);off+=c.length;}
+  // Actually cut the leading silence out of the recording itself — not just
+  // a default analysis-window marker the user could drag back over it.
+  const trimStartMs=typeof detectLeadingSilenceMs==='function'
+    ? detectLeadingSilenceMs({sampleRate:recSampleRate,numberOfChannels:1,getChannelData:()=>rawSamples})
+    : 0;
+  const i0=Math.floor(trimStartMs/1000*recSampleRate);
+  recSamples=rawSamples.slice(i0);
   recBlob=encodeWAV(recSamples,recSampleRate);
   if(recObjectURL)URL.revokeObjectURL(recObjectURL);
   recObjectURL=URL.createObjectURL(recBlob);
-  // Default the analysis window to start after any leading silence, instead
-  // of a fixed 0.33 — same detection js/drill.js/js/shadow.js already use.
-  // recTrimStartFrac is kept separately (not overwritten by later slice
-  // drags) — Compare always starts from here, not from waveStart.
-  const durationMs=total/recSampleRate*1000;
-  const trimStartMs=typeof detectLeadingSilenceMs==='function'
-    ? detectLeadingSilenceMs({sampleRate:recSampleRate,numberOfChannels:1,getChannelData:()=>recSamples})
-    : 0;
-  recTrimStartFrac=Math.min(0.9,trimStartMs/durationMs);
-  waveStart=recTrimStartFrac; waveEnd=Math.min(1,waveStart+0.34); recCursorFrac=null;
+  // Already trimmed above, so there's no silence left to skip — Compare's
+  // "from here" point is just the start of this (already-cut) buffer.
+  const durationMs=recSamples.length/recSampleRate*1000;
+  recTrimStartFrac=0;
+  waveStart=0; waveEnd=Math.min(1,0.34); recCursorFrac=null;
   recState='ready';
   document.getElementById('ppRecord').textContent='● Record';
   document.getElementById('ppRecord').classList.remove('rec-active');

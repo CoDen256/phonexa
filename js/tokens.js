@@ -108,7 +108,15 @@ function renderRows(tokens) {
       tokens: [{ symbol: t.symbol, position: [t.charStart ?? 0, t.charEnd ?? 0], analysis: hasSlice ? { f1: t.f1, f2: t.f2, slice: [t.timeStartMs, t.timeEndMs] } : null }],
     };
     const play = () => { if (t.audioUrl) new Audio(t.audioUrl).play().catch(() => {}); };
-    td.appendChild(buildDetailHighlightedText(pseudoSample, null, color, play));
+    // Padded click target — when the token's char range covers the whole
+    // sample text, there's no "plain" text left to click for the full-sample
+    // play action, so give it a margin of its own (token clicks inside
+    // already stopPropagation(), so they never reach this outer listener).
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'padding:6px 4px;cursor:pointer;border-radius:4px';
+    wrap.addEventListener('click', play);
+    wrap.appendChild(buildDetailHighlightedText(pseudoSample, null, color, play));
+    td.appendChild(wrap);
   });
 }
 

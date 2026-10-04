@@ -97,7 +97,15 @@ function renderRows(sounds) {
     }));
     const pseudoSample = { text: s.text, audio: s.audioUrl, tokens };
     const openInLab = () => { window.location.href = `praat.html?sampleId=${s.id}`; };
-    td.appendChild(buildDetailHighlightedText(pseudoSample, null, color, openInLab));
+    // Padded click target — when a sample's tokens cover the whole text,
+    // there's no "plain" text left to click to open Formant Lab, so give it
+    // a margin of its own (token clicks inside already stopPropagation(),
+    // so they never reach this outer listener).
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'padding:6px 4px;cursor:pointer;border-radius:4px';
+    wrap.addEventListener('click', openInLab);
+    wrap.appendChild(buildDetailHighlightedText(pseudoSample, null, color, openInLab));
+    td.appendChild(wrap);
   });
 }
 
