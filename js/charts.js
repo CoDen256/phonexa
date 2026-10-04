@@ -12,7 +12,7 @@
  *
  * Dependencies: utils.js, diphthong.js, index.html globals
  *   (LANGS, filters, passesFilters, showTip, showClusterTip, moveTip, hideTip,
- *    showPicker, pulse, onVowelClicked, playUrl, recordedVowel, analyzedFormants,
+ *    showPicker, pulse, onVowelClicked, playUrl, recordedVowel,
  *    refAnalyzed, refVowelMeta, TRAP, trapPos, ROWS, FP, formantPos, F1MIN/MAX,
  *    F2MIN/MAX, IPA_BASE_ORDER, getBase, getLength)
  */
@@ -155,8 +155,6 @@ function renderIpa() {
 // ─── Formant Plot ─────────────────────────────────────────────────────────────
 let recordedVowel=null; // {f1, f2, blob}
 
-const analyzedFormants={}; // lk::ipa → {f1,f2} — populated by ref analysis
-
 function renderFormant() {
   const svg=document.getElementById('chartFormant');
   while(svg.firstChild)svg.removeChild(svg.firstChild);
@@ -183,22 +181,6 @@ function renderFormant() {
         v=>(v.target?.f1&&v.target?.f2?formantPos(v.target.f1,v.target.f2):null));
   // Token scatter layer — individual measurements on top
   renderTokenLayer(svg);
-
-  // Analyzed overlay — shown automatically when available (dashed line + filled dot)
-  const overlayL=$s('g'); svg.appendChild(overlayL);
-  for(const[lk,lang]of Object.entries(LANGS)){
-    for(const v of lang.vowels){
-      if(!passesFilters(lk,v))continue;
-      const an=analyzedFormants[`${lk}::${v.symbols?.[0]}`]; if(!an)continue;
-      const{x:ax,y:ay}=formantPos(an.f1,an.f2);
-      if(v.f1&&v.f2){
-        const{x:jx,y:jy}=formantPos(v.f1,v.f2);
-        overlayL.appendChild($s('line',{x1:jx,y1:jy,x2:ax,y2:ay,stroke:lang.color,opacity:0.4,'stroke-width':1.5,'stroke-dasharray':'4 3',style:'pointer-events:none'}));
-      }
-      overlayL.appendChild($s('circle',{cx:ax,cy:ay,r:6,fill:lang.color,opacity:0.9,style:'pointer-events:none'}));
-      overlayL.appendChild($s('circle',{cx:ax,cy:ay,r:9,fill:'none',stroke:lang.color,opacity:0.35,'stroke-width':1.5,style:'pointer-events:none'}));
-    }
-  }
 
   // Your recorded vowel
   if(recordedVowel){
@@ -461,7 +443,22 @@ function showTokenContextMenu(e, sample, tok, lang, lk) {
   item('◉', 'Play token slice',  () => playTokenSlice(sample, tok));
   item('⬤', 'Trace token slice',      () => traceOnFormantChart(sample, tok, lang, lk, false));
   item('⬤', 'Trace full audio',       () => traceOnFormantChart(sample, tok, lang, lk, true));
-  item('🎙', 'Practice this vowel',   () => window.open(`drill.html?lang=${encodeURIComponent(lk)}&symbol=${encodeURIComponent(tok.symbol)}`, '_blank'));
+  item('🎙', 'Practice this vowel',   () => {
+    // index.html has an in-page practice panel — open/use that directly
+    // rather than navigating to the standalone Token Drill page. Pages
+    // without one (e.g. editor.html) fall back to Token Drill as before.
+    const panel = document.getElementById('practicePanel');
+    if (panel && typeof onVowelClicked === 'function') {
+      if (!panel.classList.contains('open')) document.getElementById('practiceTrigger')?.click();
+      const tv = {
+        symbols: [tok.symbol], f1: tok.analysis?.f1, f2: tok.analysis?.f2, audio: sample.audio,
+        timeStartMs: tok.analysis?.slice?.[0] ?? null, timeEndMs: tok.analysis?.slice?.[1] ?? null,
+      };
+      onVowelClicked(tv, lang, lk);
+    } else {
+      window.open(`drill.html?lang=${encodeURIComponent(lk)}&symbol=${encodeURIComponent(tok.symbol)}`, '_blank');
+    }
+  });
 
   document.body.appendChild(menu);
   const pw = menu.offsetWidth||195, ph = menu.offsetHeight||130;

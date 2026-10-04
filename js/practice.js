@@ -21,7 +21,7 @@
  *
  * Dependencies: js/spectro.js (SpectroLib), js/vad.js (detectLeadingSilenceMs),
  * index.html globals (LANGS, passesFilters, renderFormant, playUrl,
- * playUrlAtRate, recordedVowel, refAnalyzed, refVowelMeta, analyzedFormants)
+ * playUrlAtRate, recordedVowel, refAnalyzed, refVowelMeta)
  */
 
 // ─── Practice panel ───────────────────────────────────────────────────────────
@@ -99,10 +99,6 @@ function updateLiveMeansRef(){
   const means=SpectroLib.computeMeansForRange(refAnalysisResult, durationMsOf(refSamples,refSampleRate), refStart, refEnd);
   if(means?.nFormantFrames){
     refAnalyzed={f1:means.f1,f2:means.f2};
-    if(refVowelMeta){
-      const key=`${refVowelMeta.lk}::${refVowelMeta.v.symbols?.[0]}`;
-      analyzedFormants[key]={f1:means.f1,f2:means.f2};
-    }
     if(el)el.textContent=`F1 ${Math.round(means.f1)} · F2 ${Math.round(means.f2)} Hz`;
   } else {
     refAnalyzed=null;
@@ -203,6 +199,7 @@ function onVowelClicked(v, lang, lk){
   renderFormant();
   document.getElementById('refColTitle').textContent=`Reference: ${lang.label} /${v.symbols?.[0]}/`;
   document.getElementById('refStatus').textContent='Loading audio…';
+  document.getElementById('refSpecified').innerHTML='';
   document.getElementById('refPlay').disabled=true;
   document.getElementById('refLiveMeans').textContent='';
   document.getElementById('refWaveWrap').style.display='none';
@@ -236,8 +233,9 @@ async function loadRefAudio(url, lang, myToken){
       : 0)/durationMs);
     document.getElementById('refWaveWrap').style.display='block';
     document.getElementById('refWaveInfo').style.display='block';
-    document.getElementById('refStatus').textContent=refVowelMeta?.v?.f1
-      ? `Specified: F1 ${refVowelMeta.v.f1} F2 ${refVowelMeta.v.f2} Hz` : '';
+    document.getElementById('refStatus').textContent='';
+    document.getElementById('refSpecified').innerHTML=refVowelMeta?.v?.f1
+      ? `Specified: F1 <b>${refVowelMeta.v.f1}</b> · F2 <b>${refVowelMeta.v.f2}</b> Hz` : '';
     document.getElementById('refPlay').disabled=false;
     drawRefOverlay();
     analyzeReferenceSpectrogram(myToken);
