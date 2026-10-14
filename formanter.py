@@ -1011,6 +1011,72 @@ def http_transcribe():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# YouTube audio extraction — Formant Lab ingest-mode entry point. Shells out to
+# yt-dlp (which itself shells out to ffmpeg for the audio-extraction
+# postprocessing step — see the Dockerfile). Always argument-list subprocess
+# calls (never shell=True/string interpolation) since the URL is untrusted
+# user input reaching a shell-adjacent tool.
+# ══════════════════════════════════════════════════════════════════════════════
+
+import re          # noqa: E402
+import shutil      # noqa: E402
+import subprocess  # noqa: E402
+
+YOUTUBE_MAX_DURATION_SEC = 2 * 60 * 60  # ~2h cap — same unbounded-decode risk Shadowing hit, avoided up front
+
+
+@app.route('/api/v1/youtube-extract', methods=['POST'])
+def youtube_extract():
+    data = request.get_json(silent=True) or {}
+    url = (data.get('url') or '').strip()
+    if not re.match(r'^https?://', url):
+        return jsonify({'error': 'a valid http(s) URL is required'}), 400
+
+    try:
+        probe = subprocess.run(
+            ['yt-dlp', '-j', '--no-playlist', url],
+            capture_output=True, text=True, timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        return jsonify({'error': 'Timed out fetching video info'}), 504
+    if probe.returncode != 0:
+        return jsonify({'error': 'Could not fetch video info: ' + (probe.stderr or '').strip()[:300]}), 400
+    try:
+        info = json.loads(probe.stdout)
+    except json.JSONDecodeError:
+        return jsonify({'error': 'Could not parse video info'}), 502
+    duration = info.get('duration')
+    if duration and duration > YOUTUBE_MAX_DURATION_SEC:
+        return jsonify({
+            'error': f'Video is {duration / 60:.0f} min — longer than the '
+                     f'{YOUTUBE_MAX_DURATION_SEC // 60} min cap for this feature',
+        }), 400
+
+    tmp_dir = tempfile.mkdtemp(prefix='ytaudio-')
+
+    @after_this_request
+    def _cleanup(response):
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        return response
+
+    out_template = os.path.join(tmp_dir, 'audio.%(ext)s')
+    try:
+        dl = subprocess.run(
+            ['yt-dlp', '--no-playlist', '-f', 'bestaudio', '-x', '--audio-format', 'wav', '-o', out_template, url],
+            capture_output=True, text=True, timeout=600,
+        )
+    except subprocess.TimeoutExpired:
+        return jsonify({'error': 'Timed out downloading/extracting audio'}), 504
+    if dl.returncode != 0:
+        return jsonify({'error': 'Download failed: ' + (dl.stderr or '').strip()[:300]}), 502
+
+    wav_path = os.path.join(tmp_dir, 'audio.wav')
+    if not os.path.exists(wav_path):
+        return jsonify({'error': 'Extraction did not produce an audio file'}), 502
+    return send_file(wav_path, mimetype='audio/wav', as_attachment=False)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Phase 0 DB browsing (read-only) — lets you actually listen to what the
 # migration loaded instead of just reading storage_key strings off a table.
 # Expect this to be superseded by a real ingestion/library API in Phase 1+.
