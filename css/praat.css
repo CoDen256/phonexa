@@ -12,6 +12,7 @@
 .sent-btn:disabled { opacity:.4; cursor:default; }
 .sent-btn.primary { border-color:#7eb8f7; color:#7eb8f7; }
 .sent-btn.primary:hover:not(:disabled) { background:#1f3a58; }
+.sent-btn.rec-active { border-color:#f43f5e; color:#f43f5e; }
 
 /* ── Dropzone ────────────────────────────────────────────────── */
 .dropzone {

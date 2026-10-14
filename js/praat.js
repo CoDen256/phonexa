@@ -1016,6 +1016,7 @@ function resetToDropzone() {
   selStart = 0; selEnd = 0;
   document.getElementById('dropzone').style.display = '';
   document.getElementById('existingSamplePicker').style.display = ingestMode ? '' : 'none';
+  document.getElementById('micRecordPicker').style.display = ingestMode ? '' : 'none';
   document.getElementById('fileToolbar').style.display = 'none';
   document.getElementById('praatPanels').style.display = 'none';
   document.getElementById('paramsRow').style.display = 'none';
@@ -1046,6 +1047,44 @@ async function handleUrl(url) {
   }
 }
 
+// ─── Ingest landing: record straight from the microphone ───────────────────────
+let ingestMicStream = null, ingestMicRecorder = null;
+async function toggleIngestMicRecord() {
+  const btn = document.getElementById('micRecordBtn');
+  const dot = document.getElementById('micRecordDot');
+  if (ingestMicRecorder) { ingestMicRecorder.stop(); return; }
+  try {
+    if (!ingestMicStream) ingestMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const chunks = [];
+    const mime = pickRecorderMime();
+    const rec = new MediaRecorder(ingestMicStream, mime ? { mimeType: mime } : undefined);
+    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = async () => {
+      ingestMicRecorder = null;
+      btn.textContent = '🎤 Record';
+      btn.classList.remove('rec-active');
+      dot.classList.remove('on');
+      const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
+      setStatus('Decoding recording…');
+      try {
+        const buf = await decodeArrayBuffer(await blob.arrayBuffer());
+        await loadBuffer(buf);
+        setStatus('');
+      } catch (e) {
+        setStatus('Could not decode recording: ' + e.message);
+      }
+    };
+    rec.start();
+    ingestMicRecorder = rec;
+    btn.textContent = '■ Stop';
+    btn.classList.add('rec-active');
+    dot.classList.add('on');
+    setStatus('Recording…');
+  } catch (e) {
+    setStatus('Mic error: ' + e.message);
+  }
+}
+
 // ─── Wiring ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
@@ -1068,6 +1107,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('existingSamplePicker').style.display = '';
     document.getElementById('espFilter').addEventListener('input', renderExistingSamplesList);
     loadExistingSamplePicker();
+    document.getElementById('micRecordPicker').style.display = '';
+    document.getElementById('micRecordBtn').addEventListener('click', () => toggleIngestMicRecord());
   }
 
   document.getElementById('analyzeBtn').addEventListener('click', () => runAnalyze());

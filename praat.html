@@ -31,6 +31,12 @@
     <div id="espList" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:3px"></div>
   </div>
 
+  <div id="micRecordPicker" style="display:none;margin-top:10px;text-align:center">
+    <div style="font-size:.68rem;color:var(--muted);margin-bottom:6px">— or record from the microphone —</div>
+    <button class="sent-btn" id="micRecordBtn" type="button">🎤 Record</button>
+    <span class="rec-dot" id="micRecordDot"></span>
+  </div>
+
   <div class="token-context" id="tokenContext" style="display:none">
     Editing sample <span id="tokenSampleText" class="token-symbol"></span>
   </div>
