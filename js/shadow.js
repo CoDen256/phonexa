@@ -993,6 +993,41 @@ async function handleFile(file) {
   refreshMediaList();
 }
 
+// ─── Extract audio from a pasted YouTube URL — the server never sees more than
+// the URL itself; the extracted WAV is wrapped as a File and handed to the
+// exact same handleFile() path a dropped/opened local file goes through, so
+// nothing downstream (range picker, client-side VAD, fingerprint resume,
+// per-sentence record/compare/done/Formant-Lab-handoff) needs to know or
+// care that this file didn't come from local disk. ─────────────────────────
+async function extractYoutubeAudio() {
+  const input = document.getElementById('ytUrlInput');
+  const btn = document.getElementById('ytExtractBtn');
+  const url = input.value.trim();
+  if (!url) return;
+  btn.disabled = true;
+  showProgress(true, 'Extracting audio from YouTube… this can take a while for longer videos.', true);
+  setStatus('');
+  try {
+    const resp = await fetch('/api/v1/youtube-extract', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }),
+      signal: AbortSignal.timeout(600000),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || ('HTTP ' + resp.status));
+    }
+    const blob = await resp.blob();
+    showProgress(false);
+    const idMatch = url.match(/(?:v=|youtu\.be\/)([\w-]{6,})/);
+    const file = new File([blob], `youtube-${idMatch ? idMatch[1] : 'audio'}.wav`, { type: 'audio/wav' });
+    await handleFile(file);
+  } catch (e) {
+    showProgress(false);
+    setStatus('YouTube extraction failed: ' + e.message);
+  }
+  btn.disabled = false;
+}
+
 // ─── Remembered files list (populated only for files opened via "📂 Open file",
 // since drag-and-drop and <input type=file> never hand back a reusable handle) ─
 async function renderRecentFiles() {
@@ -1072,6 +1107,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (e.name !== 'AbortError') setStatus('Could not open file: ' + e.message);
     }
   });
+
+  document.getElementById('ytExtractBtn').addEventListener('click', () => extractYoutubeAudio());
 
   document.getElementById('deleteMediaBtn').addEventListener('click', async () => {
     if (!currentMediaId) return;

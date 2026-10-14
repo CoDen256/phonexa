@@ -1017,7 +1017,6 @@ function resetToDropzone() {
   document.getElementById('dropzone').style.display = '';
   document.getElementById('existingSamplePicker').style.display = ingestMode ? '' : 'none';
   document.getElementById('micRecordPicker').style.display = ingestMode ? '' : 'none';
-  document.getElementById('youtubePicker').style.display = ingestMode ? '' : 'none';
   document.getElementById('fileToolbar').style.display = 'none';
   document.getElementById('praatPanels').style.display = 'none';
   document.getElementById('paramsRow').style.display = 'none';
@@ -1086,33 +1085,6 @@ async function toggleIngestMicRecord() {
   }
 }
 
-// ─── Ingest landing: extract audio from a pasted YouTube URL ───────────────────
-async function extractYoutubeAudio() {
-  const input = document.getElementById('ytUrlInput');
-  const btn = document.getElementById('ytExtractBtn');
-  const url = input.value.trim();
-  if (!url) return;
-  btn.disabled = true;
-  setStatus('Extracting audio from YouTube… this can take a while for longer videos.');
-  try {
-    const resp = await fetch('/api/v1/youtube-extract', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }),
-      signal: AbortSignal.timeout(600000),
-    });
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error || ('HTTP ' + resp.status));
-    }
-    setStatus('Decoding…');
-    const buf = await decodeArrayBuffer(await resp.arrayBuffer());
-    await loadBuffer(buf);
-    setStatus('');
-  } catch (e) {
-    setStatus('YouTube extraction failed: ' + e.message);
-  }
-  btn.disabled = false;
-}
-
 // ─── Wiring ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('dropzone');
@@ -1137,8 +1109,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadExistingSamplePicker();
     document.getElementById('micRecordPicker').style.display = '';
     document.getElementById('micRecordBtn').addEventListener('click', () => toggleIngestMicRecord());
-    document.getElementById('youtubePicker').style.display = '';
-    document.getElementById('ytExtractBtn').addEventListener('click', () => extractYoutubeAudio());
   }
 
   document.getElementById('analyzeBtn').addEventListener('click', () => runAnalyze());
