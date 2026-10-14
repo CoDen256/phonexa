@@ -112,13 +112,6 @@ async function getDrillMicStream() {
   drillMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   return drillMicStream;
 }
-function pickDrillRecorderMime() {
-  for (const m of ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', '']) {
-    if (!m || MediaRecorder.isTypeSupported(m)) return m;
-  }
-  return '';
-}
-
 async function toggleDrillRecord(tok, row) {
   if (drillActiveRecordingTokenId === tok.id) { drillActiveRecorder.stop(); return; }
   if (drillActiveRecorder) drillActiveRecorder.stop();
@@ -127,7 +120,7 @@ async function toggleDrillRecord(tok, row) {
   try {
     const stream = await getDrillMicStream();
     const chunks = [];
-    const mime = pickDrillRecorderMime();
+    const mime = pickRecorderMime();
     const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
     rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
     rec.onstop = async () => {

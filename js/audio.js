@@ -245,3 +245,12 @@ function extractMonoSlice(buffer, startMs, endMs) {
     const i0 = Math.floor(startMs / 1000 * sr), i1 = Math.min(data.length, Math.ceil(endMs / 1000 * sr));
     return { samples: data.slice(i0, i1), sampleRate: sr };
 }
+
+// ─── MediaRecorder mime-type fallback (shared: shadow.js/drill.js/praat.js's
+// mic-recording flows all need the same best-available-codec probe) ───────────
+function pickRecorderMime() {
+    for (const m of ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', '']) {
+        if (!m || MediaRecorder.isTypeSupported(m)) return m;
+    }
+    return '';
+}

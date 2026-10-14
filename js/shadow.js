@@ -346,12 +346,6 @@ async function getMicStream() {
   micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   return micStream;
 }
-function pickRecorderMime() {
-  for (const m of ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', '']) {
-    if (!m || MediaRecorder.isTypeSupported(m)) return m;
-  }
-  return '';
-}
 async function toggleRecord(segId, row) {
   if (activeRecordingSegId === segId) { activeRecorder.stop(); return; }
   if (activeRecorder) activeRecorder.stop();
