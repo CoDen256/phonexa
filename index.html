@@ -22,6 +22,7 @@
   <a href="tokens.html"    class="editor-link" target="_blank">⌸ Token Browser</a>
   <a href="drill.html"     class="editor-link" target="_blank">🎙 Token Drill</a>
   <button class="practice-btn" id="practiceTrigger" type="button">🎤 Practice</button>
+  <span id="userPicker" class="user-picker"></span>
 </header>
 
 <!-- ── Practice panel (bottom bar) ──────────────────────────────── -->
@@ -119,6 +120,7 @@
 
 <!-- ── Language loader (JSON via fetch) ─────────────────────────────────────── -->
 <script src="js/utils.js"></script>
+<script src="js/user.js"></script>
 <script src="js/lang.js"></script>
 <script src="js/geometry.js"></script>
 <script src="js/filters.js"></script>
@@ -135,10 +137,12 @@
   document.getElementById('ppLive')?.addEventListener('click', toggleLive);
 </script>
 <script>
-  function init() {
+  async function init() {
     if (!Object.keys(LANGS).length) {
       console.warn('No languages loaded — check the backend / DB connection');
     }
+    UserLib.mountPicker('userPicker').catch(e => console.warn('User picker failed:', e.message));
+    await restoreFilters().catch(e => console.warn('Filter restore failed:', e.message));
     document.getElementById('loading').style.display = 'none';
     buildSidebar();
     renderAll();

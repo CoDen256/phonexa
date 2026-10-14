@@ -596,7 +596,7 @@ function buildSidebar() {
     btn.type='button'; btn.className='chip'+(fset.has(value)?' on':'');
     if(color) btn.style.setProperty('--chip-color',color);
     btn.textContent=label;
-    btn.addEventListener('click',()=>{ fset.has(value)?fset.delete(value):fset.add(value); buildSidebar(); renderAll(); });
+    btn.addEventListener('click',()=>{ fset.has(value)?fset.delete(value):fset.add(value); buildSidebar(); renderAll(); persistFilters(); });
     return btn;
   }
   function ipaChip(base) {
@@ -607,7 +607,7 @@ function buildSidebar() {
     const lbl=document.createElement('div'); lbl.className='filter-label';
     const sp=document.createElement('span'); sp.textContent=title;
     const cl=document.createElement('button'); cl.className='filter-clear-link'; cl.textContent='clear'; cl.type='button';
-    cl.addEventListener('click',()=>{ fset.clear(); buildSidebar(); renderAll(); });
+    cl.addEventListener('click',()=>{ fset.clear(); buildSidebar(); renderAll(); persistFilters(); });
     lbl.appendChild(sp); lbl.appendChild(cl);
     const grid=document.createElement('div'); grid.className='chip-grid';
     buildFn(grid);
@@ -628,6 +628,7 @@ function buildSidebar() {
       b.addEventListener('click', () => { onToggle();
         if (typeof buildSidebar==='function') buildSidebar();
         if (typeof renderAll==='function') renderAll(); else if (typeof refreshCharts==='function') refreshCharts();
+        if (typeof persistFilters==='function') persistFilters();
       });
       return b;
     };
@@ -674,6 +675,7 @@ document.getElementById('clearAllFilters')?.addEventListener('click',()=>{
   filters.languages.clear(); filters.roundness.clear();
   filters.vtype.clear();     filters.length.clear(); filters.ipaBase.clear();
   buildSidebar(); renderAll();
+  if (typeof persistFilters==='function') persistFilters();
 });
 
 // ─── Detail cards ─────────────────────────────────────────────────────────────

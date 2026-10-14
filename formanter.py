@@ -1811,6 +1811,84 @@ def serve_audio(storage_key):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Users + Settings — simple named profiles (no auth/password, see
+# db/models.py's User docstring) and a generic per-user JSONB key/value
+# store, used today for the IPA chart's filter persistence and Shadowing's
+# transcription-backend config.
+# ══════════════════════════════════════════════════════════════════════════════
+
+from db.models import Setting, User  # noqa: E402
+
+
+def _user_json(u: User) -> dict:
+    return {'id': u.id, 'name': u.name, 'createdAt': u.created_at.isoformat() if u.created_at else None}
+
+
+@app.route('/api/v1/users')
+def list_users():
+    with get_sessionmaker()() as db:
+        users = db.query(User).order_by(User.id).all()
+        return jsonify([_user_json(u) for u in users])
+
+
+@app.route('/api/v1/users', methods=['POST'])
+def create_user():
+    data = request.get_json(silent=True) or {}
+    name = (data.get('name') or '').strip()
+    if not name:
+        return jsonify({'error': 'name is required'}), 400
+    with get_sessionmaker()() as db:
+        if db.query(User).filter_by(name=name).first() is not None:
+            return jsonify({'error': f'a profile named {name!r} already exists'}), 400
+        user = User(name=name)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return jsonify(_user_json(user)), 201
+
+
+def _require_user_id() -> int | None:
+    """Every settings/shadowing route is scoped by a `userId` query param —
+    there's no session/cookie to derive it from (see User's docstring)."""
+    raw = request.args.get('userId')
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+@app.route('/api/v1/settings')
+def list_settings():
+    user_id = _require_user_id()
+    if user_id is None:
+        return jsonify({'error': 'userId query param is required'}), 400
+    with get_sessionmaker()() as db:
+        rows = db.query(Setting).filter_by(user_id=user_id).all()
+        return jsonify({s.key: s.value for s in rows})
+
+
+@app.route('/api/v1/settings/<key>', methods=['PUT'])
+def put_setting(key):
+    user_id = _require_user_id()
+    if user_id is None:
+        return jsonify({'error': 'userId query param is required'}), 400
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or 'value' not in data:
+        return jsonify({'error': 'body must be {"value": ...}'}), 400
+    with get_sessionmaker()() as db:
+        if db.get(User, user_id) is None:
+            return jsonify({'error': 'no such user'}), 404
+        row = db.query(Setting).filter_by(user_id=user_id, key=key).first()
+        if row is None:
+            row = Setting(user_id=user_id, key=key, value=data['value'])
+            db.add(row)
+        else:
+            row.value = data['value']
+        db.commit()
+        return jsonify({'key': key, 'value': data['value']})
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Static frontend
 # ══════════════════════════════════════════════════════════════════════════════
 

@@ -223,6 +223,15 @@
   }
   .editor-link:hover { color:#7eb8f7; border-color:#7eb8f7; }
 
+  /* ── Profile picker ──────────────────────────────────────── */
+  .user-picker { display:inline-block; margin-top:6px; margin-left:8px; }
+  .user-picker-select {
+    font-size:.7rem; color:#4a7090; background:#0f1c2e;
+    border:1px solid #2e4560; border-radius:20px; padding:3px 9px;
+    cursor:pointer;
+  }
+  .user-picker-select:hover { color:#7eb8f7; border-color:#7eb8f7; }
+
   /* ── Practice / recording panel ─────────────────────────── */
   .practice-btn {
     display:inline-flex; align-items:center; gap:5px;

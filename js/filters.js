@@ -57,6 +57,56 @@ function passesFilters(lk, v) {
   if (filters.ipaBase.size > 0 && !filters.ipaBase.has(getBase(v.symbols?.[0] ?? ''))) return false;
   return true;
 }
+// ─── Server-persisted filter state (per-profile, via /api/v1/settings) ─────
+let _persistFiltersTimer = null;
+
+function serializeFilters() {
+  return {
+    languages: [...filters.languages], roundness: [...filters.roundness],
+    vtype: [...filters.vtype], length: [...filters.length], ipaBase: [...filters.ipaBase],
+    showTokens: filters.showTokens, showAverages: filters.showAverages,
+  };
+}
+
+// Debounced — every chip/toggle click site calls this right after its own
+// buildSidebar()/renderAll() pair, so a burst of rapid clicks writes once.
+function persistFilters() {
+  clearTimeout(_persistFiltersTimer);
+  _persistFiltersTimer = setTimeout(async () => {
+    try {
+      const userId = await UserLib.getCurrentUserId();
+      await fetch(`/api/v1/settings/ipaChartFilters?userId=${userId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: serializeFilters() }),
+      });
+    } catch (e) {
+      console.warn('Failed to persist filters:', e.message);
+    }
+  }, 400);
+}
+
+// Mutates the live `filters` object from a previously-saved value —
+// buildSidebar()/renderAll() (called by index.html's init() right after
+// this) render purely off this object's current state, so no separate
+// DOM-checkbox step is needed.
+async function restoreFilters() {
+  try {
+    const userId = await UserLib.getCurrentUserId();
+    const res = await fetch(`/api/v1/settings?userId=${userId}`);
+    const saved = res.ok ? (await res.json()).ipaChartFilters : null;
+    if (!saved) return;
+    filters.languages = new Set(saved.languages || []);
+    filters.roundness = new Set(saved.roundness || []);
+    filters.vtype     = new Set(saved.vtype || ['monophthong']);
+    filters.length    = new Set(saved.length || []);
+    filters.ipaBase   = new Set(saved.ipaBase || []);
+    if (typeof saved.showTokens === 'boolean')   filters.showTokens   = saved.showTokens;
+    if (typeof saved.showAverages === 'boolean') filters.showAverages = saved.showAverages;
+  } catch (e) {
+    console.warn('Failed to restore filters:', e.message);
+  }
+}
+
 function countShown() {
   let n=0;
   for (const [lk,lang] of Object.entries(LANGS))
