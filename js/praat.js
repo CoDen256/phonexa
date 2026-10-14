@@ -294,6 +294,11 @@ function commitSectionFromSelection() {
     sections.push({
       id: nextSectionId++, mode: 'token', dbTokenId: null, symbol: '', vowelId: null,
       start: selStart, end: selEnd, activeAnalysisId: null, manualF1: null, manualF2: null,
+      // Defaults to the whole sample text, immediately drag-adjustable via the
+      // same char-range widget existing tokens use (buildTokCharSel) — without
+      // this, charStart/charEnd stay undefined and every comparison involving
+      // them evaluates to NaN/false, so nothing ever highlights or drags.
+      charStart: 0, charEnd: (dbSampleData?.text || '').length,
     });
   } else {
     return;   // legacy editor-launched mode: token set is fixed, nothing to add here
@@ -781,7 +786,8 @@ function drawSpectrogramWindow(cv, winStart, winEnd, selStartFrac, selEndFrac) {
   const toX = f => ((f - winStart) / winSpan) * W;
   const x0 = toX(Math.max(winStart, selStartFrac)), x1 = toX(Math.min(winEnd, selEndFrac));
   ctx.fillStyle = 'rgba(126,184,247,0.18)'; ctx.fillRect(x0, 0, x1 - x0, H);
-  ctx.fillStyle = '#7eb8f7'; ctx.fillRect(x0, 0, 1.5, H); ctx.fillRect(x1 - 1.5, 0, 1.5, H);
+  drawEdgeMarker(ctx, x0, H, '#7eb8f7', 'start');
+  drawEdgeMarker(ctx, x1, H, '#7eb8f7', 'end');
   if (playbackCursorFrac != null) SpectroLib.drawPlaybackCursor(ctx, W, H, winStart, winEnd, playbackCursorFrac);
 }
 
@@ -822,11 +828,39 @@ function wireMiniDrag(el, s) {
   document.addEventListener('touchend', end);
 }
 
+/**
+ * Draws one boundary edge at the TRUE fractional x (never inset/moved — this
+ * is an analysis tool, the drawn position must match the real boundary
+ * exactly). A thin dark halo sits behind the colored line so it has its own
+ * contrast regardless of what's behind it (spectrogram pixel, dark canvas,
+ * or — at start=0/end=1 — the spectrogram-wrap's own border, which the plain
+ * line used to blend into and vanish against). A small inward-pointing flag
+ * at the top gives an unambiguous, always-visible grab cue even when the
+ * line itself sits flush against the physical edge of the canvas.
+ */
+function drawEdgeMarker(ctx, xTrue, H, color, edge) {
+  const dir = edge === 'start' ? 1 : -1;   // inward direction the halo/line/flag extend
+  const haloW = 3, lineW = 1.5, flagH = 8, flagW = 6;
+  const haloX = edge === 'start' ? xTrue : xTrue - haloW;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(haloX, 0, haloW, H);
+  const lineX = edge === 'start' ? xTrue : xTrue - lineW;
+  ctx.fillStyle = color;
+  ctx.fillRect(lineX, 0, lineW, H);
+  ctx.beginPath();
+  ctx.moveTo(xTrue, 0);
+  ctx.lineTo(xTrue, flagH);
+  ctx.lineTo(xTrue + dir * flagW, flagH / 2);
+  ctx.closePath();
+  ctx.fill();
+}
+
 function drawSelectionBand(ctx, W, H) {
   if (selEnd <= selStart) return;
   const x0 = selStart * W, x1 = selEnd * W;
   ctx.fillStyle = 'rgba(126,184,247,0.18)'; ctx.fillRect(x0, 0, x1 - x0, H);
-  ctx.fillStyle = '#7eb8f7'; ctx.fillRect(x0, 0, 1.5, H); ctx.fillRect(x1 - 1.5, 0, 1.5, H);
+  drawEdgeMarker(ctx, x0, H, '#7eb8f7', 'start');
+  drawEdgeMarker(ctx, x1, H, '#7eb8f7', 'end');
 }
 function drawSectionBands(ctx, W, H) {
   for (const s of sections) {
@@ -834,8 +868,9 @@ function drawSectionBands(ctx, W, H) {
     const done = s.mode === 'ingest' ? !!s.savedSampleId : (s.dbTokenId !== undefined ? !!s.dbTokenId : !!s.before);
     ctx.fillStyle = done ? 'rgba(74,222,128,0.12)' : 'rgba(216,232,244,0.07)';
     ctx.fillRect(x0, 0, x1 - x0, H);
-    ctx.fillStyle = done ? '#4ade80' : '#4a6888';
-    ctx.fillRect(x0, 0, 1, H); ctx.fillRect(x1 - 1, 0, 1, H);
+    const color = done ? '#4ade80' : '#9db8d4';
+    drawEdgeMarker(ctx, x0, H, color, 'start');
+    drawEdgeMarker(ctx, x1, H, color, 'end');
   }
 }
 
