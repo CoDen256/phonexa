@@ -206,3 +206,106 @@ class Token(Base):
     sample: Mapped["Sample"] = relationship(back_populates="tokens")
     active_analysis: Mapped["SampleAnalysis | None"] = relationship()
     vowel: Mapped["Vowel | None"] = relationship()
+
+
+class User(Base):
+    """
+    A named profile, not an account — this app has deliberately had zero
+    auth so far (see db/storage.py's AUDIO_BACKEND comment / formanter.py's
+    admin-import endpoint) and that stance is kept here too. `User` exists
+    purely to scope Settings and Shadowing data per person on a shared
+    machine; there is no password and the "current" user is just a plain id
+    the client remembers in localStorage, not a security boundary.
+    """
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+    settings: Mapped[list["Setting"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    shadowing_media: Mapped[list["ShadowingMedia"]] = relationship(back_populates="user", cascade="all, delete-orphan", order_by="ShadowingMedia.created_at")
+
+
+class Setting(Base):
+    """
+    A generic per-user key/value row, same JSONB-blob idiom as
+    SampleAnalysis.config — used today for 'ipaChartFilters' (index.html's
+    chart filter state) and 'transcribeBackend' (Shadowing's transcription
+    backend config, replacing the old hardcoded TRANSCRIBE_SERVER constant
+    and raw localStorage keys). No schema is enforced on `value` beyond
+    "valid JSON" — same convention as the rest of this file's JSONB columns.
+    """
+    __tablename__ = "settings"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    key: Mapped[str] = mapped_column(Text, nullable=False)
+    value: Mapped[dict | list | None] = mapped_column(JSONB)
+    updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+    user: Mapped["User"] = relationship(back_populates="settings")
+
+
+class ShadowingMedia(Base):
+    """
+    One uploaded long-audio file (audiobook/video audio) and its own
+    segmentation settings. The audio itself is stored once via the same
+    AudioStore/'file://<storage_key>' convention Sample.url uses — unlike
+    Sample, this is always a long-form original, not a short ingested clip,
+    so it's uploaded via a streaming endpoint rather than formanter.py's
+    existing fully-buffered ingest path.
+    """
+    __tablename__ = "shadowing_media"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+
+    original_filename: Mapped[str | None] = mapped_column(Text)
+    file_size_bytes: Mapped[int | None] = mapped_column()
+    storage_key: Mapped[str] = mapped_column(Text, nullable=False)
+    duration_ms: Mapped[int | None] = mapped_column(Integer)
+    sample_rate_hz: Mapped[int | None] = mapped_column(Integer)
+    channels: Mapped[int | None] = mapped_column(SmallInteger)
+
+    # Last-used segmentation sliders — re-shown pre-filled when reopened.
+    sentence_silence_ms: Mapped[int | None] = mapped_column(Integer)
+    chapter_silence_ms: Mapped[int | None] = mapped_column(Integer)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+    user: Mapped["User"] = relationship(back_populates="shadowing_media")
+    segments: Mapped[list["ShadowingSegment"]] = relationship(
+        back_populates="media", cascade="all, delete-orphan", order_by="ShadowingSegment.order_index"
+    )
+
+
+class ShadowingSegment(Base):
+    """
+    One chapter or sentence of a ShadowingMedia's segmentation. Chapters and
+    sentences share one table (kind='chapter'|'sentence') rather than two,
+    with chapters as the (parent_segment_id IS NULL) top level and sentences
+    pointing at their containing chapter — real relational rows, not a JSONB
+    array, because manual split/merge is per-row CRUD and ordering/
+    containment queries benefit from an indexed FK + order_index.
+    `done`/`text` are the only durable "progress" — the user's own recorded
+    take is deliberately never persisted (stays ephemeral client-side, to
+    keep storage bounded for multi-hour books).
+    """
+    __tablename__ = "shadowing_segments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    media_id: Mapped[int] = mapped_column(ForeignKey("shadowing_media.id", ondelete="CASCADE"), nullable=False)
+    kind: Mapped[str] = mapped_column(Text, nullable=False)  # 'chapter'|'sentence'
+    parent_segment_id: Mapped[int | None] = mapped_column(ForeignKey("shadowing_segments.id", ondelete="CASCADE"))
+    order_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    start_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    end_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    text: Mapped[str | None] = mapped_column(Text)  # transcript
+    done: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+    media: Mapped["ShadowingMedia"] = relationship(back_populates="segments")
+    parent: Mapped["ShadowingSegment | None"] = relationship(remote_side=[id])

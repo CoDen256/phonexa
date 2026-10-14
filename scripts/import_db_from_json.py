@@ -3,8 +3,9 @@
 scripts/import_db_from_json.py — db-export/*.json -> DB (destructive rebuild).
 
 The JSON *is* the next state of the world: truncates every table this tool
-owns (languages/samples/sample_analyses/vowels/tokens — cascades handle any
-FK regardless of nullability) inside one transaction, then re-inserts
+owns (languages/samples/sample_analyses/vowels/tokens, plus
+users/settings/shadowing_media/shadowing_segments — cascades handle any FK
+regardless of nullability) inside one transaction, then re-inserts
 everything in dependency order, remapping ids as it goes since
 RESTART IDENTITY means every row gets a fresh id. Any failure rolls back the
 whole transaction — old state untouched.
@@ -36,7 +37,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlalchemy import text  # noqa: E402
 
-from db.models import Language, Sample, SampleAnalysis, Token, Vowel  # noqa: E402
+from db.models import Language, Sample, SampleAnalysis, Setting, ShadowingMedia, ShadowingSegment, Token, User, Vowel  # noqa: E402
 from db.session import get_sessionmaker  # noqa: E402
 
 
@@ -68,10 +69,58 @@ def import_sample(db, sd: dict, language_id: int | None, analyses_dir: Path) -> 
     return sample.id, analysis_id_map
 
 
+def import_shadowing_media(db, md: dict, user_id: int) -> None:
+    media = ShadowingMedia(
+        user_id=user_id, original_filename=md.get("originalFilename"), file_size_bytes=md.get("fileSizeBytes"),
+        storage_key=md.get("storageKey", ""), duration_ms=md.get("durationMs"), sample_rate_hz=md.get("sampleRateHz"),
+        channels=md.get("channels"), sentence_silence_ms=md.get("sentenceSilenceMs"), chapter_silence_ms=md.get("chapterSilenceMs"),
+    )
+    db.add(media)
+    db.flush()
+
+    # `id`/`parentId` in the export are local sequence numbers scoped to this
+    # media's own segment list (see export_shadowing_segment) — resolve
+    # chapters (parentId is null) before their child sentences so parent FKs
+    # always point at an already-inserted row.
+    segments = md.get("segments") or []
+    local_to_db_id: dict[int, int] = {}
+    for sd in sorted(segments, key=lambda s: s.get("parentId") is not None):
+        seg = ShadowingSegment(
+            media_id=media.id, kind=sd.get("kind", "sentence"),
+            parent_segment_id=local_to_db_id.get(sd["parentId"]) if sd.get("parentId") is not None else None,
+            order_index=sd.get("orderIndex", 0), start_ms=sd.get("startMs", 0), end_ms=sd.get("endMs", 0),
+            text=sd.get("text"), done=bool(sd.get("done")),
+        )
+        db.add(seg)
+        db.flush()
+        local_to_db_id[sd["id"]] = seg.id
+
+
+def import_user(db, name: str, users_dir: Path) -> None:
+    user_dir = users_dir / name
+    user = User(name=name)
+    db.add(user)
+    db.flush()
+
+    settings_path = user_dir / "settings.json"
+    if settings_path.exists():
+        settings = json.loads(settings_path.read_text())
+        for key, value in settings.items():
+            db.add(Setting(user_id=user.id, key=key, value=value))
+
+    shadowing_path = user_dir / "shadowing.json"
+    if shadowing_path.exists():
+        for md in json.loads(shadowing_path.read_text()):
+            import_shadowing_media(db, md, user.id)
+
+
 def import_all(export_dir: Path) -> dict:
     Session = get_sessionmaker()
     with Session() as db:
-        db.execute(text("TRUNCATE languages, samples, sample_analyses, vowels, tokens RESTART IDENTITY CASCADE"))
+        db.execute(text(
+            "TRUNCATE languages, samples, sample_analyses, vowels, tokens, "
+            "users, settings, shadowing_media, shadowing_segments RESTART IDENTITY CASCADE"
+        ))
 
         index = json.loads((export_dir / "index.json").read_text()) if (export_dir / "index.json").exists() else []
         sample_id_map: dict[int, int] = {}        # exported sample id -> new DB id
@@ -151,9 +200,16 @@ def import_all(export_dir: Path) -> dict:
             ))
             total_tokens += 1
 
+        users_dir = export_dir / "users"
+        users_index_path = users_dir / "index.json"
+        user_names = [u["name"] for u in json.loads(users_index_path.read_text())] if users_index_path.exists() else []
+        for name in user_names:
+            import_user(db, name, users_dir)
+
         db.commit()
-        counts = {"languages": len(index), "samples": total_samples, "tokens": total_tokens}
-        print(f"Imported {counts['languages']} language(s), {counts['samples']} sample(s), {counts['tokens']} token(s)")
+        counts = {"languages": len(index), "samples": total_samples, "tokens": total_tokens, "users": len(user_names)}
+        print(f"Imported {counts['languages']} language(s), {counts['samples']} sample(s), "
+              f"{counts['tokens']} token(s), {counts['users']} user(s)")
         return counts
 
 

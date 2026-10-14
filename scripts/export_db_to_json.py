@@ -42,7 +42,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from db.models import Language, Sample  # noqa: E402
+from db.models import Language, Sample, User  # noqa: E402
 from db.session import get_sessionmaker  # noqa: E402
 
 
@@ -102,6 +102,51 @@ def export_sample(s) -> dict:
     }
 
 
+def export_shadowing_segment(seg, local_id_map: dict[int, int], next_id: list[int]) -> dict:
+    """`id`/`parentId` here are per-export-file local sequence numbers (not
+    the real DB id) — they only need to resolve parent_segment_id within the
+    same media's segment list on import, never across media or tables."""
+    local_id = next_id[0]
+    next_id[0] += 1
+    local_id_map[seg.id] = local_id
+    return {
+        "id": local_id, "kind": seg.kind,
+        "parentId": local_id_map.get(seg.parent_segment_id) if seg.parent_segment_id is not None else None,
+        "orderIndex": seg.order_index, "startMs": seg.start_ms, "endMs": seg.end_ms,
+        "text": seg.text, "done": seg.done,
+    }
+
+
+def export_shadowing_media(m) -> dict:
+    local_id_map: dict[int, int] = {}
+    next_id = [1]
+    # Parents (chapters) must be assigned a local id before any child
+    # references them — `segments` is already ordered by order_index with
+    # kind='chapter' rows first per ShadowingMedia.segments' relationship
+    # order, but sort defensively by (parent is None desc, order_index) too.
+    ordered = sorted(m.segments, key=lambda s: (s.parent_segment_id is not None, s.order_index))
+    return {
+        "originalFilename": m.original_filename, "fileSizeBytes": m.file_size_bytes,
+        "storageKey": m.storage_key, "durationMs": m.duration_ms,
+        "sampleRateHz": m.sample_rate_hz, "channels": m.channels,
+        "sentenceSilenceMs": m.sentence_silence_ms, "chapterSilenceMs": m.chapter_silence_ms,
+        "createdAt": m.created_at.isoformat() if m.created_at else None,
+        "segments": [export_shadowing_segment(s, local_id_map, next_id) for s in ordered],
+    }
+
+
+def export_user(u, user_dir: Path) -> None:
+    user_dir.mkdir(parents=True, exist_ok=True)
+    settings = {s.key: s.value for s in u.settings}
+    (user_dir / "settings.json").write_text(json.dumps(settings, indent=2, ensure_ascii=False) + "\n")
+    if u.shadowing_media:
+        (user_dir / "shadowing.json").write_text(json.dumps(
+            [export_shadowing_media(m) for m in u.shadowing_media], indent=2, ensure_ascii=False,
+        ) + "\n")
+    else:
+        (user_dir / "shadowing.json").unlink(missing_ok=True)
+
+
 def export_all(out_dir: Path) -> dict:
     Session = get_sessionmaker()
     with Session() as db:
@@ -153,9 +198,22 @@ def export_all(out_dir: Path) -> dict:
         else:
             unassigned_path.unlink(missing_ok=True)
 
-        counts = {"languages": len(languages), "samples": total_samples, "unassignedSamples": len(unassigned), "analyses": total_analyses}
+        users = db.query(User).order_by(User.id).all()
+        users_dir = out_dir / "users"
+        users_dir.mkdir(parents=True, exist_ok=True)
+        (users_dir / "index.json").write_text(json.dumps(
+            [{"name": u.name} for u in users], indent=2, ensure_ascii=False,
+        ) + "\n")
+        for u in users:
+            export_user(u, users_dir / u.name)
+
+        counts = {
+            "languages": len(languages), "samples": total_samples, "unassignedSamples": len(unassigned),
+            "analyses": total_analyses, "users": len(users),
+        }
         print(f"Exported {counts['languages']} language(s), {counts['samples']} sample(s), "
-              f"{counts['unassignedSamples']} unassigned sample(s), {counts['analyses']} analysis/analyses to {out_dir}/")
+              f"{counts['unassignedSamples']} unassigned sample(s), {counts['analyses']} analysis/analyses, "
+              f"{counts['users']} user(s) to {out_dir}/")
         return counts
 
 
