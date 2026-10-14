@@ -11,9 +11,11 @@
 
 <header>
   <h1>Shadowing Practice</h1>
-  <p>Upload audio → it's split into sentences → listen, repeat, compare</p>
-  <a href="index.html"  class="editor-link">← Vowel Chart</a>
-  <a href="editor.html" class="editor-link">✎ Edit languages</a>
+  <p>Upload audio → it's split into chapters &amp; sentences → listen, repeat, compare</p>
+  <a href="index.html"    class="editor-link">← Vowel Chart</a>
+  <a href="editor.html"   class="editor-link">✎ Edit languages</a>
+  <a href="settings.html" class="editor-link">⚙ Settings</a>
+  <span id="userPicker" class="user-picker"></span>
 </header>
 
 <div class="shadow-wrap">
@@ -21,33 +23,29 @@
   <div class="dropzone" id="dropzone">
     <div class="dropzone-icon">🎧</div>
     <div>Click to choose an audio file, or drag one here</div>
-    <div class="dropzone-hint">Supports files of any length. Each file is one session: re-picking it resumes where you left off per silence-sensitivity, and extending the range reuses what's already decoded and analysed instead of redoing it.</div>
+    <div class="dropzone-hint">Uploaded once and stored on the server — resume later, or from another browser, without re-uploading or re-splitting.</div>
     <input type="file" id="audioFile" accept="audio/*" style="display:none">
   </div>
-  <div class="open-file-row">
-    <button class="sent-btn" id="openFileBtn" type="button">📂 Open file (remembers access — Chrome/Edge)</button>
+
+  <div class="progress-wrap" id="progressWrap" style="display:none">
+    <span class="mini-spinner"></span>
+    <span class="progress-label" id="progressLabel"></span>
   </div>
+  <div id="uploadStatus"></div>
 
   <div class="cache-section">
-    <div class="cache-section-title">Remembered files</div>
-    <div class="cache-list" id="recentFilesList"></div>
+    <div class="cache-section-title">Your uploads</div>
+    <div class="cache-list" id="mediaList"></div>
   </div>
 
-  <div class="file-info" id="fileInfo">
+  <div class="file-info" id="fileInfo" style="display:none">
     <span>📄 <b id="fileName"></b></span>
     <span id="fileDuration"></span>
-    <span class="cache-badge" id="cacheBadge"></span>
-    <audio id="fullAudio" controls></audio>
+    <button class="sent-btn" id="deleteMediaBtn" type="button">🗑 Delete this upload</button>
   </div>
 
-  <div class="transcribe-status">
+  <div class="transcribe-status" id="transcribeStatusRow" style="display:none">
     <span class="cache-badge" id="transcribeBadge"></span>
-    <label class="transcribe-lang-label">Backend
-      <select id="transcribeBackend">
-        <option value="local">Local (formanter.py + faster-whisper)</option>
-        <option value="hf">Online — Hugging Face (free tier, no install)</option>
-      </select>
-    </label>
     <label class="transcribe-lang-label">Language
       <select id="transcribeLanguage">
         <option value="">Auto-detect</option>
@@ -74,78 +72,31 @@
       </select>
       <input type="text" id="transcribeLanguageOther" placeholder="ISO 639-1, e.g. sv" style="display:none">
     </label>
-  </div>
-
-  <div class="hf-settings" id="hfSettings" style="display:none">
-    <label>Hugging Face API token
-      <input type="password" id="hfTokenInput" placeholder="hf_xxx — free at huggingface.co/settings/tokens">
-    </label>
-    <label>Model
-      <input type="text" id="hfModelInput" value="openai/whisper-large-v3" placeholder="e.g. openai/whisper-large-v3">
-    </label>
-    <div class="hf-hint">
-      Runs entirely in your browser — audio is sent directly to huggingface.co, never through formanter.py.
-      The token is stored only in this browser's local storage. Per-sentence transcription only —
-      "Transcribe whole slice" needs the local backend for segment timestamps. If the model shows as
-      "loading", the free tier is warming it up; try again in ~20s. If it 404s, pick a different model
-      id from <a href="https://huggingface.co/models?pipeline_tag=automatic-speech-recognition" target="_blank" rel="noopener">huggingface.co's ASR models</a>.
-    </div>
-  </div>
-
-  <div class="range-wrap" id="rangeWrap" style="display:none">
-    <div class="range-title">Select the time range to load &amp; analyse</div>
-    <div class="range-row">
-      <label>Start <input type="text" id="rangeStart" class="range-text" value="0:00"></label>
-      <input type="range" id="rangeStartSlider" min="0" max="100" value="0">
-      <label>End <input type="text" id="rangeEnd" class="range-text" value="0:00"></label>
-      <input type="range" id="rangeEndSlider" min="0" max="100" value="100">
-    </div>
-    <div class="range-presets">
-      <button class="sent-btn" data-preset="120" type="button">First 2 min</button>
-      <button class="sent-btn" data-preset="600" type="button">First 10 min</button>
-      <button class="sent-btn" data-preset="full" type="button">Whole file</button>
-      <span class="range-dur" id="rangeDurLabel"></span>
-      <button class="sent-btn primary" id="loadSliceBtn" type="button">▶ Load &amp; analyse this slice</button>
-    </div>
-  </div>
-
-  <div class="progress-wrap" id="progressWrap" style="display:none">
-    <span class="mini-spinner"></span>
-    <span class="progress-label" id="progressLabel"></span>
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-    <span class="progress-pct" id="progressPct">0%</span>
-  </div>
-
-  <div id="uploadStatus"></div>
-
-  <div class="params-row">
-    <span>Silence sensitivity (pause length that splits a sentence):</span>
-    <input type="range" id="silenceSlider" min="150" max="600" step="10" value="300">
-    <span id="silenceVal">300 ms</span>
-    <button class="sent-btn" id="reanalyzeBtn" type="button">↺ Re-analyse</button>
-    <button class="sent-btn" id="clearCacheBtn" type="button">🗑 Forget this analysis</button>
     <label class="trim-toggle"><input type="checkbox" id="trimSilenceToggle" checked> ✂ Ignore silence at start of my recordings</label>
-    <span class="sensitivity-cache-note" id="sensitivityCacheNote"></span>
   </div>
 
-  <div class="sentence-list-wrap" id="sentenceListWrap">
+  <div class="params-row" id="segmentParamsRow" style="display:none">
+    <span>Sentence pause (ms):</span>
+    <input type="range" id="sentenceSlider" min="150" max="600" step="10" value="300">
+    <span id="sentenceVal">300 ms</span>
+    <span>Chapter pause (ms):</span>
+    <input type="range" id="chapterSlider" min="1500" max="15000" step="100" value="4000">
+    <span id="chapterVal">4000 ms</span>
+    <button class="sent-btn primary" id="splitParamsBtn" type="button">✂ Split into chapters &amp; sentences</button>
+  </div>
+
+  <div class="sentence-list-wrap" id="sentenceListWrap" style="display:none">
     <div class="sentence-list-header">
-      <span><b id="sentCount">0</b> sentences detected</span>
-      <span>▶ reference · 🐌 slow · ● record · ⇄ compare · 📝 transcribe · 🔬 open in Formant Lab</span>
-      <button class="sent-btn" id="transcribeAllBtn" type="button" title="One request per sentence — fast, but short clips transcribe less accurately">📝 Transcribe all (per-sentence)</button>
-      <button class="sent-btn primary" id="transcribeWholeBtn" type="button" title="One request for the whole slice, then matched back onto sentences — usually more accurate">📝 Transcribe whole slice (recommended)</button>
-      <span class="whole-slice-hint" id="wholeSliceHint" style="display:none">needs Local backend — switch it above ↑</span>
+      <span><b id="sentCount">0</b> sentences in <b id="chapterCount">0</b> chapters</span>
+      <span>▶ reference · 🐌 slow · ● record · ⇄ compare · 📝 transcribe · 🔬 Formant Lab · ✓ done</span>
+      <button class="sent-btn" id="resplitBtn" type="button">↺ Re-split (discards manual edits/progress)</button>
     </div>
-    <div id="sentenceList"></div>
-  </div>
-
-  <div class="cache-section">
-    <div class="cache-section-title">Sessions (1 file = 1 session; one analysis per silence-sensitivity value)</div>
-    <div class="cache-list" id="sessionList"></div>
+    <div id="chapterList"></div>
   </div>
 
 </div>
 
+<script src="js/user.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/vad.js"></script>
 <script src="js/shadow.js"></script>

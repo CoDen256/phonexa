@@ -110,6 +110,22 @@
 .sentence-list-header b { color:#7eb8f7; }
 .whole-slice-hint { font-size:.62rem; font-weight:400; text-transform:none; letter-spacing:0; color:#f0a95c; }
 
+/* ── Chapters ─────────────────────────────────────────────────── */
+.chapter-row { margin-bottom:14px; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.chapter-header {
+  display:flex; align-items:center; gap:10px; padding:8px 12px;
+  background:#162740; cursor:pointer; font-size:.78rem; color:#7eb8f7; user-select:none;
+}
+.chapter-header:hover { background:#1a2e48; }
+.chapter-toggle { font-size:.7rem; width:14px; display:inline-block; transition:transform .15s; }
+.chapter-row.open .chapter-toggle { transform:rotate(90deg); }
+.chapter-progress { margin-left:auto; font-size:.66rem; color:var(--muted); font-family:monospace; }
+.chapter-sentences { padding:8px; display:none; }
+.chapter-row.open .chapter-sentences { display:block; }
+.done-label { display:flex; align-items:center; gap:3px; font-size:.63rem; color:var(--muted); cursor:pointer; }
+.done-checkbox { accent-color:#34d399; cursor:pointer; }
+.sent-row.done { opacity:.65; }
+
 .sent-row {
   display:flex; align-items:center; gap:12px;
   background:var(--card); border:1px solid var(--border); border-radius:12px;
