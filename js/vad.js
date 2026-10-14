@@ -127,12 +127,22 @@ function detectChapters(monoSamples, sampleRate, chapterSilenceMs, sentenceThres
 }
 
 /**
- * ~95th percentile of (pre-merge) silence-gap durations, so the chapter
- * slider's pre-filled default only catches the longest ~5% of pauses in
- * this file — same heuristic as the sentence tier's auto-threshold, just
- * measuring gap LENGTH instead of RMS level.
+ * Suggests a chapter-pause threshold by finding the "elbow" in the sorted
+ * distribution of silence-gap durations — the point where many ordinary
+ * pauses (sentence/paragraph-length) give way to a handful of much longer
+ * ones (chapter/scene breaks). A fixed percentile doesn't work here: real
+ * speech has FAR more short gaps (word/consonant-level RMS dips, sentence
+ * pauses) than genuine chapter breaks, so a percentile index — even the
+ * 95th — usually still lands inside the short-gap cluster rather than
+ * isolating the long one, regardless of how clearly separated the two
+ * clusters actually are.
+ *
+ * `minGapMs` filters out sub-pause noise first (brief dips below threshold
+ * during voiced speech that were never real pauses at all) — only gaps that
+ * would already qualify as a sentence-level pause are candidates for being
+ * a chapter-level one.
  */
-function suggestChapterSilenceMs(monoSamples, sampleRate) {
+function suggestChapterSilenceMs(monoSamples, sampleRate, minGapMs = 300) {
   const windowMs = 20;
   const winSize = Math.max(1, Math.round(sampleRate * windowMs / 1000));
   const nWin = Math.ceil(monoSamples.length / winSize);
@@ -153,12 +163,29 @@ function suggestChapterSilenceMs(monoSamples, sampleRate) {
   while (i < nWin) {
     if (rms[i] <= threshold) {
       let j = i; while (j < nWin && rms[j] <= threshold) j++;
-      gaps.push((j - i) * windowMs);
+      const gapMs = (j - i) * windowMs;
+      if (gapMs >= minGapMs) gaps.push(gapMs);
       i = j;
     } else i++;
   }
   if (!gaps.length) return 4000;
   gaps.sort((a, b) => a - b);
-  const idx = Math.min(gaps.length - 1, Math.floor(gaps.length * 0.95));
-  return Math.max(1500, Math.min(15000, gaps[idx]));
+
+  // Walk the sorted gaps from the top down looking for the biggest
+  // proportional jump between consecutive values — that jump is the
+  // boundary between "ordinary pauses" and "long (chapter) pauses".
+  let bestRatio = 1, bestIdx = gaps.length - 1;
+  for (let k = gaps.length - 1; k > 0; k--) {
+    const ratio = gaps[k] / Math.max(1, gaps[k - 1]);
+    if (ratio > bestRatio) { bestRatio = ratio; bestIdx = k; }
+  }
+  if (bestRatio >= 1.4) {
+    // Suggest just below the first gap in the "long" cluster, so it's
+    // reliably included once the user accepts the suggestion.
+    return Math.max(1500, Math.min(20000, Math.round(gaps[bestIdx] * 0.9)));
+  }
+  // No clear separation (e.g. a very uniform file) — fall back to a high
+  // percentile rather than guessing at a cluster boundary that isn't there.
+  const idx = Math.min(gaps.length - 1, Math.floor(gaps.length * 0.97));
+  return Math.max(1500, Math.min(20000, gaps[idx]));
 }

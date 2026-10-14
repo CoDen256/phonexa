@@ -272,6 +272,7 @@ let currentSliceStart = 0, currentSliceEnd = 0;   // ABSOLUTE file-seconds the l
 let currentFingerprint = null;
 let currentMediaId = null, currentMedia = null;   // server identity + metadata + persisted segments
 let chapters = [], orphanSentences = [];          // rebuilt from currentMedia.segments by rebuildChapterTree()
+const openChapterIds = new Set();                 // survives renderChapterList() rebuilds (e.g. after split/merge)
 let suggestedChapterMs = 4000;
 let splitArmedSegId = null;
 let playCtx = null, activeSource = null;
@@ -705,7 +706,7 @@ function renderChapterList() {
 
 function renderChapterRow(ch, chIdx) {
   const wrap = document.createElement('div');
-  wrap.className = 'chapter-row';
+  wrap.className = 'chapter-row' + (openChapterIds.has(ch.id) ? ' open' : '');
   wrap.innerHTML = `
     <div class="chapter-header">
       <span class="chapter-toggle">▸</span>
@@ -718,6 +719,7 @@ function renderChapterRow(ch, chIdx) {
   wrap.querySelector('.chapter-header').addEventListener('click', e => {
     if (e.target.closest('button')) return;
     wrap.classList.toggle('open');
+    if (wrap.classList.contains('open')) openChapterIds.add(ch.id); else openChapterIds.delete(ch.id);
   });
   wrap.querySelectorAll('.merge-btn').forEach(btn => btn.addEventListener('click', async e => {
     e.stopPropagation();
@@ -825,10 +827,12 @@ async function mergeSegments(idA, idB) {
   await reloadCurrentMedia();
 }
 async function reloadCurrentMedia() {
+  const scrollY = window.scrollY;
   const res = await fetch(`/api/v1/shadowing/media/${currentMediaId}`);
   currentMedia = await res.json();
   rebuildChapterTree();
   renderChapterList();
+  requestAnimationFrame(() => window.scrollTo(0, scrollY));
 }
 
 // ─── Client-side segmentation (sentence + chapter tier — js/vad.js) ────────
@@ -883,7 +887,7 @@ function resetSession() {
   resetPlaybackAndRecordings();
   currentFile = null; currentFileId = null; currentWavHeader = null; currentDuration = null;
   currentBuffer = null; currentFingerprint = null; currentMediaId = null; currentMedia = null;
-  chapters = []; orphanSentences = [];
+  chapters = []; orphanSentences = []; openChapterIds.clear();
   document.getElementById('fileInfo').style.display = 'none';
   document.getElementById('rangeWrap').style.display = 'none';
   document.getElementById('segmentParamsRow').style.display = 'none';
@@ -940,7 +944,8 @@ async function loadSelectedRange(startSec, endSec) {
     setStatus(`Loaded — showing ${currentMedia.sentenceCount} already-split sentence${currentMedia.sentenceCount === 1 ? '' : 's'} (${currentMedia.doneCount} done).`);
   } else {
     const mono = computeMonoData(currentBuffer);
-    suggestedChapterMs = suggestChapterSilenceMs(mono, currentBuffer.sampleRate);
+    const sentenceMs = parseInt(document.getElementById('sentenceSlider').value, 10);
+    suggestedChapterMs = suggestChapterSilenceMs(mono, currentBuffer.sampleRate, sentenceMs);
     document.getElementById('chapterSlider').value = suggestedChapterMs;
     document.getElementById('chapterVal').textContent = suggestedChapterMs + ' ms';
     document.getElementById('segmentParamsRow').style.display = 'flex';
@@ -986,7 +991,8 @@ async function handleFile(file) {
     document.getElementById('rangeEndSlider').value = maxEndSec;
     document.getElementById('rangeEnd').value = secToClock(maxEndSec);
     updateRangeDurLabel();
-    setStatus(`Resumed — ${currentMedia.sentenceCount} sentences already split (${currentMedia.doneCount} done). Load the range below to practice.`);
+    setStatus(`Resuming — ${currentMedia.sentenceCount} sentences already split (${currentMedia.doneCount} done)…`);
+    await loadSelectedRange(0, maxEndSec);   // auto-load so the resumed list appears without an extra click
   } else {
     setStatus('Pick a time range below, load it, then choose sensitivities and split.');
   }
