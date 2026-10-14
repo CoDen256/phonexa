@@ -386,7 +386,7 @@ async function refreshMediaList() {
   el.innerHTML = media.map(m => `
     <div class="cache-item">
       <span class="cache-name">${escapeHtml(m.originalFilename || '(unnamed)')}</span>
-      <span class="cache-n">${secToClock((m.durationMs || 0) / 1000)} · ${m.segmentCount} segment${m.segmentCount === 1 ? '' : 's'}</span>
+      <span class="cache-n">${secToClock((m.durationMs || 0) / 1000)}${m.sentenceCount ? ` · ${m.doneCount}/${m.sentenceCount} done` : ' · not split yet'}</span>
       <button class="sent-btn media-open-btn" data-id="${m.id}" type="button">▶ Open</button>
       <button class="cache-forget" data-id="${m.id}" title="Delete this upload">✕</button>
     </div>`).join('');
@@ -710,4 +710,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   await refreshMediaList();
+
+  const deepLinkMediaId = parseInt(new URLSearchParams(location.search).get('mediaId'), 10);
+  if (deepLinkMediaId) await openMedia(deepLinkMediaId);
 });

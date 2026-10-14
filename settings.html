@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings — IPA Vowel Chart</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/shadow.css">
+  <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+
+<header>
+  <h1>Settings</h1>
+  <p>Per-profile configuration and Shadowing progress</p>
+  <a href="index.html"  class="editor-link">← Vowel Chart</a>
+  <a href="shadow.html" class="editor-link">🗣 Shadowing</a>
+  <span id="userPicker" class="user-picker"></span>
+</header>
+
+<div class="shadow-wrap">
+
+  <div class="settings-section">
+    <div class="settings-section-title">Transcription backend</div>
+    <div class="settings-form">
+      <label class="settings-row">
+        Backend
+        <select id="backendSelect">
+          <option value="local">Local (formanter.py + faster-whisper)</option>
+          <option value="hf">Online — Hugging Face (free tier, no install)</option>
+        </select>
+      </label>
+      <div id="localSettings">
+        <label class="settings-row">
+          Server URL
+          <input type="text" id="urlInput" placeholder="http://localhost:5050">
+        </label>
+      </div>
+      <div id="hfSettings" style="display:none">
+        <label class="settings-row">
+          Hugging Face API token
+          <input type="password" id="hfTokenInput" placeholder="hf_xxx — free at huggingface.co/settings/tokens">
+        </label>
+        <label class="settings-row">
+          Model
+          <input type="text" id="hfModelInput" placeholder="e.g. openai/whisper-large-v3">
+        </label>
+      </div>
+      <div class="settings-actions">
+        <button class="sent-btn primary" id="saveTranscribeBtn" type="button">Save</button>
+        <span id="transcribeSaveStatus" class="settings-save-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Shadowing progress</div>
+    <div class="cache-list" id="shadowingProgressList"></div>
+  </div>
+
+</div>
+
+<script src="js/user.js"></script>
+<script src="js/settings.js"></script>
+</body>
+</html>

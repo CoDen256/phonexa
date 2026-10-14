@@ -176,12 +176,16 @@ def _extract_wav_range(storage_key: str, start_ms: int, end_ms: int) -> bytes:
 # ── JSON shapes ──────────────────────────────────────────────────────────
 
 def _media_json(m: ShadowingMedia) -> dict:
+    sentences = [s for s in m.segments if s.kind == 'sentence']
     return {
         'id': m.id, 'originalFilename': m.original_filename, 'fileSizeBytes': m.file_size_bytes,
         'durationMs': m.duration_ms, 'sampleRateHz': m.sample_rate_hz, 'channels': m.channels,
         'sentenceSilenceMs': m.sentence_silence_ms, 'chapterSilenceMs': m.chapter_silence_ms,
         'createdAt': m.created_at.isoformat() if m.created_at else None,
         'segmentCount': len(m.segments),
+        'chapterCount': sum(1 for s in m.segments if s.kind == 'chapter'),
+        'sentenceCount': len(sentences),
+        'doneCount': sum(1 for s in sentences if s.done),
     }
 
 
