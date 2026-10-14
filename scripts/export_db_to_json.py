@@ -127,7 +127,7 @@ def export_shadowing_media(m) -> dict:
     ordered = sorted(m.segments, key=lambda s: (s.parent_segment_id is not None, s.order_index))
     return {
         "originalFilename": m.original_filename, "fileSizeBytes": m.file_size_bytes,
-        "storageKey": m.storage_key, "durationMs": m.duration_ms,
+        "fingerprint": m.fingerprint, "durationMs": m.duration_ms,
         "sampleRateHz": m.sample_rate_hz, "channels": m.channels,
         "sentenceSilenceMs": m.sentence_silence_ms, "chapterSilenceMs": m.chapter_silence_ms,
         "createdAt": m.created_at.isoformat() if m.created_at else None,

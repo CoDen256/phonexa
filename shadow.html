@@ -11,7 +11,7 @@
 
 <header>
   <h1>Shadowing Practice</h1>
-  <p>Upload audio → it's split into chapters &amp; sentences → listen, repeat, compare</p>
+  <p>Open audio → it's split into chapters &amp; sentences → listen, repeat, compare</p>
   <a href="index.html"    class="editor-link">← Vowel Chart</a>
   <a href="editor.html"   class="editor-link">✎ Edit languages</a>
   <a href="settings.html" class="editor-link">⚙ Settings</a>
@@ -23,25 +23,35 @@
   <div class="dropzone" id="dropzone">
     <div class="dropzone-icon">🎧</div>
     <div>Click to choose an audio file, or drag one here</div>
-    <div class="dropzone-hint">Uploaded once and stored on the server — resume later, or from another browser, without re-uploading or re-splitting.</div>
+    <div class="dropzone-hint">Audio is never uploaded — it's decoded locally in your browser. Re-opening the exact same file (even renamed) resumes your sentence/chapter split and progress, recognized by a small content fingerprint.</div>
     <input type="file" id="audioFile" accept="audio/*" style="display:none">
+  </div>
+  <div class="open-file-row">
+    <button class="sent-btn" id="openFileBtn" type="button">📂 Open file (remembers access — Chrome/Edge)</button>
+  </div>
+
+  <div class="cache-section">
+    <div class="cache-section-title">Remembered files</div>
+    <div class="cache-list" id="recentFilesList"></div>
   </div>
 
   <div class="progress-wrap" id="progressWrap" style="display:none">
     <span class="mini-spinner"></span>
     <span class="progress-label" id="progressLabel"></span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-pct" id="progressPct">0%</span>
   </div>
   <div id="uploadStatus"></div>
 
   <div class="cache-section">
-    <div class="cache-section-title">Your uploads</div>
+    <div class="cache-section-title">Your progress (by file)</div>
     <div class="cache-list" id="mediaList"></div>
   </div>
 
   <div class="file-info" id="fileInfo" style="display:none">
     <span>📄 <b id="fileName"></b></span>
     <span id="fileDuration"></span>
-    <button class="sent-btn" id="deleteMediaBtn" type="button">🗑 Delete this upload</button>
+    <button class="sent-btn" id="deleteMediaBtn" type="button">🗑 Delete this upload's progress</button>
   </div>
 
   <div class="transcribe-status" id="transcribeStatusRow" style="display:none">
@@ -73,6 +83,23 @@
       <input type="text" id="transcribeLanguageOther" placeholder="ISO 639-1, e.g. sv" style="display:none">
     </label>
     <label class="trim-toggle"><input type="checkbox" id="trimSilenceToggle" checked> ✂ Ignore silence at start of my recordings</label>
+  </div>
+
+  <div class="range-wrap" id="rangeWrap" style="display:none">
+    <div class="range-title">Select the time range to load &amp; practice</div>
+    <div class="range-row">
+      <label>Start <input type="text" id="rangeStart" class="range-text" value="0:00"></label>
+      <input type="range" id="rangeStartSlider" min="0" max="100" value="0">
+      <label>End <input type="text" id="rangeEnd" class="range-text" value="0:00"></label>
+      <input type="range" id="rangeEndSlider" min="0" max="100" value="100">
+    </div>
+    <div class="range-presets">
+      <button class="sent-btn" data-preset="120" type="button">First 2 min</button>
+      <button class="sent-btn" data-preset="600" type="button">First 10 min</button>
+      <button class="sent-btn" data-preset="full" type="button">Whole file</button>
+      <span class="range-dur" id="rangeDurLabel"></span>
+      <button class="sent-btn primary" id="loadSliceBtn" type="button">▶ Load this range</button>
+    </div>
   </div>
 
   <div class="params-row" id="segmentParamsRow" style="display:none">

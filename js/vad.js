@@ -1,8 +1,10 @@
 /**
  * vad.js — energy-based voice-activity detection, shared between shadow.js
- * (sentence segmentation on huge uploaded files) and praat.js's ingestion
- * mode (auto-suggesting slice boundaries on a freshly dropped file).
- * Depends on computeMonoData() from js/audio.js — load that first.
+ * (sentence AND chapter segmentation on huge uploaded files — entirely
+ * client-side, since audio is never sent to or stored by the server) and
+ * praat.js's ingestion mode (auto-suggesting slice boundaries on a freshly
+ * dropped file). Depends on computeMonoData() from js/audio.js — load that
+ * first.
  */
 
 /** Same energy-threshold heuristic as detectSentences, but just the onset of the first speech. */
@@ -106,4 +108,57 @@ function detectSentences(monoSamples, sampleRate, params = {}) {
 
   const segments = merged.map((s, idx) => ({ index: idx, start: Math.round(s.start), end: Math.round(s.end) }));
   return { segments, threshold };
+}
+
+/**
+ * Chapter-tier boundaries are just ANOTHER detectSentences pass over the
+ * same mono samples — a much larger minSilenceMs (only long pauses count as
+ * a chapter break), sharing the sentence tier's own auto-derived threshold
+ * (both tiers must agree on what counts as "silence"; only the gap-merge
+ * width differs) and a correspondingly larger minSentenceMs floor so a tiny
+ * trailing blip after a long gap doesn't become its own chapter.
+ */
+function detectChapters(monoSamples, sampleRate, chapterSilenceMs, sentenceThreshold) {
+  return detectSentences(monoSamples, sampleRate, {
+    minSilenceMs: chapterSilenceMs,
+    minSentenceMs: Math.max(chapterSilenceMs, 2000),
+    threshold: sentenceThreshold,
+  });
+}
+
+/**
+ * ~95th percentile of (pre-merge) silence-gap durations, so the chapter
+ * slider's pre-filled default only catches the longest ~5% of pauses in
+ * this file — same heuristic as the sentence tier's auto-threshold, just
+ * measuring gap LENGTH instead of RMS level.
+ */
+function suggestChapterSilenceMs(monoSamples, sampleRate) {
+  const windowMs = 20;
+  const winSize = Math.max(1, Math.round(sampleRate * windowMs / 1000));
+  const nWin = Math.ceil(monoSamples.length / winSize);
+  const rms = new Float32Array(nWin);
+  for (let w = 0; w < nWin; w++) {
+    const start = w * winSize, end = Math.min(start + winSize, monoSamples.length);
+    let sum = 0;
+    for (let i = start; i < end; i++) sum += monoSamples[i] * monoSamples[i];
+    rms[w] = Math.sqrt(sum / Math.max(1, end - start));
+  }
+  const sorted = Float32Array.from(rms).sort();
+  const floor = sorted[Math.floor(sorted.length * 0.15)] || 0;
+  const peak = sorted[sorted.length - 1] || 0.0001;
+  const threshold = Math.max(floor * 2.5, peak * 0.035, 0.0025);
+
+  const gaps = [];
+  let i = 0;
+  while (i < nWin) {
+    if (rms[i] <= threshold) {
+      let j = i; while (j < nWin && rms[j] <= threshold) j++;
+      gaps.push((j - i) * windowMs);
+      i = j;
+    } else i++;
+  }
+  if (!gaps.length) return 4000;
+  gaps.sort((a, b) => a - b);
+  const idx = Math.min(gaps.length - 1, Math.floor(gaps.length * 0.95));
+  return Math.max(1500, Math.min(15000, gaps[idx]));
 }

@@ -59,6 +59,7 @@ from sqlalchemy import (
     Integer,
     SmallInteger,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -249,21 +250,28 @@ class Setting(Base):
 
 class ShadowingMedia(Base):
     """
-    One uploaded long-audio file (audiobook/video audio) and its own
-    segmentation settings. The audio itself is stored once via the same
-    AudioStore/'file://<storage_key>' convention Sample.url uses — unlike
-    Sample, this is always a long-form original, not a short ingested clip,
-    so it's uploaded via a streaming endpoint rather than formanter.py's
-    existing fully-buffered ingest path.
+    One long-audio file (audiobook/video audio) a user is shadowing — audio
+    bytes are NEVER stored server-side (decoding/storing a multi-hour file
+    here was tried and reverted: it meant a multi-GB server-side decode on
+    upload, again on split, and again on every single chapter-audio
+    request, since nothing was cached between requests). Instead, `fingerprint`
+    (a client-computed hash of file size + a few sampled byte ranges — see
+    js/shadow.js's computeFingerprint, never the whole file) is how a
+    re-uploaded file is recognized as "the same one": POST
+    /api/v1/shadowing/media/find-or-create looks up (user_id, fingerprint)
+    and returns the existing row (with its segments/progress) instead of
+    creating a new one. Segmentation itself runs client-side (js/vad.js);
+    this table only ever receives the resulting ms boundaries.
     """
     __tablename__ = "shadowing_media"
+    __table_args__ = (UniqueConstraint("user_id", "fingerprint"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
+    fingerprint: Mapped[str] = mapped_column(Text, nullable=False)
     original_filename: Mapped[str | None] = mapped_column(Text)
     file_size_bytes: Mapped[int | None] = mapped_column()
-    storage_key: Mapped[str] = mapped_column(Text, nullable=False)
     duration_ms: Mapped[int | None] = mapped_column(Integer)
     sample_rate_hz: Mapped[int | None] = mapped_column(Integer)
     channels: Mapped[int | None] = mapped_column(SmallInteger)

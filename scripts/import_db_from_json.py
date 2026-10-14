@@ -10,10 +10,11 @@ everything in dependency order, remapping ids as it goes since
 RESTART IDENTITY means every row gets a fresh id. Any failure rolls back the
 whole transaction — old state untouched.
 
-Audio bytes are never touched here — a storageKey with no corresponding
-file in AUDIO_STORAGE_ROOT just 404s on playback until provisioned
-(non-fatal); this is a metadata-only operation, consistent with the audio
-volume being backed up/restored separately from this JSON snapshot.
+Audio bytes are never touched here — Sample/Token audio lives in
+AUDIO_STORAGE_ROOT and is backed up/restored separately from this JSON
+snapshot (a missing file just 404s on playback until provisioned,
+non-fatal). ShadowingMedia carries no audio at all — only a client-computed
+fingerprint used to recognize a re-uploaded file, see db/models.py.
 
 Upsert-based restore was rejected (see the original design doc): it has to
 answer an irreducibly ambiguous question (is a DB row absent from the JSON
@@ -72,7 +73,7 @@ def import_sample(db, sd: dict, language_id: int | None, analyses_dir: Path) -> 
 def import_shadowing_media(db, md: dict, user_id: int) -> None:
     media = ShadowingMedia(
         user_id=user_id, original_filename=md.get("originalFilename"), file_size_bytes=md.get("fileSizeBytes"),
-        storage_key=md.get("storageKey", ""), duration_ms=md.get("durationMs"), sample_rate_hz=md.get("sampleRateHz"),
+        fingerprint=md.get("fingerprint", ""), duration_ms=md.get("durationMs"), sample_rate_hz=md.get("sampleRateHz"),
         channels=md.get("channels"), sentence_silence_ms=md.get("sentenceSilenceMs"), chapter_silence_ms=md.get("chapterSilenceMs"),
     )
     db.add(media)
