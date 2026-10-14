@@ -1810,6 +1810,11 @@ def serve_audio(storage_key):
     return send_file(store.get_path(storage_key), conditional=True)
 
 
+from shadowing import shadowing_bp  # noqa: E402
+
+app.register_blueprint(shadowing_bp)
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Users + Settings — simple named profiles (no auth/password, see
 # db/models.py's User docstring) and a generic per-user JSONB key/value

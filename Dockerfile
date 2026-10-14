@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Backend
-COPY formanter.py .
+COPY formanter.py shadowing.py .
 COPY db/ ./db/
 COPY alembic.ini .
 COPY alembic/ ./alembic/
