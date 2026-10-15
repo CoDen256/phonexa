@@ -1,19 +1,43 @@
-# IPA Vowel Chart — Architecture
+# IPA Vowel Chart — Realtime/Praat Pipeline Architecture
 
-A browser-only interactive IPA vowel chart with multi-language support, a language editor, and a pronunciation practice tool backed by a local Python analysis server.
+**Scope of this document:** this file is a deep-dive into the realtime microphone
+pipeline (`/frames`, `/debug`, `/stream` in `formanter.py`, and `js/realtime.js`/
+`js/practice.js` client-side) — the dual-ceiling Praat formant-selection algorithm,
+the wire protocols, and the test/calibration suite. This is the one subsystem in the
+project that's been deliberately frozen since before the rest of the app existed, so
+the deep pseudocode-level detail below stays accurate for the long haul.
+
+It does **not** cover the rest of the app (the Postgres-backed language/sample/token
+editor, Formant Lab, Shadowing, Users/Settings, the Sound/Token browsers) — those are
+living, actively-changing systems better read straight from the code: `README.md` for
+a feature-level tour, `db/models.py`'s own docstring for the schema's design rationale
+(it's maintained as a running decision log), and `formanter.py`'s `/api/v1/...` route
+list (`git log` on that file) for the actual REST surface.
+
+A browser-only interactive IPA vowel chart with multi-language support, a language editor, and a pronunciation practice tool backed by this Flask app (`formanter.py`).
 
 ---
 
-## Project Goals
+## Project Goals (original — still true, just expanded on since)
 
 - Display IPA vowels from multiple languages simultaneously on a shared trapezoid chart and a formant (F1/F2) plot
 - Allow filtering by language, roundness, vowel length, and IPA base symbol
 - Support clicking vowels to play audio; diphthongs shown as animated arrows
-- Provide a language editor to create/edit language JSON files in-browser with file-system access
-- Allow recording your own voice, comparing it to reference vowels, and analysing F1/F2 formants via a local Python server
+- Provide a language editor to create/edit languages (now DB-backed — see README, the File-System-Access/local-JSON model described further down this document was retired)
+- Allow recording your own voice, comparing it to reference vowels, and analysing F1/F2 formants via this server
 - Stream microphone audio in real time to the server and receive per-frame formant estimates
 
 ---
+
+> **Historical from here through "editor.html — Language Editor" below.** Everything in
+> this stretch (the `lang/*.json` runtime data format, `index.html`'s old global-state
+> shape, `js/charts.js`/`js/diphthong.js`/`js/utils.js`'s function-level descriptions,
+> the pre-spectrogram waveform practice panel, and the File-System-Access editor)
+> describes the **pre-Postgres-migration** architecture. `lang/*.json` is now only a
+> one-time migration seed (`scripts/migrate_legacy_to_db.py`) — nothing fetches it at
+> runtime anymore; everything goes through `/api/v1/...`. Kept as a historical record
+> of the original design, not current behavior — jump to "formanter.py — Local Formant
+> Analysis Server" further down for what's still live.
 
 ## Data Format
 
@@ -372,13 +396,15 @@ Pure JS WAV encoder. Writes a 44-byte RIFF/WAVE/fmt/data header then 16-bit sign
 ### Constants
 
 ```js
-const HTTP_URL   = 'http://localhost:5050';
-const STREAM_URL = 'ws://localhost:5051';
+const HTTP_URL   = '';   // relative — same origin as the page, works under any host/port
+const STREAM_URL = (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.host + '/stream';
 ```
+
+(These were previously documented as hardcoded `http://localhost:5050`/`ws://localhost:5051` — that was true of an earlier revision that ran the WebSocket on its own port via the standalone `websockets` library; today it's `flask-sock`'s `/stream` route on the same origin/port as everything else, hence the dynamic, relative construction above.)
 
 ### WebSocket streaming — `_openStream()` / `analyzeSynthBuffer()`
 
-`_openStream()` opens a persistent WebSocket to `:5051`. On connection it sends `{type:'init', sample_rate}` and then binary int16 PCM chunks at 128 samples per message.
+`_openStream()` opens a persistent WebSocket to `/stream` (same origin, same port as the HTTP server). On connection it sends `{type:'init', sample_rate}` and then binary int16 PCM chunks at 128 samples per message.
 
 `analyzeSynthBuffer({buffer, sampleRate})` — encodes a synthesised `AudioBuffer` as WAV and POSTs it to `/frames` with `single_segment: true` and `slice_start: 0.1, slice_end: 0.9` (trim 10% from each end):
 
@@ -419,13 +445,17 @@ const r = await fetch(`${HTTP_URL}/debug`, { method: 'POST', body: form });
 
 ---
 
-## analyze_server.py — Local Formant Analysis Server
+## formanter.py — Local Formant Analysis Server
 
-Flask HTTP server on `:5050` and a `websockets` server on `:5051`. Start with:
+One Flask process on `:5050`, serving both plain HTTP routes and the `/stream`
+WebSocket route (via `flask-sock`, not a separate `websockets`-library server —
+see the Constants note above). This file was called `analyze_server.py` in an
+earlier revision; the realtime/Praat pipeline it describes is otherwise unchanged.
+Start with:
 
 ```bash
-pip install flask flask-cors parselmouth numpy websockets
-python analyze_server.py
+pip install -r requirements.txt
+python formanter.py
 ```
 
 Both servers share the same analysis pipeline (`analyse_segment_to_frame`). The HTTP server handles file-based one-shot or sliding-window requests; the WebSocket server handles continuous microphone streaming.
@@ -587,7 +617,7 @@ Raw Praat diagnostic endpoint. Same multipart input as `/frames` (`file` + `conf
 
 ---
 
-### WebSocket stream server (`websockets`, `:5051`)
+### WebSocket stream server (`flask-sock`, `/stream`, same port as HTTP)
 
 Handles one persistent connection per client. The client sends 128-sample int16 binary chunks continuously; the server accumulates them in a 4096-sample ring buffer and emits a frame JSON message every `SEGMENT_STEP_MS` (10 ms) of new audio.
 
@@ -691,25 +721,25 @@ Returns `(f1, f2, f1_median, f2_median)` as rounded integers.
 
 ---
 
-## tests/server_tests.py — Regression and Calibration Test Suite
+## test/server_tests.py — Regression and Calibration Test Suite
 
 ```bash
 # Run a test layer
-python tests/server_tests.py single_frame           # Layer 1 — /frames one-frame mode
-python tests/server_tests.py frames                 # Layer 2 — /frames sliding window
-python tests/server_tests.py debug                  # Layer 3 — /debug raw Praat
-python tests/server_tests.py stream                 # Layer 4 — /stream per-frame
-python tests/server_tests.py stream_median_stability # Layer 5 — stable vowel position
+python test/server_tests.py single_frame           # Layer 1 — /frames one-frame mode
+python test/server_tests.py frames                 # Layer 2 — /frames sliding window
+python test/server_tests.py debug                  # Layer 3 — /debug raw Praat
+python test/server_tests.py stream                 # Layer 4 — /stream per-frame
+python test/server_tests.py stream_median_stability # Layer 5 — stable vowel position
 
 # Update saved references
-python tests/server_tests.py stream --update
+python test/server_tests.py stream --update
 
 # Compare current output against saved references
-python tests/server_tests.py compare
+python test/server_tests.py compare
 
 # Calibration: F1/F2 accuracy + stream vs /frames consistency
-python tests/server_tests.py --calibrate              # all VOWEL_EXPECTED entries
-python tests/server_tests.py --calibrate u_practice   # one case
+python test/server_tests.py --calibrate              # all VOWEL_EXPECTED entries
+python test/server_tests.py --calibrate u_practice   # one case
 ```
 
 ### Test layers
@@ -994,21 +1024,22 @@ Reload button re-runs `loadLanguages()` with a fresh timestamp. The editor has i
 
 ## Key design decisions
 
-**JSON data, not JS modules** — `lang.json` files are plain JSON, fetched at runtime. No build step. Any text editor can add a language.
+**Still true today:**
 
-**Shared `cardinal` language** — the 23 cardinal vowels live in `lang/cardinal/lang.json` like any other language. They appear on the chart when the Cardinal chip is active and always appear as reference dots in the editor.
-
-**`type` field is explicit** — vowel length/type is not inferred from the IPA symbol. The JSON specifies it. This makes filtering reliable regardless of transcription conventions.
+**`type` field is explicit** — vowel length/type is not inferred from the IPA symbol. The schema specifies it. This makes filtering reliable regardless of transcription conventions.
 
 **Proximity clustering** — vowels within 22 SVG units share a cluster dot and disambiguation picker. This is computed fresh on every render from the current positions; no persistent cluster state.
 
 **Diphthongs excluded from clustering** — diphthong vowels are separated before clustering and rendered as arrows. They appear as normal dots on the formant chart (using source F1/F2 only).
 
-**Editor uses File System Access API** — direct write to the `lang/` folder without downloads. `FileSystemDirectoryHandle` is persisted to IndexedDB so re-granting permission after page refresh is unnecessary (if the browser retains the grant).
-
 **Practice panel requires HTTPS** — `navigator.mediaDevices.getUserMedia` is only available in secure contexts (HTTPS or localhost). Plain HTTP deployments will get a "Mic error" on the record button.
 
 **Multipart form data for all server requests** — all HTTP analysis endpoints (`/frames`, `/debug`) accept `multipart/form-data` with a `file` field and a `config` JSON field. Audio format is detected from magic bytes (WAV/AIFF/FLAC/OGG/MP3 → parselmouth; anything else → raw int16 PCM). This unifies file and raw-PCM inputs and keeps all parameters in one place.
+
+**Historical (superseded by the Postgres migration — see README instead):**
+~~JSON data, not JS modules~~ — `lang.json` is now a one-time migration seed, not fetched at runtime.
+~~Shared `cardinal` language lives in `lang/cardinal/lang.json`~~ — it's a `Language` row like any other now, same behavior, DB-backed.
+~~Editor uses File System Access API~~ — retired; `editor.html` is DB-only (`/api/v1/languages`/`/vowels`).
 
 **Single-segment mode is the HTTP default** — `ConnConfig.single_segment = True`. Sending a pre-trimmed WAV with no config override yields exactly one frame for the whole clip — the common case for practice panel and IPA audio verification. Sliding-window mode requires explicitly setting `single_segment: false`.
 

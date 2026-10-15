@@ -1,10 +1,21 @@
 """
-analyze_server.py
-=================
-Dual-ceiling Praat formant tracker.
+formanter.py
+============
+Flask app serving both the original realtime/Praat formant pipeline below
+(unchanged since this file was still called analyze_server.py — never touch
+this section without explicit instruction) and the DB-backed REST API for
+languages/samples/tokens/vowels/users/settings/Formant-Lab ingest/YouTube
+extraction added later (see db/models.py's docstring for the schema
+rationale, and this file's own later sections for the route list).
 
-HTTP :5050  —  /ping  /frames  /debug
-Stream :5051  —  streaming PCM → rich diagnostic frames
+Realtime/Praat pipeline (frozen; dual-ceiling Praat formant tracker)
+---------------------------------------------------------------------
+HTTP   :5050  —  /ping  /frames  /debug
+Stream :5050  —  /stream (flask-sock WebSocket on the SAME port/process —
+                  there is no separate :5051 server; an older revision of
+                  this file ran the stream on its own `websockets`-library
+                  port, and some comments/commit messages elsewhere still
+                  say ":5051" out of habit from that era)
 
 Algorithm (see ``_run_praat_analysis`` for the full pipeline)
 --------------------------------------------------------------
@@ -16,16 +27,17 @@ Algorithm (see ``_run_praat_analysis`` for the full pipeline)
 3. Phantom-resonance fix: close front vowels (/i/, /y/) sometimes produce
    a spurious LPC pole between F1 and the real F2; re-scan to skip it.
 4. Continuity: un-swap F1/F2 if tracks cross between frames.
-5. WS only: server-side sliding median (JS-style rounding to match browser).
+5. Stream only: server-side sliding median (JS-style rounding to match browser).
 
-WS frame states
----------------
+Stream frame states
+--------------------
 A  below rms_floor  — Praat skipped; only {t_ms, voiced, rms, is_above_rms}
 B  above rms_floor, no valid formants — all Praat outputs included for diagnostics
 C  voiced — all fields populated including f1_median / f2_median
 
-Install:  pip install flask flask-cors parselmouth numpy websockets
-Optional (for /transcribe):  pip install faster-whisper
+Install:  pip install -r requirements.txt  (flask, flask-sock, parselmouth,
+          numpy, SQLAlchemy/psycopg2/alembic, yt-dlp — see requirements.txt)
+Optional (for /transcribe):  pip install -r requirements-transcribe.txt
 """
 
 from __future__ import annotations
