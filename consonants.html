@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IPA Consonant Chart</title>
+  <link rel="stylesheet" href="css/consonants.css">
+</head>
+<body>
+
+<header>
+  <h1>IPA Consonant Chart</h1>
+  <p>Place × manner overview grid, and a per-language reading strip · Click a symbol for its full feature breakdown</p>
+  <a href="index.html"     class="editor-link">← Vowel Chart</a>
+  <a href="editor.html"    class="editor-link">✎ Edit languages</a>
+  <a href="shadow.html"    class="editor-link">🗣 Shadowing</a>
+  <a href="praat.html"     class="editor-link" target="_blank">🔬 Formant Lab</a>
+  <a href="sounds.html"    class="editor-link" target="_blank">🔊 Sound Library</a>
+  <a href="tokens.html"    class="editor-link" target="_blank">⌸ Token Browser</a>
+  <a href="drill.html"     class="editor-link" target="_blank">🎙 Token Drill</a>
+  <a href="settings.html"  class="editor-link">⚙ Settings</a>
+</header>
+
+<div id="loading">
+  <div class="spinner"></div>
+  Loading consonant inventory…
+</div>
+
+<div id="app" class="con-shell" style="display:none">
+  <aside class="con-rail">
+    <div class="con-railSection">
+      <h2>Languages</h2>
+      <div class="con-chipRow" id="conLangChips"></div>
+    </div>
+
+    <div class="con-railSection">
+      <h2>Highlight secondary articulation</h2>
+      <div class="con-chipRow" id="conSecChips"></div>
+    </div>
+
+    <div class="con-railSection">
+      <h2>Highlight active articulator</h2>
+      <div class="con-chipRow" id="conActiveChips"></div>
+    </div>
+
+    <div class="con-railSection">
+      <h2>Highlight voicing</h2>
+      <div class="con-chipRow" id="conVoicingChips"></div>
+    </div>
+
+    <div class="con-railSection">
+      <h2>Highlight syllabicity</h2>
+      <div class="con-chipRow" id="conSyllChips"></div>
+    </div>
+
+    <div class="con-legend con-railSection">
+      <details>
+        <summary>Feature model — how the 18 overlap</summary>
+        <dl>
+          <dt>Passive place <span class="con-muted-inline">— where the constriction is (chart columns)</span></dt>
+          <dd>Exo-/Endo-labial, Dental, Alveolar, Post-alveolar, Alveolo-palatal (pre-palatal), Palatal, Velar, Uvular, Pharyngeal, Epiglottal, Glottal. One value, ever — it's a location.</dd>
+
+          <dt>Active articulator <span class="con-muted-inline">— what body part moves</span></dt>
+          <dd>Labial, Apical, Laminal, Sub-apical, Antero-dorsal, Postero-dorsal, Radical. Usually implied by manner+place; stored explicitly only when it disambiguates (<code>ʂ</code> apical vs <code>ʃ</code> laminal, both post-alveolar).</dd>
+
+          <dt>Secondary articulation <span class="con-muted-inline">— multi-select overlay</span></dt>
+          <dd>Labialized, Palatalized, Velarized, Pharyngealized, Glottalized, Aspirated. Zero, one, or several at once — Russian hard <code>л</code> carries both Velarized <i>and</i> Pharyngealized simultaneously.</dd>
+
+          <dt>Everything else</dt>
+          <dd>Voicing (binary, per symbol) · Syllabic (binary modifier) · Co-articulation (two simultaneous primary places, e.g. <code>w</code> = Labial+Velar) — orthogonal to all of the above.</dd>
+        </dl>
+      </details>
+    </div>
+  </aside>
+
+  <main class="con-main">
+    <div class="con-viewTabs">
+      <button class="con-viewTab active" data-view="grid" id="conTabGrid">Overview grid</button>
+      <button class="con-viewTab" data-view="strip" id="conTabStrip">Per-language strip</button>
+    </div>
+
+    <section class="con-view active" id="conView-grid">
+      <div class="con-gridWrap">
+        <table class="con-ipaGrid" id="conGrid"></table>
+      </div>
+      <div class="con-gridFoot">
+        <span><span class="con-vdot"></span> voiceless &nbsp;·&nbsp; <span class="con-vdot con-on"></span> voiced</span>
+        <span>C<sup>ʲʷʰʼ</sup> = secondary articulation (superscript, after the letter)</span>
+        <span>C̴<sup>ˠˤ</sup> = velarized/pharyngealized (tilde through the letter) — superscript disambiguates which, or both</span>
+        <span>C̺/C̻ = apical/laminal (underscript, active articulator) · C̩ = syllabic</span>
+        <span>hatched cell = no loaded phone there (place/manner combo may still be valid IPA)</span>
+      </div>
+    </section>
+
+    <section class="con-view" id="conView-strip">
+      <div class="con-stripHead">
+        <div class="con-radioRow" id="conStripRadios"></div>
+        <div class="con-stripMeta" id="conStripMeta"></div>
+      </div>
+      <div id="conStripBody"></div>
+    </section>
+  </main>
+</div>
+
+<div class="con-inspector" id="conInspector" role="dialog">
+  <button class="con-closeX" id="conInspClose">✕</button>
+  <div class="con-head">
+    <span class="con-ipa" id="conInspIpa"></span>
+    <span class="con-lang" id="conInspLang"></span>
+  </div>
+  <table>
+    <tr><td class="con-k">Manner</td><td class="con-v" id="conInspManner"></td></tr>
+    <tr><td class="con-k">Passive place</td><td class="con-v" id="conInspPlace"></td></tr>
+    <tr><td class="con-k">Active articulator</td><td class="con-v" id="conInspActive"></td></tr>
+    <tr><td class="con-k">Voicing</td><td class="con-v" id="conInspVoicing"></td></tr>
+    <tr><td class="con-k">Secondary</td><td class="con-v"><div class="con-secbadges" id="conInspSec"></div></td></tr>
+  </table>
+  <div class="con-note" id="conInspNote" style="display:none;"></div>
+  <button class="con-playBtn" id="conInspPlay" style="display:none;" type="button">▶ Play reference audio</button>
+</div>
+
+<script src="js/consonant-symbol.js"></script>
+<script src="js/consonants.js"></script>
+
+</body>
+</html>

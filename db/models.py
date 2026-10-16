@@ -83,6 +83,7 @@ class Language(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     vowels: Mapped[list["Vowel"]] = relationship(back_populates="language", cascade="all, delete-orphan", order_by="Vowel.sort_order")
+    consonants: Mapped[list["Consonant"]] = relationship(back_populates="language", cascade="all, delete-orphan", order_by="Consonant.sort_order")
     samples: Mapped[list["Sample"]] = relationship(back_populates="language", cascade="all, delete-orphan", order_by="Sample.sort_order")
 
 
@@ -173,6 +174,79 @@ class Vowel(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     language: Mapped["Language"] = relationship(back_populates="vowels")
+    representative_sample: Mapped["Sample | None"] = relationship()
+
+
+class Consonant(Base):
+    """
+    A consonant phone — deliberately NOT a `Vowel` extension or a shared
+    `Phone` supertype (see openspec/changes/add-consonant-chart/design.md
+    decision 1): consonants are a categorical feature bundle (manner/place/
+    voicing/secondary-articulation), not a continuous position+acoustic-target
+    pair, so reusing Vowel's columns would just be a wide table with two
+    permanently-disjoint sets of always-null columns.
+
+    `passive_place` (location) and `active_articulator` (what moves) are two
+    independent columns, not one flat enum, because real contrasts need both
+    at once (e.g. apical vs. laminal post-alveolar) — see design.md decision 2.
+    `secondary_articulation` is multi-valued (array) because 0, 1, or 2+ can
+    apply simultaneously (Russian hard л is velarized AND pharyngealized).
+
+    `symbols` stores only the bare base letter(s) — never a pre-composed
+    string with diacritics. The full displayed IPA symbol (secondary-
+    articulation superscripts, velarized/pharyngealized tilde overlay,
+    active-articulator underscript, syllabic mark) is always computed from
+    these feature columns at render time (see js/consonant-symbol.js) — this
+    was a real bug class during mockup iteration (inconsistent/missing marks
+    when baked into stored strings) that a derived-only rendering structurally
+    prevents from recurring (design.md decision 3).
+
+    The enums below are supersets of what's seeded by the four launch
+    languages (en/de/ru/fr) — they include manner/place/articulator values no
+    current row uses (e.g. click, ejective, implosive manners; radical,
+    epiglottal places) so a future language's inventory needs only new rows,
+    not a schema migration.
+    """
+    __tablename__ = "consonants"
+
+    MANNERS = (
+        "nasal", "plosive", "affricate", "fricative", "trill", "tap_or_flap",
+        "approximant", "lateral_approximant", "lateral_fricative", "lateral_flap",
+        "click", "ejective", "implosive",
+    )
+    PASSIVE_PLACES = (
+        "exo_labial", "endo_labial", "dental", "alveolar", "postalveolar",
+        "alveolo_palatal", "palatal", "velar", "uvular", "pharyngeal",
+        "epiglottal", "glottal", "retroflex", "labial",
+    )
+    ACTIVE_ARTICULATORS = (
+        "labial", "apical", "laminal", "sub_apical", "antero_dorsal",
+        "postero_dorsal", "radical",
+    )
+    SECONDARY_ARTICULATIONS = (
+        "labialized", "palatalized", "velarized", "pharyngealized",
+        "glottalized", "aspirated",
+    )
+    VOICINGS = ("voiced", "voiceless")
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    language_id: Mapped[int] = mapped_column(ForeignKey("languages.id", ondelete="CASCADE"), nullable=False)
+    symbols: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False)
+    manner: Mapped[str] = mapped_column(Text, nullable=False)
+    passive_place: Mapped[str] = mapped_column(Text, nullable=False)
+    active_articulator: Mapped[str | None] = mapped_column(Text)
+    voicing: Mapped[str] = mapped_column(Text, nullable=False)
+    secondary_articulation: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False, default=list)
+    syllabic: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    coarticulated_place: Mapped[str | None] = mapped_column(Text)
+    desc: Mapped[str | None] = mapped_column(Text)
+    wiki_url: Mapped[str | None] = mapped_column(Text)
+    representative_sample_id: Mapped[int | None] = mapped_column(ForeignKey("samples.id", ondelete="SET NULL"))
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+    language: Mapped["Language"] = relationship(back_populates="consonants")
     representative_sample: Mapped["Sample | None"] = relationship()
 
 

@@ -1099,7 +1099,7 @@ import re  # noqa: E402
 from sqlalchemy import func  # noqa: E402
 
 from db.session import get_sessionmaker  # noqa: E402
-from db.models import Language, Sample, SampleAnalysis, Token, Vowel  # noqa: E402
+from db.models import Consonant, Language, Sample, SampleAnalysis, Token, Vowel  # noqa: E402
 from db.storage import get_audio_store, is_local_url, storage_key_from_url, url_from_storage_key  # noqa: E402
 import tarfile  # noqa: E402
 from datetime import datetime, timezone  # noqa: E402
@@ -1846,6 +1846,41 @@ def get_language_full(key):
             'key': language.key, 'label': language.label, 'color': language.color,
             'vowels': [_vowel_full_json(v) for v in vowels],
         })
+
+
+def _consonant_audio_url(c: Consonant) -> str | None:
+    rep = c.representative_sample
+    if rep is None or not rep.url:
+        return None
+    if is_local_url(rep.url):
+        return f'/audio/{storage_key_from_url(rep.url)}'
+    return rep.url
+
+
+def _consonant_json(c: Consonant) -> dict:
+    return {
+        'id': c.id, 'languageId': c.language_id, 'symbols': c.symbols,
+        'manner': c.manner, 'passivePlace': c.passive_place,
+        'activeArticulator': c.active_articulator, 'voicing': c.voicing,
+        'secondaryArticulation': c.secondary_articulation, 'syllabic': c.syllabic,
+        'coarticulatedPlace': c.coarticulated_place, 'desc': c.desc, 'wikiUrl': c.wiki_url,
+        'representativeSampleId': c.representative_sample_id,
+        'representativeAudioUrl': _consonant_audio_url(c),
+        'sortOrder': c.sort_order,
+    }
+
+
+@app.route('/api/v1/consonants')
+def list_consonants():
+    """Read-only — no write endpoints needed since there's no consonant
+    editor UI in scope (data entry is scripts/seed_consonants.py only)."""
+    language_id = request.args.get('languageId')
+    with get_sessionmaker()() as db:
+        q = db.query(Consonant)
+        if language_id:
+            q = q.filter_by(language_id=int(language_id))
+        consonants = q.order_by(Consonant.sort_order).all()
+        return jsonify([_consonant_json(c) for c in consonants])
 
 
 @app.route('/api/v1/sounds')
