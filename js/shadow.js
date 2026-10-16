@@ -340,6 +340,89 @@ function compareSeg(seg) {
   });
 }
 
+// ─── Pitch-contour comparison (openspec/changes/add-shadowing-pitch-comparison) ─
+// On-demand only (triggered by the 🎵 Pitch button), reuses the same Praat
+// analysis call js/practice.js already proves works for arbitrary
+// {getChannelData,sampleRate} input — see js/spectro.js's SpectroLib.
+// Everything here is held in a local variable and a <canvas>, never
+// persisted — matching how the recording Blob itself is already handled.
+const PITCH_FLOOR = 60, PITCH_CEIL = 400;
+
+/** Wraps an already-decoded user-recording AudioBuffer in the plain
+ * {getChannelData,sampleRate} shape runPraatAnalysis expects — no extra
+ * decode needed here since rec.buffer is decoded once in toggleRecord's
+ * rec.onstop handler. Returns null if that decode hasn't completed/failed. */
+function recordingAnalysisBuffer(rec) {
+  if (!rec?.buffer) return null;
+  return { getChannelData: ch => rec.buffer.getChannelData(ch), sampleRate: rec.buffer.sampleRate };
+}
+
+/** Slices [startMs,endMs] out of the already-decoded full-file buffer into
+ * the same {getChannelData,sampleRate} shape — no new fetch/decode, just a
+ * cheap Float32Array.slice() of what's already in memory. */
+function sliceBufferForAnalysis(buffer, startMs, endMs) {
+  const sr = buffer.sampleRate;
+  const data = buffer.getChannelData(0);
+  const i0 = Math.floor(startMs / 1000 * sr), i1 = Math.min(data.length, Math.ceil(endMs / 1000 * sr));
+  const slice = data.slice(i0, i1);
+  return { getChannelData: () => slice, sampleRate: sr };
+}
+
+/** Draws both pitch curves on a shared 0–1 (fraction of each clip's OWN
+ * duration) x-axis — see design.md decision 3: no time-alignment, just
+ * shape-comparability. Reference = amber, you = white, matching the vowel
+ * chart's existing recorded-vs-reference dot convention (js/charts.js). */
+function drawPitchComparison(canvas, refResult, recResult, refDurationMs, recDurationMs) {
+  const W = canvas.width = canvas.offsetWidth || 300, H = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0a1520'; ctx.fillRect(0, 0, W, H);
+
+  const drawCurve = (result, durationMs, color) => {
+    if (!result || !durationMs) return;
+    ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    let drawing = false;
+    for (const row of result.pitch || []) {
+      if (row.f0 == null) { drawing = false; continue; }
+      const frac = row.t_ms / durationMs;
+      if (frac < 0 || frac > 1) continue;
+      const x = frac * W;
+      const clamped = Math.max(PITCH_FLOOR, Math.min(PITCH_CEIL, row.f0));
+      const y = H * (1 - (clamped - PITCH_FLOOR) / (PITCH_CEIL - PITCH_FLOOR));
+      if (!drawing) { ctx.moveTo(x, y); drawing = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  };
+  drawCurve(refResult, refDurationMs, '#fbbf24');
+  drawCurve(recResult, recDurationMs, '#ffffff');
+}
+
+async function pitchCompareSeg(seg, row) {
+  const rec = recordings[seg.id];
+  const recBuf = recordingAnalysisBuffer(rec);
+  if (!recBuf) { setStatus('Record a take first to compare pitch.'); return; }
+  const off = segOffsetInBuffer(seg);
+  if (!off) { setStatus('Load a wider range (covering this sentence) to compare pitch.'); return; }
+
+  const btn = row.querySelector('.pitch-btn');
+  const canvas = row.querySelector('.pitch-canvas'), legend = row.querySelector('.pitch-legend');
+  const refBuf = sliceBufferForAnalysis(currentBuffer, off.startMs, off.endMs);
+  const prevLabel = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳…';
+  try {
+    const [refResult, recResult] = await Promise.all([
+      SpectroLib.runPraatAnalysis(refBuf, {}),
+      SpectroLib.runPraatAnalysis(recBuf, {}),
+    ]);
+    canvas.style.display = 'block'; legend.style.display = 'flex';
+    drawPitchComparison(canvas, refResult, recResult, off.endMs - off.startMs, rec.buffer.duration * 1000);
+  } catch (e) {
+    setStatus('Pitch analysis failed: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = prevLabel;
+  }
+}
+
 // ─── Recording ───────────────────────────────────────────────────────────────
 async function getMicStream() {
   if (micStream) return micStream;
@@ -372,12 +455,16 @@ async function toggleRecord(segId, row) {
         if (recordings[segId]?.blob === blob) {
           recordings[segId].buffer = buf;
           recordings[segId].trimStartMs = detectLeadingSilenceMs(buf);
+          row.querySelector('.pitch-btn').disabled = false;
         }
-      } catch (e) { /* trimming unavailable for this recording; url playback still works */ }
+      } catch (e) { /* trimming/pitch-comparison unavailable for this recording; url playback still works */ }
     };
     rec.start();
     activeRecorder = rec; activeRecordingSegId = segId;
     setRowRecordingState(row, true);
+    row.querySelector('.pitch-btn').disabled = true;
+    const pc = row.querySelector('.pitch-canvas'), pl = row.querySelector('.pitch-legend');
+    pc.style.display = 'none'; pl.style.display = 'none';
   } catch (e) {
     row.querySelector('.sent-status').textContent = 'Mic error: ' + e.message;
   }
@@ -739,6 +826,8 @@ function renderSentenceRow(seg, siblings, i) {
         <span class="sent-time">${msToClock(seg.startMs)} – ${msToClock(seg.endMs)}</span>
       </div>
       <div class="sent-transcript" style="display:${seg.text ? 'block' : 'none'}">${escapeHtml(seg.text || '')}</div>
+      <canvas class="pitch-canvas"></canvas>
+      <div class="pitch-legend"><span><span class="swatch" style="background:#fbbf24"></span>reference</span><span><span class="swatch" style="background:#ffffff"></span>you</span></div>
     </div>
     <div class="sent-controls">
       <label class="done-label"><input type="checkbox" class="done-checkbox" ${seg.done ? 'checked' : ''}> done</label>
@@ -748,6 +837,7 @@ function renderSentenceRow(seg, siblings, i) {
       <span class="rec-dot"></span>
       <button class="sent-btn play-mine" disabled title="Play your recording">▶ You</button>
       <button class="sent-btn compare-btn" disabled title="Play reference then yours">⇄ Compare</button>
+      <button class="sent-btn pitch-btn" disabled title="Compare pitch contours (needs a recording)">🎵 Pitch</button>
       <button class="sent-btn transcribe-btn" title="Transcribe this sentence">📝</button>
       <button class="sent-btn open-formant-lab-btn" title="Open in Formant Lab">🔬</button>
       <button class="sent-btn split-btn" title="Click, then click a point on the waveform to split here">✂</button>
@@ -779,6 +869,7 @@ function renderSentenceRow(seg, siblings, i) {
   row.querySelector('.rec-btn').addEventListener('click', () => toggleRecord(seg.id, row));
   row.querySelector('.play-mine').addEventListener('click', () => playMine(seg.id));
   row.querySelector('.compare-btn').addEventListener('click', () => compareSeg(seg));
+  row.querySelector('.pitch-btn').addEventListener('click', () => pitchCompareSeg(seg, row));
   row.querySelector('.transcribe-btn').addEventListener('click', () => transcribeSentence(seg, row));
   row.querySelector('.open-formant-lab-btn').addEventListener('click', () => openSegmentInFormantLab(seg, row));
   row.querySelector('.split-btn').addEventListener('click', () => armSplit(seg, canvas));
