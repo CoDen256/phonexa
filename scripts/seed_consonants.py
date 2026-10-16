@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """
-scripts/seed_consonants.py — one-off seed: the validated 4-language
-(en/de/ru/fr) consonant dataset from the add-consonant-chart mockup
-(openspec/changes/add-consonant-chart/mockup.html) -> the new `consonants`
-table (db/models.py's `Consonant`).
+scripts/seed_consonants.py — one-off seed: a 4-language (en/de/ru/no)
+consonant dataset -> the new `consonants` table (db/models.py's `Consonant`).
+
+Originally ported from the add-consonant-chart mockup
+(openspec/changes/add-consonant-chart/mockup.html), which used French as its
+4th language. Swapped to Norwegian since French was never one of this app's
+actual languages (the mockup's `fr` Language row was consonants-only — no
+vowels/samples — and was deleted); Norwegian already exists here with real
+vowel/sample data.
 
 Mirrors scripts/migrate_legacy_to_db.py's shape (find-or-create Language rows,
 one-time data load) but is NOT a destructive/refuse-if-nonempty migration —
@@ -34,7 +39,7 @@ LANGUAGE_DEFAULTS = {
     "en": {"label": "English (GA)", "color": "#93c5fd"},
     "de": {"label": "German", "color": "#fdba74"},
     "ru": {"label": "Russian", "color": "#fb7185"},
-    "fr": {"label": "French", "color": "#a78bfa"},
+    "no": {"label": "Norwegian", "color": "#67e8f9"},
 }
 
 # place/manner/active-articulator keys below use the mockup's own labels;
@@ -128,28 +133,25 @@ PHONES = [
     {"l": "ru", "ipa": "j", "manner": "Approximant", "place": "Palatal", "voicing": "voiced"},
     {"l": "ru", "ipa": "l", "manner": "Lateral Approximant", "place": "Alveolar", "voicing": "voiced", "active": "Apical", "sec": ["palatalized"], "note": "soft л (ль) — e.g. голь"},
     {"l": "ru", "ipa": "l", "manner": "Lateral Approximant", "place": "Alveolar", "voicing": "voiced", "active": "Apical", "sec": ["velarized", "pharyngealized"], "note": "hard л (л) — e.g. гол. Same base phone as ль — only the secondary-articulation set differs."},
-    # ── French ───────────────────────────────────────────────────────────
-    {"l": "fr", "ipa": "m", "manner": "Nasal", "place": "Labial", "voicing": "voiced"},
-    {"l": "fr", "ipa": "n", "manner": "Nasal", "place": "Alveolar", "voicing": "voiced"},
-    {"l": "fr", "ipa": "ɲ", "manner": "Nasal", "place": "Palatal", "voicing": "voiced", "note": "agneau"},
-    {"l": "fr", "ipa": "ŋ", "manner": "Nasal", "place": "Velar", "voicing": "voiced", "note": "loanwords, e.g. parking"},
-    {"l": "fr", "ipa": "p", "manner": "Plosive", "place": "Labial", "voicing": "voiceless"},
-    {"l": "fr", "ipa": "b", "manner": "Plosive", "place": "Labial", "voicing": "voiced"},
-    {"l": "fr", "ipa": "t", "manner": "Plosive", "place": "Dental", "voicing": "voiceless", "active": "Laminal"},
-    {"l": "fr", "ipa": "d", "manner": "Plosive", "place": "Dental", "voicing": "voiced", "active": "Laminal"},
-    {"l": "fr", "ipa": "k", "manner": "Plosive", "place": "Velar", "voicing": "voiceless"},
-    {"l": "fr", "ipa": "ɡ", "manner": "Plosive", "place": "Velar", "voicing": "voiced"},
-    {"l": "fr", "ipa": "f", "manner": "Fricative", "place": "Labial", "voicing": "voiceless"},
-    {"l": "fr", "ipa": "v", "manner": "Fricative", "place": "Labial", "voicing": "voiced"},
-    {"l": "fr", "ipa": "s", "manner": "Fricative", "place": "Alveolar", "voicing": "voiceless", "active": "Laminal"},
-    {"l": "fr", "ipa": "z", "manner": "Fricative", "place": "Alveolar", "voicing": "voiced", "active": "Laminal"},
-    {"l": "fr", "ipa": "ʃ", "manner": "Fricative", "place": "Postalveolar", "voicing": "voiceless", "active": "Laminal"},
-    {"l": "fr", "ipa": "ʒ", "manner": "Fricative", "place": "Postalveolar", "voicing": "voiced", "active": "Laminal"},
-    {"l": "fr", "ipa": "ʁ", "manner": "Fricative", "place": "Uvular", "voicing": "voiced"},
-    {"l": "fr", "ipa": "j", "manner": "Approximant", "place": "Palatal", "voicing": "voiced"},
-    {"l": "fr", "ipa": "ɥ", "manner": "Approximant", "place": "Palatal", "voicing": "voiced", "sec": ["labialized"], "coart": "Labial+Palatal", "note": "huit — labial-palatal"},
-    {"l": "fr", "ipa": "w", "manner": "Approximant", "place": "Velar", "voicing": "voiced", "sec": ["labialized"], "coart": "Labial+Velar"},
-    {"l": "fr", "ipa": "l", "manner": "Lateral Approximant", "place": "Alveolar", "voicing": "voiced", "active": "Apical"},
+    # ── Norwegian (Urban East Norwegian / standard Bokmål pronunciation) ────
+    {"l": "no", "ipa": "m", "manner": "Nasal", "place": "Labial", "voicing": "voiced"},
+    {"l": "no", "ipa": "n", "manner": "Nasal", "place": "Alveolar", "voicing": "voiced"},
+    {"l": "no", "ipa": "ŋ", "manner": "Nasal", "place": "Velar", "voicing": "voiced"},
+    {"l": "no", "ipa": "p", "manner": "Plosive", "place": "Labial", "voicing": "voiceless", "sec": ["aspirated"]},
+    {"l": "no", "ipa": "b", "manner": "Plosive", "place": "Labial", "voicing": "voiced"},
+    {"l": "no", "ipa": "t", "manner": "Plosive", "place": "Alveolar", "voicing": "voiceless", "sec": ["aspirated"]},
+    {"l": "no", "ipa": "d", "manner": "Plosive", "place": "Alveolar", "voicing": "voiced"},
+    {"l": "no", "ipa": "k", "manner": "Plosive", "place": "Velar", "voicing": "voiceless", "sec": ["aspirated"]},
+    {"l": "no", "ipa": "ɡ", "manner": "Plosive", "place": "Velar", "voicing": "voiced"},
+    {"l": "no", "ipa": "f", "manner": "Fricative", "place": "Labial", "voicing": "voiceless"},
+    {"l": "no", "ipa": "ʋ", "manner": "Approximant", "place": "Labial", "voicing": "voiced", "note": "Norwegian \"v\" — an approximant, not a fricative like English/German/Russian v"},
+    {"l": "no", "ipa": "s", "manner": "Fricative", "place": "Alveolar", "voicing": "voiceless"},
+    {"l": "no", "ipa": "ʂ", "manner": "Fricative", "place": "Retroflex", "voicing": "voiceless", "note": "the \"skj/sj\" sound, e.g. skje; realization varies by dialect (some use ɧ)"},
+    {"l": "no", "ipa": "ç", "manner": "Fricative", "place": "Palatal", "voicing": "voiceless", "note": "the \"kj\" sound, e.g. kjøre"},
+    {"l": "no", "ipa": "h", "manner": "Fricative", "place": "Glottal", "voicing": "voiceless"},
+    {"l": "no", "ipa": "j", "manner": "Approximant", "place": "Palatal", "voicing": "voiced"},
+    {"l": "no", "ipa": "r", "manner": "Trill", "place": "Alveolar", "voicing": "voiced", "note": "Eastern Norwegian; often realized as a tap [ɾ] in casual speech, or a uvular [ʁ] in some southwestern dialects"},
+    {"l": "no", "ipa": "l", "manner": "Lateral Approximant", "place": "Alveolar", "voicing": "voiced"},
 ]
 
 
