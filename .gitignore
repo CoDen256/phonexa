@@ -6,3 +6,5 @@ __pycache__/
 # a regenerable copy produced by scripts/migrate_legacy_to_db.py, analogous to
 # a build artifact. Audio storage in deploy is a Docker volume, never git.
 /data/audio/
+# Local DB dumps / audio tarballs for VPS transfer — never git
+/backups/
