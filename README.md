@@ -1,17 +1,29 @@
 ## Running it
 
 ```bash
+cp .env.example .env          # optional: only PHONEXA_POSTGRES_PASSWORD (default: phonexa)
+docker network create tun-shared   # once per host; the backend joins it (see below)
 docker compose up -d
 ```
 
-Starts Postgres + the Flask app (`formanter.py`) on `:5050`. First run: apply migrations
-with `alembic upgrade head` (see `alembic.ini`/`alembic/`). Visit `http://localhost:5050`.
+Starts Postgres 17 (`phonexa-postgres`) + the Flask app (`phonexa-backend`, `formanter.py`)
+on `127.0.0.1:5050`. The container applies pending Alembic migrations (`alembic upgrade
+head`) before it starts the server, so a fresh volume gets its schema with no manual step.
+Visit `http://localhost:5050`. The app, the database (`127.0.0.1:5432`) and Adminer are
+bound to loopback only.
 
-Optional local speech-to-text for Shadowing's transcription feature:
-`pip install -r requirements-transcribe.txt` (installs `faster-whisper`; not in the base
-image, so the base server stays light). `WHISPER_MODEL` env var picks the model size
-(tiny/base/small/medium/large-v3, default `base`). YouTube extraction needs `yt-dlp` +
-`ffmpeg`, both already in the Docker image.
+- **Adminer** (dev only): `docker compose --profile dev up -d` → `http://localhost:8081`
+  (server `phonexa-postgres`). Under `tun` the shared Adminer replaces it.
+- **Part of the Tun stack:** `tun/compose.yaml` `include:`s this file. Service and volume
+  names are `phonexa-`-prefixed so they don't collide with the other stacks'; the backend
+  joins the external `tun-shared` network so mjolnir's Caddy can reach it by name.
+- **Local volume note (PG 16 → 17):** the database moved to Postgres 17 on a *new* volume,
+  `phonexa_postgres_data`, which starts empty. An older local `phonexa_pgdata` volume (PG 16)
+  is left untouched and is no longer used — a 17 image cannot start on it. Audio keeps
+  using `phonexa_audio_data`, the same volume as before.
+- **Speech-to-text** for Shadowing's transcription comes from smia — see
+  `SMIA_BASE_URL`/`SMIA_AUTH_TOKEN` in `.env.example`. YouTube extraction needs `yt-dlp` +
+  `ffmpeg`, both in the Docker image.
 
 ## Description
 
@@ -61,7 +73,7 @@ formant tracker (the original piece of this project, unchanged since day one).
 - Client-side VAD splits the loaded range into chapters (long pauses) and sentences
   (shorter pauses) — sliders for both sensitivities, auto-suggested chapter threshold
 - Per sentence: play reference, record yourself, compare, mark done, transcribe
-  (local Whisper server or Hugging Face), manually split/merge
+  (via smia's speech-to-text, provider chosen in Settings), manually split/merge
 - Resuming the same file (even renamed) is recognized by a small content fingerprint
   (file size + a few sampled byte ranges — never read the whole file) and restores your
   split + progress without re-uploading or re-splitting anything
@@ -79,8 +91,8 @@ formant tracker (the original piece of this project, unchanged since day one).
 
 ### Settings (`settings.html`)
 - Switch/create a named profile (simple, no password — see Design Decisions)
-- Configure the transcription backend (local Whisper server URL, or Hugging Face
-  token+model) used by Shadowing
+- Choose the transcription provider (a speech-to-text provider offered by smia, e.g.
+  `hf_whisper`) used by Shadowing — no tokens are entered or stored here
 - Read-only overview of Shadowing progress across all your uploads
 
 ### Live mic practice (`js/realtime.js`, `/stream`)

@@ -34,10 +34,10 @@
  * Recordings themselves are NOT persisted server-side — only done/text are
  * durable progress; a recording is lost on reload, same as always.
  *
- * Transcription can use a local /transcribe endpoint on formanter.py
- * (faster-whisper) or the Hugging Face Inference API directly from the
- * browser — backend/url/token/model come from the per-user
- * 'transcribeBackend' Setting (configured on settings.html).
+ * Transcription goes through phonexa's own POST /transcribe, which proxies to
+ * smia's speech-to-text (smia's address/token never reach the browser). The
+ * provider (e.g. hf_whisper) comes from the per-user 'transcribeBackend'
+ * Setting (configured on settings.html).
  */
 
 const MAX_NONWAV_SLICE_SEC = 1800;      // 30 min cap on real-time capture for non-WAV formats
@@ -479,15 +479,18 @@ function setRowRecordingState(row, active) {
 
 // ─── Transcription (per-user Setting, see js/user.js + settings.html) ──────
 let _transcribeSettingsCache = null;
+const DEFAULT_TRANSCRIBE_PROVIDER = 'hf_whisper';
 async function getTranscribeSettings() {
   if (_transcribeSettingsCache) return _transcribeSettingsCache;
   const userId = await UserLib.getCurrentUserId();
   const res = await fetch(`/api/v1/settings?userId=${userId}`);
   const all = res.ok ? await res.json() : {};
-  _transcribeSettingsCache = Object.assign(
-    { backend: 'local', url: 'http://localhost:5050', hfToken: '', hfModel: 'openai/whisper-large-v3' },
-    all.transcribeBackend || {},
-  );
+  // Only `provider` is meaningful now. A pre-smia value ({backend, url, hfToken,
+  // hfModel}) has no provider → default; its other fields are ignored.
+  const stored = all.transcribeBackend || {};
+  _transcribeSettingsCache = {
+    provider: (typeof stored.provider === 'string' && stored.provider) || DEFAULT_TRANSCRIBE_PROVIDER,
+  };
   return _transcribeSettingsCache;
 }
 window.addEventListener('phonexa:user-changed', () => { _transcribeSettingsCache = null; });
@@ -496,19 +499,23 @@ async function checkTranscribeServer() {
   const el = document.getElementById('transcribeBadge');
   if (!el) return;
   const cfg = await getTranscribeSettings();
-  if (cfg.backend === 'hf') {
-    const hasToken = !!cfg.hfToken;
-    el.textContent = hasToken ? '📝 Online (Hugging Face): ✓ token set' : '📝 Online (Hugging Face): ⚠ set a token in Settings';
-    el.className = hasToken ? 'cache-badge hit' : 'cache-badge';
-    return;
-  }
   try {
-    const r = await fetch(cfg.url + '/ping', { signal: AbortSignal.timeout(1500) });
-    if (r.ok) { el.textContent = `📝 Local transcription server: ✓ connected (${cfg.url})`; el.className = 'cache-badge hit'; return; }
-    el.textContent = `📝 Local transcription server: got HTTP ${r.status} from ${cfg.url}`;
-    el.className = 'cache-badge';
+    const r = await fetch('/transcribe/providers', { signal: AbortSignal.timeout(4000) });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      el.textContent = `📝 Transcription (smia): ⚠ ${data.error || 'HTTP ' + r.status}`;
+      el.className = 'cache-badge';
+      return;
+    }
+    if ((data.providers || []).includes(cfg.provider)) {
+      el.textContent = `📝 Transcription (smia): ✓ ${cfg.provider}`;
+      el.className = 'cache-badge hit';
+    } else {
+      el.textContent = `📝 Transcription (smia): ⚠ provider "${cfg.provider}" not available — pick one in Settings`;
+      el.className = 'cache-badge';
+    }
   } catch (e) {
-    el.textContent = `📝 Local transcription server: unreachable at ${cfg.url} — configure it in Settings`;
+    el.textContent = '📝 Transcription (smia): unreachable';
     el.className = 'cache-badge';
   }
 }
@@ -517,44 +524,6 @@ function getTranscribeLanguage() {
   if (!sel) return '';
   if (sel.value === '__other') return document.getElementById('transcribeLanguageOther')?.value.trim() || '';
   return sel.value;
-}
-
-function blobToBase64(blob) {
-  return blob.arrayBuffer().then(buf => {
-    let binary = '';
-    const bytes = new Uint8Array(buf), chunk = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
-    return btoa(binary);
-  });
-}
-
-/** Online fallback for when installing faster-whisper locally isn't wanted — see settings.html for token/model config. */
-async function transcribeViaHuggingFace(blob, language, cfg) {
-  const token = (cfg.hfToken || '').trim();
-  if (!token) throw new Error('No Hugging Face API token set — configure one in Settings');
-  const model = (cfg.hfModel || 'openai/whisper-large-v3').trim();
-  const url = `https://router.huggingface.co/hf-inference/models/${model}`;
-  const headers = { 'Authorization': 'Bearer ' + token };
-  let body;
-  if (language) {
-    headers['Content-Type'] = 'application/json';
-    body = JSON.stringify({
-      inputs: await blobToBase64(blob),
-      parameters: { generate_kwargs: { language, task: 'transcribe' } },
-    });
-  } else {
-    headers['Content-Type'] = 'audio/wav';
-    body = blob;
-  }
-  const resp = await fetch(url, { method: 'POST', headers, body, signal: AbortSignal.timeout(60000) });
-  const data = await resp.json().catch(() => null);
-  if (!resp.ok) {
-    if (data?.error && /loading/i.test(data.error)) {
-      throw new Error(`Model is loading on Hugging Face's servers (~${Math.ceil(data.estimated_time || 20)}s) — try again shortly`);
-    }
-    throw new Error(data?.error || ('HTTP ' + resp.status));
-  }
-  return data?.text || '';
 }
 
 async function transcribeSentence(seg, row) {
@@ -569,21 +538,14 @@ async function transcribeSentence(seg, row) {
     const blob = encodeWavBlob(samples, sampleRate);
     const cfg = await getTranscribeSettings();
     const lang = getTranscribeLanguage();
-    let text;
-    if (cfg.backend === 'hf') {
-      text = await transcribeViaHuggingFace(blob, lang, cfg);
-    } else {
-      const form = new FormData();
-      form.append('file', blob, 'slice.wav');
-      if (lang) form.append('language', lang);
-      const resp = await fetch(cfg.url + '/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(60000) });
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        throw new Error(err.error || ('HTTP ' + resp.status));
-      }
-      const data = await resp.json();
-      text = data.text;
-    }
+    const form = new FormData();
+    form.append('file', blob, 'slice.wav');
+    form.append('provider', cfg.provider);
+    if (lang) form.append('language', lang);
+    const resp = await fetch('/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(70000) });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(data.error || ('HTTP ' + resp.status));
+    let text = data.text;
     text = text || '(no speech detected)';
     out.textContent = text;
     seg.text = text;

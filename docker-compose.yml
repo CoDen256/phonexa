@@ -1,46 +1,106 @@
+# phonexa's own stack — usable standalone (`docker compose up -d` here) and as
+# one of the files tun/compose.yaml `include:`s (deployable-in-tun).
+#
+# Service and volume names are prefixed `phonexa-` on purpose: `include:`
+# merges every included file into one namespace and silently keeps only the
+# FIRST definition of a colliding name (D94/D118). The old generic names
+# (`postgres`, `backend`, `adminer`) collided with mjolnir's and stabbur's, so
+# phonexa would simply never have started under tun.
 services:
-  postgres:
-    image: postgres:16-alpine
+  phonexa-postgres:
+    image: postgres:17-alpine
+    container_name: phonexa-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: phonexa
       POSTGRES_USER: phonexa
-      POSTGRES_PASSWORD: phonexa
+      # Same value tun's backup service uses (PHONEXA_POSTGRES_PASSWORD in
+      # tun/.env) — nothing keeps the two in sync automatically.
+      POSTGRES_PASSWORD: ${PHONEXA_POSTGRES_PASSWORD:-phonexa}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - phonexa-postgres-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"   # published for local dev (native nix-shell app connecting in); drop for a locked-down deploy
+      # Loopback only: for the native nix-shell app connecting in during local
+      # dev. Never on a public interface, so a tun deploy doesn't expose it.
+      - "127.0.0.1:5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U phonexa"]
       interval: 2s
       timeout: 3s
       retries: 20
 
-  adminer:
+  # Development-only database browser. Gated behind the `dev` profile so it
+  # never starts under tun (whose shared Adminer reaches `phonexa-postgres`):
+  #   docker compose --profile dev up -d
+  phonexa-adminer:
     image: adminer
+    container_name: phonexa-adminer
+    profiles: ["dev"]
     depends_on:
-      postgres:
+      phonexa-postgres:
         condition: service_healthy
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
 
-  backend:
+  phonexa-backend:
     build: .
+    container_name: phonexa-backend
+    restart: unless-stopped
     depends_on:
-      postgres:
+      phonexa-postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://phonexa:phonexa@postgres:5432/phonexa
+      DATABASE_URL: postgresql+psycopg2://phonexa:${PHONEXA_POSTGRES_PASSWORD:-phonexa}@phonexa-postgres:5432/phonexa
       AUDIO_STORAGE_ROOT: /data/audio
       AUDIO_BACKEND: local
+      # Speech-to-text for Shadowing is proxied to smia (stt-via-smia). The
+      # default resolves over tun-shared / under tun's include:. The token is
+      # server-side only — never sent to the browser. Empty token = the 📝
+      # action reports "not configured" and everything else keeps working.
+      SMIA_BASE_URL: ${SMIA_BASE_URL:-http://smia-backend:5055}
+      SMIA_AUTH_TOKEN: ${SMIA_AUTH_TOKEN:-}
     volumes:
-      - audio_data:/data/audio
+      - phonexa-audio-data:/data/audio
       # Bind mount (not a named volume): the admin export/import endpoints
       # must read/write the host's git-tracked db-export/ directory, not an
       # ephemeral copy baked into the image by Dockerfile's COPY.
       - ./db-export:/app/db-export
     ports:
-      - "5050:5050"
+      # Loopback only: under tun the app is reached through Caddy (which adds
+      # the operator-token gate) over tun-shared, never via a published port.
+      - "127.0.0.1:5050:5050"
+    healthcheck:
+      # python:3.12-slim has no curl.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5050/ping', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      # default: this project's own network, unchanged.
+      # tun-shared: lets mjolnir's Caddy reach this container by name. One-time
+      # setup before the first `up`, standalone or under tun's `include:`
+      # (include: cannot clear `external: true` back off — see tun/DEPLOY.md):
+      #   docker network create tun-shared
+      - default
+      - tun-shared
+
+networks:
+  default: {}
+  tun-shared:
+    external: true
 
 volumes:
-  pgdata:
-  audio_data:
+  # Unique keys: include: merges top-level volume keys across files just like
+  # service names, and tun's backup service references phonexa-audio-data
+  # directly. Explicit `name:` so it is the SAME Docker volume whether started
+  # from this directory or through tun (otherwise Compose prefixes the project
+  # name and the two entry points get separate volumes).
+  phonexa-postgres-data:
+    # New name on purpose: the old local volume (phonexa_pgdata) holds PG 16
+    # data, which a postgres:17 image cannot start on. It is left untouched.
+    name: phonexa_postgres_data
+  phonexa-audio-data:
+    # Same name the old `audio_data` volume already resolved to in this
+    # directory, so existing local audio carries over.
+    name: phonexa_audio_data

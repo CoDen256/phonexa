@@ -1,48 +1,54 @@
 // ─── Settings page ───────────────────────────────────────────────────────
-// Per-profile config: transcription backend (used by Shadowing) and a
+// Per-profile config: transcription provider (smia STT, used by Shadowing) and a
 // read-only Shadowing progress overview. Profile switching itself is
 // js/user.js's shared picker, mounted in this page's header like everywhere
 // else — switching profiles here just re-renders this page's two sections.
 
+const DEFAULT_TRANSCRIBE_PROVIDER = 'hf_whisper';
+
+// The stored value's shape is now {provider}. A pre-smia value ({backend, url,
+// hfToken, hfModel}) has no provider → default; the rest is ignored and is
+// dropped for good the next time the form is saved (save writes a fresh object).
 async function loadTranscribeSettings() {
   const userId = await UserLib.getCurrentUserId();
   const res = await fetch(`/api/v1/settings?userId=${userId}`);
   const all = res.ok ? await res.json() : {};
-  return Object.assign(
-    { backend: 'local', url: 'http://localhost:5050', hfToken: '', hfModel: 'openai/whisper-large-v3' },
-    all.transcribeBackend || {},
-  );
+  const stored = all.transcribeBackend || {};
+  return { provider: (typeof stored.provider === 'string' && stored.provider) || DEFAULT_TRANSCRIBE_PROVIDER };
 }
 
-function applyBackendVisibility() {
-  const isHf = document.getElementById('backendSelect').value === 'hf';
-  document.getElementById('localSettings').style.display = isHf ? 'none' : 'block';
-  document.getElementById('hfSettings').style.display = isHf ? 'block' : 'none';
-}
-
+// Providers come from smia (via phonexa's /transcribe/providers), so a new
+// smia provider shows up here with no phonexa change. If smia can't be
+// reached, still show the saved choice so the form stays usable.
 async function renderTranscribeForm() {
   const cfg = await loadTranscribeSettings();
-  document.getElementById('backendSelect').value = cfg.backend;
-  document.getElementById('urlInput').value = cfg.url;
-  document.getElementById('hfTokenInput').value = cfg.hfToken;
-  document.getElementById('hfModelInput').value = cfg.hfModel;
-  applyBackendVisibility();
+  const select = document.getElementById('providerSelect');
+  const note = document.getElementById('providerNote');
+  let providers = [];
+  note.textContent = '';
+  try {
+    const r = await fetch('/transcribe/providers', { signal: AbortSignal.timeout(6000) });
+    const data = await r.json().catch(() => ({}));
+    if (r.ok) providers = data.providers || [];
+    else note.textContent = `⚠ ${data.error || 'HTTP ' + r.status}`;
+  } catch (e) {
+    note.textContent = '⚠ smia not reachable — showing your saved choice only';
+  }
+  if (!providers.includes(cfg.provider)) providers = [cfg.provider, ...providers];
+  select.innerHTML = providers.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+  select.value = cfg.provider;
 }
 
 async function saveTranscribeForm() {
-  const value = {
-    backend: document.getElementById('backendSelect').value,
-    url: document.getElementById('urlInput').value.trim() || 'http://localhost:5050',
-    hfToken: document.getElementById('hfTokenInput').value.trim(),
-    hfModel: document.getElementById('hfModelInput').value.trim() || 'openai/whisper-large-v3',
-  };
+  const value = { provider: document.getElementById('providerSelect').value || DEFAULT_TRANSCRIBE_PROVIDER };
   const userId = await UserLib.getCurrentUserId();
   const status = document.getElementById('transcribeSaveStatus');
   status.textContent = 'Saving…';
   try {
-    await fetch(`/api/v1/settings/transcribeBackend?userId=${userId}`, {
+    const res = await fetch(`/api/v1/settings/transcribeBackend?userId=${userId}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ value }),
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     status.textContent = '✓ Saved';
     setTimeout(() => { status.textContent = ''; }, 2000);
   } catch (e) {
@@ -85,7 +91,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderShadowingProgress();
   });
 
-  document.getElementById('backendSelect').addEventListener('change', applyBackendVisibility);
   document.getElementById('saveTranscribeBtn').addEventListener('click', saveTranscribeForm);
 
   await renderTranscribeForm();

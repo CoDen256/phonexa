@@ -27,6 +27,10 @@ COPY js/ ./js/
 COPY css/ ./css/
 COPY lang/ ./lang/
 
+RUN chmod +x /app/scripts/docker-entrypoint.sh
+
 EXPOSE 5050
 
+# Entrypoint applies Alembic migrations, then execs CMD.
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
 CMD ["python", "formanter.py"]

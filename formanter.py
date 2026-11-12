@@ -37,7 +37,8 @@ C  voiced — all fields populated including f1_median / f2_median
 
 Install:  pip install -r requirements.txt  (flask, flask-sock, parselmouth,
           numpy, SQLAlchemy/psycopg2/alembic, yt-dlp — see requirements.txt)
-Optional (for /transcribe):  pip install -r requirements-transcribe.txt
+Optional (for /transcribe): a reachable smia — set SMIA_BASE_URL / SMIA_AUTH_TOKEN
+          (transcription is proxied to smia's /stt; no local speech model)
 """
 
 from __future__ import annotations
@@ -935,91 +936,129 @@ def run_full_praat_analysis(samples: np.ndarray, sample_rate: float, config: dic
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Transcription (faster-whisper, local — no audio ever leaves this machine,
-# no API key, no rate limit). Optional: only loaded on first /transcribe call
-# so the rest of the server still runs fine without it installed.
+# Transcription — proxied to smia's POST /stt (stt-via-smia). phonexa runs no
+# speech-recognition model itself: smia owns the providers and their
+# credentials. smia's address and bearer token stay server-side — the browser
+# only ever talks to the two routes below, never to smia or a provider.
 # ══════════════════════════════════════════════════════════════════════════════
 
-_whisper_model = None
-_whisper_error: str | None = None
+import requests  # noqa: E402
+from urllib.parse import urlsplit  # noqa: E402
+
+SMIA_STT_TIMEOUT_SEC = 60
+SMIA_PROVIDERS_TIMEOUT_SEC = 5
 
 
-def _get_whisper_model():
-    global _whisper_model, _whisper_error
-    if _whisper_model is not None or _whisper_error is not None:
-        return _whisper_model
+def _smia_config():
+    """(base_url, bearer_token) from the environment; token may be empty."""
+    return (
+        os.environ.get('SMIA_BASE_URL', 'http://smia-backend:5055').rstrip('/'),
+        os.environ.get('SMIA_AUTH_TOKEN', ''),
+    )
+
+
+def _smia_not_configured():
+    return jsonify({'error': 'Transcription is not configured (SMIA_AUTH_TOKEN is not set on the server)'}), 503
+
+
+def _smia_unreachable(base_url):
+    # Host only — never echo the token, and requests' own error text can carry
+    # more than the caller needs.
+    return jsonify({'error': f'smia not reachable at {urlsplit(base_url).netloc or base_url}'}), 503
+
+
+def _smia_error_response(resp):
+    """Relay a non-2xx smia answer to the browser without leaking credentials."""
+    if resp.status_code in (401, 403):
+        # Our own token was refused — not something the browser's user can fix,
+        # and a bare 401 here would read as phonexa's own login failing.
+        return jsonify({'error': "smia rejected phonexa's credentials (check SMIA_AUTH_TOKEN)"}), 502
     try:
-        from faster_whisper import WhisperModel
-        size = os.environ.get('WHISPER_MODEL', 'base')
-        _whisper_model = WhisperModel(size, device='cpu', compute_type='int8')
-    except Exception as error:
-        _whisper_error = str(error)
-    return _whisper_model
+        body = resp.json()
+    except ValueError:
+        body = {}
+    out = {'error': body.get('error') or f'smia returned HTTP {resp.status_code}'}
+    if 'available' in body:
+        out['available'] = body['available']
+    return jsonify(out), resp.status_code
 
 
 @app.route('/transcribe', methods=['POST'])
 def http_transcribe():
     """
-    Local speech-to-text. Requires ``pip install faster-whisper`` (not a
-    default dependency — see requirements-transcribe.txt). Model size is
-    picked via the WHISPER_MODEL env var (tiny/base/small/medium/large-v3),
-    default 'base'.
-
-    Decoding deliberately reuses ``decode_audio`` (parselmouth) instead of
-    handing the raw file to faster-whisper directly: faster-whisper's own
-    file decoding goes through PyAV, whose container API has changed across
-    versions in backwards-incompatible ways (e.g. ``av.open()`` dropping the
-    ``metadata_errors`` kwarg some faster-whisper releases pass) — installing
-    whatever `av` version pip resolves can break that path. Passing an
-    already-decoded numpy array to ``model.transcribe()`` skips PyAV
-    entirely and reuses the same decoder every other endpoint here depends on.
-
-    Called once per sentence slice by the shadowing page, but also supports
-    transcribing a much longer (or the whole) audio range in one call — a
-    multi-second clip gives Whisper far more context to condition on than an
-    isolated 1-3s sentence fragment, which usually transcribes noticeably
-    more accurately. The caller can realign the returned segment timestamps
-    back onto its own shorter sentence boundaries afterwards.
-    ``vad_filter=True`` skips silence gaps (e.g. the pauses between
-    sentences in a long slice) to avoid hallucinated segments there.
+    Speech-to-text via smia (POST /stt). Called once per sentence slice by the
+    shadowing page.
 
     Request (multipart/form-data)
     ------------------------------
-    file      — audio file (magic-byte sniffed the same way as /frames)
-    language  — optional ISO 639-1 hint (e.g. 'en'); auto-detected if omitted
+    file      — audio file
+    provider  — smia STT provider (e.g. 'hf_whisper'); smia requires one and
+                answers 400 with the available list when it is missing
+    language  — optional ISO 639-1 hint (e.g. 'sv'), forwarded to smia as
+                ``lang``; omitted when empty
 
     Response
     --------
-    { text, language, segments: [{start_ms, end_ms, text}] }
+    { provider, text }   (text is '' when no speech was detected)
     """
     uploaded_file = request.files.get('file')
     if not uploaded_file:
         return jsonify({'error': 'No file uploaded'}), 400
 
-    model = _get_whisper_model()
-    if model is None:
-        return jsonify({
-            'error': 'Transcription unavailable — faster-whisper is not installed. '
-                     'Run: pip install -r requirements-transcribe.txt',
-            'detail': _whisper_error,
-        }), 501
+    base_url, token = _smia_config()
+    if not token:
+        return _smia_not_configured()
 
-    language = request.form.get('language') or None
+    form = {}
+    provider = (request.form.get('provider') or '').strip()
+    if provider:
+        form['provider'] = provider
+    language = (request.form.get('language') or '').strip()
+    if language:
+        form['lang'] = language
+
     try:
-        samples, sample_rate = decode_audio(uploaded_file)
-        if sample_rate != 16000:
-            samples = make_praat_sound(samples, sample_rate).resample(16000).values[0]
-        audio = samples.astype(np.float32)
+        resp = requests.post(
+            f'{base_url}/stt',
+            headers={'Authorization': f'Bearer {token}'},
+            files={'audio': (uploaded_file.filename or 'slice.wav', uploaded_file.stream,
+                             uploaded_file.mimetype or 'application/octet-stream')},
+            data=form,
+            timeout=SMIA_STT_TIMEOUT_SEC,
+        )
+    except requests.RequestException:
+        return _smia_unreachable(base_url)
 
-        segments_iter, info = model.transcribe(audio, language=language, vad_filter=True)
-        segments = [
-            {'start_ms': round(s.start * 1000), 'end_ms': round(s.end * 1000), 'text': s.text.strip()}
-            for s in segments_iter
-        ]
-        text = ' '.join(s['text'] for s in segments).strip()
-        return jsonify({'text': text, 'language': info.language, 'segments': segments})
-    except Exception as error:
-        return jsonify({'error': str(error)}), 500
+    if not resp.ok:
+        return _smia_error_response(resp)
+    try:
+        body = resp.json()
+    except ValueError:
+        return jsonify({'error': 'smia returned an unreadable response'}), 502
+    return jsonify({'provider': body.get('provider', provider), 'text': body.get('text') or ''})
+
+
+@app.route('/transcribe/providers', methods=['GET'])
+def http_transcribe_providers():
+    """The speech-to-text providers smia currently offers: { providers: [name, ...] }."""
+    base_url, token = _smia_config()
+    if not token:
+        return _smia_not_configured()
+    try:
+        resp = requests.get(
+            f'{base_url}/providers',
+            headers={'Authorization': f'Bearer {token}'},
+            timeout=SMIA_PROVIDERS_TIMEOUT_SEC,
+        )
+    except requests.RequestException:
+        return _smia_unreachable(base_url)
+    if not resp.ok:
+        return _smia_error_response(resp)
+    try:
+        providers = resp.json().get('stt', [])
+    except (ValueError, AttributeError):
+        return jsonify({'error': 'smia returned an unreadable response'}), 502
+    return jsonify({'providers': providers})
 
 
 # ══════════════════════════════════════════════════════════════════════════════
