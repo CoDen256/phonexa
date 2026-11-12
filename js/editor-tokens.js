@@ -25,9 +25,9 @@ async function ensureDbLanguageData() {
   if (!state.langDraft?.id) return;
   const langId = state.langDraft.id;
 
-  state.dbLanguageTokens = await fetch(`/api/v1/tokens?languageId=${langId}`)
+  state.dbLanguageTokens = await fetch(`${API_BASE}/api/v1/tokens?languageId=${langId}`)
     .then(r => r.ok ? r.json() : []).catch(() => []);
-  state.dbLanguageSamples = await fetch('/api/v1/sounds')
+  state.dbLanguageSamples = await fetch(API_BASE + '/api/v1/sounds')
     .then(r => r.ok ? r.json() : []).catch(() => [])
     .then(all => all.filter(s => s.languageId === langId));
 
@@ -182,7 +182,7 @@ function renderTokensSection(wrap, dbVowelId, vowelIdx) {
         const starBtn = iconBtn(isRepresentative ? '★' : '☆', isRepresentative ? 'This sample is the representative' : 'Set this token\'s sample as the representative');
         starBtn.style.color = isRepresentative ? '#ffd166' : '';
         starBtn.addEventListener('click', async () => {
-          const resp = await fetch(`/api/v1/vowels/${dbVowelId}`, {
+          const resp = await fetch(`${API_BASE}/api/v1/vowels/${dbVowelId}`, {
             method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ representativeSampleId: t.sampleId }),
           });
           if (resp.ok) Object.assign(state.langDraft.vowels[vowelIdx], await resp.json());
@@ -194,7 +194,7 @@ function renderTokensSection(wrap, dbVowelId, vowelIdx) {
         const assignBtn = iconBtn(assigned ? '✕' : '+', assigned ? 'Unassign from this vowel' : (assignedElsewhere ? `Reassign from /${vowelSymbolFor(t.vowelId)}/ to this vowel` : 'Assign to this vowel'));
         assignBtn.addEventListener('click', async () => {
           const newVowelId = assigned ? null : dbVowelId;
-          await fetch(`/api/v1/tokens/${t.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vowelId: newVowelId }) });
+          await fetch(`${API_BASE}/api/v1/tokens/${t.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vowelId: newVowelId }) });
           t.vowelId = newVowelId;
           renderTokensSection(wrap, dbVowelId, vowelIdx);
           statusLine(wrap, assigned ? 'Unassigned' : 'Assigned ✓');

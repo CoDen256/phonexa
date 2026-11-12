@@ -206,7 +206,7 @@ async function loadVowelsForLanguage(languageId) {
   const vowelSelect = document.getElementById('vowelSelect');
   vowelSelect.innerHTML = '<option value="">All vowels</option>';
   drillState.vowels = languageId
-    ? await fetch(`/api/v1/vowels?languageId=${languageId}`).then(r => r.ok ? r.json() : []).catch(() => [])
+    ? await fetch(`${API_BASE}/api/v1/vowels?languageId=${languageId}`).then(r => r.ok ? r.json() : []).catch(() => [])
     : [];
   drillState.vowels.forEach(v => {
     const opt = document.createElement('option');
@@ -218,11 +218,11 @@ async function loadVowelsForLanguage(languageId) {
 
 async function loadTokensForLanguage(languageId, vowelId) {
   if (!languageId) { drillState.tokens = []; renderDrillList(); return; }
-  let url = `/api/v1/tokens?languageId=${languageId}`;
+  let url = `${API_BASE}/api/v1/tokens?languageId=${languageId}`;
   if (vowelId) url += `&vowelId=${vowelId}`;
   const [tokens, sounds] = await Promise.all([
     fetch(url).then(r => r.ok ? r.json() : []).catch(() => []),
-    fetch('/api/v1/sounds').then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(API_BASE + '/api/v1/sounds').then(r => r.ok ? r.json() : []).catch(() => []),
   ]);
   const audioById = new Map(sounds.map(s => [s.id, s.audioUrl]));
   drillState.tokens = tokens.map(t => ({ ...t, audioUrl: audioById.get(t.sampleId) || null }));
@@ -249,7 +249,7 @@ async function initDrill() {
   const presetLangKey = params.get('lang');
   const presetSymbol = params.get('symbol');
 
-  drillState.languages = await fetch('/api/v1/languages').then(r => r.ok ? r.json() : []).catch(() => []);
+  drillState.languages = await fetch(API_BASE + '/api/v1/languages').then(r => r.ok ? r.json() : []).catch(() => []);
   langSelect.innerHTML = drillState.languages.map(l => `<option value="${l.id}">${escapeHtmlDr(l.label)}</option>`).join('')
     || '<option value="">No languages</option>';
 

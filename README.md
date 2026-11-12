@@ -101,8 +101,11 @@ formant tracker (the original piece of this project, unchanged since day one).
   int16 chunks; server returns per-frame F1/F2 with continuity correction and sliding
   median, RMS, voiced flag, and the raw dual-ceiling Praat diagnostics
 - This is the original piece of the project and has been deliberately **frozen** —
-  every later phase verifies `git diff --stat -- js/realtime.js formanter.py` touches
-  neither `/stream` nor `/frames` before shipping
+  every later phase verifies that neither `js/realtime.js` nor `formanter.py` has a
+  hunk in the frame pipeline (`/frames`, `/debug`, `/stream`) or its wire protocol
+  before shipping. **Endpoint URL construction is deployment configuration and is
+  outside the freeze** (see "Serving under a path prefix"): the base-URL constants
+  at the top of `js/realtime.js` may change, the pipeline below them may not
 - → see `docs/arch-detailed.md` for the full algorithm and wire-protocol documentation,
   `docs/glossary.md` for term definitions, `docs/ws.md` for the historical record of
   migrating smoothing from client to server
@@ -184,6 +187,46 @@ discards manual edits/progress for it. Both are gated behind an explicit confirm
 everything else in this project and still works exactly as originally built — see
 `docs/arch-detailed.md` for the dual-ceiling Praat formant-selection algorithm, which
 is the one genuinely novel piece of signal-processing design in this codebase.
+
+What the freeze covers is the **pipeline and the wire protocol**, not the file as a
+whole: frame handling, buffering, smoothing and the message format are off limits,
+while the base-URL constants at the top of `js/realtime.js` are deployment config and
+were changed deliberately when phonexa learned to run under a path prefix. The
+verification is therefore "no hunk in the pipeline or protocol", which is how
+`formanter.py` has always actually been checked — not "the file's diff is empty".
+
+---
+
+## Serving under a path prefix
+
+phonexa runs both at a domain root (standalone development) and under a reverse-proxy
+path prefix (`https://<host>/phonexa/` in a Tun deploy), with **nothing to configure
+in phonexa** either way. The mechanism is the same one `stabbur` and `smia` use:
+
+```
+Caddy  handle_path /phonexa/*  ──strips the prefix──▶  phonexa sees /api/v1/…
+       header_up X-Forwarded-Prefix /phonexa ─┐
+                                              ▼
+formanter.py  _prefix()  ──▶  every served .html gets __PHONEXA_PREFIX__ replaced
+                                              │
+                                              ▼
+page          window.PHONEXA_PREFIX  ──▶  var API_BASE  ──▶  fetch(`${API_BASE}/…`)
+```
+
+- **No header ⇒ no prefix.** `_prefix()` returns `''`, `API_BASE` is `''`, and every
+  URL is exactly what it was before prefixing existed.
+- `API_BASE` is defined **once per page**, in the injected inline `<script>` that sets
+  `window.PHONEXA_PREFIX`, because not every page loads `js/utils.js` and two files
+  each declaring `const API_BASE` would collide at page scope.
+- Audio URLs (`audioUrl`, `representativeAudioUrl`) are built **server-side** and carry
+  the prefix themselves — the frontend never constructs them.
+- **Pages must stay at the top level.** Every page's asset and navigation links are
+  relative (`css/index.css`, `js/shadow.js`, `shadow.html`), which resolves correctly
+  only because all pages sit at one directory level. A page in a subdirectory would
+  silently resolve its assets one level too deep.
+- **The trailing slash matters.** `/phonexa` without it resolves those relative assets
+  against `/`, so they escape the prefix and 404 against whatever serves the root. The
+  proxy redirects `/phonexa` → `/phonexa/` for exactly this reason.
 
 ---
 

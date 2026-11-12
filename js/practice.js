@@ -25,7 +25,8 @@
  */
 
 // ─── Practice panel ───────────────────────────────────────────────────────────
-const SERVER='';   // used by checkServer()'s /ping health check below
+const SERVER=API_BASE;   // used by checkServer()'s /ping health check below;
+                         // API_BASE is the proxy prefix, '' at the root
 let recState='idle';
 let recBlob=null, recObjectURL=null, recSamples=null, recSampleRate=22050;
 let recAnalysisResult=null, recCursorFrac=null;

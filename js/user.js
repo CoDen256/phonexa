@@ -16,13 +16,13 @@ const UserLib = (() => {
   let usersCache = null; // [{id, name, createdAt}, ...] — refetched on demand
 
   async function fetchUsers() {
-    const res = await fetch('/api/v1/users');
+    const res = await fetch(API_BASE + '/api/v1/users');
     usersCache = res.ok ? await res.json() : [];
     return usersCache;
   }
 
   async function createUser(name) {
-    const res = await fetch('/api/v1/users', {
+    const res = await fetch(API_BASE + '/api/v1/users', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });

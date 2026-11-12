@@ -59,6 +59,9 @@
   <div id="drillEmpty" style="display:none">No tokens for this filter.</div>
 </div>
 
+<!-- Prefix injected by formanter.py (X-Forwarded-Prefix) — empty when mounted
+     at the root. Must precede every js/ tag: API_BASE is read at load time. -->
+<script>window.PHONEXA_PREFIX = "__PHONEXA_PREFIX__"; var API_BASE = window.PHONEXA_PREFIX || '';</script>
 <script src="js/audio.js"></script>
 <script src="js/vad.js"></script>
 <script src="js/drill.js"></script>

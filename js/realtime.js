@@ -9,8 +9,8 @@
  *      white noise — Praat's LPC needs periodicity, not noise
  */
 
-const STREAM_URL = (location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/stream';
-const HTTP_URL = '';
+const STREAM_URL = (location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+(window.PHONEXA_PREFIX||'')+'/stream';
+const HTTP_URL = window.PHONEXA_PREFIX || '';
 const TRAIL_DOTS    = 50;     // keep last N voiced frames
 const TRAIL_COLOR   = '#ffd700'; // gold — matches reference style
 

@@ -10,16 +10,16 @@ const LANGS = {};   // populated by loadLanguages()
 async function loadLanguages() {
   try {
     const [languages, sounds] = await Promise.all([
-      fetch('/api/v1/languages').then(r => r.json()),
-      fetch('/api/v1/sounds').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(API_BASE + '/api/v1/languages').then(r => r.json()),
+      fetch(API_BASE + '/api/v1/sounds').then(r => r.ok ? r.json() : []).catch(() => []),
     ]);
     await Promise.all(languages.filter(l => l.enabled).map(async lang => {
       try {
-        const data = await fetch(`/api/v1/languages/${lang.key}/full`).then(r => r.ok ? r.json() : null);
+        const data = await fetch(`${API_BASE}/api/v1/languages/${lang.key}/full`).then(r => r.ok ? r.json() : null);
         if (!data) return;
         LANGS[data.key] = data;
 
-        const tokens = await fetch(`/api/v1/tokens?languageId=${lang.id}`).then(r => r.ok ? r.json() : []).catch(() => []);
+        const tokens = await fetch(`${API_BASE}/api/v1/tokens?languageId=${lang.id}`).then(r => r.ok ? r.json() : []).catch(() => []);
         const mySounds = sounds.filter(s => s.languageId === lang.id);
         if (typeof setLangSamples === 'function') {
           setLangSamples(data.key, buildPseudoSamplesFromDb(tokens, mySounds, data.vowels));

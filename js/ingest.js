@@ -23,7 +23,7 @@ async function uploadSlice(buffer, startMs, endMs, meta = {}) {
   if (meta.text) form.append('text', meta.text);
   if (meta.phonemic) form.append('phonemic', meta.phonemic);
 
-  const resp = await fetch('/api/v1/samples', { method: 'POST', body: form });
+  const resp = await fetch(API_BASE + '/api/v1/samples', { method: 'POST', body: form });
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}));
     throw new Error(err.error || `HTTP ${resp.status}`);

@@ -113,7 +113,7 @@ async function deleteSound(id) {
   const smp = allSounds.find(s => s.id === id);
   if (!confirm(`Delete sample #${id} ("${smp?.text || 'untitled'}")? This also deletes all its tokens and analysis history, and removes the audio file. This cannot be undone.`)) return;
   try {
-    const resp = await fetch(`/api/v1/samples/${id}`, { method: 'DELETE' });
+    const resp = await fetch(`${API_BASE}/api/v1/samples/${id}`, { method: 'DELETE' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     allSounds = allSounds.filter(s => s.id !== id);
     applyFilter();
@@ -136,9 +136,9 @@ function applyFilter() {
 async function load() {
   try {
     const [resp, tokens, langs] = await Promise.all([
-      fetch('/api/v1/sounds'),
-      fetch('/api/v1/tokens').then(r => r.ok ? r.json() : []).catch(() => []),
-      fetch('/api/v1/languages').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(API_BASE + '/api/v1/sounds'),
+      fetch(API_BASE + '/api/v1/tokens').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(API_BASE + '/api/v1/languages').then(r => r.ok ? r.json() : []).catch(() => []),
     ]);
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({}));

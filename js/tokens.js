@@ -122,7 +122,7 @@ function renderRows(tokens) {
 
 async function setActiveAnalysis(tokenId, analysisId) {
   try {
-    const resp = await fetch(`/api/v1/tokens/${tokenId}`, {
+    const resp = await fetch(`${API_BASE}/api/v1/tokens/${tokenId}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activeAnalysisId: analysisId }),
     });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -140,7 +140,7 @@ async function deleteTokenRow(id) {
   const tok = allTokens.find(t => t.id === id);
   if (!confirm(`Delete token /${tok?.symbol || '?'}/ (#${id})? This cannot be undone.`)) return;
   try {
-    const resp = await fetch(`/api/v1/tokens/${id}`, { method: 'DELETE' });
+    const resp = await fetch(`${API_BASE}/api/v1/tokens/${id}`, { method: 'DELETE' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     allTokens = allTokens.filter(t => t.id !== id);
     applyFilter();
@@ -162,8 +162,8 @@ function applyFilter() {
 async function load() {
   try {
     const [tokResp, langs] = await Promise.all([
-      fetch('/api/v1/tokens'),
-      fetch('/api/v1/languages').then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(API_BASE + '/api/v1/tokens'),
+      fetch(API_BASE + '/api/v1/languages').then(r => r.ok ? r.json() : []).catch(() => []),
     ]);
     if (!tokResp.ok) {
       const err = await tokResp.json().catch(() => ({}));

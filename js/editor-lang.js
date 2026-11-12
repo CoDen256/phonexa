@@ -5,7 +5,7 @@
 // ─── Load languages ───────────────────────────────────────────────────────────
 async function loadLanguages(){
   try{
-    const langs = await fetch('/api/v1/languages').then(r=>r.json());
+    const langs = await fetch(API_BASE + '/api/v1/languages').then(r=>r.json());
     state.langs = {}; state.langOrder = [];
     for(const l of langs){
       state.langs[l.key] = l;   // metadata only — {id,key,label,color,sortOrder,enabled}; vowels fetched on select
@@ -40,7 +40,7 @@ function renderLangList(){
     disBtn.title=isDisabled?'Re-enable':'Disable (hide from the public chart)';
     disBtn.addEventListener('click',async e=>{
       e.stopPropagation();
-      const resp=await fetch(`/api/v1/languages/${lang.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:isDisabled})});
+      const resp=await fetch(`${API_BASE}/api/v1/languages/${lang.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:isDisabled})});
       if(resp.ok){ state.langs[key]=await resp.json(); renderLangList(); }
     });
 
@@ -51,7 +51,7 @@ function renderLangList(){
       e.stopPropagation();
       const typed=prompt(`This permanently deletes "${lang.label}" (${key}) and ALL its samples, tokens, analyses, and audio files. This cannot be undone.\n\nType the language key to confirm:`);
       if(typed!==key) return;
-      const resp=await fetch(`/api/v1/languages/${lang.id}`,{method:'DELETE'});
+      const resp=await fetch(`${API_BASE}/api/v1/languages/${lang.id}`,{method:'DELETE'});
       if(!resp.ok){ toast('Delete failed'); return; }
       delete state.langs[key];
       const oi=state.langOrder.indexOf(key); if(oi!==-1)state.langOrder.splice(oi,1);
@@ -70,7 +70,7 @@ async function selectLang(key){
   const meta=state.langs[key];
   state.selKey=key;
   state.vowelIdx=null; state.vowelDraft=null; state.pickingMode=null;
-  const vowels = await fetch(`/api/v1/vowels?languageId=${meta.id}`).then(r=>r.ok?r.json():[]).catch(()=>[]);
+  const vowels = await fetch(`${API_BASE}/api/v1/vowels?languageId=${meta.id}`).then(r=>r.ok?r.json():[]).catch(()=>[]);
   state.langDraft = {...meta, vowels};
   renderLangList();
   showLangPanel();
@@ -110,7 +110,7 @@ function patchLanguageDebounced(fields){
   Object.assign(state.langDraft, fields);
   clearTimeout(_langPatchTimer);
   _langPatchTimer=setTimeout(async ()=>{
-    const resp=await fetch(`/api/v1/languages/${state.langDraft.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(fields)});
+    const resp=await fetch(`${API_BASE}/api/v1/languages/${state.langDraft.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(fields)});
     if(resp.ok){ const updated=await resp.json(); state.langs[state.langDraft.key]=updated; Object.assign(state.langDraft, updated); renderLangList(); }
   }, 400);
 }
@@ -127,7 +127,7 @@ function initEditorUI(){
     const key=(prompt('Language key (lowercase letters/numbers/hyphens, e.g. "fr"):')||'').trim().toLowerCase();
     if(!key) return;
     const label=(prompt('Display label:', key)||key).trim();
-    const resp=await fetch('/api/v1/languages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,label})});
+    const resp=await fetch(API_BASE + '/api/v1/languages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,label})});
     if(!resp.ok){ const err=await resp.json().catch(()=>({})); toast('Could not create language: '+(err.error||resp.status)); return; }
     const lang=await resp.json();
     state.langs[lang.key]=lang; state.langOrder.push(lang.key);
@@ -220,7 +220,7 @@ function refreshCharts(){
 async function ensureCardinalLoaded(){
   const meta=state.langs.cardinal;
   if(!meta) return;
-  const vowels = await fetch(`/api/v1/vowels?languageId=${meta.id}`).then(r=>r.ok?r.json():[]).catch(()=>[]);
+  const vowels = await fetch(`${API_BASE}/api/v1/vowels?languageId=${meta.id}`).then(r=>r.ok?r.json():[]).catch(()=>[]);
   state.cardinalLangData = {...meta, vowels};
 }
 

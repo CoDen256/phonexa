@@ -1300,7 +1300,7 @@ def ingest_sample():
             return jsonify({
                 'id': sample.id,
                 'url': sample.url,
-                'audioUrl': f'/audio/{storage_key}',
+                'audioUrl': f'{_prefix()}/audio/{storage_key}',
                 'durationMs': sample.duration_ms,
                 'text': sample.text,
                 'phonemic': sample.phonemic,
@@ -1366,7 +1366,7 @@ def get_sample(sample_id):
         storage_key = storage_key_from_url(sample.url) if local else None
         return jsonify({
             'id': sample.id, 'url': sample.url,
-            'audioUrl': f'/audio/{storage_key}' if storage_key else sample.url,
+            'audioUrl': f'{_prefix()}/audio/{storage_key}' if storage_key else sample.url,
             'text': sample.text, 'phonemic': sample.phonemic,
             'languageId': sample.language_id, 'durationMs': sample.duration_ms,
             'tokens': [_token_json(t) for t in sample.tokens],
@@ -1653,7 +1653,7 @@ def list_tokens():
         for t, s, lang in rows:
             f1, f2 = _token_mean_f1_f2(t)
             local = bool(s.url) and is_local_url(s.url)
-            audio_url = f'/audio/{storage_key_from_url(s.url)}' if local else s.url
+            audio_url = f'{_prefix()}/audio/{storage_key_from_url(s.url)}' if local else s.url
             analyses = []
             for a in s.analyses:
                 af1, af2 = _mean_f1_f2_for_range(a, t.time_start_ms, t.time_end_ms)
@@ -1748,7 +1748,7 @@ def _representative_audio_url(v: Vowel) -> str | None:
     if rep is None or not rep.url:
         return None
     if is_local_url(rep.url):
-        return f'/audio/{storage_key_from_url(rep.url)}'
+        return f'{_prefix()}/audio/{storage_key_from_url(rep.url)}'
     return rep.url
 
 
@@ -1892,7 +1892,7 @@ def _consonant_audio_url(c: Consonant) -> str | None:
     if rep is None or not rep.url:
         return None
     if is_local_url(rep.url):
-        return f'/audio/{storage_key_from_url(rep.url)}'
+        return f'{_prefix()}/audio/{storage_key_from_url(rep.url)}'
     return rep.url
 
 
@@ -1945,7 +1945,7 @@ def list_sounds():
                     'phonemic': s.phonemic,
                     'languageId': s.language_id,
                     'hasFile': bool(storage_key) and store.exists(storage_key),
-                    'audioUrl': f'/audio/{storage_key}' if storage_key else s.url,
+                    'audioUrl': f'{_prefix()}/audio/{storage_key}' if storage_key else s.url,
                     'createdAt': s.created_at.isoformat() if s.created_at else None,
                     'updatedAt': s.updated_at.isoformat() if s.updated_at else None,
                 })
@@ -2049,13 +2049,50 @@ def put_setting(key):
 # Static frontend
 # ══════════════════════════════════════════════════════════════════════════════
 
+from werkzeug.utils import safe_join  # noqa: E402
+
+
+def _prefix() -> str:
+    """The path prefix this request arrived under, '' when mounted at the root.
+
+    Set by the reverse proxy (`header_up X-Forwarded-Prefix /phonexa` in
+    mjolnir's Caddyfile) alongside stripping that prefix off the path, so
+    every route below stays prefix-agnostic while the URLs we hand back to
+    the browser carry it. Same form stabbur's and smia's app.py use (D46).
+    Empty in standalone development — nothing to configure there.
+    """
+    return request.headers.get('X-Forwarded-Prefix', '').rstrip('/')
+
+
+def _serve_page(filename: str):
+    """Serve an HTML page with the prefix substituted in.
+
+    Only HTML is read-and-rewritten; every other asset streams through
+    send_from_directory untouched. The pages declare the prefix as a global
+    (`window.PHONEXA_PREFIX`) before loading any js/, which reads it back
+    once as API_BASE — see js/utils.js."""
+    path = Path(app.root_path) / filename
+    html = path.read_text(encoding='utf-8')
+    return html.replace('__PHONEXA_PREFIX__', _prefix()), 200, {
+        'Content-Type': 'text/html; charset=utf-8'
+    }
+
+
 @app.route('/')
 def serve_index():
-    return send_from_directory('.', 'index.html')
+    return _serve_page('index.html')
 
 
 @app.route('/<path:path>')
 def serve_static(path):
+    if path.endswith('.html'):
+        # send_from_directory's safe_join rules still apply: resolve the
+        # request against the app directory and refuse anything escaping it
+        # before reading the file ourselves.
+        safe = safe_join(app.root_path, path)
+        if safe is None or not os.path.isfile(safe):
+            abort(404)
+        return _serve_page(os.path.relpath(safe, app.root_path))
     return send_from_directory('.', path)
 
 

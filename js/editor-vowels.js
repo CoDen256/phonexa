@@ -42,7 +42,7 @@ function renderVowelCards(){
       state.langDraft.vowels.forEach((vv,idx)=>{
         if(vv.id==null||vv.sortOrder===idx)return;
         vv.sortOrder=idx;
-        fetch(`/api/v1/vowels/${vv.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({sortOrder:idx})});
+        fetch(`${API_BASE}/api/v1/vowels/${vv.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({sortOrder:idx})});
       });
       renderVowelCards(); refreshCharts();
     });
@@ -54,7 +54,7 @@ function renderVowelCards(){
       e.stopPropagation();
       if(!confirm(`Delete vowel "${v.symbols?.[0]}"? Any tokens assigned to it just become unassigned.`))return;
       if(v.id!=null){
-        const resp=await fetch(`/api/v1/vowels/${v.id}`,{method:'DELETE'});
+        const resp=await fetch(`${API_BASE}/api/v1/vowels/${v.id}`,{method:'DELETE'});
         if(!resp.ok){toast('Delete failed');return;}
       }
       state.langDraft.vowels.splice(i,1);

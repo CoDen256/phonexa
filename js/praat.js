@@ -95,7 +95,7 @@ function escapeAttr(str) { return String(str ?? '').replace(/"/g, '&quot;'); }
 
 async function loadLanguagesList() {
   try {
-    const resp = await fetch('/api/v1/languages');
+    const resp = await fetch(API_BASE + '/api/v1/languages');
     languagesList = resp.ok ? await resp.json() : [];
   } catch (e) { languagesList = []; }
   renderSections();   // refresh in case sections were already drawn before this resolved
@@ -104,7 +104,7 @@ async function loadLanguagesList() {
 async function loadVowelsList(languageId) {
   if (!languageId) { vowelsList = []; return; }
   try {
-    const resp = await fetch('/api/v1/vowels?languageId=' + languageId);
+    const resp = await fetch(API_BASE + '/api/v1/vowels?languageId=' + languageId);
     vowelsList = resp.ok ? await resp.json() : [];
   } catch (e) { vowelsList = []; }
   renderSections();
@@ -131,7 +131,7 @@ function renderExistingSamplesList() {
 }
 async function loadExistingSamplePicker() {
   try {
-    const resp = await fetch('/api/v1/sounds');
+    const resp = await fetch(API_BASE + '/api/v1/sounds');
     existingSamples = resp.ok ? await resp.json() : [];
   } catch (e) { existingSamples = []; }
   renderExistingSamplesList();
@@ -193,7 +193,7 @@ async function loadBuffer(buffer) {
 
 // ─── Sample mode: fetch the real Sample + its Tokens/analysis-history from the DB ──
 async function fetchDbSample() {
-  const resp = await fetch(`/api/v1/samples/${dbSampleId}`);
+  const resp = await fetch(`${API_BASE}/api/v1/samples/${dbSampleId}`);
   if (!resp.ok) throw new Error('Could not load sample #' + dbSampleId);
   dbSampleData = await resp.json();
   analysesHistory = dbSampleData.analyses || [];
@@ -212,7 +212,7 @@ async function trimAudioToSelection() {
     const form = new FormData();
     form.append('file', blob, 'trimmed.wav');
     form.append('trimStartMs', String(trimStartMs));
-    const resp = await fetch(`/api/v1/samples/${dbSampleId}/trim`, { method: 'POST', body: form });
+    const resp = await fetch(`${API_BASE}/api/v1/samples/${dbSampleId}/trim`, { method: 'POST', body: form });
     if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || 'HTTP ' + resp.status); }
     await fetchDbSample();
     // Cache-bust — same storage_key/URL as before the trim, so a cached
@@ -323,7 +323,7 @@ async function saveSection(s) {
 
 async function updateSavedSection(s) {
   try {
-    const resp = await fetch(`/api/v1/samples/${s.savedSampleId}`, {
+    const resp = await fetch(`${API_BASE}/api/v1/samples/${s.savedSampleId}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: s.text, phonemic: s.phonemic }),
     });
@@ -387,7 +387,7 @@ async function onAnalysisHistoryChange() {
   if (val == null) { await runAnalyze(); return; }   // back to the live preview
   setStatus('Loading session #' + val + '…');
   try {
-    const resp = await fetch(`/api/v1/samples/${dbSampleId}/analyses/${val}`);
+    const resp = await fetch(`${API_BASE}/api/v1/samples/${dbSampleId}/analyses/${val}`);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const full = await resp.json();
     analysisResult = { ...analysisResult, formants: full.formants, pitch: full.pitch };
@@ -412,7 +412,7 @@ async function saveCurrentAnalysis() {
       pitch_floor: +(document.getElementById('pPitchFloor')?.value) || 75,
       pitch_ceiling: +(document.getElementById('pPitchCeiling')?.value) || 600,
     };
-    const resp = await fetch(`/api/v1/samples/${dbSampleId}/analyze`, {
+    const resp = await fetch(`${API_BASE}/api/v1/samples/${dbSampleId}/analyze`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config }),
     });
     if (!resp.ok) {
@@ -486,11 +486,11 @@ async function saveToken(s) {
   try {
     let resp;
     if (s.dbTokenId) {
-      resp = await fetch(`/api/v1/tokens/${s.dbTokenId}`, {
+      resp = await fetch(`${API_BASE}/api/v1/tokens/${s.dbTokenId}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       });
     } else {
-      resp = await fetch(`/api/v1/samples/${dbSampleId}/tokens`, {
+      resp = await fetch(`${API_BASE}/api/v1/samples/${dbSampleId}/tokens`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       });
     }
@@ -509,7 +509,7 @@ async function deleteToken(s) {
   if (s.dbTokenId) {
     if (!confirm('Delete this saved token? This cannot be undone.')) return;
     try {
-      await fetch(`/api/v1/tokens/${s.dbTokenId}`, { method: 'DELETE' });
+      await fetch(`${API_BASE}/api/v1/tokens/${s.dbTokenId}`, { method: 'DELETE' });
     } catch (e) { setStatus('Delete failed: ' + e.message); return; }
   }
   sections = sections.filter(x => x.id !== s.id);
@@ -521,7 +521,7 @@ async function useViewedAnalysisForToken(s) {
   s.activeAnalysisId = viewedAnalysisId;
   try {
     if (s.dbTokenId) {
-      await fetch(`/api/v1/tokens/${s.dbTokenId}`, {
+      await fetch(`${API_BASE}/api/v1/tokens/${s.dbTokenId}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activeAnalysisId: viewedAnalysisId }),
       });
     }

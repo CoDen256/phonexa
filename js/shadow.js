@@ -483,7 +483,7 @@ const DEFAULT_TRANSCRIBE_PROVIDER = 'hf_whisper';
 async function getTranscribeSettings() {
   if (_transcribeSettingsCache) return _transcribeSettingsCache;
   const userId = await UserLib.getCurrentUserId();
-  const res = await fetch(`/api/v1/settings?userId=${userId}`);
+  const res = await fetch(`${API_BASE}/api/v1/settings?userId=${userId}`);
   const all = res.ok ? await res.json() : {};
   // Only `provider` is meaningful now. A pre-smia value ({backend, url, hfToken,
   // hfModel}) has no provider → default; its other fields are ignored.
@@ -500,7 +500,7 @@ async function checkTranscribeServer() {
   if (!el) return;
   const cfg = await getTranscribeSettings();
   try {
-    const r = await fetch('/transcribe/providers', { signal: AbortSignal.timeout(4000) });
+    const r = await fetch(API_BASE + '/transcribe/providers', { signal: AbortSignal.timeout(4000) });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) {
       el.textContent = `📝 Transcription (smia): ⚠ ${data.error || 'HTTP ' + r.status}`;
@@ -542,14 +542,14 @@ async function transcribeSentence(seg, row) {
     form.append('file', blob, 'slice.wav');
     form.append('provider', cfg.provider);
     if (lang) form.append('language', lang);
-    const resp = await fetch('/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(70000) });
+    const resp = await fetch(API_BASE + '/transcribe', { method: 'POST', body: form, signal: AbortSignal.timeout(70000) });
     const data = await resp.json().catch(() => ({}));
     if (!resp.ok) throw new Error(data.error || ('HTTP ' + resp.status));
     let text = data.text;
     text = text || '(no speech detected)';
     out.textContent = text;
     seg.text = text;
-    await fetch(`/api/v1/shadowing/segments/${seg.id}`, {
+    await fetch(`${API_BASE}/api/v1/shadowing/segments/${seg.id}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }),
     });
   } catch (e) {
@@ -655,7 +655,7 @@ async function refreshMediaList() {
   const el = document.getElementById('mediaList');
   if (!el) return;
   const userId = await UserLib.getCurrentUserId();
-  const media = await fetch(`/api/v1/shadowing/media?userId=${userId}`).then(r => r.ok ? r.json() : []).catch(() => []);
+  const media = await fetch(`${API_BASE}/api/v1/shadowing/media?userId=${userId}`).then(r => r.ok ? r.json() : []).catch(() => []);
   if (!media.length) { el.innerHTML = '<div class="cache-empty">No uploads yet</div>'; return; }
   el.innerHTML = media.map(m => `
     <div class="cache-item">
@@ -665,7 +665,7 @@ async function refreshMediaList() {
     </div>`).join('');
   el.querySelectorAll('.cache-forget').forEach(btn => btn.addEventListener('click', async () => {
     if (!confirm('Delete this upload\'s segments/progress? This cannot be undone.')) return;
-    await fetch(`/api/v1/shadowing/media/${btn.dataset.id}`, { method: 'DELETE' });
+    await fetch(`${API_BASE}/api/v1/shadowing/media/${btn.dataset.id}`, { method: 'DELETE' });
     if (currentMediaId === parseInt(btn.dataset.id, 10)) resetSession();
     refreshMediaList();
   }));
@@ -821,7 +821,7 @@ function renderSentenceRow(seg, siblings, i) {
       const ch = chapters.find(c => c.sentences.includes(seg));
       if (ch) hdr.textContent = chapterProgressText(ch);
     }
-    await fetch(`/api/v1/shadowing/segments/${seg.id}`, {
+    await fetch(`${API_BASE}/api/v1/shadowing/segments/${seg.id}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ done: seg.done }),
     });
   });
@@ -860,14 +860,14 @@ function armSplit(seg, canvas) {
   canvas.addEventListener('click', onClick, { once: true });
 }
 async function splitSegment(segId, atMs) {
-  const resp = await fetch(`/api/v1/shadowing/segments/${segId}/split`, {
+  const resp = await fetch(`${API_BASE}/api/v1/shadowing/segments/${segId}/split`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ atMs }),
   });
   if (!resp.ok) { const err = await resp.json().catch(() => ({})); setStatus('Split failed: ' + (err.error || '')); return; }
   await reloadCurrentMedia();
 }
 async function mergeSegments(idA, idB) {
-  const resp = await fetch('/api/v1/shadowing/segments/merge', {
+  const resp = await fetch(API_BASE + '/api/v1/shadowing/segments/merge', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ segmentIdA: idA, segmentIdB: idB }),
   });
   if (!resp.ok) { const err = await resp.json().catch(() => ({})); setStatus('Merge failed: ' + (err.error || '')); return; }
@@ -875,7 +875,7 @@ async function mergeSegments(idA, idB) {
 }
 async function reloadCurrentMedia() {
   const scrollY = window.scrollY;
-  const res = await fetch(`/api/v1/shadowing/media/${currentMediaId}`);
+  const res = await fetch(`${API_BASE}/api/v1/shadowing/media/${currentMediaId}`);
   currentMedia = await res.json();
   rebuildChapterTree();
   renderChapterList();
@@ -910,7 +910,7 @@ async function runClientSegmentation() {
     segmentsOut.push({ localId: nextLocalId++, kind: 'sentence', parentLocalId: parent ? parent.localId : null, orderIndex: se.index, startMs, endMs });
   });
 
-  const resp = await fetch(`/api/v1/shadowing/media/${currentMediaId}/segment`, {
+  const resp = await fetch(`${API_BASE}/api/v1/shadowing/media/${currentMediaId}/segment`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sentenceSilenceMs: sentenceMs, chapterSilenceMs: chapterMs, segments: segmentsOut }),
   });
@@ -1021,7 +1021,7 @@ async function handleFile(file) {
   setStatus('Checking for existing progress on this file…');
   currentFingerprint = await computeFingerprint(file);
   const userId = await UserLib.getCurrentUserId();
-  const resp = await fetch('/api/v1/shadowing/media/find-or-create', {
+  const resp = await fetch(API_BASE + '/api/v1/shadowing/media/find-or-create', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       userId, fingerprint: currentFingerprint, originalFilename: file.name, fileSizeBytes: file.size,
@@ -1061,7 +1061,7 @@ async function extractYoutubeAudio() {
   showProgress(true, 'Extracting audio from YouTube… this can take a while for longer videos.', true);
   setStatus('');
   try {
-    const resp = await fetch('/api/v1/youtube-extract', {
+    const resp = await fetch(API_BASE + '/api/v1/youtube-extract', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }),
       signal: AbortSignal.timeout(600000),
     });
@@ -1166,7 +1166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('deleteMediaBtn').addEventListener('click', async () => {
     if (!currentMediaId) return;
     if (!confirm('Delete this upload\'s segments/progress? This cannot be undone.')) return;
-    await fetch(`/api/v1/shadowing/media/${currentMediaId}`, { method: 'DELETE' });
+    await fetch(`${API_BASE}/api/v1/shadowing/media/${currentMediaId}`, { method: 'DELETE' });
     resetSession();
     refreshMediaList();
   });
@@ -1247,7 +1247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const deepLinkMediaId = parseInt(new URLSearchParams(location.search).get('mediaId'), 10);
   if (deepLinkMediaId) {
-    const res = await fetch(`/api/v1/shadowing/media/${deepLinkMediaId}`);
+    const res = await fetch(`${API_BASE}/api/v1/shadowing/media/${deepLinkMediaId}`);
     if (res.ok) {
       const media = await res.json();
       setStatus(`To continue "${media.originalFilename || 'this upload'}" (${media.sentenceCount} sentences, ${media.doneCount} done), choose or drop that same file below.`);

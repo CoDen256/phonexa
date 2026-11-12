@@ -75,7 +75,7 @@ function persistFilters() {
   _persistFiltersTimer = setTimeout(async () => {
     try {
       const userId = await UserLib.getCurrentUserId();
-      await fetch(`/api/v1/settings/ipaChartFilters?userId=${userId}`, {
+      await fetch(`${API_BASE}/api/v1/settings/ipaChartFilters?userId=${userId}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ value: serializeFilters() }),
       });
@@ -92,7 +92,7 @@ function persistFilters() {
 async function restoreFilters() {
   try {
     const userId = await UserLib.getCurrentUserId();
-    const res = await fetch(`/api/v1/settings?userId=${userId}`);
+    const res = await fetch(`${API_BASE}/api/v1/settings?userId=${userId}`);
     const saved = res.ok ? (await res.json()).ipaChartFilters : null;
     if (!saved) return;
     filters.languages = new Set(saved.languages || []);

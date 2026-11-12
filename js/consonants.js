@@ -56,8 +56,8 @@ function el(tag, attrs = {}, ...kids) {
 // ---------- Bootstrap ----------
 async function init() {
   const [languages, consonants] = await Promise.all([
-    fetch('/api/v1/languages').then(r => r.json()),
-    fetch('/api/v1/consonants').then(r => r.json()),
+    fetch(API_BASE + '/api/v1/languages').then(r => r.json()),
+    fetch(API_BASE + '/api/v1/consonants').then(r => r.json()),
   ]);
   const idToLang = {};
   languages.forEach(l => { idToLang[l.id] = l; });

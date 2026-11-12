@@ -42,6 +42,9 @@
 
 </div>
 
+<!-- Prefix injected by formanter.py (X-Forwarded-Prefix) — empty when mounted
+     at the root. Must precede every js/ tag: API_BASE is read at load time. -->
+<script>window.PHONEXA_PREFIX = "__PHONEXA_PREFIX__"; var API_BASE = window.PHONEXA_PREFIX || '';</script>
 <script src="js/user.js"></script>
 <script src="js/settings.js"></script>
 </body>

@@ -242,9 +242,9 @@ async function applyVowel() {
   try {
     let resp;
     if (v.id) {
-      resp = await fetch(`/api/v1/vowels/${v.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      resp = await fetch(`${API_BASE}/api/v1/vowels/${v.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     } else {
-      resp = await fetch(`/api/v1/languages/${state.langDraft.id}/vowels`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      resp = await fetch(`${API_BASE}/api/v1/languages/${state.langDraft.id}/vowels`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     }
     if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || 'HTTP ' + resp.status); }
     const saved = await resp.json();
@@ -267,7 +267,7 @@ async function deleteVowel() {
   if (!v?.id) return;
   if (!confirm(`Delete vowel "${v.symbols?.[0] || '?'}"? Any tokens assigned to it just become unassigned — they aren't deleted.`)) return;
   try {
-    const resp = await fetch(`/api/v1/vowels/${v.id}`, { method: 'DELETE' });
+    const resp = await fetch(`${API_BASE}/api/v1/vowels/${v.id}`, { method: 'DELETE' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     state.langDraft.vowels.splice(state.vowelIdx, 1);
     closeVowelEditor();

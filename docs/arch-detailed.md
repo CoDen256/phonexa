@@ -396,8 +396,9 @@ Pure JS WAV encoder. Writes a 44-byte RIFF/WAVE/fmt/data header then 16-bit sign
 ### Constants
 
 ```js
-const HTTP_URL   = '';   // relative — same origin as the page, works under any host/port
-const STREAM_URL = (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.host + '/stream';
+const HTTP_URL   = window.PHONEXA_PREFIX || '';   // same origin as the page; the
+                                                  // proxy prefix when mounted under one
+const STREAM_URL = (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.host + (window.PHONEXA_PREFIX || '') + '/stream';
 ```
 
 (These were previously documented as hardcoded `http://localhost:5050`/`ws://localhost:5051` — that was true of an earlier revision that ran the WebSocket on its own port via the standalone `websockets` library; today it's `flask-sock`'s `/stream` route on the same origin/port as everything else, hence the dynamic, relative construction above.)
