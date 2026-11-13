@@ -39,6 +39,12 @@
 - [x] 3.4 Convert the light files: `consonants.js`, `editor-vowels.js`,
       `filters.js`, `user.js` (2 each), `audio.js`, `ingest.js`, `practice.js`
       (1 each — `practice.js`'s is `/ping`)
+- [x] 3.5b **Cross-check the call sites against the server's ROUTE TABLE, not a
+      grep of path families.** Added 2026-11-13 after `/analyze-praat` 404'd in
+      the browser: the inventory was built by grepping for
+      `api/v1|audio|ping|transcribe|stream|frames|debug`, so a route outside
+      that list was never converted and never tested. `grep -oP "@app\\.route\\('\\K[^']+" formanter.py`
+      enumerates all 21; every one is now either prefixed or unreachable from js/
 - [x] 3.5 Grep for survivors:
       `grep -rn "['\"\`]/\(api/v1\|audio/\|ping\|transcribe\)" js/*.js` returns
       nothing outside the `API_BASE` definition
@@ -76,7 +82,10 @@
       empty there — **done: scratch Caddy on `tun-shared`, `handle_path /phonexa/*` +
       `header_up X-Forwarded-Prefix /phonexa`, with a catch-all mimicking mjolnir's.
       All 9 pages, assets, API, audio, `/ping`, `/transcribe/providers`, Shadowing
-      media/settings: 0 requests reached the catch-all**
+      media/settings: 0 requests reached the catch-all. **Incomplete, in hindsight:
+      curl exercised what page loads and list endpoints fetch, never what a user
+      ACTION triggers — `/analyze-praat` (spectrograms) only fires when an
+      analysis is run, so it 404'd for the first real user instead**
 - [x] 6.3 Audio under the prefix: a vowel's `representativeAudioUrl` and a
       sample's `audioUrl` are prefixed and fetch 200
 - [x] 6.4 `/stream` under the prefix: the mic tracker connects and F1/F2 frames

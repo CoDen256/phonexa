@@ -121,7 +121,10 @@ async function runPraatAnalysis(buffer, config, serverUrl) {
   const form = new FormData();
   form.append('file', blob, 'audio.wav');
   form.append('config', JSON.stringify(config || {}));
-  const resp = await fetch((serverUrl || '') + '/analyze-praat', { method: 'POST', body: form, signal: AbortSignal.timeout(30000) });
+  // serverUrl is an explicit override (no caller passes one today); API_BASE is
+  // the proxy prefix, '' at the root. Missed in the first prefix pass — the
+  // inventory grepped a list of path families and /analyze-praat was not in it.
+  const resp = await fetch((serverUrl || API_BASE) + '/analyze-praat', { method: 'POST', body: form, signal: AbortSignal.timeout(30000) });
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({}));
     throw new Error(err.error || ('HTTP ' + resp.status));
